@@ -26,6 +26,7 @@ AuditJS home: ...
 A result for a package that returns 'Queued request for vulnerability search' indicates that the package has been submitted at OSS Index for manual cross referencing with the NVD. Once a package is cross references it remains so, which means that over time we should approach complete coverage. The manual cross referencing will be done as quickly as possible. If you get 'queued' results we suggest you check again the following day -- you should have complete results by that time.
 
 Limitations
+-----------
 
 As this program depends on the OSS Index database, network access is required. Connection problems with OSS Index will result in an exception.
 
