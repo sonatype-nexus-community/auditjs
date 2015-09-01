@@ -112,7 +112,7 @@ function usage() {
 	console.log("indicates that the package has been submitted at OSS Index for manual");
 	console.log("cross referencing with the NVD. Once a package is cross references it");
 	console.log("remains so, which means that over time we should approach complete coverage.");
-	console.log("The manual cross referencing will be done as quickly as possible. If you get");
+	console.log("Cross referencing will be performed as quickly as possible. If you get");
 	console.log("'queued' results we suggest you check again the following day -- you should");
 	console.log("have complete results by that time.");
 	console.log();
@@ -146,6 +146,12 @@ function resultCallback(err, pkgName, version, details) {
 	}
 	else {
 		console.log(colors.bold(pkgName + " " + version));
+	}
+	if(err) {
+		console.log(colors.bold.red("Error running audit: " + err));
+		if(err.stack) {
+			console.log(err.stack);
+		}
 	}
 	if(details != undefined) {
 		for(var i = 0; i < details.length; i++) {

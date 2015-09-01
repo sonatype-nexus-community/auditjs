@@ -26,38 +26,45 @@
  */
 
 // Provides simplified REST API access
-var RestClient = require('node-rest-client').Client;
+var ossi = require('ossindexjs');
 
 // A simple control-flow library for node.JS
 var step = require('step');
 
-//RELEASE HOST
-//var ossindex = "https://ossindex.net";
-
-//DEBUG HOST
-var ossindex = "http://localhost:8080";
-
-// Instantiate the rest client
-var client = new RestClient();
-
 /**
  * EXPORT providing auditing of specified dependencies.
  * 
- * Results are sent to a callback(err, pkgName, version, details)
- * 
- *   pkgName is the name of the package
- *   version is the version of the package
- *   details is an OSS Index CVE object
- * 
- * @param dependencies A map of {package name: version} pairs.
- * @param callback Function to call on completion of each dependency
- *                 analysis. This call back has 4 arguments:
- *                 (err, pkgName, version, details).
  */
 module.exports = {
+		
+		/**
+		 * Results are sent to a callback(err, pkgName, version, details)
+		 * 
+		 *   pkgName is the name of the package
+		 *   version is the version of the package
+		 *   details is an OSS Index CVE object
+		 * 
+		 * @param dependencies A map of {package name: version} pairs.
+		 * @param callback Function to call on completion of each dependency
+		 *                 analysis. This call back has 4 arguments:
+		 *                 (err, pkgName, version, details).
+		 */
 		audit: function(dependencies, callback) {
 			var keys = Object.keys(dependencies);
 			auditPackages(dependencies, keys, callback);
+		},
+
+		/**
+		 * Audit a specific package
+		 * 
+		 * @param pkgName Name of the package to audit
+		 * @param versionRange Semantic version range for the package
+		 * @param callback Function to call on completion of each dependency
+		 *                 analysis. This call back has 4 arguments:
+		 *                 (err, pkgName, version, details).
+		 */
+		auditPackage: function(pkgName, versionRange, callback) {
+			auditPackageImpl(pkgName, versionRange, callback);
 		}
 };
 
@@ -75,7 +82,7 @@ auditPackages = function(dependencies, keys, callback) {
 		var version = dependencies[key];
 		
 		// Audit the specified package/version
-		auditPackage(key, version, function(err, details) {
+		auditPackageImpl(key, version, function(err, details) {
 			if(err) {
 				callback(err, key, version);
 			}
@@ -97,20 +104,20 @@ auditPackages = function(dependencies, keys, callback) {
  * @param version
  * @param callback
  */
-auditPackage = function(key, version, onComplete) {
+auditPackageImpl = function(key, version, onComplete) {
 	step(
 			// Get the SCM ID for the artifact with the specified package name/version
 			function() {
-				getOssIndexIds(key, version, this)
+				ossi.getNpmArtifact(key, version, this)
 			},
 			// Given an SCM ID, get known CPEs
-			function(err, artifactId, scmId) {
+			function(err, artifact) {
 				if(err) {
 					onComplete(err);
 					return;
 				}
-				if(scmId != undefined) {
-					getCpes(scmId, this);
+				if(artifact != undefined && artifact.scm_id != undefined) {
+					ossi.getScm(artifact.scm_id, this);
 				}
 				else
 				{
@@ -118,38 +125,49 @@ auditPackage = function(key, version, onComplete) {
 				}
 			},
 			// For a given list of CPEs, get the associated CVEs
-			function(err, cpes) {
+			function(err, scm) {
 				if(err) {
 					onComplete(err);
 					return;
 				}
-				var realCpes = [];
+				var cpeIds = [];
 				var statusCpes = [];
-				if(cpes != undefined) {
+				if(scm != undefined && scm.cpes != undefined) {
+					var cpes = scm.cpes;
 					for(var i = 0; i < cpes.length; i++) {
 						if(cpes[i].status != undefined) {
 							statusCpes.push(cpes[i]);
 						}
 						else {
-							realCpes.push(cpes[i]);
+							cpeIds.push(cpes[i].cpecode);
 						}
 					}
 				}
-				if(realCpes.length > 0) {
-					getCvesFromCpeList(realCpes, this);
+				if(cpeIds.length > 0) {
+					ossi.getCpeListDetails(cpeIds, this);
 				}
 				else {
 					onComplete(undefined, statusCpes);
 				}
 			},
 			// For the specified CVEs get the full CVE details
-			function(err, cves) {
+			function(err, cpes) {
 				if(err) {
 					onComplete(err);
 					return;
 				}
-				if(cves != undefined) {
-					getCveListDetails(cves, this);
+				if(cpes != undefined) {
+					// Collect all the CVE IDs from the CPE detail list
+					var cveIds = [];
+					for(var i = 0; i < cpes.length; i++) {
+						var cpe = cpes[i];
+						if(cpe.cves != undefined) {
+							for(var j = 0; j < cpe.cves.length; j++) {
+								cveIds.push(cpe.cves[j].id);
+							}
+						}
+					}
+					ossi.getCveListDetails(cveIds, this);
 				}
 				else {
 					onComplete();
@@ -165,126 +183,4 @@ auditPackage = function(key, version, onComplete) {
 				onComplete(undefined, cveDetails);
 			}			
 	);
-};
-
-/** OSS Index REST call
- * 
- * Request a list of artifacts matching the given package/version. Return the ID
- * of the best match.
- */
-function getOssIndexIds(name, version, callback) {
-	var query = ossindex + "/v1.0/search/artifact/npm/" + name + "/" + version;
-	client.get(query, function(data, response){
-		if(data != undefined && data.length > 0) {
-			callback(undefined, data[0].id, data[0].scm_id);
-		}
-		else {
-			callback();
-		}
-	});
-};
-
-/** OSS Index REST call
- * 
- * Request SCM data, getting the CPE information if it exists.
- */
-function getCpes(scmId, callback) {
-	client.get(ossindex + "/v1.0/scm/" + scmId, function(data, response){
-		if(data != undefined) {
-			callback(undefined, data.cpes);
-		}
-		else {
-			callback();
-		}
-	});
-};
-
-/** Request CVE information, gathering them into a list before calling
- * the callback.
- * 
- * @param cpeList
- * @param callback
- */
-function getCvesFromCpeList(cpeList, callback, results) {
-	if(results == undefined) {
-		results = [];
-	}
-	if(cpeList.length == 0) {
-		callback(undefined, results);
-	}
-	else {
-		var cpe = cpeList.shift();
-		getCves(cpe, function(err, cves) {
-			if(err) {
-				callback(err);
-			}
-			if(cves != undefined) {
-				results = results.concat(cves);
-			}
-			getCvesFromCpeList(cpeList, callback, results);
-		});
-	}
-}
-
-/**OSS Index REST call
- * 
- * Request SCM data, getting the CPE information if it exists.
- */
-function getCves(cpe, callback) {
-	client.get(cpe.cpe, function(data, response){
-		if(data != undefined) {
-			callback(undefined, data.cves);
-		}
-		else {
-			callback();
-		}
-	});
-};
-
-/**
- * Given a CVE list, get all of the details which includes but is not limited to
- *   o Score
- *   o Impact information
- *   o Affected CPEs with versions
- *   o Reference information
- */
-function getCveListDetails(cveList, callback, results) {
-	if(results == undefined) {
-		results = [];
-	}
-	if(cveList.length == 0) {
-		callback(undefined, results);
-	}
-	else {
-		var cve = cveList.shift();
-		getCveDetails(cve, function(err, details) {
-			if(err) {
-				callback(err);
-			}
-			if(details != undefined) {
-				results.push(details);
-			}
-			getCveListDetails(cveList, callback, results);
-		});
-	}
-};
-
-
-/** OSS Index REST call
- * 
- * Given a CVE list, get all of the details which includes but is not limited to
- *   o Score
- *   o Impact information
- *   o Affected CPEs with versions
- *   o Reference information
- */
-function getCveDetails(cve, callback) {
-	client.get(cve.cve, function(data, response){
-		if(data != undefined) {
-			callback(undefined, data);
-		}
-		else {
-			callback();
-		}
-	});
 };
