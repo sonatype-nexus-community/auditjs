@@ -52,61 +52,123 @@ var entities = new Entities();
 // Semantic version code
 var semver = require('semver');
 
+// Used to find installed packages and their dependencies
+var npm = require('npm');
+
 //Parse command line options. We currently support only one argument so
 // this is a little overkill. It allows for future growth.
 var program = require('commander');
 program
 .version(pkg.version)
-.arguments('<dir>')
-.action(function (dir) {
-	projectDir = dir;
+.option('-p --package [package.json]', 'Specific package.json file to audit')
+.option('-n --check-node', 'Do a vulnerability check on the installed node version')
+.action(function () {
+});
+
+program.on('--help', function(){
+	usage();
 });
 
 program.parse(process.argv);
 
-//Make sure the appropriate arguments were passed
-if (typeof projectDir === 'undefined') {
-	usage();
-	process.exit(1);
+// By default we run an audit against all installed packages and their
+// dependencies.
+if (!program["package"]) {
+	npm.load(function(err, npm) {
+	    npm.commands.ls([], true, function(err, data, lite) {
+			// Get a flat list of dependencies instead of a map.
+			var deps = getDependencyList(data.dependencies);
+			
+			if(program["check-node"]) {
+				// First check for node itself
+				auditor.auditScm("https://github.com/joyent/node.git", function(err, data) {
+					resultCallback(err, "nodejs", process.version, data);
+					
+					// Now check for the dependencies
+					auditor.auditPackages(deps, resultCallback);
+				});
+			}
+			else {
+				// Don't check node, only the dependencies
+				auditor.auditPackages(deps, resultCallback);
+			}
+	    });
+	});
 }
 
-//Load the target package file
-var filename = projectDir + "/package.json";
-var targetPkg = undefined;
-
-try {
-	// default encoding is utf8
-	encoding = 'utf8';
-
-	// read file synchroneously
-	var contents = fs.readFileSync(filename, encoding);
-
-	// parse contents as JSON
-	targetPkg = JSON.parse(contents);
-
-} catch (err) {
-	// an error occurred
-	throw err;	
+// If a package.json file is specified, do an audit on the dependencies
+// in the file only.
+else {
+	//Load the target package file
+	var filename = program["package"];
+	var targetPkg = undefined;
+	
+	try {
+		// default encoding is utf8
+		encoding = 'utf8';
+	
+		// read file synchroneously
+		var contents = fs.readFileSync(filename, encoding);
+	
+		// parse contents as JSON
+		targetPkg = JSON.parse(contents);
+	
+	} catch (err) {
+		// an error occurred
+		throw err;	
+	}
+	
+	// Call the auditor library passing the dependency list from the
+	// package.json file. The second argument is a callback that will
+	// print the results to the console.
+	if(targetPkg.dependencies != undefined) {
+		// Get a flat list of dependencies instead of a map.
+		var deps = getDependencyList(targetPkg.dependencies);
+		auditor.auditPackages(deps, resultCallback);
+	}
 }
 
-// Call the auditor library passing the dependency list from the
-// package.json file. The second argument is a callback that will
-// print the results to the console.
-if(targetPkg.dependencies != undefined) {
-	// get all identifiable package IDS
-	auditor.audit(targetPkg.dependencies, resultCallback);
+/** Recursively get a flat list of dependency objects. This is simpler for
+ * subsequent code to handle then a tree of dependencies.
+ * 
+ * @param depMap
+ * @returns A list of dependency objects
+ */
+function getDependencyList(depMap) {
+	var results = [];
+	var keys = Object.keys(depMap);
+	for(var i = 0; i < keys.length; i++) {
+		var name = keys[i];
+		
+		// The value of o depends on the type of structure we are passed
+		var o = depMap[name];
+		if(o.version) {
+			results.push({"name": name, "version": o.version});
+			if(o.dependencies) {
+				var deps = getDependencyList(o.dependencies);
+				if(deps != undefined) {
+					results = results.concat(deps);
+				}
+			}
+		}
+		else {
+			results.push({"name": name, "version": o});
+		}
+	}
+	return results;
 }
 
+/** Help text
+ * 
+ * @returns
+ */
 function usage() {
-	console.log(colors.bold("Usage: node audit.js <dir>"));
+	console.log("Audit installed packages and their dependencies to identify known");
+	console.log("vulnerabilities as specified in the National Vulnerability Database (NVD) found");
+	console.log("here: " + colors.bold.blue("https://nvd.nist.gov/"));
 	console.log();
-	console.log(colors.bold("  dir") + ": Directory containing package.json file");
-	console.log();
-	console.log("Audit the dependencies defined in a specified package.json file to identify");
-	console.log("known vulnerabilities as specified in the National Vulnerability Database");
-	console.log("(NVD) found here: " + colors.bold.blue("https://nvd.nist.gov/"));
-	console.log();
-	console.log("AuditJS home: ...");
+	console.log("If a package.json file is specified as an argument, only the dependencies in");
+	console.log("the package file will be audited.");
 	console.log();
 	console.log("A result for a package that returns 'Queued request for vulnerability search'");
 	console.log("indicates that the package has been submitted at OSS Index for manual");

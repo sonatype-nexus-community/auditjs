@@ -1,7 +1,8 @@
 AuditJS
 =======
 
-Audits an NPM package.json file to identify known vulnerabilities.
+Audits an NPM package.json file using the [OSS Index REST API](https://ossinex.net)
+to identify known vulnerabilities.
 
 ![Screenshot](screenshot/screenshot.png)
 
@@ -13,15 +14,24 @@ npm install auditjs
 
 Usage
 -----
-```
-Usage: node audit.js <dir>
 
-  dir: Directory containing package.json file
+```
+  Usage: audit [options]
+
+  Options:
+
+    -h, --help                   output usage information
+    -V, --version                output the version number
+    -p --package [package.json]  Specific package.json file to audit
+    -n --check-node              Do a vulnerability check on the installed node version
 ```
 
-Audit the dependencies defined in a specified package.json file to identify
-known vulnerabilities as specified in the National Vulnerability Database
-(NVD) found here: https://nvd.nist.gov/
+Audit installed packages and their dependencies to identify known
+vulnerabilities as specified in the National Vulnerability Database (NVD) found
+here: https://nvd.nist.gov/
+
+If a package.json file is specified as an argument, only the dependencies in
+the package file will be audited.
 
 A result for a package that returns 'Queued request for vulnerability search'
 indicates that the package has been submitted at OSS Index for manual

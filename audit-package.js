@@ -37,7 +37,7 @@ var step = require('step');
  */
 module.exports = {
 		
-		/**
+		/** Audit a list of packages
 		 * Results are sent to a callback(err, pkgName, version, details)
 		 * 
 		 *   pkgName is the name of the package
@@ -49,9 +49,8 @@ module.exports = {
 		 *                 analysis. This call back has 4 arguments:
 		 *                 (err, pkgName, version, details).
 		 */
-		audit: function(dependencies, callback) {
-			var keys = Object.keys(dependencies);
-			auditPackages(dependencies, keys, callback);
+		auditPackages: function(depList, callback) {
+			auditPackagesImpl(depList, callback);
 		},
 
 		/**
@@ -65,33 +64,41 @@ module.exports = {
 		 */
 		auditPackage: function(pkgName, versionRange, callback) {
 			auditPackageImpl(pkgName, versionRange, callback);
+		},
+		
+		/**
+		 * Audit an SCM with the supplied URI. For example
+		 * `https://github.com/joyent/node.git`
+		 */
+		auditScm: function(uri, callback) {
+			auditScmImpl(uri, callback);
 		}
 };
 
-/** Iterate through the keys, running against each dependency. Get the audit
- * results for each.
+/** Iterate through the dependencies. Get the audit results for each.
  * 
  * @param dependencies
  * @param keys
  */
-auditPackages = function(dependencies, keys, callback) {
+auditPackagesImpl = function(depList, callback) {
 	// Iterate through the list until there are no elements left.
-	if(keys.length != 0) {
+	if(depList.length != 0) {
 		// Get the current package/version
-		var key = keys.shift();
-		var version = dependencies[key];
+		var dep = depList.shift();
+		var name = dep.name;
+		var version = dep.version;
 		
 		// Audit the specified package/version
-		auditPackageImpl(key, version, function(err, details) {
+		auditPackageImpl(name, version, function(err, details) {
 			if(err) {
-				callback(err, key, version);
+				callback(err, name, version);
 			}
 			else {
 				// Send the results to the result callback
-				callback(undefined, key, version, details);
+				callback(undefined, name, version, details);
 				
 				// Iterate to the next element in the list
-				auditPackages(dependencies, keys, callback);
+				auditPackagesImpl(depList, callback);
 			}
 		});
 	}
@@ -106,11 +113,11 @@ auditPackages = function(dependencies, keys, callback) {
  */
 auditPackageImpl = function(key, version, onComplete) {
 	step(
-			// Get the SCM ID for the artifact with the specified package name/version
+			// Get the artifact with the specified package name/version
 			function() {
 				ossi.getNpmArtifact(key, version, this)
 			},
-			// Given an SCM ID, get known CPEs
+			// Given an artifact, get the related SCM
 			function(err, artifact) {
 				if(err) {
 					onComplete(err);
@@ -124,7 +131,7 @@ auditPackageImpl = function(key, version, onComplete) {
 					onComplete(undefined, [{"status": "unknown"}]);
 				}
 			},
-			// For a given list of CPEs, get the associated CVEs
+			// For a given SCM, get the associated CPEs
 			function(err, scm) {
 				if(err) {
 					onComplete(err);
@@ -151,6 +158,94 @@ auditPackageImpl = function(key, version, onComplete) {
 				}
 			},
 			// For the specified CVEs get the full CVE details
+			function(err, cpes) {
+				if(err) {
+					onComplete(err);
+					return;
+				}
+				if(cpes != undefined) {
+					// Collect all the CVE IDs from the CPE detail list
+					var cveIds = [];
+					for(var i = 0; i < cpes.length; i++) {
+						var cpe = cpes[i];
+						if(cpe.cves != undefined) {
+							for(var j = 0; j < cpe.cves.length; j++) {
+								cveIds.push(cpe.cves[j].id);
+							}
+						}
+					}
+					ossi.getCveListDetails(cveIds, this);
+				}
+				else {
+					onComplete();
+				}
+			},
+			// Return the accumulated results
+			function(err, cveDetails) {
+				if(err) {
+					onComplete(err);
+					return;
+				}
+
+				onComplete(undefined, cveDetails);
+			}			
+	);
+};
+
+/** Run an audit pass against a specific SCM version. This involves
+ * multiple access to the OSS Index JSON API.
+ * 
+ * @param key
+ * @param version
+ * @param callback
+ */
+auditScmImpl = function(uri, onComplete) {
+	step(
+			// Get the SCM ID for the artifact with the specified package name/version
+			function() {
+				ossi.getScmByUri(uri, this)
+			},
+			// Given a small SCM object (from search) request the full details
+			function(err, scmShortForm) {
+				if(err) {
+					onComplete(err);
+					return;
+				}
+				if(scmShortForm != undefined && scmShortForm.length == 1 && scmShortForm[0].id != undefined) {
+					ossi.getScm(scmShortForm[0].id, this);
+				}
+				else
+				{
+					onComplete(undefined, [{"status": "unknown"}]);
+				}
+			},
+			// For a given SCM, get the associated CPEs
+			function(err, scm) {
+				if(err) {
+					onComplete(err);
+					return;
+				}
+				var cpeIds = [];
+				var statusCpes = [];
+				if(scm != undefined && scm.cpes != undefined) {
+					var cpes = scm.cpes;
+					for(var i = 0; i < cpes.length; i++) {
+						if(cpes[i].status != undefined) {
+							statusCpes.push(cpes[i]);
+						}
+						else {
+							cpeIds.push(cpes[i].cpecode);
+						}
+					}
+				}
+				if(cpeIds.length > 0) {
+					ossi.getCpeListDetails(cpeIds, this);
+				}
+				else {
+					onComplete(undefined, statusCpes);
+				}
+			},
+			// For the specified CPEs get the full CVE details
 			function(err, cpes) {
 				if(err) {
 					onComplete(err);
