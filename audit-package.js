@@ -150,7 +150,7 @@ auditPackageBatchImpl = function(names, versions, onResult, onComplete) {
 				// There are various possible reasons why this may happen.
 				var artifactIds = [];
 				for(var i = 0; i < names.length; i++) {
-					if(artifacts[i] == undefined) {
+					if(artifacts[i] == undefined || artifacts[i].scm_id == undefined) {
 						onResult(err, names[i], versions[i], [{"status": "unknown"}]);
 						names.splice(i, 1);
 						versions.splice(i, 1);
@@ -225,9 +225,14 @@ auditScms = function(names, versions, scms, onResult, onComplete) {
 	}
 	
 	// Anything left by this point have CPEs
-	auditScmList(names, versions, scms, onResult, function(err){
+	if(scms.length > 0) {
+		auditScmList(names, versions, scms, onResult, function(err){
+			onComplete();
+		});
+	}
+	else {
 		onComplete();
-	});
+	}
 };
 
 /** Given arrays of names/versions/scms which we *know* have valid CPE
