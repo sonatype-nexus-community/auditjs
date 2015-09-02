@@ -132,6 +132,7 @@ else {
 	if(targetPkg.dependencies != undefined) {
 		// Get a flat list of dependencies instead of a map.
 		var deps = getDependencyList(targetPkg.dependencies);
+		expectedAudits = deps.length;
 		auditor.auditPackages(deps, resultCallback);
 	}
 }
@@ -221,17 +222,20 @@ function resultCallback(err, pkgName, version, details) {
 	// Add one to audits completed
 	actualAudits++;
 	
-	console.log("------------------------------------------------------------");
 	// If we KNOW a possibly used version is vulnerable then highlight the
 	// title in red.
 	var myVulnerabilities = getValidVulnerabilities(version, details);
 	
 	if(myVulnerabilities.length > 0) {
-		console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + version + " [VULNERABLE]"));
+		console.log("------------------------------------------------------------");
+		console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + version + "  [VULNERABLE]") + "   ");
 	}
 	else {
-		console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold(pkgName + " " + version));
+		if(program.verbose) console.log("------------------------------------------------------------");
+		process.stdout.write("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold(pkgName + " " + version) + "   ");
+		if(program.verbose) console.log();
 	}
+	
 	if(err) {
 		console.log(colors.bold.red("Error running audit: " + err));
 		if(err.stack) {
@@ -255,7 +259,7 @@ function resultCallback(err, pkgName, version, details) {
 			else if(detail.status == "unknown") {
 				console.log(colors.grey("Unknown source for package"));
 			}
-			console.log();
+			if(program.verbose) console.log();
 		}
 		
 		// Vulnerabilities found
@@ -306,7 +310,11 @@ function resultCallback(err, pkgName, version, details) {
 					console.log(colors.bold("Affected versions") + ": unspecified");
 				}
 			}
-			console.log();
+			
+			if(program.verbose || myVulnerabilities.length > 0) {
+				console.log("------------------------------------------------------------");
+				console.log();
+			}
 		}
 	}
 }

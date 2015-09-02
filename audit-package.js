@@ -32,6 +32,12 @@ var ossi = require('ossindexjs');
 var step = require('step');
 
 /**
+ * Queries should be done in batches when possible to reduce the hits on the
+ * server.
+ */
+var BATCH_SIZE = 20;
+
+/**
  * EXPORT providing auditing of specified dependencies.
  * 
  */
@@ -76,6 +82,7 @@ module.exports = {
 };
 
 /** Iterate through the dependencies. Get the audit results for each.
+ * We will be running the audit in batches for speed reasons.
  * 
  * @param dependencies
  * @param keys
@@ -83,117 +90,241 @@ module.exports = {
 auditPackagesImpl = function(depList, callback) {
 	// Iterate through the list until there are no elements left.
 	if(depList.length != 0) {
-		// Get the current package/version
-		var dep = depList.shift();
-		var name = dep.name;
-		var version = dep.version;
+		
+		var names = [];
+		var versions = [];
+		for(var i = 0; i < BATCH_SIZE; i++)
+		{
+			// Get the current package/version
+			var dep = depList.shift();
+			names.push(dep.name);
+			versions.push(dep.version);
+			
+			if(depList.length == 0) break;
+		}
 		
 		// Audit the specified package/version
-		auditPackageImpl(name, version, function(err, details) {
-			if(err) {
-				callback(err, name, version);
-			}
-			else {
-				// Send the results to the result callback
-				callback(undefined, name, version, details);
-				
-				// Iterate to the next element in the list
-				auditPackagesImpl(depList, callback);
-			}
+		auditPackageBatchImpl(names, versions, callback, function(err) {
+			// Iterate to the next element in the list
+			auditPackagesImpl(depList, callback);
 		});
 	}
 };
 
 /** Run an audit pass against a specific package version. This involves
- * multiple access to the OSS Index JSON API.
+ * multiple accesses to the OSS Index JSON API.
  * 
- * @param key
- * @param version
- * @param callback
+ * The code is rather complex because we are performing batch queries to
+ * the database and we need to retain knowledge about which package
+ * name/versions belong with which result data.
+ * 
+ * @param names Array of package names to run against
+ * @param versions Array of versions for the packages
+ * @param onResult Where to send results
+ * @param onComplete What to call when a job is done
  */
-auditPackageImpl = function(key, version, onComplete) {
+auditPackageBatchImpl = function(names, versions, onResult, onComplete) {
 	step(
-			// Get the artifact with the specified package name/version
+			// Get the artifacts with the specified package name/version
+			// We do this first query in batch.
 			function() {
-				ossi.getNpmArtifact(key, version, this)
+				ossi.getNpmArtifacts(names, versions, this)
 			},
 			// Given an artifact, get the related SCM
-			function(err, artifact) {
+			function(err, artifacts) {
 				if(err) {
+					onResult(err, names[0], versions[0]);
 					onComplete(err);
 					return;
 				}
-				if(artifact != undefined && artifact.scm_id != undefined) {
-					ossi.getScm(artifact.scm_id, this);
-				}
-				else
-				{
-					onComplete(undefined, [{"status": "unknown"}]);
-				}
-			},
-			// For a given SCM, get the associated CPEs
-			function(err, scm) {
-				if(err) {
-					onComplete(err);
+				
+				// If there is a mismatch with the array lengths then something has
+				// surely gone wrong. We could try to repair the data, but for now
+				// lets bail out on the query.
+				if(artifacts.length != names.length) {
+					onResult("Unexpected results. Artifact mismatch with supplied names");
 					return;
 				}
-				var cpeIds = [];
-				var statusCpes = [];
-				if(scm != undefined && scm.cpes != undefined) {
-					var cpes = scm.cpes;
-					for(var i = 0; i < cpes.length; i++) {
-						if(cpes[i].status != undefined) {
-							statusCpes.push(cpes[i]);
-						}
-						else {
-							cpeIds.push(cpes[i].cpecode);
-						}
+				
+				// Filter out the artifacts which we cannot find in the OSS Index.
+				// There are various possible reasons why this may happen.
+				var artifactIds = [];
+				for(var i = 0; i < names.length; i++) {
+					if(artifacts[i] == undefined) {
+						onResult(err, names[i], versions[i], [{"status": "unknown"}]);
+						names.splice(i, 1);
+						versions.splice(i, 1);
+						artifacts.splice(i, 1);
+						i--;
+					}
+					else {
+						artifactIds.push(artifacts[i].scm_id);
 					}
 				}
-				if(cpeIds.length > 0) {
-					ossi.getCpeListDetails(cpeIds, this);
+				
+				// If there are any good artifactIds left, then try to get the matching
+				// SCMs.
+				if(artifactIds.length > 0) {
+					ossi.getScms(artifactIds, this);
 				}
-				else {
-					onComplete(undefined, statusCpes);
-				}
-			},
-			// For the specified CVEs get the full CVE details
-			function(err, cpes) {
-				if(err) {
-					onComplete(err);
-					return;
-				}
-				if(cpes != undefined) {
-					// Collect all the CVE IDs from the CPE detail list
-					var cveIds = [];
-					for(var i = 0; i < cpes.length; i++) {
-						var cpe = cpes[i];
-						if(cpe.cves != undefined) {
-							for(var j = 0; j < cpe.cves.length; j++) {
-								cveIds.push(cpe.cves[j].id);
-							}
-						}
-					}
-					ossi.getCveListDetails(cveIds, this);
-				}
+				
+				// Otherwise bail out.
 				else {
 					onComplete();
 				}
 			},
-			// Return the accumulated results
-			function(err, cveDetails) {
+			// Get all of the SCM data and run an audit on them
+			function(err, scms) {
 				if(err) {
+					onResult(err, names[0], versions[0]);
 					onComplete(err);
 					return;
 				}
-
-				onComplete(undefined, cveDetails);
-			}			
+				
+				// Now that we have SCMs batch more becomes more difficult.
+				// It also becomes much less important as the number of
+				// packages with known vulnerabilities are small compared to
+				// the total number.
+				auditScms(names, versions, scms, onResult, function(err) {
+					onComplete();
+				});
+			}
 	);
 };
 
+/** Given a list of names, versions, and matching SCMs, figure out
+ * which ones can be audited further (have valid CPE codes). Ones
+ * that do not either have a status of some sort or will be given
+ * one.
+ * 
+ * @param names
+ * @param versions
+ * @param scms
+ * @param onResult
+ * @param onComplete
+ */
+auditScms = function(names, versions, scms, onResult, onComplete) {
+	// Figure out which SCMs have CPEs. This will be a small subset.
+	// The remainder are sent as results.
+	for(var i = 0; i < scms.length; i++) {
+		
+		// Figure out the status
+		var status = undefined;
+		if(scms[i].cpes == undefined) status = "pending";
+		else if(scms[i].cpes.length == 0) status = "pending";
+		else if(scms[i].cpes[0].status != undefined) status = scms[i].cpes[0].status;
+		
+		// Does this SCM has a known status?
+		if(status != undefined) {
+			onResult(undefined, names[i], versions[i], [{"status": status}]);
+			names.splice(i, 1);
+			versions.splice(i, 1);
+			scms.splice(i, 1);
+			i--;
+		}
+	}
+	
+	// Anything left by this point have CPEs
+	auditScmList(names, versions, scms, onResult, function(err){
+		onComplete();
+	});
+};
+
+/** Given arrays of names/versions/scms which we *know* have valid CPE
+ * codes, find any related CVEs and related interesting information.
+ * 
+ * @param names
+ * @param versions
+ * @param scms
+ * @param onResult
+ * @param onComplete
+ */
+auditScmList = function(names, versions, scms, onResult, onComplete) {
+	if(names.length == 0) {
+		onComplete();
+		return;
+	}
+	
+	var name = names.shift();
+	var version = versions.shift();
+	var scm = scms.shift();
+	
+	auditScm(name, version, scm, onResult, function(err) {
+		auditScmList(names, versions, scms, onResult, onComplete);
+	});
+};
+
+/** Given a single SCM which we KNOW has valid CPE code(s), find any
+ * related CVEs and related interesting information.
+ * 
+ * @param name
+ * @param version
+ * @param scm
+ * @param onResult
+ * @param onComplete
+ */
+auditScm = function(name, version, scm, onResult, onComplete) {
+	step(
+			// First get a list of CPE IDs and perform a query to get the details
+		function() {
+			var cpeIds = [];
+			var cpes = scm.cpes;
+			for(var i = 0; i < cpes.length; i++) {
+				cpeIds.push(cpes[i].cpecode);
+			}
+			ossi.getCpeListDetails(cpeIds, this);
+		},
+		// For the CPEs we can get a list of CVEs which we will then
+		// get further details for.
+		function(err, cpes) {
+			if(err) {
+				onResult(err, name, version);
+				onComplete(err);
+				return;
+			}
+			if(cpes != undefined) {
+				// Collect all the CVE IDs from the CPE detail list
+				var cveIds = [];
+				for(var i = 0; i < cpes.length; i++) {
+					var cpe = cpes[i];
+					if(cpe.cves != undefined) {
+						for(var j = 0; j < cpe.cves.length; j++) {
+							cveIds.push(cpe.cves[j].id);
+						}
+					}
+				}
+				ossi.getCves(cveIds, this);
+			}
+			else {
+				onResult(undefined, name, version);
+				onComplete();
+			}
+		},
+		// Now that we have full CVE results, send them to the results callback.
+		// Finally some real data!
+		function(err, cveDetails) {
+			if(err) {
+				onResult(err, name, version);
+				onComplete(err);
+				return;
+			}
+			
+			onResult(undefined, name, version, cveDetails);
+			onComplete();
+		}
+	);
+};
+
+
 /** Run an audit pass against a specific SCM version. This involves
  * multiple access to the OSS Index JSON API.
+ * 
+ * Note that this is a simple case where there is no batch processing
+ * going on. It is reasonable to run things this way if there are not
+ * too many queries going on.
+ * 
+ * If we will be calling this A LOT then we will want to start batching
+ * the queries.
  * 
  * @param key
  * @param version
@@ -212,7 +343,7 @@ auditScmImpl = function(uri, onComplete) {
 					return;
 				}
 				if(scmShortForm != undefined && scmShortForm.length == 1 && scmShortForm[0].id != undefined) {
-					ossi.getScm(scmShortForm[0].id, this);
+					ossi.getScms([scmShortForm[0].id], this);
 				}
 				else
 				{
@@ -220,15 +351,15 @@ auditScmImpl = function(uri, onComplete) {
 				}
 			},
 			// For a given SCM, get the associated CPEs
-			function(err, scm) {
+			function(err, scms) {
 				if(err) {
 					onComplete(err);
 					return;
 				}
 				var cpeIds = [];
 				var statusCpes = [];
-				if(scm != undefined && scm.cpes != undefined) {
-					var cpes = scm.cpes;
+				if(scms != undefined && scms.length == 1 && scms[0].cpes != undefined) {
+					var cpes = scms[0].cpes;
 					for(var i = 0; i < cpes.length; i++) {
 						if(cpes[i].status != undefined) {
 							statusCpes.push(cpes[i]);
@@ -262,7 +393,7 @@ auditScmImpl = function(uri, onComplete) {
 							}
 						}
 					}
-					ossi.getCveListDetails(cveIds, this);
+					ossi.getCves(cveIds, this);
 				}
 				else {
 					onComplete();
