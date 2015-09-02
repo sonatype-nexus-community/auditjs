@@ -55,13 +55,23 @@ var semver = require('semver');
 // Used to find installed packages and their dependencies
 var npm = require('npm');
 
+/**
+ * Total number of dependencies being audited. This will be set
+ * before starting the audit.
+ */
+var expectedAudits = 0;
+
+/**
+ * Total number of dependencies audited so far.
+ */
+var actualAudits = 0;
+
 //Parse command line options. We currently support only one argument so
 // this is a little overkill. It allows for future growth.
 var program = require('commander');
 program
 .version(pkg.version)
 .option('-p --package [package.json]', 'Specific package.json file to audit')
-.option('-n --check-node', 'Do a vulnerability check against nodejs')
 .option('-v --verbose', 'Print all vulnerabilities')
 .action(function () {
 });
@@ -80,19 +90,16 @@ if (!program["package"]) {
 			// Get a flat list of dependencies instead of a map.
 			var deps = getDependencyList(data.dependencies);
 			
-			if(program.checkNode) {
-				// First check for node itself
-				auditor.auditScm("https://github.com/joyent/node.git", function(err, data) {
-					resultCallback(err, "nodejs", process.version, data);
-					
-					// Now check for the dependencies
-					auditor.auditPackages(deps, resultCallback);
-				});
-			}
-			else {
-				// Don't check node, only the dependencies
+			// Set the number of expected audits
+			expectedAudits = deps.length + 1; // +1 for hardcoded nodejs test
+
+			// First check for node itself
+			auditor.auditScm("https://github.com/joyent/node.git", function(err, data) {
+				resultCallback(err, "nodejs", process.version, data);
+				
+				// Now check for the dependencies
 				auditor.auditPackages(deps, resultCallback);
-			}
+			});
 	    });
 	});
 }
@@ -137,6 +144,7 @@ else {
  */
 function getDependencyList(depMap) {
 	var results = [];
+	var lookup = {};
 	var keys = Object.keys(depMap);
 	for(var i = 0; i < keys.length; i++) {
 		var name = keys[i];
@@ -144,16 +152,25 @@ function getDependencyList(depMap) {
 		// The value of o depends on the type of structure we are passed
 		var o = depMap[name];
 		if(o.version) {
-			results.push({"name": name, "version": o.version});
-			if(o.dependencies) {
-				var deps = getDependencyList(o.dependencies);
-				if(deps != undefined) {
-					results = results.concat(deps);
+			// Only add a dependency once
+			if(lookup[name + o.version] == undefined) {
+				lookup[name + o.version] = true;
+				results.push({"name": name, "version": o.version});
+				if(o.dependencies) {
+					var deps = getDependencyList(o.dependencies);
+					
+					if(deps != undefined) {
+						results = results.concat(deps);
+					}
 				}
 			}
 		}
 		else {
-			results.push({"name": name, "version": o});
+			// Only add a dependency once
+			if(lookup[name + o] == undefined) {
+				lookup[name + o] = true;
+				results.push({"name": name, "version": o});
+			}
 		}
 	}
 	return results;
@@ -201,16 +218,19 @@ function usage() {
  * @returns
  */
 function resultCallback(err, pkgName, version, details) {
+	// Add one to audits completed
+	actualAudits++;
+	
 	console.log("------------------------------------------------------------");
 	// If we KNOW a possibly used version is vulnerable then highlight the
 	// title in red.
 	var myVulnerabilities = getValidVulnerabilities(version, details);
 	
 	if(myVulnerabilities.length > 0) {
-		console.log(colors.bold.red(pkgName + " " + version + " [VULNERABLE]"));
+		console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + version + " [VULNERABLE]"));
 	}
 	else {
-		console.log(colors.bold(pkgName + " " + version));
+		console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold(pkgName + " " + version));
 	}
 	if(err) {
 		console.log(colors.bold.red("Error running audit: " + err));
@@ -220,7 +240,11 @@ function resultCallback(err, pkgName, version, details) {
 	}
 	if(details != undefined) {
 		// Special statuses
-		if(details.length == 1 && details[0].status != undefined) {
+		if(details.length == 0) {
+			// FIXME: We should always get some response. This should not happen.
+			console.log(colors.grey("No known vulnerabilities..."));
+		}
+		else if(details.length == 1 && details[0].status != undefined) {
 			var detail = details[0];
 			if(detail.status == "pending") {
 				console.log(colors.cyan("Queued request for vulnerability search"));
