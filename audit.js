@@ -61,7 +61,8 @@ var program = require('commander');
 program
 .version(pkg.version)
 .option('-p --package [package.json]', 'Specific package.json file to audit')
-.option('-n --check-node', 'Do a vulnerability check on the installed node version')
+.option('-n --check-node', 'Do a vulnerability check against nodejs')
+.option('-v --verbose', 'Print all vulnerabilities')
 .action(function () {
 });
 
@@ -79,7 +80,7 @@ if (!program["package"]) {
 			// Get a flat list of dependencies instead of a map.
 			var deps = getDependencyList(data.dependencies);
 			
-			if(program["check-node"]) {
+			if(program.checkNode) {
 				// First check for node itself
 				auditor.auditScm("https://github.com/joyent/node.git", function(err, data) {
 					resultCallback(err, "nodejs", process.version, data);
@@ -203,7 +204,9 @@ function resultCallback(err, pkgName, version, details) {
 	console.log("------------------------------------------------------------");
 	// If we KNOW a possibly used version is vulnerable then highlight the
 	// title in red.
-	if(isVulnerable(version, details)) {
+	var myVulnerabilities = getValidVulnerabilities(version, details);
+	
+	if(myVulnerabilities.length > 0) {
 		console.log(colors.bold.red(pkgName + " " + version + " [VULNERABLE]"));
 	}
 	else {
@@ -216,8 +219,9 @@ function resultCallback(err, pkgName, version, details) {
 		}
 	}
 	if(details != undefined) {
-		for(var i = 0; i < details.length; i++) {
-			var detail = details[i];
+		// Special statuses
+		if(details.length == 1 && details[0].status != undefined) {
+			var detail = details[0];
 			if(detail.status == "pending") {
 				console.log(colors.cyan("Queued request for vulnerability search"));
 			}
@@ -227,8 +231,26 @@ function resultCallback(err, pkgName, version, details) {
 			else if(detail.status == "unknown") {
 				console.log(colors.grey("Unknown source for package"));
 			}
-			else {
+			console.log();
+		}
+		
+		// Vulnerabilities found
+		else {
+			// Status line
+			console.log(details.length + " known vulnerabilities, " + myVulnerabilities.length + " affecting installed version");
+
+			// By default only print known problems
+			var printTheseProblems = myVulnerabilities;
+			
+			// If verbose, print all problems
+			if(program.verbose) {
+				printTheseProblems = details;
+			}
+		
+			// We have decided that these are the problems worth mentioning.
+			for(var i = 0; i < printTheseProblems.length; i++) {
 				console.log();
+				var detail = printTheseProblems[i];
 				var title = detail["cve-id"] + " [http://ossindex.net/resource/cve/" + detail.id + "]";
 				//console.log("  + " + JSON.stringify(detail));
 				if(detail.score < 4) {
@@ -260,18 +282,19 @@ function resultCallback(err, pkgName, version, details) {
 					console.log(colors.bold("Affected versions") + ": unspecified");
 				}
 			}
+			console.log();
 		}
-		console.log();
 	}
 }
 
-/** If we KNOW a possibly used version is vulnerable then return true.
+/** Return list of vulnerabilities found to affect this version
  * 
  * @param range A version range as defined by semantic versioning
  * @param details The OSS Index CVE details object
  * @returns
  */
-function isVulnerable(range, details) {
+function getValidVulnerabilities(range, details) {
+	var results = [];
 	if(details != undefined) {
 		for(var i = 0; i < details.length; i++) {
 			var detail = details[i];
@@ -281,7 +304,8 @@ function isVulnerable(range, details) {
 					var version = getSemanticVersion(detail.cpes[j].version);
 					try {
 						if(semver.satisfies(version, range)) {
-							return true;
+							results.push(detail);
+							break;
 						}
 					}
 					catch(err) {
@@ -292,7 +316,7 @@ function isVulnerable(range, details) {
 			}
 		}
 	}
-	return false;
+	return results;
 }
 
 /** Try and force a version to match that expected by semantic versioning.
