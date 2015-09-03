@@ -26,10 +26,13 @@
  */
 
 // Provides simplified REST API access
-var ossi = require('ossindexjs');
+var ossi = require('./ossindex.js');
 
 // A simple control-flow library for node.JS
 var step = require('step');
+
+// Used in package version comparisons
+var semver = require('semver');
 
 /**
  * Queries should be done in batches when possible to reduce the hits on the
@@ -138,11 +141,16 @@ auditPackageBatchImpl = function(names, versions, onResult, onComplete) {
 					return;
 				}
 				
+				// The artifacts that are returned will match the request ranges.
+				// Some package ranges may not be matched at all. We need to get
+				// an array with the best matches for each of the names/versions.
+				var artifactMatches = getArtifactMatches(names, artifacts);
+				
 				// If there is a mismatch with the array lengths then something has
 				// surely gone wrong. We could try to repair the data, but for now
 				// lets bail out on the query.
-				if(artifacts.length != names.length) {
-					onResult("Unexpected results. Artifact mismatch with supplied names");
+				if(artifactMatches.length != names.length) {
+					onResult("Unexpected results. Artifact mismatch with supplied names [" + artifacts.length + "," + names.length + "]");
 					return;
 				}
 				
@@ -150,15 +158,15 @@ auditPackageBatchImpl = function(names, versions, onResult, onComplete) {
 				// There are various possible reasons why this may happen.
 				var artifactIds = [];
 				for(var i = 0; i < names.length; i++) {
-					if(artifacts[i] == undefined || artifacts[i].scm_id == undefined) {
+					if(artifactMatches[i] == undefined || artifactMatches[i].scm_id == undefined) {
 						onResult(err, names[i], versions[i], [{"status": "unknown"}]);
 						names.splice(i, 1);
 						versions.splice(i, 1);
-						artifacts.splice(i, 1);
+						artifactMatches.splice(i, 1);
 						i--;
 					}
 					else {
-						artifactIds.push(artifacts[i].scm_id);
+						artifactIds.push(artifactMatches[i].scm_id);
 					}
 				}
 				
@@ -191,6 +199,47 @@ auditPackageBatchImpl = function(names, versions, onResult, onComplete) {
 			}
 	);
 };
+
+/** The artifacts that are returned will match the request ranges.
+ * Some package ranges may not be matched at all. We need to get
+ * an array with the best matches for each of the names/versions.
+ */
+getArtifactMatches = function(names, artifacts) {
+	var results = [];
+	var j = 0;
+	for(var i = 0; i < names.length; i++) {
+		var name = names[i];
+		
+		// Find the most recent artifact matching the name
+		var artifact = artifacts[j];
+		var matchedArtifact = undefined;
+		while(artifact.search[1] == name) {
+			if(matchedArtifact == undefined) {
+				matchedArtifact = artifact;
+			}
+			else {
+				// Keep the most recent artifact
+				if(semver.gt(artifact.version, matchedArtifact.version)) {
+					matchedArtifact = artifact;
+				}
+			}
+			j++;
+			if(j < artifacts.length) {
+				artifact = artifacts[j];
+			}
+			else {
+				break;
+			}
+		}
+		
+		// Keep the best matches as well as nulls
+		results.push(matchedArtifact);
+		
+		// If we are out of artifacts then bail here
+		if(j >= artifacts.length) break;
+	}
+	return results;
+}
 
 /** Given a list of names, versions, and matching SCMs, figure out
  * which ones can be audited further (have valid CPE codes). Ones
