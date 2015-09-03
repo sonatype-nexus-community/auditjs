@@ -26,7 +26,7 @@
  */
 
 // Provides simplified REST API access
-var ossi = require('./ossindex.js');
+var ossi = require('ossindexjs');
 
 // A simple control-flow library for node.JS
 var step = require('step');
@@ -38,7 +38,7 @@ var semver = require('semver');
  * Queries should be done in batches when possible to reduce the hits on the
  * server.
  */
-var BATCH_SIZE = 20;
+var BATCH_SIZE = 100;
 
 /**
  * EXPORT providing auditing of specified dependencies.
