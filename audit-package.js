@@ -129,6 +129,15 @@ auditPackageBatchImpl = function(pkgs, onResult, onComplete) {
 			// Get the artifacts with the specified package name/version
 			// We do this first query in batch.
 			function() {
+				// For the sake of auditing we want to find whether there
+				// are more recent versions of artifacts available. For that
+				// reason make sure we are looking for *ranges*
+				for(var i = 0; i < pkgs.length; i++) {
+					if(semver.valid(pkgs[i].version)) {
+						pkgs[i].remVersion = pkgs[i].version;
+						pkgs[i].version = ">=" + pkgs[i].version;
+					}
+				}
 				ossi.getNpmArtifacts(pkgs, this)
 			},
 			// Given an artifact, get the related SCM
@@ -139,6 +148,13 @@ auditPackageBatchImpl = function(pkgs, onResult, onComplete) {
 					return;
 				}
 				
+				// Restore the version information if it was changed
+				for(var i = 0; i < pkgs.length; i++) {
+					if(pkgs[i].remVersion) {
+						pkgs[i].version = pkgs[i].remVersion;
+					}
+				}
+
 				// The artifacts that are returned will match the request ranges.
 				// Some package ranges may not be matched at all. We need to get
 				// an array with the best matches for each of the names/versions.
