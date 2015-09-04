@@ -2,7 +2,7 @@ AuditJS
 =======
 
 Audits an NPM package.json file using the [OSS Index REST API](https://ossinex.net)
-to identify known vulnerabilities.
+to identify known vulnerabilities and outdated package versions.
 
 ![Screenshot](screenshot/screenshot.png)
 
@@ -23,7 +23,7 @@ Usage
     -h, --help                   output usage information
     -V, --version                output the version number
     -p --package [package.json]  Specific package.json file to audit
-    -n --check-node              Do a vulnerability check on the installed node version
+    -v --verbose                 Print all vulnerabilities
 ```
 
 Audit installed packages and their dependencies to identify known
@@ -32,6 +32,14 @@ here: https://nvd.nist.gov/
 
 If a package.json file is specified as an argument, only the dependencies in
 the package file will be audited.
+
+If a vulnerability is found to be affecting an installed library the package
+header will be highlighted in red and information about the pertinent
+vulnerability will be printed to the screen.
+
+If a newer version of a package is available the installed version will be
+highlighted in yellow followed by the newest available version, surrounded by
+square brackets.
 
 A result for a package that returns 'Queued request for vulnerability search'
 indicates that the package has been submitted at OSS Index for manual
