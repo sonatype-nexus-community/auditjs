@@ -1,6 +1,6 @@
 {
   "name": "auditjs",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Audit dependencies to identify known vulnerabilities and maintenance problems",
   "main": "audit-package.js",
   "bin": "./audit.js",
@@ -24,9 +24,9 @@
     "colors": "^1.1.2",
     "commander": "^2.8.1",
     "html-entities": "^1.1.3",
-    "ossindexjs": "0.0.4",
+    "ossindexjs": "^0.0.5",
     "jquery": "^1.6.0",
     "semver": "^5.0.1",
-    "step": "0.0.6"
+    "step": "^0.0.6"
   }
 }

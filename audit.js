@@ -95,7 +95,7 @@ if (!program["package"]) {
 
 			// First check for node itself
 			auditor.auditScm("https://github.com/joyent/node.git", function(err, data) {
-				resultCallback(err, "nodejs", process.version, data);
+				resultCallback(err, {name: "nodejs", version: process.version}, data);
 				
 				// Now check for the dependencies
 				auditor.auditPackages(deps, resultCallback);
@@ -218,7 +218,30 @@ function usage() {
  * @param details
  * @returns
  */
-function resultCallback(err, pkgName, version, details) {
+function resultCallback(err, pkg, details) {
+	if(pkg) {
+		pkgName = pkg.name;
+		version = pkg.version;
+		versionString = version;
+		bestVersion = undefined;
+		
+		// If there is an artifact
+		if(pkg.artifact) {
+			bestVersion = pkg.artifact.version;
+			// Only specify a "warning" if the expected version is *not* a range.
+			if(semver.valid(version)) {
+				if(bestVersion != version) {
+					versionString = colors.bold.yellow(version) + " [" + bestVersion + "]";
+				}
+				else {
+					versionString = colors.bold.green(version)
+				}
+			}
+			else {
+				versionString = version + " [" + bestVersion + "]";
+			}
+		}
+	}
 	// Add one to audits completed
 	actualAudits++;
 	
@@ -228,11 +251,11 @@ function resultCallback(err, pkgName, version, details) {
 	
 	if(myVulnerabilities.length > 0) {
 		console.log("------------------------------------------------------------");
-		console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + version + "  [VULNERABLE]") + "   ");
+		console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ");
 	}
 	else {
 		if(program.verbose) console.log("------------------------------------------------------------");
-		process.stdout.write("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold(pkgName + " " + version) + "   ");
+		process.stdout.write("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold(pkgName + " " + versionString) + "   ");
 		if(program.verbose) console.log();
 	}
 	
@@ -241,7 +264,35 @@ function resultCallback(err, pkgName, version, details) {
 		if(err.stack) {
 			console.log(err.stack);
 		}
+		return;
 	}
+
+	// Print information about the expected and actual package versions
+	if(program.verbose) {
+		if(semver.valid(version)) {
+			if(bestVersion) {
+				if(bestVersion != version) {
+					console.log(colors.bold.yellow("Installed version: " + version));
+				}
+				else {
+					console.log("Installed version: " + version);
+				}
+				console.log("Available version: " + bestVersion);
+			}
+			else {
+				console.log("Installed version: " + version);
+			}
+		}
+		else {
+			console.log("Requested range: " + version);
+			if(bestVersion) {
+				console.log("Available version: " + bestVersion);
+			}			
+		}
+	}
+	
+	// The details will specify whether there are vulnerabilities and what the
+	// vulnerability status is.
 	if(details != undefined) {
 		// Special statuses
 		if(details.length == 0) {
@@ -317,6 +368,8 @@ function resultCallback(err, pkgName, version, details) {
 			}
 		}
 	}
+	
+	//console.log(JSON.stringify(pkg.artifact));
 }
 
 /** Return list of vulnerabilities found to affect this version

@@ -26,7 +26,7 @@
  */
 
 // Provides simplified REST API access
-var ossi = require('ossindexjs');
+var ossi = require('./ossindex.js');
 
 // A simple control-flow library for node.JS
 var step = require('step');
@@ -72,7 +72,7 @@ module.exports = {
 		 *                 (err, pkgName, version, details).
 		 */
 		auditPackage: function(pkgName, versionRange, callback) {
-			auditPackageImpl(pkgName, versionRange, callback);
+			auditPackageImpl({name: pkgName, version: versionRange}, callback);
 		},
 		
 		/**
@@ -94,20 +94,18 @@ auditPackagesImpl = function(depList, callback) {
 	// Iterate through the list until there are no elements left.
 	if(depList.length != 0) {
 		
-		var names = [];
-		var versions = [];
+		var pkgs = [];
 		for(var i = 0; i < BATCH_SIZE; i++)
 		{
 			// Get the current package/version
 			var dep = depList.shift();
-			names.push(dep.name);
-			versions.push(dep.version);
+			pkgs.push({name: dep.name, version: dep.version})
 			
 			if(depList.length == 0) break;
 		}
 		
 		// Audit the specified package/version
-		auditPackageBatchImpl(names, versions, callback, function(err) {
+		auditPackageBatchImpl(pkgs, callback, function(err) {
 			// Iterate to the next element in the list
 			auditPackagesImpl(depList, callback);
 		});
@@ -126,17 +124,17 @@ auditPackagesImpl = function(depList, callback) {
  * @param onResult Where to send results
  * @param onComplete What to call when a job is done
  */
-auditPackageBatchImpl = function(names, versions, onResult, onComplete) {
+auditPackageBatchImpl = function(pkgs, onResult, onComplete) {
 	step(
 			// Get the artifacts with the specified package name/version
 			// We do this first query in batch.
 			function() {
-				ossi.getNpmArtifacts(names, versions, this)
+				ossi.getNpmArtifacts(pkgs, this)
 			},
 			// Given an artifact, get the related SCM
 			function(err, artifacts) {
 				if(err) {
-					onResult(err, names[0], versions[0]);
+					onResult(err, pkgs[0]);
 					onComplete(err);
 					return;
 				}
@@ -144,36 +142,36 @@ auditPackageBatchImpl = function(names, versions, onResult, onComplete) {
 				// The artifacts that are returned will match the request ranges.
 				// Some package ranges may not be matched at all. We need to get
 				// an array with the best matches for each of the names/versions.
-				var artifactMatches = getArtifactMatches(names, artifacts);
+				var artifactMatches = getArtifactMatches(pkgs, artifacts);
 				
 				// If there is a mismatch with the array lengths then something has
 				// surely gone wrong. We could try to repair the data, but for now
 				// lets bail out on the query.
-				if(artifactMatches.length != names.length) {
+				if(artifactMatches.length != pkgs.length) {
 					onResult("Unexpected results. Artifact mismatch with supplied names [" + artifacts.length + "," + names.length + "]");
 					return;
 				}
 				
 				// Filter out the artifacts which we cannot find in the OSS Index.
 				// There are various possible reasons why this may happen.
-				var artifactIds = [];
-				for(var i = 0; i < names.length; i++) {
+				var scmIds = [];
+				for(var i = 0; i < pkgs.length; i++) {
 					if(artifactMatches[i] == undefined || artifactMatches[i].scm_id == undefined) {
-						onResult(err, names[i], versions[i], [{"status": "unknown"}]);
-						names.splice(i, 1);
-						versions.splice(i, 1);
+						onResult(err, pkgs[i], [{"status": "unknown"}]);
+						pkgs.splice(i, 1);
 						artifactMatches.splice(i, 1);
 						i--;
 					}
 					else {
-						artifactIds.push(artifactMatches[i].scm_id);
+						pkgs[i].artifact = artifactMatches[i];
+						scmIds.push(artifactMatches[i].scm_id);
 					}
 				}
 				
 				// If there are any good artifactIds left, then try to get the matching
 				// SCMs.
-				if(artifactIds.length > 0) {
-					ossi.getScms(artifactIds, this);
+				if(scmIds.length > 0) {
+					ossi.getScms(scmIds, this);
 				}
 				
 				// Otherwise bail out.
@@ -184,7 +182,7 @@ auditPackageBatchImpl = function(names, versions, onResult, onComplete) {
 			// Get all of the SCM data and run an audit on them
 			function(err, scms) {
 				if(err) {
-					onResult(err, names[0], versions[0]);
+					onResult(err, pkgs[0]);
 					onComplete(err);
 					return;
 				}
@@ -193,7 +191,7 @@ auditPackageBatchImpl = function(names, versions, onResult, onComplete) {
 				// It also becomes much less important as the number of
 				// packages with known vulnerabilities are small compared to
 				// the total number.
-				auditScms(names, versions, scms, onResult, function(err) {
+				auditScms(pkgs, scms, onResult, function(err) {
 					onComplete();
 				});
 			}
@@ -204,11 +202,11 @@ auditPackageBatchImpl = function(names, versions, onResult, onComplete) {
  * Some package ranges may not be matched at all. We need to get
  * an array with the best matches for each of the names/versions.
  */
-getArtifactMatches = function(names, artifacts) {
+getArtifactMatches = function(pkgs, artifacts) {
 	var results = [];
 	var j = 0;
-	for(var i = 0; i < names.length; i++) {
-		var name = names[i];
+	for(var i = 0; i < pkgs.length; i++) {
+		var name = pkgs[i].name;
 		
 		// Find the most recent artifact matching the name
 		var artifact = artifacts[j];
@@ -252,11 +250,11 @@ getArtifactMatches = function(names, artifacts) {
  * @param onResult
  * @param onComplete
  */
-auditScms = function(names, versions, scms, onResult, onComplete) {
+auditScms = function(pkgs, scms, onResult, onComplete) {
 	// Figure out which SCMs have CPEs. This will be a small subset.
 	// The remainder are sent as results.
 	for(var i = 0; i < scms.length; i++) {
-		
+		pkgs[i].scm = scms[i];
 		// Figure out the status
 		var status = undefined;
 		if(scms[i].cpes == undefined) status = "pending";
@@ -265,17 +263,16 @@ auditScms = function(names, versions, scms, onResult, onComplete) {
 		
 		// Does this SCM has a known status?
 		if(status != undefined) {
-			onResult(undefined, names[i], versions[i], [{"status": status}]);
-			names.splice(i, 1);
-			versions.splice(i, 1);
+			onResult(undefined, pkgs[i], [{"status": status}]);
+			pkgs.splice(i, 1);
 			scms.splice(i, 1);
 			i--;
 		}
 	}
 	
 	// Anything left by this point have CPEs
-	if(scms.length > 0) {
-		auditScmList(names, versions, scms, onResult, function(err){
+	if(pkgs.length > 0) {
+		auditScmList(pkgs, onResult, function(err){
 			onComplete();
 		});
 	}
@@ -293,18 +290,16 @@ auditScms = function(names, versions, scms, onResult, onComplete) {
  * @param onResult
  * @param onComplete
  */
-auditScmList = function(names, versions, scms, onResult, onComplete) {
-	if(names.length == 0) {
+auditScmList = function(pkgs, onResult, onComplete) {
+	if(pkgs.length == 0) {
 		onComplete();
 		return;
 	}
 	
-	var name = names.shift();
-	var version = versions.shift();
-	var scm = scms.shift();
+	var pkg = pkgs.shift();
 	
-	auditScm(name, version, scm, onResult, function(err) {
-		auditScmList(names, versions, scms, onResult, onComplete);
+	auditScm(pkg, onResult, function(err) {
+		auditScmList(pkgs, onResult, onComplete);
 	});
 };
 
@@ -317,7 +312,10 @@ auditScmList = function(names, versions, scms, onResult, onComplete) {
  * @param onResult
  * @param onComplete
  */
-auditScm = function(name, version, scm, onResult, onComplete) {
+auditScm = function(pkg, onResult, onComplete) {
+	var name = pkg.name;
+	var version = pkg.version;
+	var scm = pkg.scm;
 	step(
 			// First get a list of CPE IDs and perform a query to get the details
 		function() {
@@ -332,10 +330,11 @@ auditScm = function(name, version, scm, onResult, onComplete) {
 		// get further details for.
 		function(err, cpes) {
 			if(err) {
-				onResult(err, name, version);
+				onResult(err, pkg);
 				onComplete(err);
 				return;
 			}
+			pkg.cpes = cpes;
 			if(cpes != undefined) {
 				// Collect all the CVE IDs from the CPE detail list
 				var cveIds = [];
@@ -350,7 +349,7 @@ auditScm = function(name, version, scm, onResult, onComplete) {
 				ossi.getCves(cveIds, this);
 			}
 			else {
-				onResult(undefined, name, version);
+				onResult(undefined, pkg);
 				onComplete();
 			}
 		},
@@ -358,12 +357,12 @@ auditScm = function(name, version, scm, onResult, onComplete) {
 		// Finally some real data!
 		function(err, cveDetails) {
 			if(err) {
-				onResult(err, name, version);
+				onResult(err, pkg);
 				onComplete(err);
 				return;
 			}
-			
-			onResult(undefined, name, version, cveDetails);
+			pkg.cves = cveDetails;
+			onResult(undefined, pkg, cveDetails);
 			onComplete();
 		}
 	);
