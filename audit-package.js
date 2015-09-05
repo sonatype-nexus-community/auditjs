@@ -164,7 +164,7 @@ auditPackageBatchImpl = function(pkgs, onResult, onComplete) {
 				// surely gone wrong. We could try to repair the data, but for now
 				// lets bail out on the query.
 				if(artifactMatches.length != pkgs.length) {
-					onResult("Unexpected results. Artifact mismatch with supplied names [" + artifacts.length + "," + names.length + "]");
+					onResult("Unexpected results. Artifact mismatch with supplied names [" + artifacts.length + "," + pkgs.length + "]");
 					return;
 				}
 				
@@ -225,9 +225,10 @@ getArtifactMatches = function(pkgs, artifacts) {
 		var name = pkgs[i].name;
 		
 		// Find the most recent artifact matching the name
-		var artifact = artifacts[j];
+		var artifact = undefined;
+		if(j < artifacts.length) artifact = artifacts[j];
 		var matchedArtifact = undefined;
-		while(artifact.search[1] == name) {
+		while(artifact != undefined && artifact.search[1] == name) {
 			if(matchedArtifact == undefined) {
 				matchedArtifact = artifact;
 			}
@@ -251,6 +252,9 @@ getArtifactMatches = function(pkgs, artifacts) {
 		
 		// If we are out of artifacts then bail here
 		if(j >= artifacts.length) break;
+	}
+	for(var i = results.length; i < pkgs.length; i++) {
+		results.push(undefined);
 	}
 	return results;
 }

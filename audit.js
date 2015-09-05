@@ -219,6 +219,10 @@ function usage() {
  * @returns
  */
 function resultCallback(err, pkg, details) {
+	pkgName = undefined;
+	version = undefined;
+	versionString = undefined;
+	bestVersion = undefined;
 	if(pkg) {
 		pkgName = pkg.name;
 		version = pkg.version;
