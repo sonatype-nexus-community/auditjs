@@ -26,7 +26,7 @@
  */
 
 // Provides simplified REST API access
-var ossi = require('./ossindex.js');
+var ossi = require('ossindexjs');
 
 // A simple control-flow library for node.JS
 var step = require('step');

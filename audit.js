@@ -71,6 +71,11 @@ var actualAudits = 0;
  */
 var dependencies = [];
 
+/**
+ * Node SCM for performing auto check on Node and removing from 'extra' dep list.
+ */
+var NODE_URI = "https://github.com/joyent/node.git";
+
 //Parse command line options. We currently support only one argument so
 // this is a little overkill. It allows for future growth.
 var program = require('commander');
@@ -99,7 +104,7 @@ if (!program["package"]) {
 			expectedAudits = deps.length + 1; // +1 for hardcoded nodejs test
 
 			// First check for node itself
-			auditor.auditScm("https://github.com/joyent/node.git", function(err, data) {
+			auditor.auditScm(NODE_URI, function(err, data) {
 				resultCallback(err, {name: "nodejs", version: process.version}, data);
 				
 				// Now check for the dependencies
@@ -369,26 +374,34 @@ function resultCallback(err, pkg, details) {
 		}
 	}
 	
-	if(program.verbose) {
-		// Print dependencies
-		if(pkg.scm != undefined) {
-			if(pkg.scm.requires != undefined && pkg.scm.requires.length > 0) {
-				var reqs = pkg.scm.requires;
-				// Clear 'NPM' dependencies. We are only interested in extra dependencies
-				var nonNodeDeps = [];
-				if(reqs.length > 1 || reqs[0].context != "npm") {
-					nonNodeDeps.push(reqs[0]);
-				}
-				if(nonNodeDeps > 0)
-				{
-					console.log("EXTRA DEPENDENCIES:");
-					for(var i = 0; i < nonNodeDeps.length; i++) {
-						console.log("  " + nonNodeDeps[i].name + " [" + nonNodeDeps[i].uri + "]");
+	// Print dependencies
+	if(pkg.scm != undefined) {
+		if(pkg.scm.requires != undefined && pkg.scm.requires.length > 0) {
+			var reqs = pkg.scm.requires;
+			// Clear 'node.js' dependencies. We already know that one.
+			var nonNodeDeps = [];
+			if(reqs != undefined) {
+				for(var i = 0; i < reqs.length; i++) {
+					if(reqs[i].uri != NODE_URI) {
+						nonNodeDeps.push(reqs[i]);
 					}
 				}
 			}
+			
+			// Print any known dependencies
+			if(nonNodeDeps.length > 0)
+			{
+				if(program.verbose) {
+					console.log("EXTRA DEPENDENCIES:");
+				}
+				for(var i = 0; i < nonNodeDeps.length; i++) {
+					console.log(colors.bold("    [+] ") + nonNodeDeps[i].name + " [" + nonNodeDeps[i].uri + "]");
+				}
+			}
 		}
+	}
 		
+	if(program.verbose) {
 		// Print a separator
 		console.log("------------------------------------------------------------");
 		console.log();
