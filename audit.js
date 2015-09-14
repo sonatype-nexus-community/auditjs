@@ -66,6 +66,11 @@ var expectedAudits = 0;
  */
 var actualAudits = 0;
 
+/**
+ * List of dependencies that we want to check after the package checks.
+ */
+var dependencies = [];
+
 //Parse command line options. We currently support only one argument so
 // this is a little overkill. It allows for future growth.
 var program = require('commander');
@@ -183,35 +188,23 @@ function getDependencyList(depMap) {
  */
 function usage() {
 	console.log("Audit installed packages and their dependencies to identify known");
-	console.log("vulnerabilities as specified in the National Vulnerability Database (NVD) found");
-	console.log("here: " + colors.bold.blue("https://nvd.nist.gov/"));
+	console.log("vulnerabilities.");
 	console.log();
 	console.log("If a package.json file is specified as an argument, only the dependencies in");
 	console.log("the package file will be audited.");
-	console.log();
-	console.log("A result for a package that returns 'Queued request for vulnerability search'");
-	console.log("indicates that the package has been submitted at OSS Index for manual");
-	console.log("cross referencing with the NVD. Once a package is cross references it");
-	console.log("remains so, which means that over time we should approach complete coverage.");
-	console.log("Cross referencing will be performed as quickly as possible. If you get");
-	console.log("'queued' results we suggest you check again the following day -- you should");
-	console.log("have complete results by that time.");
 	console.log();
 	console.log(colors.bold.yellow("Limitations"));
 	console.log();
 	console.log("As this program depends on the OSS Index database, network access is");
 	console.log("required. Connection problems with OSS Index will result in an exception.");
 	console.log();
-	console.log("The current version of AuditJS only reports on top level dependencies.");
-	console.log("If feedback indicates people are interested we will extend auditing to run");
-	console.log("against the full dependency tree");
-	console.log();
-	console.log("The NVD does not always indicate all (or any) of the affected versions");
-	console.log("it is best to read the vulnerability text itself to determine whether");
-	console.log("any particular version is known to be vulnerable.")
+	console.log("The vulnerabilities do not always indicate all (or any) of the affected");
+	console.log("versions it is best to read the vulnerability text itself to determine");
+	console.log("whether any particular version is known to be vulnerable.");
 }
 
-/** Write the audit results.
+/** Write the audit results. This handles both standard and verbose
+ * mode.
  * 
  * @param pkgName
  * @param version
@@ -305,10 +298,7 @@ function resultCallback(err, pkg, details) {
 		}
 		else if(details.length == 1 && details[0].status != undefined) {
 			var detail = details[0];
-			if(detail.status == "pending") {
-				console.log(colors.cyan("Queued request for vulnerability search"));
-			}
-			else if(detail.status == "none") {
+			if(detail.status == "pending" || detail.status == "none") {
 				console.log(colors.grey("No known vulnerabilities"));
 			}
 			else if(detail.status == "unknown") {
@@ -333,31 +323,35 @@ function resultCallback(err, pkg, details) {
 			// We have decided that these are the problems worth mentioning.
 			for(var i = 0; i < printTheseProblems.length; i++) {
 				console.log();
+				
 				var detail = printTheseProblems[i];
-				var title = detail["cve-id"] + " [http://ossindex.net/resource/cve/" + detail.id + "]";
-				//console.log("  + " + JSON.stringify(detail));
-				if(detail.score < 4) {
-					console.log(colors.yellow.bold(title));
+				
+				// Are these CVEs?
+				if(detail["cve-id"] != undefined) {
+					var title = detail["cve-id"] + " [http://ossindex.net/resource/cve/" + detail.id + "]";
+					//console.log("  + " + JSON.stringify(detail));
+					if(detail.score < 4) {
+						console.log(colors.yellow.bold(title));
+					}
+					else if(detail.score < 7) {
+						console.log(colors.yellow.bold(title));
+					}
+					else {
+						console.log(colors.red.bold(title));
+					}
+					if(detail.summary != undefined) console.log(entities.decode(detail.summary));
+					console.log();
 				}
-				else if(detail.score < 7) {
-					console.log(colors.yellow.bold(title));
-				}
+				// Not CVEs. We have only basic information.
 				else {
-					console.log(colors.red.bold(title));
+					console.log(colors.red.bold("[" + detail.uri + "]"));
 				}
-				console.log(entities.decode(detail.summary));
-				console.log();
-				if(detail.cpes != null && detail.cpes.length > 0) {
-					var vers = "";
-					for(var j = 0; j < detail.cpes.length; j++) {
-						if(j > 0) vers += ", ";
-						var ver = detail.cpes[j].version;
-						if(ver == undefined || ver.trim() == "") {
-							vers += "unspecified";
-						}
-						else {
-							vers += ver;
-						}
+				
+				// Print affected version information if available
+				if(detail.versions != null && detail.versions.length > 0) {
+					var vers = detail.versions.join(",");
+					if(vers.trim() == "") {
+						vers = "unspecified";
 					}
 					console.log(colors.bold("Affected versions") + ": " + vers);
 				}
@@ -366,46 +360,106 @@ function resultCallback(err, pkg, details) {
 				}
 			}
 			
-			if(program.verbose || myVulnerabilities.length > 0) {
+			// If we printed vulnerabilities we need a separator. Don't bother
+			// if we are running in verbose mode since one will be printed later.
+			if(!program.verbose && myVulnerabilities.length > 0) {
 				console.log("------------------------------------------------------------");
 				console.log();
 			}
 		}
 	}
 	
+	if(program.verbose) {
+		// Print dependencies
+		if(pkg.scm != undefined) {
+			if(pkg.scm.requires != undefined && pkg.scm.requires.length > 0) {
+				var reqs = pkg.scm.requires;
+				// Clear 'NPM' dependencies. We are only interested in extra dependencies
+				var nonNodeDeps = [];
+				if(reqs.length > 1 || reqs[0].context != "npm") {
+					nonNodeDeps.push(reqs[0]);
+				}
+				if(nonNodeDeps > 0)
+				{
+					console.log("EXTRA DEPENDENCIES:");
+					for(var i = 0; i < nonNodeDeps.length; i++) {
+						console.log("  " + nonNodeDeps[i].name + " [" + nonNodeDeps[i].uri + "]");
+					}
+				}
+			}
+		}
+		
+		// Print a separator
+		console.log("------------------------------------------------------------");
+		console.log();
+	}
+	
 	//console.log(JSON.stringify(pkg.artifact));
 }
 
-/** Return list of vulnerabilities found to affect this version
+/** Return list of vulnerabilities found to affect this version.
  * 
- * @param range A version range as defined by semantic versioning
- * @param details The OSS Index CVE details object
+ * The input 'version' or details 'versions' may be ranges, depending
+ * on the situation.
+ * 
+ * @param productRange A version range as defined by semantic versioning
+ * @param details Vulnerability details
  * @returns
  */
-function getValidVulnerabilities(range, details) {
+function getValidVulnerabilities(productRange, details) {
 	var results = [];
 	if(details != undefined) {
 		for(var i = 0; i < details.length; i++) {
 			var detail = details[i];
 			
-			if(detail.cpes != null && detail.cpes.length > 0) {
-				for(var j = 0; j < detail.cpes.length; j++) {
-					var version = getSemanticVersion(detail.cpes[j].version);
-					try {
-						if(semver.satisfies(version, range)) {
-							results.push(detail);
-							break;
-						}
-					}
-					catch(err) {
-						// Ignore errors. Probably due to the version in NVD not
-						// being a proper semantic version.
+			if(detail.versions != undefined && detail.versions.length > 0) {
+				for(var j = 0; j < detail.versions.length; j++) {
+					// Get the vulnerability range
+					var vulnRange = detail.versions[j]
+
+					if(rangesOverlap(productRange, vulnRange)) {
+						results.push(detail);
+						break;
 					}
 				}
 			}
 		}
 	}
 	return results;
+}
+
+/** Return true if the given ranges overlap.
+ * 
+ * @param prange Product range
+ * @param vrange Vulnerability range
+ */
+function rangesOverlap(prange, vrange) {
+	// Try and treat the vulnerability range as a single version, as it
+	// is in CVEs.
+	if(semver.valid(getSemanticVersion(vrange))) {
+		return semver.satisfies(getSemanticVersion(vrange), prange);
+	}
+	
+	// Try and treat the product range as a single version, as when not
+	// run in --package mode.
+	if(semver.valid(getSemanticVersion(prange))) {
+		return semver.satisfies(getSemanticVersion(prange), vrange);
+	}
+	
+	// Both prange and vrange are ranges. A simple test for overlap for not
+	// is to attempt to coerce a range into static versions and compare
+	// with the other ranges.
+	var pversion = forceSemanticVersion(prange);
+	if(pversion != undefined) {
+		if(semver.satisfies(pversion, vrange)) return true;
+	}
+
+	var vversion = forceSemanticVersion(vrange);
+	if(vversion != undefined) {
+		if(semver.satisfies(vversion, prange)) return true;
+	}
+
+	return false;
 }
 
 /** Try and force a version to match that expected by semantic versioning.
@@ -422,4 +476,18 @@ function getSemanticVersion(version) {
 	
 	// Fall back: hope it works
 	return version;
+}
+
+/** Identify a semantic version within the given range for use in comparisons.
+ * 
+ * @param range
+ * @returns
+ */
+function forceSemanticVersion(range) {
+	var re = /([0-9]+)\.([0-9]+)\.([0-9]+)/;
+	var match = range.match(re);
+	if(match != undefined) {
+		return match[1] + "." + match[2] + "." + match[3];
+	}
+	return undefined;
 }

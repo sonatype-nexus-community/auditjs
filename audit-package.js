@@ -26,7 +26,7 @@
  */
 
 // Provides simplified REST API access
-var ossi = require('ossindexjs');
+var ossi = require('./ossindex.js');
 
 // A simple control-flow library for node.JS
 var step = require('step');
@@ -187,7 +187,7 @@ auditPackageBatchImpl = function(pkgs, onResult, onComplete) {
 				// If there are any good artifactIds left, then try to get the matching
 				// SCMs.
 				if(scmIds.length > 0) {
-					ossi.getScms(scmIds, this);
+					ossi.getScms(scmIds, {"expand": "requires"}, this);
 				}
 				
 				// Otherwise bail out.
@@ -259,10 +259,8 @@ getArtifactMatches = function(pkgs, artifacts) {
 	return results;
 }
 
-/** Given a list of names, versions, and matching SCMs, figure out
- * which ones can be audited further (have valid CPE codes). Ones
- * that do not either have a status of some sort or will be given
- * one.
+/** Given a list of names, versions, and matching SCMs, find ones with
+ * vulnerabilities.
  * 
  * @param names
  * @param versions
@@ -281,9 +279,14 @@ auditScms = function(pkgs, scms, onResult, onComplete) {
 		else if(scms[i].cpes.length == 0) status = "pending";
 		else if(scms[i].cpes[0].status != undefined) status = scms[i].cpes[0].status;
 		
-		// Does this SCM has a known status?
-		if(status != undefined) {
-			onResult(undefined, pkgs[i], [{"status": status}]);
+		// If there are no vulnerabilities bail out
+		if(!scms[i].hasVulnerability) {
+			if(status != undefined) {
+				onResult(undefined, pkgs[i], [{"status": status}]);
+			}
+			else {
+				onResult(undefined, pkgs[i]);
+			}
 			pkgs.splice(i, 1);
 			scms.splice(i, 1);
 			i--;
@@ -301,8 +304,8 @@ auditScms = function(pkgs, scms, onResult, onComplete) {
 	}
 };
 
-/** Given arrays of names/versions/scms which we *know* have valid CPE
- * codes, find any related CVEs and related interesting information.
+/** Given arrays of names/versions/scms which we *know* have valid
+ * vulnerabilities, get the vulnerability information.
  * 
  * @param names
  * @param versions
@@ -323,8 +326,8 @@ auditScmList = function(pkgs, onResult, onComplete) {
 	});
 };
 
-/** Given a single SCM which we KNOW has valid CPE code(s), find any
- * related CVEs and related interesting information.
+/** Given a single SCM which we KNOW has valid vulnerabilities, get
+ * the vulnerability information.
  * 
  * @param name
  * @param version
@@ -337,52 +340,20 @@ auditScm = function(pkg, onResult, onComplete) {
 	var version = pkg.version;
 	var scm = pkg.scm;
 	step(
-			// First get a list of CPE IDs and perform a query to get the details
+			// Get the list of vulnerabilities for the scm
 		function() {
-			var cpeIds = [];
-			var cpes = scm.cpes;
-			for(var i = 0; i < cpes.length; i++) {
-				cpeIds.push(cpes[i].cpecode);
-			}
-			ossi.getCpeListDetails(cpeIds, this);
+			ossi.getScmVulnerabilities(scm.id, this);
 		},
-		// For the CPEs we can get a list of CVEs which we will then
-		// get further details for.
-		function(err, cpes) {
-			if(err) {
-				onResult(err, pkg);
-				onComplete(err);
-				return;
-			}
-			pkg.cpes = cpes;
-			if(cpes != undefined) {
-				// Collect all the CVE IDs from the CPE detail list
-				var cveIds = [];
-				for(var i = 0; i < cpes.length; i++) {
-					var cpe = cpes[i];
-					if(cpe.cves != undefined) {
-						for(var j = 0; j < cpe.cves.length; j++) {
-							cveIds.push(cpe.cves[j].id);
-						}
-					}
-				}
-				ossi.getCves(cveIds, this);
-			}
-			else {
-				onResult(undefined, pkg);
-				onComplete();
-			}
-		},
-		// Now that we have full CVE results, send them to the results callback.
+		// Now that we have full vulnerability results, send them to the results callback.
 		// Finally some real data!
-		function(err, cveDetails) {
+		function(err, vulnerabilities) {
 			if(err) {
 				onResult(err, pkg);
 				onComplete(err);
 				return;
 			}
-			pkg.cves = cveDetails;
-			onResult(undefined, pkg, cveDetails);
+			pkg.vulnerabilities = vulnerabilities;
+			onResult(undefined, pkg, vulnerabilities);
 			onComplete();
 		}
 	);
@@ -405,81 +376,52 @@ auditScm = function(pkg, onResult, onComplete) {
  */
 auditScmImpl = function(uri, onComplete) {
 	step(
-			// Get the SCM ID for the artifact with the specified package name/version
-			function() {
-				ossi.getScmByUri(uri, this)
-			},
-			// Given a small SCM object (from search) request the full details
-			function(err, scmShortForm) {
-				if(err) {
-					onComplete(err);
+		// Get the SCM ID for the artifact with the specified package name/version
+		function() {
+			ossi.getScmByUri(uri, this)
+		},
+		// Given a small SCM object (from search) request the full details
+		function(err, scmShortForm) {
+			if(err) {
+				onComplete(err);
+				return;
+			}
+			if(scmShortForm != undefined && scmShortForm.length == 1 && scmShortForm[0].id != undefined) {
+				ossi.getScms([scmShortForm[0].id], this);
+			}
+			else
+			{
+				onComplete(undefined, [{"status": "unknown"}]);
+			}
+		},
+		// For a given SCM, get the associated vulnerabilities
+		function(err, scms) {
+			if(err) {
+				onComplete(err);
+				return;
+			}
+			
+			if(!scms[0].hasVulnerability) {
+				if(status != undefined) {
+					onComplete(undefined, [{"status": status}]);
 					return;
-				}
-				if(scmShortForm != undefined && scmShortForm.length == 1 && scmShortForm[0].id != undefined) {
-					ossi.getScms([scmShortForm[0].id], this);
-				}
-				else
-				{
-					onComplete(undefined, [{"status": "unknown"}]);
-				}
-			},
-			// For a given SCM, get the associated CPEs
-			function(err, scms) {
-				if(err) {
-					onComplete(err);
-					return;
-				}
-				var cpeIds = [];
-				var statusCpes = [];
-				if(scms != undefined && scms.length == 1 && scms[0].cpes != undefined) {
-					var cpes = scms[0].cpes;
-					for(var i = 0; i < cpes.length; i++) {
-						if(cpes[i].status != undefined) {
-							statusCpes.push(cpes[i]);
-						}
-						else {
-							cpeIds.push(cpes[i].cpecode);
-						}
-					}
-				}
-				if(cpeIds.length > 0) {
-					ossi.getCpeListDetails(cpeIds, this);
 				}
 				else {
-					onComplete(undefined, statusCpes);
-				}
-			},
-			// For the specified CPEs get the full CVE details
-			function(err, cpes) {
-				if(err) {
-					onComplete(err);
+					onComplete(undefined, [{"status": "none"}]);
 					return;
 				}
-				if(cpes != undefined) {
-					// Collect all the CVE IDs from the CPE detail list
-					var cveIds = [];
-					for(var i = 0; i < cpes.length; i++) {
-						var cpe = cpes[i];
-						if(cpe.cves != undefined) {
-							for(var j = 0; j < cpe.cves.length; j++) {
-								cveIds.push(cpe.cves[j].id);
-							}
-						}
-					}
-					ossi.getCves(cveIds, this);
-				}
-				else {
-					onComplete();
-				}
-			},
-			// Return the accumulated results
-			function(err, cveDetails) {
-				if(err) {
-					onComplete(err);
-					return;
-				}
-
-				onComplete(undefined, cveDetails);
-			}			
+			}
+			
+			ossi.getScmVulnerabilities(scms[0].id, this);
+		},
+		// Now that we have full vulnerability results, send them to the results callback.
+		// Finally some real data!
+		function(err, vulnerabilities) {
+			if(err) {
+				onComplete(err);
+				return;
+			}
+			onComplete(undefined, vulnerabilities);
+		}
 	);
 };
