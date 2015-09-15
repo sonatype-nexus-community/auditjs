@@ -1,13 +1,14 @@
 AuditJS
 =======
 
-Audits an NPM package.json file using the [OSS Index REST API](https://ossinex.net)
+Audits an NPM project using the [OSS Index REST API](https://ossinex.net)
 to identify known vulnerabilities and outdated package versions.
 
 ![Screenshot](screenshots/screenshot.png)
 
 Installation
 ------------
+
 ```
 npm install auditjs -g
 ```
@@ -28,6 +29,9 @@ Usage
 
 Audit installed packages and their dependencies to identify known
 vulnerabilities.
+
+Execute from inside a node project (above the node_modules directory) to audit
+the dependencies. 
 
 If a package.json file is specified as an argument, only the dependencies in
 the package file will be audited.
