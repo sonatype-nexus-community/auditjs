@@ -9,7 +9,7 @@ to identify known vulnerabilities and outdated package versions.
 Installation
 ------------
 ```
-npm install auditjs
+npm install auditjs -g
 ```
 
 Usage

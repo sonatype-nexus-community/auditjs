@@ -72,6 +72,11 @@ var actualAudits = 0;
 var dependencies = [];
 
 /**
+ * Count encountered vulnerabilities
+ */
+var vulnerabilityCount = 0;
+
+/**
  * Node SCM for performing auto check on Node and removing from 'extra' dep list.
  */
 var NODE_URI = "https://github.com/joyent/node.git";
@@ -83,6 +88,7 @@ program
 .version(pkg.version)
 .option('-p --package [package.json]', 'Specific package.json file to audit')
 .option('-v --verbose', 'Print all vulnerabilities')
+.option('-n --noNode', 'Ignore node executable')
 .action(function () {
 });
 
@@ -100,16 +106,25 @@ if (!program["package"]) {
 			// Get a flat list of dependencies instead of a map.
 			var deps = getDependencyList(data.dependencies);
 			
-			// Set the number of expected audits
-			expectedAudits = deps.length + 1; // +1 for hardcoded nodejs test
-
-			// First check for node itself
-			auditor.auditScm(NODE_URI, function(err, data) {
-				resultCallback(err, {name: "nodejs", version: process.version}, data);
+			if(program.noNode) {
+				// Set the number of expected audits
+				expectedAudits = deps.length;
 				
-				// Now check for the dependencies
+				// Only check dependencies
 				auditor.auditPackages(deps, resultCallback);
-			});
+			}
+			else {
+				// Set the number of expected audits
+				expectedAudits = deps.length + 1; // +1 for hardcoded nodejs test
+				
+				// First check for node itself
+				auditor.auditScm(NODE_URI, function(err, data) {
+					resultCallback(err, {name: "nodejs", version: process.version}, data);
+					
+					// Now check for the dependencies
+					auditor.auditPackages(deps, resultCallback);
+				});
+			}
 	    });
 	});
 }
@@ -146,6 +161,25 @@ else {
 		auditor.auditPackages(deps, resultCallback);
 	}
 }
+
+/** Set the return value
+ * 
+ * @param options
+ * @param err
+ * @returns
+ */
+function exitHandler(options, err) {
+	process.exit(vulnerabilityCount);
+}
+
+//do something when app is closing
+process.on('exit', exitHandler.bind(null,{cleanup:true}));
+
+//catches ctrl+c event
+process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+
+//catches uncaught exceptions
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 
 /** Recursively get a flat list of dependency objects. This is simpler for
  * subsequent code to handle then a tree of dependencies.
@@ -252,6 +286,7 @@ function resultCallback(err, pkg, details) {
 	var myVulnerabilities = getValidVulnerabilities(version, details);
 	
 	if(myVulnerabilities.length > 0) {
+		vulnerabilityCount += 1;
 		console.log("------------------------------------------------------------");
 		console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ");
 	}
