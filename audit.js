@@ -368,7 +368,7 @@ function resultCallback(err, pkg, details) {
 				
 				// Are these CVEs?
 				if(detail["cve-id"] != undefined) {
-					var title = detail["cve-id"] + " [http://ossindex.net/resource/cve/" + detail.id + "]";
+					var title = detail.title;
 					//console.log("  + " + JSON.stringify(detail));
 					if(detail.score < 4) {
 						console.log(colors.yellow.bold(title));
@@ -379,13 +379,20 @@ function resultCallback(err, pkg, details) {
 					else {
 						console.log(colors.red.bold(title));
 					}
-					if(detail.summary != undefined) console.log(entities.decode(detail.summary));
-					console.log();
+					if(program.verbose) {
+						console.log("[http://ossindex.net/resource/cve/" + detail.id + "]");
+					}
 				}
 				// Not CVEs. We have only basic information.
 				else {
-					console.log(colors.red.bold("[" + detail.uri + "]"));
+					console.log(colors.red.bold(detail.title));
+					if(program.verbose) {
+						console.log("[" + detail.uri + "]");
+					}
 				}
+				
+				if(detail.summary != undefined) console.log(entities.decode(detail.summary));
+				console.log();
 				
 				// Print affected version information if available
 				if(detail.versions != null && detail.versions.length > 0) {
