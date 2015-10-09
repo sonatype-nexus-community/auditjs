@@ -297,7 +297,12 @@ function resultCallback(err, pkg, details) {
 	}
 	
 	if(err) {
-		console.log(colors.bold.red("Error running audit: " + err));
+		if(err.error) {
+			console.log(colors.bold.red("Error running audit: " + err.error + " (" + err.code + ")"));
+		}
+		else {
+			console.log(colors.bold.red("Error running audit: " + err));
+		}
 		if(err.stack) {
 			console.log(err.stack);
 		}

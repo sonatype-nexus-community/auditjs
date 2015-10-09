@@ -228,7 +228,7 @@ getArtifactMatches = function(pkgs, artifacts) {
 		var artifact = undefined;
 		if(j < artifacts.length) artifact = artifacts[j];
 		var matchedArtifact = undefined;
-		while(artifact != undefined && artifact.search[1] == name) {
+		while(artifact != undefined && artifact.search != undefined && artifact.search[1] == name) {
 			if(matchedArtifact == undefined) {
 				matchedArtifact = artifact;
 			}
