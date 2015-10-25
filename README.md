@@ -1,7 +1,7 @@
 AuditJS
 =======
 
-Audits an NPM project using the [OSS Index REST API](https://ossinex.net)
+Audits an NPM project using the [OSS Index REST API](https://ossindex.net)
 to identify known vulnerabilities and outdated package versions.
 
 ![Screenshot](screenshots/screenshot.png)
