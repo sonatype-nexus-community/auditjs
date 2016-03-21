@@ -180,6 +180,9 @@ auditPackageBatchImpl = function(pkgs, onResult, onComplete) {
 					}
 					else {
 						pkgs[i].artifact = artifactMatches[i];
+						if(pkgs[i].artifact.hasVulnerability) {
+							pkgs[i].vulnerabilityUrl = [pkgs[i].artifact.vulnerabilities];
+						}
 						scmIds.push(artifactMatches[i].scm_id);
 					}
 				}
@@ -279,8 +282,15 @@ auditScms = function(pkgs, scms, onResult, onComplete) {
 		else if(scms[i].cpes.length == 0) status = "pending";
 		else if(scms[i].cpes[0].status != undefined) status = scms[i].cpes[0].status;
 		
+		if(scms[i].hasVulnerability) {
+			if(pkgs[i].vulnerabilityUrl == undefined) {
+				pkgs[i].vulnerabilityUrl = [];
+			}
+			pkgs[i].vulnerabilityUrl.push(scms[i].vulnerabilities);
+		}
+		
 		// If there are no vulnerabilities bail out
-		if(!scms[i].hasVulnerability) {
+		if(pkgs[i].vulnerabilityUrl == undefined) {
 			if(status != undefined) {
 				onResult(undefined, pkgs[i], [{"status": status}]);
 			}
@@ -327,7 +337,8 @@ auditScmList = function(pkgs, onResult, onComplete) {
 };
 
 /** Given a single SCM which we KNOW has valid vulnerabilities, get
- * the vulnerability information.
+ * the vulnerability information. Note that the vulnerabilities may
+ * be from multiple queries.
  * 
  * @param name
  * @param version
@@ -336,27 +347,39 @@ auditScmList = function(pkgs, onResult, onComplete) {
  * @param onComplete
  */
 auditScm = function(pkg, onResult, onComplete) {
-	var name = pkg.name;
-	var version = pkg.version;
-	var scm = pkg.scm;
-	step(
-			// Get the list of vulnerabilities for the scm
-		function() {
-			ossi.getScmVulnerabilities(scm.id, this);
-		},
-		// Now that we have full vulnerability results, send them to the results callback.
-		// Finally some real data!
-		function(err, vulnerabilities) {
-			if(err) {
-				onResult(err, pkg);
-				onComplete(err);
-				return;
-			}
-			pkg.vulnerabilities = vulnerabilities;
-			onResult(undefined, pkg, vulnerabilities);
-			onComplete();
+	var urls = pkg.vulnerabilityUrl;
+	auditScmVulnerabilityUrlList(pkg, urls, function(err, vulnerabilities) {
+		if(err) {
+			onResult(err, pkg);
+			onComplete(err);
+			return;
 		}
-	);
+		pkg.vulnerabilities = vulnerabilities;
+		onResult(undefined, pkg, vulnerabilities);
+		onComplete();
+	});
+};
+
+/** Iterate through the vulnerability URL list
+ */
+auditScmVulnerabilityUrlList = function(pkg, urls, onComplete, resultsList) {
+	if(urls.length == 0) {
+		onComplete(undefined, resultsList);
+		return;
+	}
+	var url = urls.shift();
+	
+	ossi.getVulnerabilityList(url, function(err, vulnerabilities) {
+		if(vulnerabilities != undefined) {
+			if(resultsList == undefined) {
+				resultsList = vulnerabilities;
+			}
+			else {
+				resultsList = resultsList.concat(vulnerabilities);
+			}
+		}
+		auditScmVulnerabilityUrlList(pkg, urls, onComplete, resultsList);
+	});
 };
 
 
