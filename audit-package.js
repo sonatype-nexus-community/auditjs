@@ -27,6 +27,7 @@
 
 // Provides simplified REST API access
 var ossi = require('ossindexjs');
+//var ossi = require('./ossindex.js');
 
 // A simple control-flow library for node.JS
 var step = require('step');
@@ -183,14 +184,18 @@ auditPackageBatchImpl = function(pkgs, onResult, onComplete) {
 						if(pkgs[i].artifact.hasVulnerability) {
 							pkgs[i].vulnerabilityUrl = [pkgs[i].artifact.vulnerabilities];
 						}
-						scmIds.push(artifactMatches[i].scm_id);
+						if(artifactMatches[i].project_id > 0) {
+							scmIds.push(artifactMatches[i].project_id);
+						} else {
+							scmIds.push(artifactMatches[i].scm_id);
+						}
 					}
 				}
 				
 				// If there are any good artifactIds left, then try to get the matching
 				// SCMs.
 				if(scmIds.length > 0) {
-					ossi.getScms(scmIds, {"expand": "requires"}, this);
+					ossi.getProjects(scmIds, {"expand": "requires"}, this);
 				}
 				
 				// Otherwise bail out.
