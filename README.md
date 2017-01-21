@@ -17,7 +17,7 @@ Usage
 -----
 
 ```
-  Usage: audit [options]
+  Usage: auditjs [options]
 
   Options:
 

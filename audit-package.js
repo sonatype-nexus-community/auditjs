@@ -27,6 +27,7 @@
 
 // Provides simplified REST API access
 var ossi = require('ossindexjs');
+//var ossi = require('./ossindex.js');
 
 // Used in package version comparisons
 var semver = require('semver');
