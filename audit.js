@@ -323,17 +323,6 @@ function resultCallback(err, pkg) {
 			// FIXME: We should always get some response. This should not happen.
 			console.log(colors.grey("No known vulnerabilities..."));
 		}
-		else if(pkg.vulnerabilities.length == 1 && pkg.vulnerabilities[0].status != undefined) {
-			var detail = pkg.vulnerabilities[0];
-			if(detail.status == "pending" || detail.status == "none") {
-				console.log(colors.grey("No known vulnerabilities"));
-			}
-			else if(detail.status == "unknown") {
-				console.log(colors.grey("Unknown source for package"));
-			}
-			if(program.verbose) console.log();
-		}
-		
 		// Vulnerabilities found
 		else {
 			// Status line
@@ -386,6 +375,8 @@ function resultCallback(err, pkg) {
 				console.log();
 			}
 		}
+	} else {
+		console.log(colors.grey("No known vulnerabilities..."));
 	}
 		
 	if(program.verbose) {
