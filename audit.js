@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- *	Copyright (c) 2015-2016 Vör Security Inc.
+ *	Copyright (c) 2015-2017 Vör Security Inc.
  *	All rights reserved.
  *	
  *	Redistribution and use in source and binary forms, with or without
@@ -76,11 +76,6 @@ var dependencies = [];
  */
 var vulnerabilityCount = 0;
 
-/**
- * Node SCM for performing auto check on Node and removing from 'extra' dep list.
- */
-var NODE_URI = "https://github.com/joyent/node.git";
-
 //Parse command line options. We currently support only one argument so
 // this is a little overkill. It allows for future growth.
 var program = require('commander');
@@ -117,9 +112,10 @@ if (!program["package"]) {
 				// Set the number of expected audits
 				expectedAudits = deps.length + 1; // +1 for hardcoded nodejs test
 				
-				// First check for node itself
-				auditor.auditScm(NODE_URI, function(err, data) {
-					resultCallback(err, {name: "nodejs", version: process.version}, data);
+				// First check for node itself. We use the 'chocolatey' package manager
+				// to hang this query on.
+				auditor.auditPackage("chocolatey", "nodejs", process.version, function(err, data) {
+					resultCallback(err, data);
 					
 					// Now check for the dependencies
 					auditor.auditPackages(deps, resultCallback);
@@ -200,7 +196,7 @@ function getDependencyList(depMap) {
 			// Only add a dependency once
 			if(lookup[name + o.version] == undefined) {
 				lookup[name + o.version] = true;
-				results.push({"name": name, "version": o.version});
+				results.push({"pm": "npm", "name": name, "version": o.version});
 				if(o.dependencies) {
 					var deps = getDependencyList(o.dependencies);
 					
@@ -214,7 +210,7 @@ function getDependencyList(depMap) {
 			// Only add a dependency once
 			if(lookup[name + o] == undefined) {
 				lookup[name + o] = true;
-				results.push({"name": name, "version": o});
+				results.push({"pm": "npm", "name": name, "version": o});
 			}
 		}
 	}
@@ -245,12 +241,16 @@ function usage() {
 /** Write the audit results. This handles both standard and verbose
  * mode.
  * 
+ * Currently the v2 API does not provide information about most recently available
+ * package version, so some of this code can be considered "dead" until that
+ * information becomes available.
+ * 
  * @param pkgName
  * @param version
  * @param details
  * @returns
  */
-function resultCallback(err, pkg, details) {
+function resultCallback(err, pkg) {
 	pkgName = undefined;
 	version = undefined;
 	versionString = undefined;
@@ -260,31 +260,13 @@ function resultCallback(err, pkg, details) {
 		version = pkg.version;
 		versionString = version;
 		bestVersion = undefined;
-		
-		// If there is an artifact
-		if(pkg.artifact) {
-			bestVersion = pkg.artifact.version;
-			// Only specify a "warning" if the expected version is *not* a range.
-			if(semver.valid(version)) {
-				if(bestVersion != version) {
-					versionString = colors.bold.yellow(version) + " [" + bestVersion + "]";
-				}
-				else {
-					versionString = colors.bold.green(version)
-				}
-			}
-			else {
-				versionString = version + " [" + bestVersion + "]";
-			}
-		}
 	}
 	// Add one to audits completed
 	actualAudits++;
 	
 	// If we KNOW a possibly used version is vulnerable then highlight the
 	// title in red.
-	var myVulnerabilities = getValidVulnerabilities(version, details);
-	
+	var myVulnerabilities = getValidVulnerabilities(version, pkg.vulnerabilities);
 	if(myVulnerabilities.length > 0) {
 		vulnerabilityCount += 1;
 		console.log("------------------------------------------------------------");
@@ -335,14 +317,14 @@ function resultCallback(err, pkg, details) {
 	
 	// The details will specify whether there are vulnerabilities and what the
 	// vulnerability status is.
-	if(details != undefined) {
+	if(pkg.vulnerabilities != undefined) {
 		// Special statuses
-		if(details.length == 0) {
+		if(pkg.vulnerabilities.length == 0) {
 			// FIXME: We should always get some response. This should not happen.
 			console.log(colors.grey("No known vulnerabilities..."));
 		}
-		else if(details.length == 1 && details[0].status != undefined) {
-			var detail = details[0];
+		else if(pkg.vulnerabilities.length == 1 && pkg.vulnerabilities[0].status != undefined) {
+			var detail = pkg.vulnerabilities[0];
 			if(detail.status == "pending" || detail.status == "none") {
 				console.log(colors.grey("No known vulnerabilities"));
 			}
@@ -355,14 +337,14 @@ function resultCallback(err, pkg, details) {
 		// Vulnerabilities found
 		else {
 			// Status line
-			console.log(details.length + " known vulnerabilities, " + myVulnerabilities.length + " affecting installed version");
+			console.log(pkg.vulnerabilities.length + " known vulnerabilities, " + myVulnerabilities.length + " affecting installed version");
 
 			// By default only print known problems
 			var printTheseProblems = myVulnerabilities;
 			
 			// If verbose, print all problems
 			if(program.verbose) {
-				printTheseProblems = details;
+				printTheseProblems = pkg.vulnerabilities;
 			}
 		
 			// We have decided that these are the problems worth mentioning.
@@ -370,33 +352,11 @@ function resultCallback(err, pkg, details) {
 				console.log();
 				
 				var detail = printTheseProblems[i];
+				console.log(colors.red.bold(detail.title));
 				
-				// Are these CVEs?
-				if(detail["cve-id"] != undefined) {
-					var title = detail.title;
-					//console.log("  + " + JSON.stringify(detail));
-					if(detail.score < 4) {
-						console.log(colors.yellow.bold(title));
-					}
-					else if(detail.score < 7) {
-						console.log(colors.yellow.bold(title));
-					}
-					else {
-						console.log(colors.red.bold(title));
-					}
-					if(program.verbose) {
-						console.log("[http://ossindex.net/resource/cve/" + detail.id + "]");
-					}
+				if(detail.description != undefined) {
+					console.log(entities.decode(detail.description));
 				}
-				// Not CVEs. We have only basic information.
-				else {
-					console.log(colors.red.bold(detail.title));
-					if(program.verbose) {
-						console.log("[" + detail.uri + "]");
-					}
-				}
-				
-				if(detail.summary != undefined) console.log(entities.decode(detail.summary));
 				console.log();
 				
 				// Print affected version information if available
@@ -410,6 +370,13 @@ function resultCallback(err, pkg, details) {
 				else {
 					console.log(colors.bold("Affected versions") + ": unspecified");
 				}
+				
+				if (detail.references != undefined && detail.references.length > 0) {
+					console.log(colors.bold("References") + ":");
+					for (var j = 0; j < detail.references.length; j++) {
+						console.log("  * " + detail.references[j]);
+					}
+				}
 			}
 			
 			// If we printed vulnerabilities we need a separator. Don't bother
@@ -417,33 +384,6 @@ function resultCallback(err, pkg, details) {
 			if(!program.verbose && myVulnerabilities.length > 0) {
 				console.log("------------------------------------------------------------");
 				console.log();
-			}
-		}
-	}
-	
-	// Print dependencies
-	if(pkg.scm != undefined) {
-		if(pkg.scm.requires != undefined && pkg.scm.requires.length > 0) {
-			var reqs = pkg.scm.requires;
-			// Clear 'node.js' dependencies. We already know that one.
-			var nonNodeDeps = [];
-			if(reqs != undefined) {
-				for(var i = 0; i < reqs.length; i++) {
-					if(reqs[i].uri != NODE_URI) {
-						nonNodeDeps.push(reqs[i]);
-					}
-				}
-			}
-			
-			// Print any known dependencies
-			if(nonNodeDeps.length > 0)
-			{
-				if(program.verbose) {
-					console.log("EXTRA DEPENDENCIES:");
-				}
-				for(var i = 0; i < nonNodeDeps.length; i++) {
-					console.log(colors.bold("    [+] ") + nonNodeDeps[i].name + " [" + nonNodeDeps[i].uri + "]");
-				}
 			}
 		}
 	}

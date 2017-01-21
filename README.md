@@ -1,7 +1,7 @@
 AuditJS
 =======
 
-Audits an NPM project using the [OSS Index REST API](https://ossindex.net)
+Audits an NPM project using the [OSS Index v2 REST API](https://ossindex.net/docs/restapi2)
 to identify known vulnerabilities and outdated package versions.
 
 ![Screenshot](screenshots/screenshot.png)
@@ -42,37 +42,9 @@ vulnerability will be printed to the screen.
 
 ![Screenshot](screenshots/cve.png)
 
-If a newer version of a package is available the installed version will be
-highlighted in yellow followed by the newest available version, surrounded by
-square brackets.
-
-![Screenshot](screenshots/new_version.png)
-
-We are starting to identify external dependencies. They are displayed in the
-output like so:
-
-![Screenshot](screenshots/deps.png)
-
-Where the NPM package is the top line, and the **[+]** indicates the external
-dependency. An external dependency indicates a requirement outside of the
-code itself, for example to a database or other external service or program.
-These can be seen as "runtime" dependencies.
-
 Running in verbose mode prints more descriptive output, and some extra information
 such as ALL vulnerabilities for a package, whether they are identified as
 impacting the installed version or not.
-
-Vulnerabilities
----------------
-
-Vulnerabilities are currently output in two different ways. Vulnerabilities
-identified in the National Vulnerability Database (NVD) are displayed with
-descriptive text and the vulnerability ID.
-
-Vulnerabilities manually added directly to OSS Index tend to be displayed as
-links with attached version information, like so:
-
-![Screenshot](screenshots/external_vulnerability.png)
 
 Limitations
 -----------
