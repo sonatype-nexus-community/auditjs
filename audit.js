@@ -305,9 +305,11 @@ function resultCallback(err, pkg) {
 	if(myVulnerabilities.length > 0) {
 		vulnerabilityCount += 1;
 		console.log("------------------------------------------------------------");
-	        console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ");
-                vulnerablePkg[`testcase name="${pkg.name}"`] = {};
-                Object.assign(vulnerablePkg[`testcase name="${pkg.name}"`], pkg);
+	   console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ");
+           vulnerablePkg[`testcase name="${pkg.name}"`] = `failure messages="${pkg['vulnerability-matches']}"`;
+           //Object.assign(vulnerablePkg[`testcase name="${pkg.name}"`],); `failure
+           //              message="${pkg['vulnerability-matches']}"\n
+           //              ${pgk[vulnerabilitites]}`);
 	}
 	else {
 		if(program.verbose) console.log("------------------------------------------------------------");
