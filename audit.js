@@ -178,13 +178,13 @@ else {
  */
 function exitHandler(options, err) {
    JUnit = jsontoxml(JUnit);
+   console.log(JUnit);
    var dom = new DOMParser().parseFromString(JUnit);
    dom.documentElement.setAttribute('name', 'audit_security');
    dom.documentElement.setAttribute('errors', 0);
    dom.documentElement.setAttribute('tests', expectedAudits);
    dom.documentElement.setAttribute('failures', vulnerabilityCount);
    JUnit = new XMLSerializer().serializeToString(dom);
-   console.log(`junit ${typeof JUnit}`);
    fs.writeFileSync( output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
    process.exit(vulnerabilityCount);
 }
@@ -286,8 +286,8 @@ function resultCallback(err, pkg) {
 	actualAudits++;
 	
 	// If we KNOW a possibly used version is vulnerable then highlight the
-	// title in red.
-	var myVulnerabilities = getValidVulnerabilities(version, pkg.vulnerabilities);
+   // title in red.
+        var myVulnerabilities = getValidVulnerabilities(version, pkg.vulnerabilities);
 	if(myVulnerabilities.length > 0) {
 		vulnerabilityCount += 1;
 		console.log("------------------------------------------------------------");
@@ -301,7 +301,7 @@ function resultCallback(err, pkg) {
 		if(program.verbose) console.log("------------------------------------------------------------");
 		process.stdout.write("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold(pkgName + " " + versionString) + "   ");
 	   if(program.verbose) console.log();
-           JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}})
+           JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}});
 	}
 	
 	if(err) {

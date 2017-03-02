@@ -10,6 +10,10 @@
   "license": "ISC",
   "dependencies": {
     "angular": "^1.4.3",
-    "jquery": "^2.2.4"
+    "angular-mocks": "^1.6.2",
+    "angular-sanitize": "^1.6.2",
+    "jquery": "^2.2.4",
+    "laxar": "^2.0.0-alpha.16",
+    "moment": "^2.17.1"
   }
 }
