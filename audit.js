@@ -31,6 +31,13 @@
  * vulnerabilities.
  */
 
+//write found vulnerabilities to JUnit xml
+var jstoxml = require('jstoxml');
+
+//edit JUnit xml
+var DOMParser = require('xmldom').DOMParser;
+const XMLSerializer = require( 'xmldom' ).XMLSerializer;
+
 // File system access
 var fs = require('fs');
 
@@ -51,6 +58,9 @@ var entities = new Entities();
 
 // Semantic version code
 var semver = require('semver');
+
+// dictionary of vulnerable packages for xml-report
+vulnerablePkg = {};
 
 // Used to find installed packages and their dependencies
 var npm = require('npm');
@@ -84,6 +94,7 @@ program
 .option('-p --package [package.json]', 'Specific package.json file to audit')
 .option('-v --verbose', 'Print all vulnerabilities')
 .option('-n --noNode', 'Ignore node executable')
+.option('-o --output [output.xml]', 'Output file for xml-report.')
 .action(function () {
 });
 
@@ -92,6 +103,8 @@ program.on('--help', function(){
 });
 
 program.parse(process.argv);
+
+var output = program['output'] ? program['output'] : `${program[ 'package' ].toString().split( '.json' ).slice(0, -1)}_vulnerabilities.json`;
 
 // By default we run an audit against all installed packages and their
 // dependencies.
@@ -165,6 +178,35 @@ else {
  * @returns
  */
 function exitHandler(options, err) {
+   // convert to JUnit format
+   console.log();
+   console.log();
+   console.log();
+   console.log();
+   console.log();
+   var JUnit = {}
+   JUnit['testsuite'] = vulnerablePkg;;
+   JUnit = JSON.stringify( JUnit, null, 3 );
+   JUnit = JUnit.replace(/</g, '&lt');
+   JUnit = JUnit.replace(/>/g, '&gt');
+   JUnit = JSON.parse(JUnit);
+   var result = jstoxml.toXML(JUnit, {header: false, indent: '  '})
+   console.log('==================================================')
+   var doc = new DOMParser().parseFromString(result)
+   doc.documentElement.setAttribute( 'name',
+                                     'auditjs_security_checks' );
+   doc.documentElement.setAttribute( 'tests',
+                                     vulnerabilityCount );
+   doc.documentElement.setAttribute( 'errors',
+                                     '0' );
+   doc.documentElement.setAttribute( 'failures',
+                                     vulnerabilityCount);
+   doc.documentElement.setAttribute( 'skipped',
+                                     '0' );
+
+   result = new XMLSerializer().serializeToString(doc);
+   console.log(result);
+   fs.writeFileSync( output, `${result}`, 'utf8');
 	process.exit(vulnerabilityCount);
 }
 
@@ -270,7 +312,9 @@ function resultCallback(err, pkg) {
 	if(myVulnerabilities.length > 0) {
 		vulnerabilityCount += 1;
 		console.log("------------------------------------------------------------");
-		console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ");
+	        console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ");
+                vulnerablePkg[pkg.name] = {};
+                Object.assign(vulnerablePkg[pkg.name], pkg);
 	}
 	else {
 		if(program.verbose) console.log("------------------------------------------------------------");
