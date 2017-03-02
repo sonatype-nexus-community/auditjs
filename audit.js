@@ -181,7 +181,7 @@ function exitHandler(options, err) {
    var dom = new DOMParser().parseFromString(JUnit);
    dom.documentElement.setAttribute('name', 'audit_security');
    dom.documentElement.setAttribute('errors', 0);
-   dom.documentElement.setAttribute('tests', vulnerabilityCount);
+   dom.documentElement.setAttribute('tests', expectedAudits);
    dom.documentElement.setAttribute('failures', vulnerabilityCount);
    JUnit = new XMLSerializer().serializeToString(dom);
    console.log(`junit ${typeof JUnit}`);
@@ -300,7 +300,8 @@ function resultCallback(err, pkg) {
 	else {
 		if(program.verbose) console.log("------------------------------------------------------------");
 		process.stdout.write("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold(pkgName + " " + versionString) + "   ");
-		if(program.verbose) console.log();
+	   if(program.verbose) console.log();
+           JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}}
 	}
 	
 	if(err) {
