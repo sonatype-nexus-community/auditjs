@@ -179,11 +179,6 @@ else {
  */
 function exitHandler(options, err) {
    // convert to JUnit format
-   console.log();
-   console.log();
-   console.log();
-   console.log();
-   console.log();
    var JUnit = {}
    JUnit['testsuite'] = vulnerablePkg;;
    JUnit = JSON.stringify( JUnit, null, 3 );
@@ -191,7 +186,6 @@ function exitHandler(options, err) {
    JUnit = JUnit.replace(/>/g, '&gt');
    JUnit = JSON.parse(JUnit);
    var result = jstoxml.toXML(JUnit, {header: false, indent: '  '})
-   console.log('==================================================')
    var doc = new DOMParser().parseFromString(result)
    doc.documentElement.setAttribute( 'name',
                                      'auditjs_security_checks' );
@@ -205,8 +199,7 @@ function exitHandler(options, err) {
                                      '0' );
 
    result = new XMLSerializer().serializeToString(doc);
-   console.log(result);
-   fs.writeFileSync( output, `${result}`, 'utf8');
+   fs.writeFileSync( output, `<?xml version="1.0" encoding="UTF-8"?>\n${result}`, 'utf8');
 	process.exit(vulnerabilityCount);
 }
 
