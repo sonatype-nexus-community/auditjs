@@ -32,11 +32,7 @@
  */
 
 //write found vulnerabilities to JUnit xml
-var jstoxml = require('jstoxml');
-
-//edit JUnit xml
-var DOMParser = require('xmldom').DOMParser;
-const XMLSerializer = require( 'xmldom' ).XMLSerializer;
+var jsontoxml = require('jsontoxml');
 
 // File system access
 var fs = require('fs');
@@ -60,7 +56,7 @@ var entities = new Entities();
 var semver = require('semver');
 
 // dictionary of vulnerable packages for xml-report
-vulnerablePkg = {};
+var JUnit = { 'testsuite':[] };
 
 // Used to find installed packages and their dependencies
 var npm = require('npm');
@@ -178,29 +174,9 @@ else {
  * @returns
  */
 function exitHandler(options, err) {
-   // convert to JUnit format
-   var JUnit = {};
-   
-   JUnit['testsuite'] = vulnerablePkg;
-   JUnit = JSON.stringify( JUnit, null, 3 );
-   JUnit = JUnit.replace(/</g, '&lt');
-   JUnit = JUnit.replace(/>/g, '&gt');
-   JUnit = JSON.parse(JUnit);
-   var result = jstoxml.toXML(JUnit, {header: false, indent: '  '})
-   var doc = new DOMParser().parseFromString(result)
-   doc.documentElement.setAttribute( 'name',
-                                     'auditjs_security_checks' );
-   doc.documentElement.setAttribute( 'tests',
-                                     vulnerabilityCount );
-   doc.documentElement.setAttribute( 'errors',
-                                     '0' );
-   doc.documentElement.setAttribute( 'failures',
-                                     vulnerabilityCount);
-   doc.documentElement.setAttribute( 'skipped',
-                                     '0' );
-   result = new XMLSerializer().serializeToString(doc);
-   fs.writeFileSync( output, `<?xml version="1.0" encoding="UTF-8"?>\n${result}`);
-	process.exit(vulnerabilityCount);
+   JUnit = jsontoxml(JUnit);
+   fs.writeFileSync( output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
+   process.exit(vulnerabilityCount);
 }
 
 //do something when app is closing
@@ -306,10 +282,10 @@ function resultCallback(err, pkg) {
 		vulnerabilityCount += 1;
 		console.log("------------------------------------------------------------");
 	   console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ");
-           vulnerablePkg[`testcase name="${pkg.name}"`] = `failure messages="${pkg['vulnerability-matches']}"`;
-           //Object.assign(vulnerablePkg[`testcase name="${pkg.name}"`],); `failure
-           //              message="${pkg['vulnerability-matches']}"\n
-           //              ${pgk[vulnerabilitites]}`);
+           JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}, children: [{
+              name: 'failure', text: `Found ${pkg['vulnerability-matches']} vulnerabilitites. See lines below for details:\n
+              ${JSON.stringify(pkg['vulnerabilities']).replace(/</g, '&lt').replace(/>/g, '&gt')
+               }\n\n`, attrs: {message:pkg['vulnerability-matches']}}]});
 	}
 	else {
 		if(program.verbose) console.log("------------------------------------------------------------");
