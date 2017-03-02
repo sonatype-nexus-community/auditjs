@@ -31,6 +31,9 @@
  * vulnerabilities.
  */
 
+//sumarize results in JUnit with this
+var DOMParser = require('xmldom').DOMParser;
+var XMLSerializer = require('xmldom').XMLSerializer;
 //write found vulnerabilities to JUnit xml
 var jsontoxml = require('jsontoxml');
 
@@ -175,6 +178,13 @@ else {
  */
 function exitHandler(options, err) {
    JUnit = jsontoxml(JUnit);
+   var dom = new DOMParser().parseFromString(JUnit);
+   dom.documentElement.setAttribute('name', 'audit_security');
+   dom.documentElement.setAttribute('errors', 0);
+   dom.documentElement.setAttribute('tests', vulnerabilityCount);
+   dom.documentElement.setAttribute('failures', vulnerabilityCount);
+   JUnit = new XMLSerializer().serializeToString(dom);
+   console.log(`junit ${typeof JUnit}`);
    fs.writeFileSync( output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
    process.exit(vulnerabilityCount);
 }
