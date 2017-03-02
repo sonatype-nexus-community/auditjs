@@ -301,7 +301,7 @@ function resultCallback(err, pkg) {
 		if(program.verbose) console.log("------------------------------------------------------------");
 		process.stdout.write("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold(pkgName + " " + versionString) + "   ");
 	   if(program.verbose) console.log();
-           JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}}
+           JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}})
 	}
 	
 	if(err) {
