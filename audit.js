@@ -179,8 +179,9 @@ else {
  */
 function exitHandler(options, err) {
    // convert to JUnit format
-   var JUnit = {}
-   JUnit['testsuite'] = vulnerablePkg;;
+   var JUnit = {};
+   
+   JUnit['testsuite'] = vulnerablePkg;
    JUnit = JSON.stringify( JUnit, null, 3 );
    JUnit = JUnit.replace(/</g, '&lt');
    JUnit = JUnit.replace(/>/g, '&gt');
@@ -197,9 +198,8 @@ function exitHandler(options, err) {
                                      vulnerabilityCount);
    doc.documentElement.setAttribute( 'skipped',
                                      '0' );
-
    result = new XMLSerializer().serializeToString(doc);
-   fs.writeFileSync( output, `<?xml version="1.0" encoding="UTF-8"?>\n${result}`, 'utf8');
+   fs.writeFileSync( output, `<?xml version="1.0" encoding="UTF-8"?>\n${result}`);
 	process.exit(vulnerabilityCount);
 }
 
@@ -306,8 +306,8 @@ function resultCallback(err, pkg) {
 		vulnerabilityCount += 1;
 		console.log("------------------------------------------------------------");
 	        console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ");
-                vulnerablePkg[pkg.name] = {};
-                Object.assign(vulnerablePkg[pkg.name], pkg);
+                vulnerablePkg[`testcase name="${pkg.name}"`] = {};
+                Object.assign(vulnerablePkg[`testcase name="${pkg.name}"`], pkg);
 	}
 	else {
 		if(program.verbose) console.log("------------------------------------------------------------");
