@@ -293,8 +293,9 @@ function resultCallback(err, pkg) {
 		console.log("------------------------------------------------------------");
 	   console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ");
            JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}, children: [{
-              name: 'failure', text: `Found ${pkg['vulnerability-matches']} vulnerabilitites. See lines below for details:\n`, attrs: {message:pkg['vulnerability-matches']}}]});
-           //${JSON.stringify(pkg['vulnerabilities']).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g,	'&quot;').replace(/'/g,	'&apos;')}\n\n
+              name: 'failure', text: `Details:\n
+              ${JSON.stringify(pkg['vulnerabilities']).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')}\n\n`,
+              attrs: {message:`Found ${pkg['vulnerability-matches']} vulnerabilities. See stacktrace for details.`}}]});
 	}
 	else {
 		if(program.verbose) console.log("------------------------------------------------------------");
