@@ -180,7 +180,7 @@ function exitHandler(options, err) {
    JUnit = jsontoxml(JUnit);
    console.log(JUnit);
    var dom = new DOMParser().parseFromString(JUnit);
-   dom.documentElement.setAttribute('name', `auditjs.security.${program['package']}`);
+   dom.documentElement.setAttribute('name', `auditjs.security.${program['package'].split('.')[0]}`);
    dom.documentElement.setAttribute('errors', 0);
    dom.documentElement.setAttribute('tests', expectedAudits);
    dom.documentElement.setAttribute('failures', vulnerabilityCount);
