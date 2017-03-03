@@ -31,6 +31,12 @@
  * vulnerabilities.
  */
 
+//sumarize results in JUnit with this
+var DOMParser = require('xmldom').DOMParser;
+var XMLSerializer = require('xmldom').XMLSerializer;
+//write found vulnerabilities to JUnit xml
+var jsontoxml = require('jsontoxml');
+
 // File system access
 var fs = require('fs');
 
@@ -51,6 +57,9 @@ var entities = new Entities();
 
 // Semantic version code
 var semver = require('semver');
+
+// dictionary of vulnerable packages for xml-report
+var JUnit = { 'testsuite':[] };
 
 // Used to find installed packages and their dependencies
 var npm = require('npm');
@@ -84,6 +93,7 @@ program
 .option('-p --package [package.json]', 'Specific package.json file to audit')
 .option('-v --verbose', 'Print all vulnerabilities')
 .option('-n --noNode', 'Ignore node executable')
+.option('-o --output [output.xml]', 'Output file for xml-report.')
 .action(function () {
 });
 
@@ -92,6 +102,8 @@ program.on('--help', function(){
 });
 
 program.parse(process.argv);
+
+var output = program['output'] ? program['output'] : `${program[ 'package' ].toString().split( '.json' ).slice(0, -1)}_vulnerabilities.json`;
 
 // By default we run an audit against all installed packages and their
 // dependencies.
@@ -165,7 +177,18 @@ else {
  * @returns
  */
 function exitHandler(options, err) {
-	process.exit(vulnerabilityCount);
+   JUnit = jsontoxml(JUnit);
+   console.log(JUnit);
+   var dom = new DOMParser().parseFromString(JUnit);
+   dom.documentElement.setAttribute('name', 'audit_security');
+   dom.documentElement.setAttribute('errors', 0);
+   dom.documentElement.setAttribute('tests', expectedAudits);
+   dom.documentElement.setAttribute('failures', vulnerabilityCount);
+   dom.documentElement.setAttribute('package', 'audit_security');
+   dom.documentElement.setAttribute('id', '');
+   JUnit = new XMLSerializer().serializeToString(dom);
+   fs.writeFileSync( output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
+   process.exit(vulnerabilityCount);
 }
 
 //do something when app is closing
@@ -265,17 +288,22 @@ function resultCallback(err, pkg) {
 	actualAudits++;
 	
 	// If we KNOW a possibly used version is vulnerable then highlight the
-	// title in red.
-	var myVulnerabilities = getValidVulnerabilities(version, pkg.vulnerabilities);
+   // title in red.
+        var myVulnerabilities = getValidVulnerabilities(version, pkg.vulnerabilities);
 	if(myVulnerabilities.length > 0) {
 		vulnerabilityCount += 1;
 		console.log("------------------------------------------------------------");
-		console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ");
+	   console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ");
+           JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}, children: [{
+              name: 'failure', text: `Details:\n
+              ${JSON.stringify(pkg['vulnerabilities'], null, 2).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')}\n\n`,
+              attrs: {message:`Found ${pkg['vulnerability-matches']} vulnerabilities. See stacktrace for details.`}}]});
 	}
 	else {
 		if(program.verbose) console.log("------------------------------------------------------------");
 		process.stdout.write("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold(pkgName + " " + versionString) + "   ");
-		if(program.verbose) console.log();
+	   if(program.verbose) console.log();
+           JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}});
 	}
 	
 	if(err) {

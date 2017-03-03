@@ -1,0 +1,19 @@
+{
+  "name": "vulnerable",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "angular": "^1.4.3",
+    "angular-mocks": "^1.6.2",
+    "angular-sanitize": "^1.6.2",
+    "jquery": "^2.2.4",
+    "laxar": "^2.0.0-alpha.16",
+    "moment": "^2.17.1"
+  }
+}
