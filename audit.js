@@ -30,7 +30,9 @@
  * a map of best case dependencies and indicate if there are any known
  * vulnerabilities.
  */
-
+//create reports directory
+var mkdirp = require('mkdirp');
+var path = require('path');
 //sumarize results in JUnit with this
 var DOMParser = require('xmldom').DOMParser;
 var XMLSerializer = require('xmldom').XMLSerializer;
@@ -93,7 +95,6 @@ program
 .option('-p --package [package.json]', 'Specific package.json file to audit')
 .option('-v --verbose', 'Print all vulnerabilities')
 .option('-n --noNode', 'Ignore node executable')
-.option('-o --output [output.xml]', 'Output file for xml-report.')
 .option('-q --quiet', 'Supress console logging.')
 .action(function () {
 });
@@ -107,9 +108,9 @@ if(program['quiet']===true){
    console.log = function(){};
    process.stdout.write = function(){};
 }
-var programPackage = program['package'] ? program['package']: 'scan_node_modules.json';
-var output = program['output'] ? program['output'] : `${programPackage.toString().split('.json').slice(0, -1)}.xml`;
-
+var programPackage = program['package'] ? path.basename(program['package']): 'scan_node_modules.json';
+var output = `reports/${programPackage.toString().split('.json').slice(0, -1)}.xml`;
+mkdirp('reports');
 // By default we run an audit against all installed packages and their
 // dependencies.
 if (!program["package"]) {
