@@ -94,6 +94,7 @@ program
 .option('-v --verbose', 'Print all vulnerabilities')
 .option('-n --noNode', 'Ignore node executable')
 .option('-o --output [output.xml]', 'Output file for xml-report.')
+.option('-q --quiet', 'Supress console logging.')
 .action(function () {
 });
 
@@ -102,8 +103,11 @@ program.on('--help', function(){
 });
 
 program.parse(process.argv);
-
-var output = program['output'] ? program['output'] : `${program[ 'package' ].toString().split( '.json' ).slice(0, -1)}_vulnerabilities.json`;
+if(program['quiet']===true){
+   console.log = function(){};
+}
+var programPackage = program['package'] ? program['package']: 'scan_node_modules.json';
+var output = program['output'] ? program['output'] : `${programPackage.toString().split('.json').slice(0, -1)}.xml`;
 
 // By default we run an audit against all installed packages and their
 // dependencies.
@@ -178,9 +182,8 @@ else {
  */
 function exitHandler(options, err) {
    JUnit = jsontoxml(JUnit);
-   console.log(JUnit);
    var dom = new DOMParser().parseFromString(JUnit);
-   dom.documentElement.setAttribute('name', `auditjs.security.${program['package'].split('.')[0]}`);
+   dom.documentElement.setAttribute('name', `auditjs.security.${programPackage.split('.')[0]}`);
    dom.documentElement.setAttribute('errors', 0);
    dom.documentElement.setAttribute('tests', expectedAudits);
    dom.documentElement.setAttribute('failures', vulnerabilityCount);
@@ -188,7 +191,8 @@ function exitHandler(options, err) {
    dom.documentElement.setAttribute('id', '');
    dom.documentElement.setAttribute('skipped', expectedAudits-actualAudits);
    JUnit = new XMLSerializer().serializeToString(dom);
-   fs.writeFileSync( output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
+   console.log(output);
+   fs.writeFileSync(output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
    process.exit(vulnerabilityCount);
 }
 
