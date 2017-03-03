@@ -105,6 +105,7 @@ program.on('--help', function(){
 program.parse(process.argv);
 if(program['quiet']===true){
    console.log = function(){};
+   process.stdout.write = function(){};
 }
 var programPackage = program['package'] ? program['package']: 'scan_node_modules.json';
 var output = program['output'] ? program['output'] : `${programPackage.toString().split('.json').slice(0, -1)}.xml`;
