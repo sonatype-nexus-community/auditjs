@@ -184,6 +184,8 @@ function exitHandler(options, err) {
    dom.documentElement.setAttribute('errors', 0);
    dom.documentElement.setAttribute('tests', expectedAudits);
    dom.documentElement.setAttribute('failures', vulnerabilityCount);
+   dom.documentElement.setAttribute('package', 'audit_security');
+   dom.documentElement.setAttribute('id', '');
    JUnit = new XMLSerializer().serializeToString(dom);
    fs.writeFileSync( output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
    process.exit(vulnerabilityCount);
