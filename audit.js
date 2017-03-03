@@ -184,6 +184,8 @@ function exitHandler(options, err) {
    dom.documentElement.setAttribute('errors', 0);
    dom.documentElement.setAttribute('tests', expectedAudits);
    dom.documentElement.setAttribute('failures', vulnerabilityCount);
+   dom.documentElement.setAttribute('package', 'audit_security');
+   dom.documentElement.setAttribute('id', '');
    JUnit = new XMLSerializer().serializeToString(dom);
    fs.writeFileSync( output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
    process.exit(vulnerabilityCount);
@@ -294,7 +296,7 @@ function resultCallback(err, pkg) {
 	   console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ");
            JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}, children: [{
               name: 'failure', text: `Details:\n
-              ${JSON.stringify(pkg['vulnerabilities']).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')}\n\n`,
+              ${JSON.stringify(pkg['vulnerabilities'], null, 2).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')}\n\n`,
               attrs: {message:`Found ${pkg['vulnerability-matches']} vulnerabilities. See stacktrace for details.`}}]});
 	}
 	else {
