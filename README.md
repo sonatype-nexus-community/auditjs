@@ -1,5 +1,12 @@
-AuditJS
+AuditJS - Fork
 =======
+
+This Forks intends to extend audit.js to create junit reports (for CI environments like Jenkins).
+The reports will be saved in a reports/ directory created in the base directory where audit.js is called.
+It will also use the ossindex to audit bower.json files. Some useful CLI options like
+--quiet are also added, which supress console output.
+
+
 
 Audits an NPM project using the [OSS Index v2 REST API](https://ossindex.net/docs/restapi2)
 to identify known vulnerabilities and outdated package versions.
@@ -25,6 +32,7 @@ Usage
     -V, --version                output the version number
     -p --package [package.json]  Specific package.json file to audit
     -v --verbose                 Print all vulnerabilities
+    -q --quiet                   Supress console logging.
 ```
 
 Audit installed packages and their dependencies to identify known
