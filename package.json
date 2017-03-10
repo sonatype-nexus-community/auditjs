@@ -6,8 +6,8 @@
   "bin": "./audit.js",
   "preferGlobal": true,
   "scripts": {
-    "pretest": "node audit.js -r -q || true && node audit.js -r -q -n -p test_data/package.json || true &&  node audit.js -r -q -b -p test_data/bower.json || true",
-    "test": "diff reports/scan_node_modules.xml test_data/expected_reports/scan_node_modules.xml && diff reports/bower.xml test_data/expected_reports/bower.xml && diff reports/package.xml test_data/expected_reports/package.xml",
+    "pretest": "node audit.js -r -q -n -p test_data/package.json || true &&  node audit.js -r -q -b -p test_data/bower.json || true",
+    "test": "diff reports/bower.xml test_data/expected_reports/bower.xml && diff reports/package.xml test_data/expected_reports/package.xml",
     "update-tests": "npm run pretest && cp reports/*.xml test_data/expected_reports/"
   },
   "keywords": [
