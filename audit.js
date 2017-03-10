@@ -204,43 +204,37 @@ function exitHandler(options, err) {
                 dom.documentElement.setAttribute('id', '');
                 dom.documentElement.setAttribute('skipped', expectedAudits-actualAudits);
                 if(whitelist){
+                        whitelist = JSON.parse(whitelist);
                         console.log(colors.bold('Applying whitelist filtering for JUnit reports. Take care to keep the whitelist up to date!'));
-                        whitelist = new DOMParser().parseFromString(whitelist);
-                        whitelist = whitelist.documentElement.getElementsByTagName('testcase');
-                        for(var i=0; i<whitelist.length; i++) {
-                                var wl = whitelist[i].firstChild.textContent;
-                                wl = wl.split('\n');
-                                wl.shift();
-                                console.log( colors.bold.yellow(`Filtering the following vulnerabilities for ${whitelist[i].getAttribute('name')}:`));
-                                wl = JSON.parse(wl.join('\n'));
-                                // The only xml nodes that need filtering are ones containing the failure tag.
-                                for( var j=0; j<dom.documentElement.getElementsByTagName('failure').length; j++){
-                                        if(dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name') === whitelist[i].getAttribute('name')) {
-                                                var report = dom.documentElement.getElementsByTagName('failure')[j].textContent;
-                                                report = report.split('\n');
-                                                report.shift();
-                                                report = JSON.parse(report.join('\n'));
-                                                for(w in wl){
-                                                        for(r in report){
-                                                                if(JSON.stringify(wl[w]) == JSON.stringify(report[r])) {
-                                                                        console.log(`${colors.bold.blue(wl[w]['title'])} affected versions: ${colors.bold.red(whitelist[i].getAttribute('name'))} ${colors.red(wl[w]['versions'])}`);
-                                                                        console.log(`${wl[w]['description']}`);
-                                                                        delete report[r];
-                                                                }
-                                                        }
-                                                }
-                                                if(checkProperties(report)){
-                                                        //if report is empty, delete failure tag
-                                                        dom.documentElement.getElementsByTagName('failure')[j].parentNode.removeChild(
-                                                                dom.documentElement.getElementsByTagName('failure')[j].firstChild
-                                                        );
-                                                }
-                                                else{
-                                                        dom.documentElement.getElementsByTagName('failure')[j].textContent = JSON.stringify(report);
-                                                }
+                        // The only xml nodes that need filtering are ones containing the failure tag.
+                        for( var j=0; j<dom.documentElement.getElementsByTagName('failure').length; j++){
+                                console.log(colors.bold.yellow(`Filtering the following vulnerabilities for ${dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name')}:`));
+                                var report = dom.documentElement.getElementsByTagName('failure')[j].textContent;
+                                report = report.split('\n');
+                                report.shift();
+                                report = JSON.parse(report.join('\n'));
+                                var skip = [];
+                                for(key in whitelist[dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name')]){
+                                        skip.push(whitelist[dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name')][key]['id']);
+                                }
+                                for(key in report){
+                                        if(skip.indexOf(report[key]['id'])!==-1) {
+                                                console.log(`${colors.bold.blue(report[key]['title'])} affected versions: ${colors.bold.red(dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name'))}  ${colors.red(report[key]['versions'])}`);
+                                                console.log(`${report[key]['description']}`);
+                                                delete report.key;
                                         }
                                 }
                                 console.log(colors.bold.yellow('=================================================='));
+                        
+                                if(checkProperties(report)){
+                                        //if report is empty, delete failure tag
+                                        dom.documentElement.getElementsByTagName('failure')[j].parentNode.removeChild(
+                                                dom.documentElement.getElementsByTagName('failure')[j].firstChild
+                                        );
+                                }
+                                else{
+                                        dom.documentElement.getElementsByTagName('failure')[j].textContent = JSON.stringify(report, null, 2);
+                                }
                         }
                 }
                 JUnit = new XMLSerializer().serializeToString(dom);

@@ -34,8 +34,9 @@ Usage
     -r --report                  Create JUnit reports in reports/ directory
     -v --verbose                 Print all vulnerabilities
     -V --version                 Output the version number
-    -w --whitelist <file>        Whitelist of vulnerabilities that should not break the build,
+    -w --whitelist <file>        Whitelist.json of vulnerabilities that should not break the build,
                                  e.g. XSS vulnerabilities for an app with no possbile input for XSS.
+                                 See Example test_data/audit_package_whitelist.json.
 
 ```
 
