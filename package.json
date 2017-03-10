@@ -6,7 +6,7 @@
   "bin": "./audit.js",
   "preferGlobal": true,
   "scripts": {
-    "pretest": "node audit.js -qrn -p test_data/package.json || true &&  node audit.js -rqb -p test_data/bower.json || true",
+    "pretest": "node audit.js -rq && node audit.js -qrn -p test_data/package.json || true &&  node audit.js -rqb -p test_data/bower.json || true",
     "test": "diff reports/bower.xml test_data/expected_reports/bower.xml && diff reports/package.xml test_data/expected_reports/package.xml" 
   },
   "keywords": [

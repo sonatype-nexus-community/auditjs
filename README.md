@@ -1,3 +1,5 @@
+ [![Build Status](https://travis-ci.org/qacwnfq/auditjs.svg?branch=master)](https://travis-ci.org/qacwnfq/my_first_webshop)
+
 AuditJS - Fork
 =======
 
