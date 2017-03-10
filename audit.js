@@ -98,7 +98,7 @@ program
         .option('-q --quiet', 'Supress console logging')
         .option('-r --report', 'Create JUnit reports in reports/ directory')
         .option('-v --verbose', 'Print all vulnerabilities')
-        .option('-w --whitelist <file>', 'Whitelist of vulnerabilities that should not break the build,\n\t\t\t\t e.g. XSS vulnerabilities for an app with no possbile input for XSS.')
+        .option('-w --whitelist <file>', 'Whitelist of vulnerabilities that should not break the build,\n\t\t\t\t e.g. XSS vulnerabilities for an app with no possbile input for XSS.\b\t\t\t\t                                 See Example test_data/audit_package_whitelist.json.')
         .action(function () {
         });
 
