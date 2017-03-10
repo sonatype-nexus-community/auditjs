@@ -204,14 +204,14 @@ function exitHandler(options, err) {
                 dom.documentElement.setAttribute('id', '');
                 dom.documentElement.setAttribute('skipped', expectedAudits-actualAudits);
                 if(whitelist){
-                        console.log(colors.bold('Applying whitelist. Take care to keep it up to date!'));
+                        console.log(colors.bold('Applying whitelist filtering for JUnit reports. Take care to keep the whitelist up to date!'));
                         whitelist = new DOMParser().parseFromString(whitelist);
                         whitelist = whitelist.documentElement.getElementsByTagName('testcase');
                         for(var i=0; i<whitelist.length; i++) {
                                 var wl = whitelist[i].firstChild.textContent;
                                 wl = wl.split('\n');
                                 wl.shift();
-                                console.log( colors.bold.red(`Filtering the following vulnerabilities for ${whitelist[i].getAttribute('name')}:`));
+                                console.log( colors.bold.yellow(`Filtering the following vulnerabilities for ${whitelist[i].getAttribute('name')}:`));
                                 wl = JSON.parse(wl.join('\n'));
                                 // The only xml nodes that need filtering are ones containing the failure tag.
                                 for( var j=0; j<dom.documentElement.getElementsByTagName('failure').length; j++){
@@ -223,7 +223,8 @@ function exitHandler(options, err) {
                                                 for(w in wl){
                                                         for(r in report){
                                                                 if(JSON.stringify(wl[w]) == JSON.stringify(report[r])) {
-                                                                        console.log(`${JSON.stringify(wl[w], null, 4)}`);
+                                                                        console.log(`${colors.bold.blue(wl[w]['title'])} affected versions: ${colors.bold.red(whitelist[i].getAttribute('name'))} ${colors.red(wl[w]['versions'])}`);
+                                                                        console.log(`${wl[w]['description']}`);
                                                                         delete report[r];
                                                                 }
                                                         }
@@ -239,7 +240,7 @@ function exitHandler(options, err) {
                                                 }
                                         }
                                 }
-                                console.log('==================================================');
+                                console.log(colors.bold.yellow('=================================================='));
                         }
                 }
                 JUnit = new XMLSerializer().serializeToString(dom);
