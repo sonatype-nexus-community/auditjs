@@ -94,11 +94,11 @@ program
         .version(pkg.version)
         .option('-b --bower', 'This flag is necessary to correctly audit bower\n\t\t\t\t packages. Use together with -p bower.json, since\n\t\t\t\t scanning bower_componfents is not supported')
         .option('-n --noNode', 'Ignore node executable when scanning node_modules.')
-        .option('-p --package [package.json]', 'Specific package.json or bower.json file to audit')
+        .option('-p --package <file>', 'Specific package.json or bower.json file to audit')
         .option('-q --quiet', 'Supress console logging')
         .option('-r --report', 'Create JUnit reports in reports/ directory')
         .option('-v --verbose', 'Print all vulnerabilities')
-        .option('-w --whitelist', 'Whitelist of vulnerabilities that should not break the build,\n\t\t\t\t e.g. XSS vulnerabilities for an app with no possbile input for XSS.')
+        .option('-w --whitelist <file>', 'Whitelist of vulnerabilities that should not break the build,\n\t\t\t\t e.g. XSS vulnerabilities for an app with no possbile input for XSS.')
         .action(function () {
         });
 
@@ -116,7 +116,8 @@ if(program['bower'] && !program['package']){
 }
 var programPackage = program['package'] ? path.basename(program['package']): 'scan_node_modules.json';
 var output = `${programPackage.toString().split('.json').slice(0, -1)}.xml`;
-var pm = program['bower'] ? 'bower' : 'npm';
+var pm = program['bower'] ? 'bower' : 'npm'
+var whitelist = program['whitelist'] ? fs.readFileSync(program['whitelist'], 'utf-8') : null;
 
 
 // By default we run an audit against all installed packages and their
@@ -202,6 +203,45 @@ function exitHandler(options, err) {
                 dom.documentElement.setAttribute('package', 'test');
                 dom.documentElement.setAttribute('id', '');
                 dom.documentElement.setAttribute('skipped', expectedAudits-actualAudits);
+                if(whitelist){
+                        console.log(colors.bold('Applying whitelist. Take care to keep it up to date!'));
+                        whitelist = new DOMParser().parseFromString(whitelist);
+                        whitelist = whitelist.documentElement.getElementsByTagName('testcase');
+                        for(var i=0; i<whitelist.length; i++) {
+                                var wl = whitelist[i].firstChild.textContent;
+                                wl = wl.split('\n');
+                                wl.shift();
+                                console.log( colors.bold.red(`Filtering the following vulnerabilities for ${whitelist[i].getAttribute('name')}:`));
+                                wl = JSON.parse(wl.join('\n'));
+                                // The only xml nodes that need filtering are ones containing the failure tag.
+                                for( var j=0; j<dom.documentElement.getElementsByTagName('failure').length; j++){
+                                        if(dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name') === whitelist[i].getAttribute('name')) {
+                                                var report = dom.documentElement.getElementsByTagName('failure')[j].textContent;
+                                                report = report.split('\n');
+                                                report.shift();
+                                                report = JSON.parse(report.join('\n'));
+                                                for(w in wl){
+                                                        for(r in report){
+                                                                if(JSON.stringify(wl[w]) == JSON.stringify(report[r])) {
+                                                                        console.log(`${JSON.stringify(wl[w], null, 4)}`);
+                                                                        delete report[r];
+                                                                }
+                                                        }
+                                                }
+                                                if(checkProperties(report)){
+                                                        //if report is empty, delete failure tag
+                                                        dom.documentElement.getElementsByTagName('failure')[j].parentNode.removeChild(
+                                                                dom.documentElement.getElementsByTagName('failure')[j].firstChild
+                                                        );
+                                                }
+                                                else{
+                                                        dom.documentElement.getElementsByTagName('failure')[j].textContent = JSON.stringify(report);
+                                                }
+                                        }
+                                }
+                                console.log('==================================================');
+                        }
+                }
                 JUnit = new XMLSerializer().serializeToString(dom);
                 console.log( `Wrote JUnit report to reports/${output}`);
                 fs.writeFileSync('reports/' + output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
@@ -217,6 +257,15 @@ process.on('SIGINT', exitHandler.bind(null, {exit:true}));
 
 //catches uncaught exceptions
 process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
+
+// Check if all properties of an object are null and return true if they are
+function checkProperties(obj) {
+    for (var key in obj) {
+        if (obj[key] !== null && obj[key] != "")
+            return false;
+    }
+    return true;
+}
 
 /** Recursively get a flat list of dependency objects. This is simpler for
  * subsequent code to handle then a tree of dependencies.

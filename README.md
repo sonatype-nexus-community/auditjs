@@ -29,12 +29,12 @@ Usage
     -h, --help                   Output usage information
 
     -n --noNode                  Ignore node executable when scanning node_modules
-    -p --package [package.json]  Specific package.json or bower.json file to audit
+    -p --package <file>          Specific package.json or bower.json file to audit
     -q --quiet                   Supress console logging
     -r --report                  Create JUnit reports in reports/ directory
     -v --verbose                 Print all vulnerabilities
     -V --version                 Output the version number
-    -w --whitelist               Whitelist of vulnerabilities that should not break the build,
+    -w --whitelist <file>        Whitelist of vulnerabilities that should not break the build,
                                  e.g. XSS vulnerabilities for an app with no possbile input for XSS.
 
 ```
