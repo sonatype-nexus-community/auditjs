@@ -217,16 +217,19 @@ function exitHandler(options, err) {
                                 for(key in whitelist[dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name')]){
                                         skip.push(whitelist[dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name')][key]['id']);
                                 }
+                                console.log(`skip ${skip}`);
                                 for(key in report){
                                         if(skip.indexOf(report[key]['id'])!==-1) {
+                                                console.log(`delete ${report[key]}`);
                                                 console.log(`${colors.bold.blue(report[key]['title'])} affected versions: ${colors.bold.red(dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name'))}  ${colors.red(report[key]['versions'])}`);
                                                 console.log(`${report[key]['description']}`);
-                                                delete report.key;
+                                                delete report[key];
                                         }
                                 }
                                 console.log(colors.bold.yellow('=================================================='));
                         
                                 if(checkProperties(report)){
+                                        console.log('report is empty');
                                         //if report is empty, delete failure tag
                                         dom.documentElement.getElementsByTagName('failure')[j].parentNode.removeChild(
                                                 dom.documentElement.getElementsByTagName('failure')[j].firstChild
@@ -255,11 +258,11 @@ process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 
 // Check if all properties of an object are null and return true if they are
 function checkProperties(obj) {
-    for (var key in obj) {
-        if (obj[key] !== null && obj[key] != "")
-            return false;
-    }
-    return true;
+        for (var key in obj) {
+                if (obj[key] !== null && obj[key] != "")
+                        return false;
+        }
+        return true;
 }
 
 /** Recursively get a flat list of dependency objects. This is simpler for
