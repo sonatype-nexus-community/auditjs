@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="auditjs.security.bower" errors="0" tests="9" failures="2" package="test" id="" skipped="0"><testcase name="requirejs"/><testcase name="requirejs-plugins"/><testcase name="bootswatch-scss"/><testcase name="angular"><failure message="Found 21 vulnerabilities. See stacktrace for details.">Details:
+<testsuite name="auditjs.security.bower" errors="0" tests="9" package="test" id="" skipped="0" failures="2"><testcase name="requirejs"/><testcase name="requirejs-plugins"/><testcase name="bootswatch-scss"/><testcase name="angular"><failure message="Found 21 vulnerabilities. See stacktrace for details.">Details:
 
                         [
   {

@@ -196,13 +196,6 @@ function exitHandler(options, err) {
                 mkdirp('reports');
                 JUnit = jsontoxml(JUnit);
                 var dom = new DOMParser().parseFromString(JUnit);
-                dom.documentElement.setAttribute('name', `auditjs.security.${programPackage.split('.')[0]}`);
-                dom.documentElement.setAttribute('errors', 0);
-                dom.documentElement.setAttribute('tests', expectedAudits);
-                dom.documentElement.setAttribute('failures', vulnerabilityCount);
-                dom.documentElement.setAttribute('package', 'test');
-                dom.documentElement.setAttribute('id', '');
-                dom.documentElement.setAttribute('skipped', expectedAudits-actualAudits);
                 if(whitelist){
                         whitelist = JSON.parse(whitelist);
                         console.log(colors.bold('Applying whitelist filtering for JUnit reports. Take care to keep the whitelist up to date!'));
@@ -223,6 +216,7 @@ function exitHandler(options, err) {
                                                 console.log(`${colors.bold.blue(report[key]['title'])} affected versions: ${colors.bold.red(dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name'))}  ${colors.red(report[key]['versions'])}`);
                                                 console.log(`${report[key]['description']}`);
                                                 delete report[key];
+                                                vunlerabilityCount-=1;
                                         }
                                 }
                                 console.log(colors.bold.yellow('=================================================='));
@@ -241,6 +235,13 @@ function exitHandler(options, err) {
                                 }
                         }
                 }
+                dom.documentElement.setAttribute('name', `auditjs.security.${programPackage.split('.')[0]}`);
+                dom.documentElement.setAttribute('errors', 0);
+                dom.documentElement.setAttribute('tests', expectedAudits);
+                dom.documentElement.setAttribute('package', 'test');
+                dom.documentElement.setAttribute('id', '');
+                dom.documentElement.setAttribute('skipped', expectedAudits-actualAudits);
+                dom.documentElement.setAttribute('failures', vulnerabilityCount);
                 JUnit = new XMLSerializer().serializeToString(dom);
                 console.log( `Wrote JUnit report to reports/${output}`);
                 fs.writeFileSync('reports/' + output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
