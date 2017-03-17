@@ -217,7 +217,6 @@ function exitHandler(options, err) {
                                 for(key in whitelist[dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name')]){
                                         skip.push(whitelist[dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name')][key]['id']);
                                 }
-                                console.log(`skip ${skip}`);
                                 for(key in report){
                                         if(skip.indexOf(report[key]['id'])!==-1) {
                                                 console.log(`delete ${report[key]}`);
@@ -234,9 +233,11 @@ function exitHandler(options, err) {
                                         dom.documentElement.getElementsByTagName('failure')[j].parentNode.removeChild(
                                                 dom.documentElement.getElementsByTagName('failure')[j].firstChild
                                         );
+                                        // go back one step, since we deleted one element from the xmldom.
+                                        j-=1;
                                 }
                                 else{
-                                        dom.documentElement.getElementsByTagName('failure')[j].textContent = JSON.stringify(report, null, 2);
+                                        dom.documentElement.getElementsByTagName('failure')[j].textContent = JSON.stringify(report, replacer, 2);
                                 }
                         }
                 }
@@ -245,6 +246,12 @@ function exitHandler(options, err) {
                 fs.writeFileSync('reports/' + output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
         }
         process.exit(vulnerabilityCount);
+}
+function replacer(key, value) {
+        if(typeof value === 'undefined'){
+                return undefined;
+        }
+        return value;
 }
 
 //do something when app is closing
