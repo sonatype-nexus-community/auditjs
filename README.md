@@ -1,4 +1,6 @@
-AuditJS
+ [![Build Status](https://travis-ci.org/qacwnfq/auditjs.svg?branch=master)](https://travis-ci.org/qacwnfq/my_first_webshop)
+
+AuditJS - Fork
 =======
 
 Audits an NPM project using the [OSS Index v2 REST API](https://ossindex.net/docs/restapi2)
@@ -16,15 +18,26 @@ npm install auditjs -g
 Usage
 -----
 
-```
+```terminal
   Usage: auditjs [options]
 
   Options:
 
-    -h, --help                   output usage information
-    -V, --version                output the version number
-    -p --package [package.json]  Specific package.json file to audit
+    -b --bower                   This flag is necessary to correctly audit bower packages. 
+                                 Use together with -p bower.json, since scanning
+                                 bower_components is not supported.
+    -h, --help                   Output usage information
+
+    -n --noNode                  Ignore node executable when scanning node_modules
+    -p --package <file>          Specific package.json or bower.json file to audit
+    -q --quiet                   Supress console logging
+    -r --report                  Create JUnit reports in reports/ directory
     -v --verbose                 Print all vulnerabilities
+    -V --version                 Output the version number
+    -w --whitelist <file>        Whitelist.json of vulnerabilities that should not break the build,
+                                 e.g. XSS vulnerabilities for an app with no possbile input for XSS.
+                                 See Example test_data/audit_package_whitelist.json.
+
 ```
 
 Audit installed packages and their dependencies to identify known
