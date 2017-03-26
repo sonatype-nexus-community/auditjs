@@ -1,6 +1,4 @@
- [![Build Status](https://travis-ci.org/qacwnfq/auditjs.svg?branch=master)](https://travis-ci.org/qacwnfq/my_first_webshop)
-
-AuditJS - Fork
+AuditJS
 =======
 
 Audits an NPM project using the [OSS Index v2 REST API](https://ossindex.net/docs/restapi2)
@@ -23,7 +21,7 @@ Usage
 
   Options:
 
-    -b --bower                   This flag is necessary to correctly audit bower packages. 
+    -b --bower                   This flag is necessary to correctly audit bower packages.
                                  Use together with -p bower.json, since scanning
                                  bower_components is not supported.
     -h, --help                   Output usage information
@@ -44,7 +42,7 @@ Audit installed packages and their dependencies to identify known
 vulnerabilities.
 
 Execute from inside a node project (above the node_modules directory) to audit
-the dependencies. 
+the dependencies.
 
 If a package.json file is specified as an argument, only the dependencies in
 the package file will be audited.
@@ -75,6 +73,11 @@ any particular version is known to be vulnerable.
 
 Credit
 ------
+
+Many thanks to [Frederik J](https://github.com/qacwnfq) for his great improvements, including:
+* Bower support
+* JUnit reports
+* Whitelisting
 
 Data in OSS Index has been retrieved and cross referenced from several
 sources, including but not limited to:
