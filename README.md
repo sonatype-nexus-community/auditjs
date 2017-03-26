@@ -74,7 +74,7 @@ any particular version is known to be vulnerable.
 Credit
 ------
 
-Many thanks to [Frederik J](https://github.com/qacwnfq) for his great improvements, including:
+Many thanks to [Fredrik J](https://github.com/qacwnfq) for his great improvements, including:
 * Bower support
 * JUnit reports
 * Whitelisting
