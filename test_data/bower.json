@@ -4,17 +4,6 @@
     "description": "A demo bower.json for audit.js.",
     "license": "MIT",
     "dependencies": {
-        "requirejs": "~2.1.0",
-        "requirejs-plugins": "~1.0.0",
-        "bootswatch-scss": "~3.2.0",
-        "angular": "~1.4.3",
-        "angular-route": "~1.4.3",
-        "angular-mocks": "^1.6.2",
-        "angular-sanitize": "~1.4.3",
-        "jquery": "^2.2.4",
-        "moment": "^2.17.1"
-    },
-    "resolutions": {
-        "bootstrap-sass-official": "3.3.x"
+        "angular": "~1.4.3"
     }
 }
