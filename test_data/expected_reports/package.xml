@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="auditjs.security.package" errors="0" tests="9" package="test" id="" skipped="0" failures="-3"><testcase name="requirejs"/><testcase name="requirejs-plugins"/><testcase name="bootswatch-scss"/><testcase name="angular"><failure message="Found 8 vulnerabilities. See stacktrace for details.">[
+<testsuite name="auditjs.security.package" errors="0" tests="9" package="test" id="" skipped="0" failures="1"><testcase name="requirejs"/><testcase name="requirejs-plugins"/><testcase name="bootswatch-scss"/><testcase name="angular"><failure message="Found 9 vulnerabilities. See stacktrace for details.">[
+  {
+    "id": 8398878757,
+    "title": "Cross Site Scripting (XSS) in JSONP",
+    "description": "JSONP allows untrusted resource URLs, which provides a vector for attack by malicious actors.",
+    "versions": [
+      "&lt;1.6.0-rc.0"
+    ],
+    "references": [
+      "https://github.com/angular/angular.js/commit/6476af83cd0418c84e034a955b12a842794385c4",
+      "https://github.com/angular/angular.js/issues/11352",
+      "https://snyk.io/vuln/npm:angular:20150315"
+    ],
+    "published": 0,
+    "updated": 1493261505026
+  },
   {
     "id": 8399952532,
     "title": "Possible security hold with usemap attribute",

@@ -213,17 +213,17 @@ function exitHandler(options, err) {
                                 }
                                 for(key in report){
                                         if(skip.indexOf(report[key]['id'])!==-1) {
-                                                console.log(`delete ${report[key]}`);
+
                                                 console.log(`${colors.bold.blue(report[key]['title'])} affected versions: ${colors.bold.red(dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name'))}  ${colors.red(report[key]['versions'])}`);
                                                 console.log(`${report[key]['description']}`);
                                                 delete report[key];
-                                                filtered += 1;
                                         }
                                 }
                                 console.log(colors.bold.yellow('=================================================='));
                         
                                 if(checkProperties(report)){
-                                        console.log('report is empty');
+                                        // report is empty
+                                        filtered += 1;
                                         //if report is empty, delete failure tag
                                         dom.documentElement.getElementsByTagName('failure')[j].parentNode.removeChild(
                                                 dom.documentElement.getElementsByTagName('failure')[j].firstChild
