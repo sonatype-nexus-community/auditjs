@@ -1,4 +1,6 @@
-#!/usr/bin/env node
+#!/bin/sh
+':' //; exec "$(command -v nodejs || command -v node)" "$0" "$@"
+
 /**
  *      Copyright (c) 2015-2017 Vör Security Inc.
  *      All rights reserved.
