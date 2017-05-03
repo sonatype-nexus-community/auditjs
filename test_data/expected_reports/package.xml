@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="auditjs.security.package" errors="0" tests="9" package="test" id="" skipped="0" failures="1"><testcase name="requirejs"/><testcase name="requirejs-plugins"/><testcase name="bootswatch-scss"/><testcase name="angular"><failure message="Found 9 vulnerabilities. See stacktrace for details.">[
+<testsuite name="auditjs.security.package" errors="0" tests="9" package="test" id="" skipped="0" failures="1"><testcase name="requirejs"/><testcase name="requirejs-plugins"/><testcase name="bootswatch-scss"/><testcase name="angular"><failure message="Found 10 vulnerabilities. See stacktrace for details.">[
   {
     "id": 8398878757,
     "title": "Cross Site Scripting (XSS) in JSONP",
@@ -135,5 +135,22 @@
     ],
     "published": 1485949862562,
     "updated": 1485964583864
+  },
+  {
+    "id": 8402905897,
+    "title": "Cross Site Scripting (XSS)",
+    "description": "> Affected versions of the package are vulnerable to Cross-site Scripting (XSS) due to the usemap attribute not being blacklisted.\n> \n> -- [snyk.io](https://snyk.io/vuln/npm:angular:20160122)",
+    "versions": [
+      ">=1.3.0 &lt;1.5.0-rc.2"
+    ],
+    "references": [
+      "https://cwe.mitre.org/data/definitions/79.html",
+      "https://github.com/angular/angular.js/blob/master/CHANGELOG.md#150-rc2-controller-requisition-2016-01-28",
+      "https://github.com/angular/angular.js/commit/234053fc9ad90e0d05be7e8359c6af66be94c094",
+      "https://github.com/angular/angular.js/pull/13826",
+      "https://snyk.io/vuln/npm:angular:20160122"
+    ],
+    "published": 1493786539513,
+    "updated": 1493790769282
   }
 ]</failure></testcase><testcase name="angular-mocks"/><testcase name="angular-sanitize"/><testcase name="angular-route"/><testcase name="jquery"/><testcase name="moment"/></testsuite>
