@@ -1,5 +1,5 @@
 #!/bin/sh
-':' //; exec "$(command -v nodejs || command -v node)" "$0" "$@"
+':' //; exec "$(command -v node || command -v nodejs)" "$0" "$@"
 
 /**
  *      Copyright (c) 2015-2017 Vör Security Inc.
