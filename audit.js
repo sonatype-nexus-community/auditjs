@@ -85,6 +85,12 @@ var actualAudits = 0;
 var dependencies = [];
 
 /**
+ * Map of dependencies to audit. This ensures we only audit a dependency
+ * once.
+ */
+var auditLookup = {};
+
+/**
  * Count encountered vulnerabilities
  */
 var vulnerabilityCount = 0;
@@ -297,7 +303,15 @@ function getDependencyList(depMap) {
                         // Only add a dependency once
                         if(lookup[name + o.version] == undefined) {
                                 lookup[name + o.version] = true;
-                                results.push({"pm": pm, "name": name, "version": o.version});
+                                // We need both the local and global "auditLookup" tables.
+                                // The global lookup is used to ensure we only audit a
+                                // dependency once, but cannot be done at the same level
+                                // as the local lookup since the sub-dependencies are not
+                                // available at all locations of the dependency tree (depMap).
+                                if (auditLookup[name + o.version] == undefined) {
+									auditLookup[name + o.version] = true;
+									results.push({"pm": pm, "name": name, "version": o.version});
+								}
                                 if(o.dependencies) {
                                         var deps = getDependencyList(o.dependencies);
 
@@ -311,7 +325,10 @@ function getDependencyList(depMap) {
                         // Only add a dependency once
                         if(lookup[name + o] == undefined) {
                                 lookup[name + o] = true;
-                                results.push({"pm": pm, "name": name, "version": o});
+                                if (auditLookup[name + o] == undefined) {
+									auditLookup[name + o] = true;
+									results.push({"pm": pm, "name": name, "version": o});
+								}
                         }
                 }
         }
