@@ -42,8 +42,12 @@ Usage
 Audit installed packages and their dependencies to identify known
 vulnerabilities.
 
+**IMPORTANT WINDOWS USAGE NOTE ... IMPORTANT WINDOWS USAGE NOTE ... IMPORTANT WINDOWS USAGE NOTE**
+
 > **On windows execute using `auditjs-win`.** This is required for now due to some
 > Linux-specific code which mitigates some odd Debian/Ubuntu specific edge cases.
+
+**IMPORTANT WINDOWS USAGE NOTE ... IMPORTANT WINDOWS USAGE NOTE ... IMPORTANT WINDOWS USAGE NOTE**
 
 Execute from inside a node project (above the node_modules directory) to audit
 the dependencies.
