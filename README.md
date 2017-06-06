@@ -42,8 +42,8 @@ Usage
 Audit installed packages and their dependencies to identify known
 vulnerabilities.
 
-**On windows execute using `auditjs-win`.** This is required for now due to some
-Linux-specific code which mitigates some odd Debian/Ubuntu specific edge cases.
+> **On windows execute using `auditjs-win`.** This is required for now due to some
+> Linux-specific code which mitigates some odd Debian/Ubuntu specific edge cases.
 
 Execute from inside a node project (above the node_modules directory) to audit
 the dependencies.
