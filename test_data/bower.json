@@ -4,6 +4,6 @@
     "description": "A demo bower.json for audit.js.",
     "license": "MIT",
     "dependencies": {
-        "angular": "~1.4.3"
+        "vor-test-project-bower-please-ignore-1": "2.0.0"
     }
 }
