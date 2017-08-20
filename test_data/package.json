@@ -10,5 +10,17 @@
     "license": "ISC",
     "dependencies": {
         "vor-test-project-npm-please-ignore-1": "2.0.0"
+    },
+    "devDependencies": {
+        "vor-test-project-npm-please-ignore-2": "2.0.0"
+    },
+    "peerDependencies": {
+        "vor-test-project-npm-please-ignore-2": "2.0.0"
+    },
+    "bundledDependencies": {
+        "vor-test-project-npm-please-ignore-1": "2.0.0"
+    },
+    "optionalDependencies": {
+        "vor-test-project-npm-please-ignore-1": "2.0.0"
     }
 }

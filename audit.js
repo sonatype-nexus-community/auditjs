@@ -103,6 +103,7 @@ program
         .option('-b --bower', 'This flag is necessary to correctly audit bower\n\t\t\t\t packages. Use together with -p bower.json, since\n\t\t\t\t scanning bower_componfents is not supported')
         .option('-n --noNode', 'Ignore node executable when scanning node_modules.')
         .option('-p --package <file>', 'Specific package.json or bower.json file to audit')
+        .option('-d --dependencyTypes <list>', 'One or more of devDependencies, dependencies, peerDependencies, bundledDependencies, or optionalDependencies')
         .option('-q --quiet', 'Supress console logging')
         .option('-r --report', 'Create JUnit reports in reports/ directory')
         .option('-v --verbose', 'Print all vulnerabilities')
@@ -127,6 +128,8 @@ var output = `${programPackage.toString().split('.json').slice(0, -1)}.xml`;
 var pm = program['bower'] ? 'bower' : 'npm'
 var whitelist = program['whitelist'] ? fs.readFileSync(program['whitelist'], 'utf-8') : null;
 
+var categories = ['dependencies'];
+categories = program['dependencyTypes'] ? program['dependencyTypes'].split(",") : categories;
 
 // By default we run an audit against all installed packages and their
 // dependencies.
@@ -185,12 +188,21 @@ else {
         // Call the auditor library passing the dependency list from the
         // package.json file. The second argument is a callback that will
         // print the results to the console.
-        if(targetPkg.dependencies != undefined) {
+        var deps = [];
+        for (var i = 0; i < categories.length; i++) {
+        	var category = categories[i];
+            if(targetPkg[category] != undefined) {
                 // Get a flat list of dependencies instead of a map.
-                var deps = getDependencyList(targetPkg.dependencies);
-                expectedAudits = deps.length;
-                auditor.auditPackages(deps, resultCallback);
+            	var myDeps = getDependencyList(targetPkg[category]);
+            	if (myDeps) {
+            		// getDependencyList avoids duplicates, so we can just append
+            		deps = deps.concat(myDeps);
+            	}
+            }
         }
+        
+        expectedAudits = deps.length;
+        auditor.auditPackages(deps, resultCallback);
 }
 
 /** Set the return value
