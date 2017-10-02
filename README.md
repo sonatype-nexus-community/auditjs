@@ -67,6 +67,105 @@ Running in verbose mode prints more descriptive output, and some extra informati
 such as ALL vulnerabilities for a package, whether they are identified as
 impacting the installed version or not.
 
+Whitelisting
+------------
+It may be that a particular vulnerability does not impact your code, and upgrading the
+dependency is not feasible, wise, or indeed possible in your case. In that situation it
+is possible to whitelist a vulnerability to hide it from the output and report.
+
+Successful whitelisting will remove vulnerability mentions in the standard output and
+report text, but will be mentioned elsewhere in the standard output like so:
+
+```
+Filtering the following vulnerabilities
+==================================================
+Test vulnerability, please ignore affected versions: vor-test-project-npm-please-ignore-1 <=2.0.0
+This is a test vulnerability for a test project
+==================================================
+```
+
+The whitelist is a JSON document which is passed on the command line using the `-w <file>`
+option. The whitelist document itself can take one of two forms: simplified and verbose.
+
+### Simplified Whitelist Format
+
+The simplified whitelist is a list of vulnerability IDs. The ID for a vulnerability can
+be seen by generating the report (`-r`) and viewing the embedded JSON describing a
+particular vulnerability. For example:
+
+```
+...
+  {
+    "id": 8398878757,
+    "title": "Cross Site Scripting (XSS) in JSONP",
+    "description": "JSONP allows untrusted resource URLs, which provides a vector for attack by malicious actors.",
+    "versions": [
+      "&lt;1.6.0-rc.0"
+    ],
+    "references": [
+      "https://github.com/angular/angular.js/commit/6476af83cd0418c84e034a955b12a842794385c4",
+      "https://github.com/angular/angular.js/issues/11352"
+    ],
+    "published": 0,
+    "updated": 1493261505026
+  },
+...
+```
+
+The vulnerability id is right at the top. A whitelist will look like this:
+
+```
+[
+8402907551,
+8402907552
+]
+```
+
+### Verbose Whitelist Format
+
+The verbose whitelist is valuable because it acts as documentation on the details of the
+vulnerabilities that have been filtered, with the associated title, description, version
+range, and associated package.
+
+Here is the simplest example:
+
+```
+{
+  "packageName": [
+  {
+    "id": 8402907551
+  }
+  ]
+}
+...
+```
+
+The document is a JSON object, where the field names are the names of packages which contain
+the vulnerabilities, and the value is a list of the vulnerabilities affecting the package that
+should be filtered. The minimal data required is the ID for the vulnerability.
+
+And now something a bit more useful.
+
+```
+{
+  "packageName": [
+  {
+    "id": 8402907551,
+    "title": "Test vulnerability, please ignore",
+    "description": "This is a test vulnerability for a test project",
+    "versions": [
+      "&lt;=2.0.0"
+    ]
+  }
+  ]
+}
+...
+```
+
+Here we reproduced the title, description, and version range of the vulnerability that is being
+filtered. The data was copied straight from the JSON in the generated report. You can include any
+of the fields that you feel are most useful in documenting the vulnerability.
+
 Limitations
 -----------
 
