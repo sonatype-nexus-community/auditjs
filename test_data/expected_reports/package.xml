@@ -1,16 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="auditjs.security.package" errors="0" tests="1" package="test" id="" skipped="0" failures="1"><testcase name="vor-test-project-npm-please-ignore-1"><failure message="Found 1 vulnerabilities. See stacktrace for details.">[
-  {
-    "id": 8402907551,
-    "title": "Test vulnerability, please ignore",
-    "description": "This is a test vulnerability for a test project",
-    "versions": [
-      "&lt;=2.0.0"
-    ],
-    "references": [
-      "https://vorsecurity.com/3"
-    ],
-    "published": 1493874212256,
-    "updated": 1493874464883
-  }
-]</failure></testcase></testsuite>
+<testsuite name="auditjs.security.package" errors="0" tests="1" package="test" id="" skipped="0" failures="0"><testcase name="vor-test-project-npm-please-ignore-1"/></testsuite>
