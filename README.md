@@ -50,10 +50,12 @@ vulnerabilities.
 **IMPORTANT WINDOWS USAGE NOTE ... IMPORTANT WINDOWS USAGE NOTE ... IMPORTANT WINDOWS USAGE NOTE**
 
 Execute from inside a node project (above the node_modules directory) to audit
-the dependencies.
+the dependencies. This will audit not only the direct dependencies of the project,
+but all **transitive** dependencies. To identify transitive dependencies they must
+all be installed for the project under audit.
 
 If a package.json file is specified as an argument, only the dependencies in
-the package file will be audited.
+the package file will be audited (no transitive dependencies).
 
 If a vulnerability is found to be affecting an installed library the package
 header will be highlighted in red and information about the pertinent
