@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="auditjs.security.bower" errors="0" tests="1" package="test" id="" skipped="0" failures="1"><testcase name="angular"><failure message="Found 8 vulnerabilities. See stacktrace for details.">Details:
+<testsuite name="auditjs.security.bower" errors="0" tests="1" package="test" id="" skipped="0" failures="1"><testcase name="angular"><failure message="Found 5 vulnerabilities. See stacktrace for details.">Details:
 
                         [
   {
@@ -11,8 +11,7 @@
     ],
     "references": [
       "https://github.com/angular/angular.js/commit/6476af83cd0418c84e034a955b12a842794385c4",
-      "https://github.com/angular/angular.js/issues/11352",
-      "https://snyk.io/vuln/npm:angular:20150315"
+      "https://github.com/angular/angular.js/issues/11352"
     ],
     "published": 0,
     "updated": 1493261505026
@@ -56,7 +55,6 @@
       "https://cwe.mitre.org/data/definitions/78.html",
       "https://github.com/angular/angular.js/commit/67688d5ca00f6de4c7fe6084e2fa762a00d25610",
       "https://github.com/angular/angular.js/pull/11290",
-      "https://snyk.io/vuln/npm:angular:20150310",
       "https://srcclr.com/security/arbitrary-code-execution-through-svg/javascript/s-2253"
     ],
     "published": 1469728274567,
@@ -75,51 +73,6 @@
     ],
     "published": 1483077792740,
     "updated": 1483078107273
-  },
-  {
-    "id": 8402384794,
-    "title": "Cross-site Scripting (XSS)",
-    "description": "> Affected versions of the package are vulnerable to Cross-site Scripting (XSS) due to no proper sanitization of xlink:href attributes.\n> \n> -- [snyk.io](https://snyk.io/vuln/npm:angular:20150807)",
-    "versions": [
-      "&lt;1.5.0-beta.0 >=1.0.0"
-    ],
-    "references": [
-      "https://github.com/angular/angular.js/commit/f33ce173c90736e349cf594df717ae3ee41e0f7a",
-      "https://github.com/angular/angular.js/pull/12524",
-      "https://snyk.io/vuln/npm:angular:20150807"
-    ],
-    "published": 1485900514365,
-    "updated": 1485931408807
-  },
-  {
-    "id": 8402384796,
-    "title": "Cross-site Scripting (XSS)",
-    "description": "> Affected versions of the package are vulnerable to Mutation Cross-site Scripting (mXSS).\n> \n> -- [snyk.io](https://snyk.io/vuln/npm:angular:20150909)",
-    "versions": [
-      "&lt;1.5.0-beta.2"
-    ],
-    "references": [
-      "https://github.com/angular/angular.js/commit/bc0d8c4eea9a34bff5e29dd492dcdd668251be40",
-      "https://github.com/angular/angular.js/pull/12524",
-      "https://snyk.io/vuln/npm:angular:20150909"
-    ],
-    "published": 1485901294649,
-    "updated": 1485931425201
-  },
-  {
-    "id": 8402385510,
-    "title": "Cross-site Scripting (XSS)",
-    "description": ">  Affected versions of the package are vulnerable to Cross-site Scripting (XSS) attacks involving assignment on constructor properties.\n> \n> -- [snyk](https://snyk.io/vuln/npm:angular:20151130)",
-    "versions": [
-      "&lt;1.4.10"
-    ],
-    "references": [
-      "https://github.com/angular/angular.js/commit/5a674f3bb9d1118d11b333e3b966c01a571c09e6",
-      "https://github.com/angular/angular.js/pull/13417",
-      "https://snyk.io/vuln/npm:angular:20151130"
-    ],
-    "published": 1485949862562,
-    "updated": 1485964583864
   }
 ]
 
