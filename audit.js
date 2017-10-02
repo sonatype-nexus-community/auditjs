@@ -126,10 +126,16 @@ if(program['bower'] && !program['package']){
 var programPackage = program['package'] ? path.basename(program['package']): 'scan_node_modules.json';
 var output = `${programPackage.toString().split('.json').slice(0, -1)}.xml`;
 var pm = program['bower'] ? 'bower' : 'npm'
-var whitelist = program['whitelist'] ? fs.readFileSync(program['whitelist'], 'utf-8') : null;
 
 var categories = ['dependencies'];
 categories = program['dependencyTypes'] ? program['dependencyTypes'].split(",") : categories;
+
+// Simplify the white-list so that it is a simple lookup table of vulnerability IDs.
+var whitelist = program['whitelist'] ? fs.readFileSync(program['whitelist'], 'utf-8') : null;
+whitelist = prepareWhitelist(whitelist);
+
+// Remember all vulnerabilities that were white-listed
+var whitelistedVulnerabilities = [];
 
 // By default we run an audit against all installed packages and their
 // dependencies.
@@ -212,65 +218,84 @@ else {
  * @returns
  */
 function exitHandler(options, err) {
-        if(program['report']) {
-                var filtered = 0;
-                mkdirp('reports');
-                JUnit = jsontoxml(JUnit);
-                var dom = new DOMParser().parseFromString(JUnit);
-                if(whitelist){
-                        whitelist = JSON.parse(whitelist);
-                        console.log(colors.bold('Applying whitelist filtering for JUnit reports. Take care to keep the whitelist up to date!'));
-                        // The only xml nodes that need filtering are ones containing the failure tag.
-                        for( var j=0; j<dom.documentElement.getElementsByTagName('failure').length; j++){
-                                console.log(colors.bold.yellow(`Filtering the following vulnerabilities for ${dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name')}:`));
-                                var report = dom.documentElement.getElementsByTagName('failure')[j].textContent;
-                                report = report.split('\n');
-                                report.shift();
-                                report = JSON.parse(report.join('\n'));
-                                var skip = [];
-                                for(key in whitelist[dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name')]){
-                                        skip.push(whitelist[dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name')][key]['id']);
-                                }
-                                for(key in report){
-                                        if(skip.indexOf(report[key]['id'])!==-1) {
-
-                                                console.log(`${colors.bold.blue(report[key]['title'])} affected versions: ${colors.bold.red(dom.documentElement.getElementsByTagName('failure')[j].parentNode.getAttribute('name'))}  ${colors.red(report[key]['versions'])}`);
-                                                console.log(`${report[key]['description']}`);
-                                                delete report[key];
-                                        }
-                                }
-                                console.log(colors.bold.yellow('=================================================='));
-                        
-                                if(checkProperties(report)){
-                                        // report is empty
-                                        filtered += 1;
-                                        //if report is empty, delete failure tag
-                                        dom.documentElement.getElementsByTagName('failure')[j].parentNode.removeChild(
-                                                dom.documentElement.getElementsByTagName('failure')[j].firstChild
-                                        );
-                                        // go back one step, since we deleted one element from the xmldom.
-                                        j-=1;
-                                }
-                                else{
-                                        dom.documentElement.getElementsByTagName('failure')[j].textContent = JSON.stringify(report, replacer, 2);
-                                }
-                        }
-                }
-                dom.documentElement.setAttribute('name', `auditjs.security.${programPackage.split('.')[0]}`);
-                dom.documentElement.setAttribute('errors', 0);
-                dom.documentElement.setAttribute('tests', expectedAudits);
-                dom.documentElement.setAttribute('package', 'test');
-                dom.documentElement.setAttribute('id', '');
-                dom.documentElement.setAttribute('skipped', expectedAudits-actualAudits);
-                dom.documentElement.setAttribute('failures', vulnerabilityCount-filtered);
-                JUnit = new XMLSerializer().serializeToString(dom);
-                console.log( `Wrote JUnit report to reports/${output}`);
-                fs.writeFileSync('reports/' + output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
-                // Report mode is much like a test mode where builds shouldn't fail if the report was created.
-                vulnerabilityCount = 0;
+	if (whitelistedVulnerabilities.length > 0) {
+        console.log(colors.bold.yellow("Filtering the following vulnerabilities"));
+        console.log(colors.bold.yellow('=================================================='));
+        for (var i = 0; i < whitelistedVulnerabilities.length; i++) {
+        	var detail = whitelistedVulnerabilities[i];
+            console.log(`${colors.bold.blue(detail['title'])} affected versions: ${colors.red(detail['package'])} ${colors.red(detail['versions'])}`);
+            console.log(`${detail['description']}`);
+            console.log(colors.bold.yellow('=================================================='));
+        };
+	}
+	
+    if(program['report']) {
+        var filtered = 0;
+        mkdirp('reports');
+        if (JUnit[0] != '<') { // This is a hack in case this gets called twice
+        	// Convert to XML
+            JUnit = jsontoxml(JUnit);
         }
-        process.exit(vulnerabilityCount);
+        var dom = new DOMParser().parseFromString(JUnit);
+        dom.documentElement.setAttribute('name', `auditjs.security.${programPackage.split('.')[0]}`);
+        dom.documentElement.setAttribute('errors', 0);
+        dom.documentElement.setAttribute('tests', expectedAudits);
+        dom.documentElement.setAttribute('package', 'test');
+        dom.documentElement.setAttribute('id', '');
+        dom.documentElement.setAttribute('skipped', expectedAudits-actualAudits);
+        dom.documentElement.setAttribute('failures', vulnerabilityCount-filtered);
+        JUnit = new XMLSerializer().serializeToString(dom);
+        console.log( `Wrote JUnit report to reports/${output}`);
+        fs.writeFileSync('reports/' + output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
+        // Report mode is much like a test mode where builds shouldn't fail if the report was created.
+        vulnerabilityCount = 0;
+    }
+    process.exit(vulnerabilityCount);
 }
+
+/**
+ * Do some preparations on the whitelist, which results in it being a map of vulnerability
+ * IDs (to themselves).
+ */
+function prepareWhitelist(whitelist) {
+	if(whitelist){
+        console.log(colors.bold('Applying whitelist filtering for JUnit reports. Take care to keep the whitelist up to date!'));
+
+		// The white-list is either a list or the old format, which is an object with more
+		// complex structures.
+	    whitelist = JSON.parse(whitelist);
+	    
+	    // If we are using the old white list format, then convert it to the simplified format
+	    if (!Array.isArray(whitelist)) {
+	    	whitelist = simplifyWhitelist(whitelist);
+	    }
+	    
+	    // Convert the list to a map for easy lookup
+	    var whitelistMap = {};
+	    for (var i = 0; i < whitelist.length; i++) {
+	    	var key = whitelist[i];
+	    	whitelistMap[key] = key;
+	    }
+	    whitelist = whitelistMap;
+	}
+	return whitelist;
+}
+
+/**
+ * Simplify the white-list into a list of issue IDs.
+ */
+function simplifyWhitelist(whitelist) {
+	var results = [];
+	for (var project in whitelist) {
+		var vlist = whitelist[project];
+		for (var i = 0; i < vlist.length; i++) {
+			var id = vlist[i].id;
+			results.push(id);
+		}
+	}
+	return results;
+}
+
 function replacer(key, value) {
         if(typeof value === 'undefined'){
                 return undefined;
@@ -396,7 +421,7 @@ function resultCallback(err, pkg) {
 
         // If we KNOW a possibly used version is vulnerable then highlight the
         // title in red.
-        var myVulnerabilities = getValidVulnerabilities(version, pkg.vulnerabilities);
+        var myVulnerabilities = getValidVulnerabilities(version, pkg.vulnerabilities, pkg.name);
         if(myVulnerabilities.length > 0) {
                 vulnerabilityCount += 1;
                 console.log("------------------------------------------------------------");
@@ -532,18 +557,26 @@ function resultCallback(err, pkg) {
  * @param details Vulnerability details
  * @returns
  */
-function getValidVulnerabilities(productRange, details) {
+function getValidVulnerabilities(productRange, details, pkg) {
         var results = [];
         if(details != undefined) {
                 for(var i = 0; i < details.length; i++) {
                         var detail = details[i];
-
+                        
                         if(detail.versions != undefined && detail.versions.length > 0) {
                                 for(var j = 0; j < detail.versions.length; j++) {
                                         // Get the vulnerability range
                                         var vulnRange = detail.versions[j]
 
                                         if(rangesOverlap(productRange, vulnRange)) {
+                                        		// Do we white-list this match?
+	                                            var id = detail.id;
+	                                            if (whitelist && whitelist[id]) {
+	                                            	detail["package"] = pkg;
+	                                            	whitelistedVulnerabilities.push(detail);
+	                                            	break;
+	                                            }
+
                                                 results.push(detail);
                                                 break;
                                         }
