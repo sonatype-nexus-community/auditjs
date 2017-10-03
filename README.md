@@ -79,8 +79,8 @@ report text, but will be mentioned elsewhere in the standard output like so:
 ```
 Filtering the following vulnerabilities
 ==================================================
-Test vulnerability, please ignore affected versions: vor-test-project-npm-please-ignore-1 <=2.0.0
-This is a test vulnerability for a test project
+Root path disclosure vulnerability affected versions: expressjs <3.19.1 || >=4.0.0 <4.11.1
+Fixed root path disclosure vulnerability in express.static, res.sendfile, and res.sendFile
 ==================================================
 ```
 
@@ -116,16 +116,16 @@ The vulnerability id is right at the top. A whitelist will look like this:
 
 ```
 [
-8402907551,
+8398878757,
 8402907552
 ]
 ```
 
 ### Verbose Whitelist Format
 
-The verbose whitelist is valuable because it acts as documentation on the details of the
+The verbose whitelist is useful because it acts as documentation on the details of the
 vulnerabilities that have been filtered, with the associated title, description, version
-range, and associated package.
+range, and package.
 
 Here is the simplest example:
 
@@ -133,7 +133,10 @@ Here is the simplest example:
 {
   "packageName": [
   {
-    "id": 8402907551
+    "id": 8398878757
+  },
+  {
+    "id": 8402907552
   }
   ]
 }
@@ -148,15 +151,16 @@ And now something a bit more useful.
 
 ```
 {
-  "packageName": [
-  {
-    "id": 8402907551,
-    "title": "Test vulnerability, please ignore",
-    "description": "This is a test vulnerability for a test project",
-    "versions": [
-      "&lt;=2.0.0"
-    ]
-  }
+  "expressjs": [
+    {
+      "id": 8301582599,
+      "title": "Root path disclosure vulnerability",
+      "description": "Fixed root path disclosure vulnerability in express.static, res.sendfile, and res.sendFile",
+      "versions": [
+        "&lt;3.19.1 || >=4.0.0 &lt;4.11.1"
+      ]
+    },
+    ...
   ]
 }
 ...
