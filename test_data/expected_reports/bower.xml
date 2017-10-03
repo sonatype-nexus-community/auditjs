@@ -1,78 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="auditjs.security.bower" errors="0" tests="1" package="test" id="" skipped="0" failures="1"><testcase name="angular"><failure message="Found 5 vulnerabilities. See stacktrace for details.">Details:
+<testsuite name="auditjs.security.bower" errors="0" tests="1" package="test" id="" skipped="0" failures="1"><testcase name="vor-test-project-bower-please-ignore-1"><failure message="Found 1 vulnerabilities. See stacktrace for details.">Details:
 
                         [
   {
-    "id": 8398878757,
-    "title": "Cross Site Scripting (XSS) in JSONP",
-    "description": "JSONP allows untrusted resource URLs, which provides a vector for attack by malicious actors.",
+    "id": 8402907551,
+    "title": "Test vulnerability, please ignore",
+    "description": "This is a test vulnerability for a test project",
     "versions": [
-      "&lt;1.6.0-rc.0"
+      "&lt;=2.0.0"
     ],
     "references": [
-      "https://github.com/angular/angular.js/commit/6476af83cd0418c84e034a955b12a842794385c4",
-      "https://github.com/angular/angular.js/issues/11352"
+      "https://vorsecurity.com/3"
     ],
-    "published": 0,
-    "updated": 1493261505026
-  },
-  {
-    "id": 8399952532,
-    "title": "Possible security hold with usemap attribute",
-    "description": "The attribute usemap has been blacklisted as it can be used as a security exploit.",
-    "versions": [
-      "&lt;1.5.0-rc.2"
-    ],
-    "references": [
-      "https://github.com/angular/angular.js/blob/master/CHANGELOG.md#1"
-    ],
-    "published": 1469727878777,
-    "updated": 1469727878777
-  },
-  {
-    "id": 8399952533,
-    "title": "UI Redress Attack Through Improper Sanitization Of SVG Elements",
-    "description": "angular is susceptible to UI redress attacks. The vulnerability is due to the lack of proper sanitisation of an html input string by stripping all potentially dangerous tokens. So, an attacker can place svg elements outside of the containing element, leading to rendering it over other elements on the page (example: a login link).",
-    "versions": [
-      "&lt;1.5.0-beta.2"
-    ],
-    "references": [
-      "https://github.com/angular/angular.js/commit/181fc567d873df065f1e84af7225deb70a8d2eb9",
-      "https://github.com/angular/angular.js/pull/12524",
-      "https://srcclr.com/security/ui-redress-attack-through-improper/javascript/s-2252"
-    ],
-    "published": 1469728183493,
-    "updated": 1469728183493
-  },
-  {
-    "id": 8399952534,
-    "title": "Arbitrary Code Execution",
-    "description": "SVG animations tags are not being sanitized properly, resulting in possible arbitrary code execution.",
-    "versions": [
-      "&lt;1.5.0-beta.2"
-    ],
-    "references": [
-      "https://cwe.mitre.org/data/definitions/78.html",
-      "https://github.com/angular/angular.js/commit/67688d5ca00f6de4c7fe6084e2fa762a00d25610",
-      "https://github.com/angular/angular.js/pull/11290",
-      "https://srcclr.com/security/arbitrary-code-execution-through-svg/javascript/s-2253"
-    ],
-    "published": 1469728274567,
-    "updated": 1486325942923
-  },
-  {
-    "id": 8402281303,
-    "title": "Cross Site Scripting (XSS) through use elements referencing external SVG",
-    "description": "> The use element can reference external svg's (same origin) and can include\nxlink javascript urls or foreign object that can execute xss.\n> \n> -- [github.com](https://github.com/angular/angular.js/pull/13453)",
-    "versions": [
-      "&lt;1.5.0"
-    ],
-    "references": [
-      "https://cwe.mitre.org/data/definitions/79.html",
-      "https://github.com/angular/angular.js/issues/13453"
-    ],
-    "published": 1483077792740,
-    "updated": 1483078107273
+    "published": 1493874212256,
+    "updated": 1493874464883
   }
 ]
 
