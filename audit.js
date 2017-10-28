@@ -163,8 +163,6 @@ if (!program['package']) {
   categories = newCategories;
 }
 
-console.error("CATEGORIES: " + categories);
-
 
 // Simplify the white-list so that it is a simple lookup table of vulnerability IDs.
 var whitelist = program['whitelist'] ? fs.readFileSync(program['whitelist'], 'utf-8') : null;
