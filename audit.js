@@ -138,10 +138,11 @@ var categories = [];
 if (program['package']) {
   // By default in package mode we only check production dependencies
   categories = ['dependencies'];
-} else {
-  if (program['production']) {
-    categories = ['dependencies'];
-  }
+}
+
+// The --production option means do dependencies
+if (program['production']) {
+  categories = ['dependencies'];
 }
 
 categories = program['dependencyTypes'] ? program['dependencyTypes'].split(",") : categories;
