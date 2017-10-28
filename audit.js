@@ -104,6 +104,7 @@ program
         .option('-n --noNode', 'Ignore node executable when scanning node_modules.')
         .option('-p --package <file>', 'Specific package.json or bower.json file to audit')
         .option('-d --dependencyTypes <list>', 'One or more of devDependencies, dependencies, peerDependencies, bundledDependencies, or optionalDependencies')
+        .option('--prod --production', 'Analyze production dependencies only')
         .option('-q --quiet', 'Supress console logging')
         .option('-r --report', 'Create JUnit reports in reports/ directory')
         .option('-v --verbose', 'Print all vulnerabilities')
@@ -143,7 +144,11 @@ if (!program["package"]) {
         npm.load(function(err, npm) {
                 npm.commands.ls([], true, function(err, data, lite) {
                         // Get a flat list of dependencies instead of a map.
-                        var deps = getDependencyList(data.dependencies);
+                        var dataDeps = data.dependencies;
+                        if (program['production']) {
+                          dataDeps = data._dependencies;
+                        }
+                        var deps = getDependencyList(dataDeps);
                         if(program.noNode) {
                                 // Set the number of expected audits
                                 expectedAudits = deps.length;
@@ -206,7 +211,7 @@ else {
             	}
             }
         }
-        
+
         expectedAudits = deps.length;
         auditor.auditPackages(deps, resultCallback);
 }
@@ -228,7 +233,7 @@ function exitHandler(options, err) {
             console.log(colors.bold.yellow('=================================================='));
         };
 	}
-	
+
     if(program['report']) {
         var filtered = 0;
         mkdirp('reports');
@@ -264,12 +269,12 @@ function prepareWhitelist(whitelist) {
 		// The white-list is either a list or the old format, which is an object with more
 		// complex structures.
 	    whitelist = JSON.parse(whitelist);
-	    
+
 	    // If we are using the old white list format, then convert it to the simplified format
 	    if (!Array.isArray(whitelist)) {
 	    	whitelist = simplifyWhitelist(whitelist);
 	    }
-	    
+
 	    // Convert the list to a map for easy lookup
 	    var whitelistMap = {};
 	    for (var i = 0; i < whitelist.length; i++) {
@@ -337,26 +342,31 @@ function getDependencyList(depMap) {
                 // The value of o depends on the type of structure we are passed
                 var o = depMap[name];
                 if(o.version) {
-                        // Only add a dependency once
-                        if(lookup[name + o.version] == undefined) {
-                                lookup[name + o.version] = true;
-                                // We need both the local and global "auditLookup" tables.
-                                // The global lookup is used to ensure we only audit a
-                                // dependency once, but cannot be done at the same level
-                                // as the local lookup since the sub-dependencies are not
-                                // available at all locations of the dependency tree (depMap).
-                                if (auditLookup[name + o.version] == undefined) {
-									auditLookup[name + o.version] = true;
-									results.push({"pm": pm, "name": name, "version": o.version});
-								}
-                                if(o.dependencies) {
-                                        var deps = getDependencyList(o.dependencies);
+                  // Only add a dependency once
+                  if(lookup[name + o.version] == undefined) {
+                    lookup[name + o.version] = true;
+                    // We need both the local and global "auditLookup" tables.
+                    // The global lookup is used to ensure we only audit a
+                    // dependency once, but cannot be done at the same level
+                    // as the local lookup since the sub-dependencies are not
+                    // available at all locations of the dependency tree (depMap).
+                    if (auditLookup[name + o.version] == undefined) {
+    									auditLookup[name + o.version] = true;
+    									results.push({"pm": pm, "name": name, "version": o.version});
+    								}
+                    var dataDeps = o.dependencies;
+                    if (program['production']) {
+                      dataDeps = o._dependencies;
+                    }
 
-                                        if(deps != undefined) {
-                                                results = results.concat(deps);
-                                        }
-                                }
-                        }
+                    if(dataDeps) {
+                      var deps = getDependencyList(dataDeps);
+
+                      if(deps != undefined) {
+                        results = results.concat(deps);
+                      }
+                    }
+                  }
                 }
                 else {
                         // Only add a dependency once
@@ -562,7 +572,7 @@ function getValidVulnerabilities(productRange, details, pkg) {
         if(details != undefined) {
                 for(var i = 0; i < details.length; i++) {
                         var detail = details[i];
-                        
+
                         if(detail.versions != undefined && detail.versions.length > 0) {
                                 for(var j = 0; j < detail.versions.length; j++) {
                                         // Get the vulnerability range

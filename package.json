@@ -4,9 +4,9 @@
   "description": "Audit dependencies to identify known vulnerabilities and maintenance problems",
   "main": "audit-package.js",
   "bin": {
-      "auditjs": "./audit.js",
-      "auditjs-win": "./auditjs.js"
-    },
+    "auditjs": "./audit.js",
+    "auditjs-win": "./auditjs.js"
+  },
   "preferGlobal": true,
   "scripts": {
     "pretest": "node audit.js -r -n -p test_data/package.json -w test_data/audit_package_whitelist.json || true &&  node audit.js -r -b -p test_data/bower.json || true",
