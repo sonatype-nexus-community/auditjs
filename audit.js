@@ -126,10 +126,44 @@ if(program['bower'] && !program['package']){
 }
 var programPackage = program['package'] ? path.basename(program['package']): 'scan_node_modules.json';
 var output = `${programPackage.toString().split('.json').slice(0, -1)}.xml`;
-var pm = program['bower'] ? 'bower' : 'npm'
+var pm = program['bower'] ? 'bower' : 'npm';
 
-var categories = ['dependencies'];
+if (program['dependencyTypes'] && program['production']) {
+  throw Error('Cannot use --dependencyTypes and --production options together');
+}
+
+
+// Categories are somewhat complicated in order to not break backward-compatibility.
+var categories = [];
+if (program['package']) {
+  // By default in package mode we only check production dependencies
+  categories = ['dependencies'];
+} else {
+  if (program['production']) {
+    categories = ['dependencies'];
+  }
+}
+
 categories = program['dependencyTypes'] ? program['dependencyTypes'].split(",") : categories;
+
+// For recursive dependencies 'dependencies' should be '_dependencies'
+if (!program['package']) {
+  newCategories = [];
+  for (var i = 0; i < categories.length; i++) {
+    switch (categories[i]) {
+      case 'dependencies':
+        newCategories.push('_dependencies');
+        break;
+      default:
+        newCategories.push(categories[i]);
+        break;
+    }
+  }
+  categories = newCategories;
+}
+
+console.error("CATEGORIES: " + categories);
+
 
 // Simplify the white-list so that it is a simple lookup table of vulnerability IDs.
 var whitelist = program['whitelist'] ? fs.readFileSync(program['whitelist'], 'utf-8') : null;
@@ -144,10 +178,7 @@ if (!program["package"]) {
         npm.load(function(err, npm) {
                 npm.commands.ls([], true, function(err, data, lite) {
                         // Get a flat list of dependencies instead of a map.
-                        var dataDeps = data.dependencies;
-                        if (program['production']) {
-                          dataDeps = data._dependencies;
-                        }
+                        var dataDeps = getDepsFromDataObject(data);
                         var deps = getDependencyList(dataDeps);
                         if(program.noNode) {
                                 // Set the number of expected audits
@@ -354,11 +385,7 @@ function getDependencyList(depMap) {
     									auditLookup[name + o.version] = true;
     									results.push({"pm": pm, "name": name, "version": o.version});
     								}
-                    var dataDeps = o.dependencies;
-                    if (program['production']) {
-                      dataDeps = o._dependencies;
-                    }
-
+                    var dataDeps = getDepsFromDataObject(dependencies);
                     if(dataDeps) {
                       var deps = getDependencyList(dataDeps);
 
@@ -369,17 +396,33 @@ function getDependencyList(depMap) {
                   }
                 }
                 else {
-                        // Only add a dependency once
-                        if(lookup[name + o] == undefined) {
-                                lookup[name + o] = true;
-                                if (auditLookup[name + o] == undefined) {
-									auditLookup[name + o] = true;
-									results.push({"pm": pm, "name": name, "version": o});
-								}
-                        }
+                  // Only add a dependency once
+                  if(lookup[name + o] == undefined) {
+                      lookup[name + o] = true;
+                      if (auditLookup[name + o] == undefined) {
+    									auditLookup[name + o] = true;
+    									results.push({"pm": pm, "name": name, "version": o});
+    								}
+                  }
                 }
         }
         return results;
+}
+
+/** Get the dependencies from an npm object. The exact dependencies retrieved
+ * depend on what is requested by the user.
+ */
+function getDepsFromDataObject(data) {
+  var results = {};
+  if (categories.length == 0) {
+    Object.assign(results, data.dependencies);
+  }
+
+  for (var i = 0; i < categories.length; i++) {
+    var category = categories[i];
+    Object.assign(results, data[category]);
+  }
+  return results;
 }
 
 /** Help text
