@@ -194,10 +194,9 @@ if (!program["package"]) {
                 npm.commands.ls([], true, function(err, data, lite) {
                         // Get a flat list of dependencies instead of a map.
 
-                        var lookup = {};
-                        buildDependencyObjectLookup(lookup, data);
-                        var dataDeps = getDepsFromDataObject(data, lookup);
-                        var deps = getDependencyList(dataDeps, lookup);
+                        var depObjectLookup = buildDependencyObjectLookup(data);
+                        var dataDeps = getDepsFromDataObject(data, depObjectLookup);
+                        var deps = getDependencyList(dataDeps, depObjectLookup);
                         if(program.noNode) {
                                 // Set the number of expected audits
                                 expectedAudits = deps.length;
@@ -380,65 +379,65 @@ function checkProperties(obj) {
  * Therefore we make a special lookup table
  * of package@version = [Object] which will be referenced later.
  */
-function buildDependencyObjectLookup(lookup, data) {
+function buildDependencyObjectLookup(data, lookup) {
+  if (lookup == undefined) {
+    lookup = {};
+  }
   for(var k in data.dependencies) {
     var dep = data.dependencies[k];
     lookup[dep._from] = dep;
-    buildDependencyObjectLookup(lookup, dep);
+    buildDependencyObjectLookup(dep, lookup);
   }
+  return lookup;
 }
 
 /** Recursively get a flat list of dependency objects. This is simpler for
  * subsequent code to handle then a tree of dependencies.
  *
- * @param depMap
- * @returns A list of dependency objects
+ * Depending on the command line arguments, the dependencies may includes
+ * a mix of production, development, optional, etc. dependencies.
  */
 function getDependencyList(depMap, depLookup) {
-        var results = [];
-        var lookup = {};
-        var keys = Object.keys(depMap);
+  var results = [];
+  var lookup = {};
+  var keys = Object.keys(depMap);
 
-        for(var i = 0; i < keys.length; i++) {
-                var name = keys[i];
+  for(var i = 0; i < keys.length; i++) {
+    var name = keys[i];
 
-                // The value of o depends on the type of structure we are passed
-                var o = depMap[name];
-                if(o.version) {
-                  // Only add a dependency once
-                  if(lookup[name + o.version] == undefined) {
-                    lookup[name + o.version] = true;
-                    // We need both the local and global "auditLookup" tables.
-                    // The global lookup is used to ensure we only audit a
-                    // dependency once, but cannot be done at the same level
-                    // as the local lookup since the sub-dependencies are not
-                    // available at all locations of the dependency tree (depMap).
-                    if (auditLookup[name + o.version] == undefined) {
-    									auditLookup[name + o.version] = true;
-    									results.push({"pm": pm, "name": name, "version": o.version});
-    								}
-                    var dataDeps = getDepsFromDataObject(o, depLookup);
-                    if(dataDeps) {
-                      var deps = getDependencyList(dataDeps, depLookup);
+    // The value of o depends on the type of structure we are passed
+    var o = depMap[name];
 
-                      if(deps != undefined) {
-                        results = results.concat(deps);
-                      }
-                    }
-                  }
-                }
-                else {
-                  // Only add a dependency once
-                  if(lookup[name + o] == undefined) {
-                      lookup[name + o] = true;
-                      if (auditLookup[name + o] == undefined) {
-    									auditLookup[name + o] = true;
-    									results.push({"pm": pm, "name": name, "version": o});
-    								}
-                  }
-                }
+    var spec = o.version ? name + "@" + o.version : o;
+    var version = o.version ? o.version : o;
+
+    // Only add a dependency once
+    if(lookup[spec] == undefined) {
+      lookup[spec] = true;
+      // We need both the local and global "auditLookup" tables.
+      // The global lookup is used to ensure we only audit a
+      // dependency once, but cannot be done at the same level
+      // as the local lookup since the sub-dependencies are not
+      // available at all locations of the dependency tree (depMap).
+      if (auditLookup[spec] == undefined) {
+				auditLookup[spec] = true;
+				results.push({"pm": pm, "name": name, "version": version});
+			}
+
+      // If there is a possibility of recursive dependencies...
+      if (o.version) {
+        var dataDeps = getDepsFromDataObject(o, depLookup);
+        if(dataDeps) {
+          var deps = getDependencyList(dataDeps, depLookup);
+
+          if(deps != undefined) {
+            results = results.concat(deps);
+          }
         }
-        return results;
+      }
+    }
+  }
+  return results;
 }
 
 /** Get the dependencies from an npm object. The exact dependencies retrieved
