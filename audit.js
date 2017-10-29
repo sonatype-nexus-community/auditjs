@@ -193,7 +193,6 @@ if (!program["package"]) {
         npm.load(function(err, npm) {
                 npm.commands.ls([], true, function(err, data, lite) {
                         // Get a flat list of dependencies instead of a map.
-
                         var depObjectLookup = buildDependencyObjectLookup(data);
                         var dataDeps = getDepsFromDataObject(data, depObjectLookup);
                         var deps = getDependencyList(dataDeps, depObjectLookup);
@@ -456,6 +455,10 @@ function getDepsFromDataObject(data, lookup) {
       var category = categories[i];
       for(var k in data[category]) {
         var spec = k + "@" + data[category][k];
+        // Sometimes a match is not quite exact
+        if (!lookup[spec]) {
+          spec = spec.replace(/@\D/g,'@');
+        }
         // If there is no match in the lookup then this dependency was "deduped"
         if (lookup[spec]) {
           results[k]=lookup[spec];
