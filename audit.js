@@ -44,6 +44,9 @@ var jsontoxml = require('jsontoxml');
 // File system access
 var fs = require('fs');
 
+// Use winston for logging
+const winston = require('winston');
+
 // Next two requires used to get version from out package.json file
 var path = require('path');
 var pkg = require( path.join(__dirname, 'package.json') );
@@ -109,6 +112,7 @@ program
         .option('-r --report', 'Create JUnit reports in reports/ directory')
         .option('-v --verbose', 'Print all vulnerabilities')
         .option('-w --whitelist <file>', 'Whitelist of vulnerabilities that should not break the build,\n\t\t\t\t e.g. XSS vulnerabilities for an app with no possbile input for XSS.\b\t\t\t\t                                 See Example test_data/audit_package_whitelist.json.')
+        .option('-l --level <level>', 'Logging level. Possible options: error, warn, info, verbose, debug, silly')
         .action(function () {
         });
 
@@ -132,6 +136,17 @@ if (program['dependencyTypes'] && program['production']) {
   throw Error('Cannot use --dependencyTypes and --production options together');
 }
 
+//Set logging level based on environmental value or flag
+let logger = new (winston.Logger)({
+  transports: [
+    new (winston.transports.Console)({
+      level: process.env.LOG_LEVEL ||
+        (program['quiet']?'error':false) ||
+        (['error', 'warn', 'info', 'verbose', 'debug', 'silly'].includes(program['level'])?program['level']:false)
+        || 'info',
+      formatter: logFormatter})
+  ]
+});
 
 // Categories are somewhat complicated in order to not break backward-compatibility.
 var categories = [];
@@ -474,31 +489,40 @@ function resultCallback(err, pkg) {
         // If we KNOW a possibly used version is vulnerable then highlight the
         // title in red.
         var myVulnerabilities = getValidVulnerabilities(version, pkg.vulnerabilities, pkg.name);
+        var prefix = undefined;
         if(myVulnerabilities.length > 0) {
                 vulnerabilityCount += 1;
-                console.log("------------------------------------------------------------");
-                console.log("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ");
+                logger.error("------------------------------------------------------------");
+                prefix = "[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ";
+                if (program.verbose) {
+                  logger.error(prefix);
+                  prefix = "";
+                }
                 JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}, children: [{
                         name: 'failure', text: `Details:\n
                         ${JSON.stringify(myVulnerabilities, null, 2).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')}\n\n`,
                         attrs: {message:`Found ${myVulnerabilities.length} vulnerabilities. See stacktrace for details.`}}]});
         }
         else {
-                if(program.verbose) console.log("------------------------------------------------------------");
-                process.stdout.write("[" + actualAudits + "/" + expectedAudits + "] " + colors.bold(pkgName + " " + versionString) + "   ");
-                if(program.verbose) console.log();
+                if (program.verbose) logger.info("------------------------------------------------------------");
+                prefix = "[" + actualAudits + "/" + expectedAudits + "] " + colors.bold(pkgName + " " + versionString) + "   ";
+                if (program.verbose) {
+                  logger.info(prefix);
+                  logger.info();
+                  prefix = "";
+                }
                 JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}});
         }
 
         if(err) {
                 if(err.error) {
-                        console.log(colors.bold.red("Error running audit: " + err.error + " (" + err.code + ")"));
+                        logger.error(prefix + colors.bold.red("Error running audit: " + err.error + " (" + err.code + ")"));
                 }
                 else {
-                        console.log(colors.bold.red("Error running audit: " + err));
+                        logger.error(prefix + colors.bold.red("Error running audit: " + err));
                 }
                 if(err.stack) {
-                        console.log(err.stack);
+                        logger.error(prefix + err.stack);
                 }
                 return;
         }
@@ -508,21 +532,21 @@ function resultCallback(err, pkg) {
                 if(semver.valid(version)) {
                         if(bestVersion) {
                                 if(bestVersion != version) {
-                                        console.log(colors.bold.yellow("Installed version: " + version));
+                                        logger.info(colors.bold.yellow("Installed version: " + version));
                                 }
                                 else {
-                                        console.log("Installed version: " + version);
+                                        logger.info("Installed version: " + version);
                                 }
-                                console.log("Available version: " + bestVersion);
+                                logger.info("Available version: " + bestVersion);
                         }
                         else {
-                                console.log("Installed version: " + version);
+                                logger.info("Installed version: " + version);
                         }
                 }
                 else {
-                        console.log("Requested range: " + version);
+                        logger.info("Requested range: " + version);
                         if(bestVersion) {
-                                console.log("Available version: " + bestVersion);
+                                logger.info("Available version: " + bestVersion);
                         }
                 }
         }
@@ -533,12 +557,16 @@ function resultCallback(err, pkg) {
                 // Special statuses
                 if(pkg.vulnerabilities.length == 0) {
                         // FIXME: We should always get some response. This should not happen.
-                        console.log(colors.grey("No known vulnerabilities..."));
+                        logger.info(prefix + colors.grey("No known vulnerabilities..."));
                 }
                 // Vulnerabilities found
                 else {
+                        var log = logger.error;
                         // Status line
-                        console.log(pkg.vulnerabilities.length + " known vulnerabilities, " + myVulnerabilities.length + " affecting installed version");
+                        if (myVulnerabilities.length == 0) {
+                          log = logger.info;
+                        }
+                        log(prefix + pkg.vulnerabilities.length + " known vulnerabilities, " + myVulnerabilities.length + " affecting installed version");
 
                         // By default only print known problems
                         var printTheseProblems = myVulnerabilities;
@@ -550,15 +578,15 @@ function resultCallback(err, pkg) {
 
                         // We have decided that these are the problems worth mentioning.
                         for(var i = 0; i < printTheseProblems.length; i++) {
-                                console.log();
+                                log();
 
                                 var detail = printTheseProblems[i];
-                                console.log(colors.red.bold(detail.title));
+                                log(colors.red.bold(detail.title));
 
                                 if(detail.description != undefined) {
-                                        console.log(entities.decode(detail.description));
+                                        log(entities.decode(detail.description));
                                 }
-                                console.log();
+                                log();
 
                                 // Print affected version information if available
                                 if(detail.versions != null && detail.versions.length > 0) {
@@ -566,16 +594,16 @@ function resultCallback(err, pkg) {
                                         if(vers.trim() == "") {
                                                 vers = "unspecified";
                                         }
-                                        console.log(colors.bold("Affected versions") + ": " + vers);
+                                        log(colors.bold("Affected versions") + ": " + vers);
                                 }
                                 else {
-                                        console.log(colors.bold("Affected versions") + ": unspecified");
+                                        log(colors.bold("Affected versions") + ": unspecified");
                                 }
 
                                 if (detail.references != undefined && detail.references.length > 0) {
-                                        console.log(colors.bold("References") + ":");
+                                        log(colors.bold("References") + ":");
                                         for (var j = 0; j < detail.references.length; j++) {
-                                                console.log("  * " + detail.references[j]);
+                                                log("  * " + detail.references[j]);
                                         }
                                 }
                         }
@@ -583,18 +611,18 @@ function resultCallback(err, pkg) {
                         // If we printed vulnerabilities we need a separator. Don't bother
                         // if we are running in verbose mode since one will be printed later.
                         if(!program.verbose && myVulnerabilities.length > 0) {
-                                console.log("------------------------------------------------------------");
-                                console.log();
+                                logger.error("------------------------------------------------------------");
+                                logger.error();
                         }
                 }
         } else {
-                console.log(colors.grey("No known vulnerabilities..."));
+                logger.info(prefix + colors.grey("No known vulnerabilities..."));
         }
 
         if(program.verbose) {
                 // Print a separator
-                console.log("------------------------------------------------------------");
-                console.log();
+                logger.info("------------------------------------------------------------");
+                logger.info();
         }
 
         //console.log(JSON.stringify(pkg.artifact));
@@ -701,4 +729,12 @@ function forceSemanticVersion(range) {
                 return match[1] + "." + match[2] + "." + match[3];
         }
         return undefined;
+}
+
+/** Overriding the winston formatter to output a log message in the same manner
+ * that console.log was working, to reduce the inpact on the code for the
+ * initial move to winston.
+ */
+function logFormatter(args) {
+  return args.message;
 }
