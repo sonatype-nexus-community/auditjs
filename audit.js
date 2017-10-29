@@ -98,6 +98,8 @@ var auditLookup = {};
  */
 var vulnerabilityCount = 0;
 
+const LOGGER_LEVELS = ['error', 'warn', 'info', 'verbose', 'debug'];
+
 //Parse command line options. We currently support only one argument so
 // this is a little overkill. It allows for future growth.
 var program = require('commander');
@@ -111,8 +113,8 @@ program
         .option('-q --quiet', 'Supress console logging')
         .option('-r --report', 'Create JUnit reports in reports/ directory')
         .option('-v --verbose', 'Print all vulnerabilities')
-        .option('-w --whitelist <file>', 'Whitelist of vulnerabilities that should not break the build,\n\t\t\t\t e.g. XSS vulnerabilities for an app with no possbile input for XSS.\b\t\t\t\t                                 See Example test_data/audit_package_whitelist.json.')
-        .option('-l --level <level>', 'Logging level. Possible options: error, warn, info, verbose, debug, silly')
+        .option('-w --whitelist <file>', 'Whitelist of vulnerabilities that should not break the build,\n\t\t\t\t e.g. XSS vulnerabilities for an app with no possbile input for XSS.\n\t\t\t\t See Example test_data/audit_package_whitelist.json.')
+        .option('-l --level <level>', 'Logging level. Possible options: ' + LOGGER_LEVELS)
         .action(function () {
         });
 
@@ -142,12 +144,23 @@ if (program['quiet']) {
       new (winston.transports.Console)({
         level: process.env.LOG_LEVEL ||
           (program['quiet']?'error':false) ||
-          (['error', 'warn', 'info', 'verbose', 'debug', 'silly'].includes(program['level'])?program['level']:false)
+          (program['verbose']?'verbose':false) ||
+          (LOGGER_LEVELS.includes(program['level'])?program['level']:false)
           || 'info',
         formatter: logFormatter})
     ]
   });
 }
+
+/** Hack code to allow us to check if a specific logger level is enabled.
+ */
+logger.isLevelEnabled = function(level) {
+  if (this.transports) {
+    var levels = this.transports.console.level;
+    return levels == level;
+  }
+  return false;
+};
 
 // Categories are somewhat complicated in order to not break backward-compatibility.
 var categories = [];
@@ -524,8 +537,9 @@ function resultCallback(err, pkg) {
                 vulnerabilityCount += 1;
                 logger.error("------------------------------------------------------------");
                 prefix = "[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ";
-                if (program.verbose) {
-                  logger.error(prefix);
+                if (logger.isLevelEnabled("verbose")) {
+
+                  logger.verbose(prefix);
                   prefix = "";
                 }
                 JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}, children: [{
@@ -534,11 +548,12 @@ function resultCallback(err, pkg) {
                         attrs: {message:`Found ${myVulnerabilities.length} vulnerabilities. See stacktrace for details.`}}]});
         }
         else {
-                if (program.verbose) logger.info("------------------------------------------------------------");
+                logger.verbose("------------------------------------------------------------");
                 prefix = "[" + actualAudits + "/" + expectedAudits + "] " + colors.bold(pkgName + " " + versionString) + "   ";
-                if (program.verbose) {
-                  logger.info(prefix);
-                  logger.info();
+                if (logger.isLevelEnabled("verbose")) {
+
+                  logger.verbose(prefix);
+                  logger.verbose();
                   prefix = "";
                 }
                 JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}});
@@ -558,26 +573,24 @@ function resultCallback(err, pkg) {
         }
 
         // Print information about the expected and actual package versions
-        if(program.verbose) {
-                if(semver.valid(version)) {
-                        if(bestVersion) {
-                                if(bestVersion != version) {
-                                        logger.info(colors.bold.yellow("Installed version: " + version));
-                                }
-                                else {
-                                        logger.info("Installed version: " + version);
-                                }
-                                logger.info("Available version: " + bestVersion);
+        if(semver.valid(version)) {
+                if(bestVersion) {
+                        if(bestVersion != version) {
+                                logger.verbose(colors.bold.yellow("Installed version: " + version));
                         }
                         else {
-                                logger.info("Installed version: " + version);
+                                logger.verbose("Installed version: " + version);
                         }
+                        logger.verbose("Available version: " + bestVersion);
                 }
                 else {
-                        logger.info("Requested range: " + version);
-                        if(bestVersion) {
-                                logger.info("Available version: " + bestVersion);
-                        }
+                        logger.verbose("Installed version: " + version);
+                }
+        }
+        else {
+                logger.verbose("Requested range: " + version);
+                if(bestVersion) {
+                        logger.verbose("Available version: " + bestVersion);
                 }
         }
 
@@ -602,7 +615,7 @@ function resultCallback(err, pkg) {
                         var printTheseProblems = myVulnerabilities;
 
                         // If verbose, print all problems
-                        if(program.verbose) {
+                        if (logger.isLevelEnabled("verbose")) {
                                 printTheseProblems = pkg.vulnerabilities;
                         }
 
@@ -640,7 +653,7 @@ function resultCallback(err, pkg) {
 
                         // If we printed vulnerabilities we need a separator. Don't bother
                         // if we are running in verbose mode since one will be printed later.
-                        if(!program.verbose && myVulnerabilities.length > 0) {
+                        if(!logger.isLevelEnabled("verbose") && myVulnerabilities.length > 0) {
                                 logger.error("------------------------------------------------------------");
                                 logger.error();
                         }
@@ -649,11 +662,9 @@ function resultCallback(err, pkg) {
                 logger.info(prefix + colors.grey("No known vulnerabilities..."));
         }
 
-        if(program.verbose) {
-                // Print a separator
-                logger.info("------------------------------------------------------------");
-                logger.info();
-        }
+        // Print a separator
+        logger.verbose("------------------------------------------------------------");
+        logger.verbose();
 
         //console.log(JSON.stringify(pkg.artifact));
 }
