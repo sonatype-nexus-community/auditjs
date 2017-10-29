@@ -381,6 +381,8 @@ function getDependencyList(depMap) {
         var results = [];
         var lookup = {};
         var keys = Object.keys(depMap);
+        console.error("ZOUNDS: " + keys.length);
+
         for(var i = 0; i < keys.length; i++) {
                 var name = keys[i];
 
@@ -399,7 +401,7 @@ function getDependencyList(depMap) {
     									auditLookup[name + o.version] = true;
     									results.push({"pm": pm, "name": name, "version": o.version});
     								}
-                    var dataDeps = getDepsFromDataObject(dependencies);
+                    var dataDeps = getDepsFromDataObject(o);
                     if(dataDeps) {
                       var deps = getDependencyList(dataDeps);
 
