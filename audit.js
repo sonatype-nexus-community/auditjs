@@ -193,8 +193,11 @@ if (!program["package"]) {
         npm.load(function(err, npm) {
                 npm.commands.ls([], true, function(err, data, lite) {
                         // Get a flat list of dependencies instead of a map.
-                        var dataDeps = getDepsFromDataObject(data);
-                        var deps = getDependencyList(dataDeps);
+
+                        var lookup = {};
+                        buildDependencyObjectLookup(lookup, data);
+                        var dataDeps = getDepsFromDataObject(data, lookup);
+                        var deps = getDependencyList(dataDeps, lookup);
                         if(program.noNode) {
                                 // Set the number of expected audits
                                 expectedAudits = deps.length;
@@ -372,13 +375,26 @@ function checkProperties(obj) {
         return true;
 }
 
+/** Each specific package@version is only represented with the complete
+ * dependency definitions once in the tree, but might not be where we need it.
+ * Therefore we make a special lookup table
+ * of package@version = [Object] which will be referenced later.
+ */
+function buildDependencyObjectLookup(lookup, data) {
+  for(var k in data.dependencies) {
+    var dep = data.dependencies[k];
+    lookup[dep._from] = dep;
+    buildDependencyObjectLookup(lookup, dep);
+  }
+}
+
 /** Recursively get a flat list of dependency objects. This is simpler for
  * subsequent code to handle then a tree of dependencies.
  *
  * @param depMap
  * @returns A list of dependency objects
  */
-function getDependencyList(depMap) {
+function getDependencyList(depMap, depLookup) {
         var results = [];
         var lookup = {};
         var keys = Object.keys(depMap);
@@ -401,9 +417,9 @@ function getDependencyList(depMap) {
     									auditLookup[name + o.version] = true;
     									results.push({"pm": pm, "name": name, "version": o.version});
     								}
-                    var dataDeps = getDepsFromDataObject(o);
+                    var dataDeps = getDepsFromDataObject(o, depLookup);
                     if(dataDeps) {
-                      var deps = getDependencyList(dataDeps);
+                      var deps = getDependencyList(dataDeps, depLookup);
 
                       if(deps != undefined) {
                         results = results.concat(deps);
@@ -428,7 +444,7 @@ function getDependencyList(depMap) {
 /** Get the dependencies from an npm object. The exact dependencies retrieved
  * depend on what is requested by the user.
  */
-function getDepsFromDataObject(data) {
+function getDepsFromDataObject(data, lookup) {
   var results = {};
   if (categories.length == 0) {
     for(var k in data.dependencies) {
@@ -436,11 +452,15 @@ function getDepsFromDataObject(data) {
     }
   }
 
-  for (var i = 0; i < categories.length; i++) {
-    var category = categories[i];
-    for(var k in data[category]) {
-      if (data.dependencies[k]) {
-        results[k]=data.dependencies[k];
+  if (lookup) {
+    for (var i = 0; i < categories.length; i++) {
+      var category = categories[i];
+      for(var k in data[category]) {
+        var spec = k + "@" + data[category][k];
+        // If there is no match in the lookup then this dependency was "deduped"
+        if (lookup[spec]) {
+          results[k]=lookup[spec];
+        }
       }
     }
   }
