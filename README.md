@@ -22,20 +22,22 @@ Usage
 
   Options:
 
-    -b --bower                   This flag is necessary to correctly audit bower packages.
-                                 Use together with -p bower.json, since scanning
-                                 bower_components is not supported.
-    -h, --help                   Output usage information
-
-    -n --noNode                  Ignore node executable when scanning node_modules
+    -V, --version                output the version number
+    -b --bower                   This flag is necessary to correctly audit bower
+    				 packages. Use together with -p bower.json, since
+    				 scanning bower_componfents is not supported
+    -n --noNode                  Ignore node executable when scanning node_modules.
     -p --package <file>          Specific package.json or bower.json file to audit
+    -d --dependencyTypes <list>  One or more of devDependencies, dependencies, peerDependencies, bundledDependencies, or optionalDependencies
+    --prod --production          Analyze production dependencies only
     -q --quiet                   Supress console logging
     -r --report                  Create JUnit reports in reports/ directory
     -v --verbose                 Print all vulnerabilities
-    -V --version                 Output the version number
-    -w --whitelist <file>        Whitelist.json of vulnerabilities that should not break the build,
-                                 e.g. XSS vulnerabilities for an app with no possbile input for XSS.
-                                 See Example test_data/audit_package_whitelist.json.
+    -w --whitelist <file>        Whitelist of vulnerabilities that should not break the build,
+    				 e.g. XSS vulnerabilities for an app with no possbile input for XSS.
+    				 See Example test_data/audit_package_whitelist.json.
+    -l --level <level>           Logging level. Possible options: error,warn,info,verbose,debug
+    -h, --help                   output usage information
 
 ```
 
