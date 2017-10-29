@@ -431,12 +431,18 @@ function getDependencyList(depMap) {
 function getDepsFromDataObject(data) {
   var results = {};
   if (categories.length == 0) {
-    Object.assign(results, data.dependencies);
+    for(var k in data.dependencies) {
+      results[k]=data.dependencies[k];
+    }
   }
 
   for (var i = 0; i < categories.length; i++) {
     var category = categories[i];
-    Object.assign(results, data[category]);
+    for(var k in data[category]) {
+      if (data.dependencies[k]) {
+        results[k]=data.dependencies[k];
+      }
+    }
   }
   return results;
 }
