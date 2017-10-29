@@ -441,7 +441,7 @@ function getDependencyList(depMap, depLookup) {
 }
 
 /** Get the dependencies from an npm object. The exact dependencies retrieved
- * depend on what is requested by the user.
+ * depend on categories requested by the user.
  */
 function getDepsFromDataObject(data, lookup) {
   var results = {};
