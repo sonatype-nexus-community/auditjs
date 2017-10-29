@@ -121,10 +121,6 @@ program.on('--help', function(){
 });
 
 program.parse(process.argv);
-if(program['quiet']){
-        console.log = function(){};
-        process.stdout.write = function(){};
-}
 if(program['bower'] && !program['package']){
         throw Error('Use -b option together with -p bower.json. Bower dependencies are flat, therefore it is enough to only support the auditing of bower.json files.');
 }
@@ -137,16 +133,21 @@ if (program['dependencyTypes'] && program['production']) {
 }
 
 //Set logging level based on environmental value or flag
-let logger = new (winston.Logger)({
-  transports: [
-    new (winston.transports.Console)({
-      level: process.env.LOG_LEVEL ||
-        (program['quiet']?'error':false) ||
-        (['error', 'warn', 'info', 'verbose', 'debug', 'silly'].includes(program['level'])?program['level']:false)
-        || 'info',
-      formatter: logFormatter})
-  ]
-});
+let logger = undefined;
+if (program['quiet']) {
+  logger = new (winston.Logger)();
+} else {
+  logger = new (winston.Logger)({
+    transports: [
+      new (winston.transports.Console)({
+        level: process.env.LOG_LEVEL ||
+          (program['quiet']?'error':false) ||
+          (['error', 'warn', 'info', 'verbose', 'debug', 'silly'].includes(program['level'])?program['level']:false)
+          || 'info',
+        formatter: logFormatter})
+    ]
+  });
+}
 
 // Categories are somewhat complicated in order to not break backward-compatibility.
 var categories = [];
@@ -269,13 +270,13 @@ else {
  */
 function exitHandler(options, err) {
 	if (whitelistedVulnerabilities.length > 0) {
-        console.log(colors.bold.yellow("Filtering the following vulnerabilities"));
-        console.log(colors.bold.yellow('=================================================='));
+        logger.info(colors.bold.yellow("Filtering the following vulnerabilities"));
+        logger.info(colors.bold.yellow('=================================================='));
         for (var i = 0; i < whitelistedVulnerabilities.length; i++) {
         	var detail = whitelistedVulnerabilities[i];
-            console.log(`${colors.bold.blue(detail['title'])} affected versions: ${colors.red(detail['package'])} ${colors.red(detail['versions'])}`);
-            console.log(`${detail['description']}`);
-            console.log(colors.bold.yellow('=================================================='));
+            logger.info(`${colors.bold.blue(detail['title'])} affected versions: ${colors.red(detail['package'])} ${colors.red(detail['versions'])}`);
+            logger.info(`${detail['description']}`);
+            logger.info(colors.bold.yellow('=================================================='));
         };
 	}
 
@@ -295,7 +296,7 @@ function exitHandler(options, err) {
         dom.documentElement.setAttribute('skipped', expectedAudits-actualAudits);
         dom.documentElement.setAttribute('failures', vulnerabilityCount-filtered);
         JUnit = new XMLSerializer().serializeToString(dom);
-        console.log( `Wrote JUnit report to reports/${output}`);
+        logger.info( `Wrote JUnit report to reports/${output}`);
         fs.writeFileSync('reports/' + output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
         // Report mode is much like a test mode where builds shouldn't fail if the report was created.
         vulnerabilityCount = 0;
@@ -309,7 +310,7 @@ function exitHandler(options, err) {
  */
 function prepareWhitelist(whitelist) {
 	if(whitelist){
-        console.log(colors.bold('Applying whitelist filtering for JUnit reports. Take care to keep the whitelist up to date!'));
+        logger.info(colors.bold('Applying whitelist filtering for JUnit reports. Take care to keep the whitelist up to date!'));
 
 		// The white-list is either a list or the old format, which is an object with more
 		// complex structures.
@@ -381,7 +382,6 @@ function getDependencyList(depMap) {
         var results = [];
         var lookup = {};
         var keys = Object.keys(depMap);
-        console.error("ZOUNDS: " + keys.length);
 
         for(var i = 0; i < keys.length; i++) {
                 var name = keys[i];
