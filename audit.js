@@ -307,11 +307,17 @@ function exitHandler(options, err) {
         logger.info(colors.bold.yellow('=================================================='));
         for (var i = 0; i < whitelistedVulnerabilities.length; i++) {
         	var detail = whitelistedVulnerabilities[i];
-            logger.info(`${colors.bold.blue(detail['title'])} affected versions: ${colors.red(detail['package'])} ${colors.red(detail['versions'])}`);
-            logger.info(`${detail['description']}`);
-            logger.info(colors.bold.yellow('=================================================='));
+          logger.info(`${colors.bold.blue(detail['title'])} affected versions: ${colors.red(detail['package'])} ${colors.red(detail['versions'])}`);
+          logger.info(`${detail['description']}`);
+          logger.info(colors.bold("ID") + ": " + detail.id);
+          logger.info(colors.bold.yellow('=================================================='));
         };
 	}
+
+  logger.info('');
+  logger.info('Audited dependencies: ' + actualAudits +
+            ', Vulnerabilities: ' + colors.bold.red(vulnerabilityCount) +
+            ', Ignored: ' + whitelistedVulnerabilities.length);
 
     if(program['report']) {
         var filtered = 0;
@@ -334,10 +340,11 @@ function exitHandler(options, err) {
         // Report mode is much like a test mode where builds shouldn't fail if the report was created.
         vulnerabilityCount = 0;
     }
+
     if (program['suppressExitError']) {
       process.exit(0);
     } else {
-      process.exit(vulnerabilityCount);
+      logger.info(colors.bold.red(''));
     }
 }
 
@@ -653,6 +660,8 @@ function resultCallback(err, pkg) {
                                         log(entities.decode(detail.description));
                                 }
                                 log();
+
+                                log(colors.bold("ID") + ": " + detail.id);
 
                                 // Print affected version information if available
                                 if(detail.versions != null && detail.versions.length > 0) {
