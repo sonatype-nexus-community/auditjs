@@ -115,6 +115,10 @@ program
         .option('-v --verbose', 'Print all vulnerabilities')
         .option('-w --whitelist <file>', 'Whitelist of vulnerabilities that should not break the build,\n\t\t\t\t e.g. XSS vulnerabilities for an app with no possbile input for XSS.\n\t\t\t\t See Example test_data/audit_package_whitelist.json.')
         .option('-l --level <level>', 'Logging level. Possible options: ' + LOGGER_LEVELS)
+        .option('--suppressExitError', 'Supress exit code when vulnerability found')
+        .option('--scheme <scheme>', '[testing] http/https')
+        .option('--host <host>', '[testing] data host')
+        .option('--port <port>', '[testing] data port')
         .action(function () {
         });
 
@@ -190,6 +194,14 @@ if (!program['package']) {
     }
   }
   categories = newCategories;
+}
+
+// Override the host
+if (program['scheme'] || program['host'] || program['port']) {
+  var scheme = program['scheme'] ? program['scheme'] : "https";
+  var host = program['host'] ? program['host'] : "ossindex.net";
+  var port = program['port'] ? program['port'] : 443;
+  auditor.setHost(scheme, host, port);
 }
 
 
@@ -283,6 +295,13 @@ else {
  * @returns
  */
 function exitHandler(options, err) {
+  if (err) {
+    if (err.stack) {
+      console.error(err.stack);
+    } else {
+      console.error(err.toString());
+    }
+  }
 	if (whitelistedVulnerabilities.length > 0) {
         logger.info(colors.bold.yellow("Filtering the following vulnerabilities"));
         logger.info(colors.bold.yellow('=================================================='));
@@ -315,7 +334,11 @@ function exitHandler(options, err) {
         // Report mode is much like a test mode where builds shouldn't fail if the report was created.
         vulnerabilityCount = 0;
     }
-    process.exit(vulnerabilityCount);
+    if (program['suppressExitError']) {
+      process.exit(0);
+    } else {
+      process.exit(vulnerabilityCount);
+    }
 }
 
 /**

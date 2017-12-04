@@ -1,7 +1,7 @@
 /**
  *	Copyright (c) 2015-2017 Vör Security Inc.
  *	All rights reserved.
- *	
+ *
  *	Redistribution and use in source and binary forms, with or without
  *	modification, are permitted provided that the following conditions are met:
  *	    * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *	    * Neither the name of the <organization> nor the
  *	      names of its contributors may be used to endorse or promote products
  *	      derived from this software without specific prior written permission.
- *	
+ *
  *	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *	ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,7 +27,7 @@
 
 // Provides simplified REST API access
 //var ossi = require('ossindexjs');
-var ossi = require('ossindexjs');
+var ossi = require('./ossindex.js');
 
 // Used in package version comparisons
 var semver = require('semver');
@@ -40,13 +40,20 @@ var BATCH_SIZE = 100;
 
 /**
  * EXPORT providing auditing of specified dependencies.
- * 
+ *
  */
 module.exports = {
-		
+
+	/** Override the data host.
+	 */
+	setHost: function (scheme, host, port) {
+		ossi.setHost(scheme, host, port);
+	},
+
+
 		/** Audit a list of packages
 		 * Results are sent to a callback(err, single_package_data)
-		 * 
+		 *
 		 * @param dependencies A map of {package manager, package name, version} objects.
 		 * @param callback Function to call on completion of each dependency
 		 *                 analysis. This call back has 2 arguments:
@@ -58,7 +65,7 @@ module.exports = {
 
 		/**
 		 * Audit a specific package
-		 * 
+		 *
 		 * @param pkgManagerName Name of the package manager the package belongs to
 		 * @param pkgName Name of the package to audit
 		 * @param versionRange Semantic version range for the package
@@ -73,24 +80,24 @@ module.exports = {
 
 /** Iterate through the dependencies. Get the audit results for each.
  * We will be running the audit in batches for speed reasons.
- * 
+ *
  * @param dependencies
  * @param keys
  */
 auditPackagesImpl = function(depList, callback) {
 	// Iterate through the list until there are no elements left.
 	if(depList.length != 0) {
-		
+
 		var pkgs = [];
 		for(var i = 0; i < BATCH_SIZE; i++)
 		{
 			// Get the current package/version
 			var dep = depList.shift();
 			pkgs.push({pm: dep.pm, name: dep.name, version: dep.version})
-			
+
 			if(depList.length == 0) break;
 		}
-		
+
 		// Audit the specified package/version
 		auditPackageBatchImpl(pkgs, callback, function(err) {
 			// Iterate to the next element in the list
