@@ -427,7 +427,12 @@ function buildDependencyObjectLookup(data, lookup) {
   }
   for(var k in data.dependencies) {
     var dep = data.dependencies[k];
-    lookup[dep._from] = dep;
+    if (dep._from) {
+      lookup[dep._from] = dep;
+    } else if (dep.requiredBy) {
+      var key = k + "@" + dep.requiredBy;
+      lookup[key] = extractDep(data.dependencies[k]);
+    }
     buildDependencyObjectLookup(dep, lookup);
   }
   return lookup;
@@ -482,6 +487,19 @@ function getDependencyList(depMap, depLookup) {
   return results;
 }
 
+/** It seems dependencies can be defined in numerous ways. This method is
+ * a hack to try and normalize the data.
+ *
+ * TODO: Why do we get these different representations?
+ */
+function extractDep(dep) {
+  if (dep.requiredBy) {
+    // {"requiredBy":"^5.0.0","missing":true,"optional":false}
+    return {"version": dep.requiredBy};
+  }
+  return dep;
+}
+
 /** Get the dependencies from an npm object. The exact dependencies retrieved
  * depend on categories requested by the user.
  */
@@ -489,7 +507,8 @@ function getDepsFromDataObject(data, lookup) {
   var results = {};
   if (categories.length == 0) {
     for(var k in data.dependencies) {
-      results[k]=data.dependencies[k];
+      var dep = extractDep(data.dependencies[k]);
+      results[k]=dep;
     }
   }
 
