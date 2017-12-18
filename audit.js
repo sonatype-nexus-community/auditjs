@@ -500,6 +500,38 @@ function extractDep(dep) {
   return dep;
 }
 
+/** Given a lookup table, try and find the best specification match for the
+ * provided name@version
+ */
+function lookupSpecMatch(lookup, spec) {
+  console.error("LOOKUP: " + spec);
+  // Direct match
+  if (lookup[spec]) {
+    return lookup[spec];
+  }
+
+  // Close match
+  var shortSpec = spec.replace(/@\D/g,'@');
+  if (lookup[shortSpec]) {
+    return lookup[shortSpec];
+  }
+
+  // Check for Semver valid match
+  var lastIndex = spec.lastIndexOf('@');
+  var myName = spec.substring(0, lastIndex);
+  var myVersion = spec.substring(lastIndex + 1);
+  for(var k in lookup) {
+    console.error("  * " + k);
+    lastIndex = k.lastIndexOf('@');
+    var yourName = k.substring(0, lastIndex);
+    var yourVersion = k.substring(lastIndex + 1);
+    if (myName == yourName && semver.valid(yourVersion) && semver.satisfies(yourVersion, myVersion)) {
+      return lookup[k];
+    }
+  }
+  return undefined;
+}
+
 /** Get the dependencies from an npm object. The exact dependencies retrieved
  * depend on categories requested by the user.
  */
@@ -517,13 +549,12 @@ function getDepsFromDataObject(data, lookup) {
       var category = categories[i];
       for(var k in data[category]) {
         var spec = k + "@" + data[category][k];
-        // Sometimes a match is not quite exact
-        if (!lookup[spec]) {
-          spec = spec.replace(/@\D/g,'@');
-        }
+
+        var specMatch = lookupSpecMatch(lookup, spec);
+
         // If there is no match in the lookup then this dependency was "deduped"
-        if (lookup[spec]) {
-          results[k]=lookup[spec];
+        if (specMatch) {
+          results[k]=specMatch;
         }
       }
     }
