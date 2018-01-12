@@ -93,7 +93,7 @@ auditPackagesImpl = function(depList, callback) {
 		{
 			// Get the current package/version
 			var dep = depList.shift();
-			pkgs.push({pm: dep.pm, name: dep.name, version: dep.version})
+			pkgs.push({pm: dep.pm, name: dep.name, version: dep.version, depPaths: dep.depPaths})
 
 			if(depList.length == 0) break;
 		}
@@ -117,6 +117,7 @@ auditPackageBatchImpl = function(pkgs, onResult, onComplete) {
 		} else {
 			for (var i = 0; i < data.length; i++) {
 				data[i].version = pkgs[i].version;
+				data[i].depPaths = pkgs[i].depPaths;
 				onResult(undefined, data[i]);
 			}
 			onComplete();

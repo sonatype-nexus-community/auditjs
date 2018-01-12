@@ -310,6 +310,11 @@ function exitHandler(options, err) {
           logger.info(`${colors.bold.blue(detail['title'])} affected versions: ${colors.red(detail['package'])} ${colors.red(detail['versions'])}`);
           logger.info(`${detail['description']}`);
           logger.info(colors.bold("ID") + ": " + detail.id);
+          if (detail.whitelistedPaths) {
+            detail.whitelistedPaths.forEach(function(path) {
+              logger.info(colors.bold("Ignored Path") + ": " + path);
+            })
+          }
           logger.info(colors.bold.yellow('=================================================='));
         };
 	}
@@ -368,8 +373,8 @@ function prepareWhitelist(whitelist) {
 	    // Convert the list to a map for easy lookup
 	    var whitelistMap = {};
 	    for (var i = 0; i < whitelist.length; i++) {
-	    	var key = whitelist[i];
-	    	whitelistMap[key] = key;
+	    	var key = whitelist[i].id;
+	    	whitelistMap[key] = whitelist[i];
 	    }
 	    whitelist = whitelistMap;
 	}
@@ -385,7 +390,10 @@ function simplifyWhitelist(whitelist) {
 		var vlist = whitelist[project];
 		for (var i = 0; i < vlist.length; i++) {
 			var id = vlist[i].id;
-			results.push(id);
+			results.push({
+				"id": id,
+				"dependencyPaths": vlist[i].dependencyPaths
+			});
 		}
 	}
 	return results;
@@ -421,19 +429,35 @@ function checkProperties(obj) {
  * Therefore we make a special lookup table
  * of package@version = [Object] which will be referenced later.
  */
-function buildDependencyObjectLookup(data, lookup) {
+function buildDependencyObjectLookup(data, lookup, depPath) {
   if (lookup == undefined) {
     lookup = {};
   }
+
+  depPath = depPath || '';
+
   for(var k in data.dependencies) {
     var dep = data.dependencies[k];
+    depPath += '/' + dep.name;
     if (dep._from) {
-      lookup[dep._from] = dep;
+      var existing = lookup[dep._from];
+      if (existing) {
+        existing.depPaths.push(depPath);
+      } else {
+        lookup[dep._from] = dep;
+        lookup[dep._from].depPaths = [depPath];
+      }
     } else if (dep.requiredBy) {
       var key = k + "@" + dep.requiredBy;
-      lookup[key] = extractDep(data.dependencies[k]);
+      var existing = lookup[key];
+      if (existing) {
+        existing.depPaths.push(depPath);
+      } else {
+        lookup[key] = extractDep(data.dependencies[k]);
+        lookup[key].depPaths = [depPath];
+      }
     }
-    buildDependencyObjectLookup(dep, lookup);
+    buildDependencyObjectLookup(dep, lookup, depPath);
   }
   return lookup;
 }
@@ -457,6 +481,7 @@ function getDependencyList(depMap, depLookup) {
 
     var spec = o.version ? name + "@" + o.version : o;
     var version = o.version ? o.version : o;
+    var depPaths = o.depPaths ? o.depPaths : spec;
 
     // Only add a dependency once
     if(lookup[spec] == undefined) {
@@ -468,7 +493,7 @@ function getDependencyList(depMap, depLookup) {
       // available at all locations of the dependency tree (depMap).
       if (auditLookup[spec] == undefined) {
 				auditLookup[spec] = true;
-				results.push({"pm": pm, "name": name, "version": version});
+				results.push({"pm": pm, "name": name, "version": version, "depPaths": depPaths});
 			}
 
       // If there is a possibility of recursive dependencies...
@@ -611,7 +636,7 @@ function resultCallback(err, pkg) {
 
         // If we KNOW a possibly used version is vulnerable then highlight the
         // title in red.
-        var myVulnerabilities = getValidVulnerabilities(version, pkg.vulnerabilities, pkg.name);
+        var myVulnerabilities = getValidVulnerabilities(version, pkg.vulnerabilities, pkg.name, pkg.depPaths);
         var prefix = undefined;
         if(myVulnerabilities.length > 0) {
                 vulnerabilityCount += 1;
@@ -712,6 +737,9 @@ function resultCallback(err, pkg) {
                                 log();
 
                                 log(colors.bold("ID") + ": " + detail.id);
+                                for (var j = 0; j < detail.depPaths.length; j++) {
+                                  log(colors.bold("Dependency path") + ": " + detail.depPaths[j]);
+                                }
 
                                 // Print affected version information if available
                                 if(detail.versions != null && detail.versions.length > 0) {
@@ -760,11 +788,12 @@ function resultCallback(err, pkg) {
  * @param details Vulnerability details
  * @returns
  */
-function getValidVulnerabilities(productRange, details, pkg) {
+function getValidVulnerabilities(productRange, details, pkg, depPaths) {
         var results = [];
         if(details != undefined) {
                 for(var i = 0; i < details.length; i++) {
                         var detail = details[i];
+                        detail.depPaths = depPaths;
 
                         if(detail.versions != undefined && detail.versions.length > 0) {
                                 for(var j = 0; j < detail.versions.length; j++) {
@@ -775,9 +804,33 @@ function getValidVulnerabilities(productRange, details, pkg) {
                                         		// Do we white-list this match?
 	                                            var id = detail.id;
 	                                            if (whitelist && whitelist[id]) {
-	                                            	detail["package"] = pkg;
-	                                            	whitelistedVulnerabilities.push(detail);
-	                                            	break;
+	                                                var whitelistEntry = whitelist[id];
+	                                                if (whitelistEntry.dependencyPaths) {
+	                                                  for (var whitelistIdx = 0; whitelistIdx < whitelistEntry.dependencyPaths.length; whitelistIdx++) {
+	                                                    var wDep = whitelistEntry.dependencyPaths[whitelistIdx];
+	                                                    var regex = new RegExp(wDep);
+	                                                    detail.depPaths = detail.depPaths.filter(function(dDep) {
+	                                                      if (regex.test(dDep)){
+	                                                        detail.whitelistedPaths = detail.whitelistedPaths || [];
+	                                                        detail.whitelistedPaths.push(dDep);
+	                                                        return false;
+	                                                      }
+
+	                                                      return true;
+	                                                    });
+	                                                  }
+
+	                                                  detail["package"] = pkg;
+	                                                  whitelistedVulnerabilities.push(detail);
+	                                                  if (detail.depPaths.length == 0) {
+	                                                    console.log('SKIPPING BECAUSE ALL PATHS MATCHED')
+	                                                    break;
+	                                                  }
+	                                                } else {
+	                                                  detail["package"] = pkg;
+	                                                  whitelistedVulnerabilities.push(detail);
+	                                                  break;
+	                                                }
 	                                            }
 
                                                 results.push(detail);
