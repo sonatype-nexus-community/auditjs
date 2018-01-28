@@ -108,6 +108,11 @@ particular vulnerability. For example:
       "https://github.com/angular/angular.js/commit/6476af83cd0418c84e034a955b12a842794385c4",
       "https://github.com/angular/angular.js/issues/11352"
     ],
+    "depPaths": [
+      "/colors/angular",
+      "/react/colors/angular",
+      "/react/brace-expansion/angular"
+    ],
     "published": 0,
     "updated": 1493261505026
   },
@@ -147,7 +152,8 @@ Here is the simplest example:
 
 The document is a JSON object, where the field names are the names of packages which contain
 the vulnerabilities, and the value is a list of the vulnerabilities affecting the package that
-should be filtered. The minimal data required is the ID for the vulnerability.
+should be filtered. The minimal data required is the ID for the vulnerability. Dependency paths
+may be the full path of the dependency or any matching regular expression.
 
 And now something a bit more useful.
 
@@ -160,6 +166,10 @@ And now something a bit more useful.
       "description": "Fixed root path disclosure vulnerability in express.static, res.sendfile, and res.sendFile",
       "versions": [
         "&lt;3.19.1 || >=4.0.0 &lt;4.11.1"
+      ],
+      "dependencyPaths": [
+        "/colors/expressjs",
+        "/react/.*
       ]
     },
     ...
@@ -168,7 +178,7 @@ And now something a bit more useful.
 ...
 ```
 
-Here we reproduced the title, description, and version range of the vulnerability that is being
+Here we reproduced the title, description, dependency paths, and version range of the vulnerability that is being
 filtered. The data was copied straight from the JSON in the generated report. You can include any
 of the fields that you feel are most useful in documenting the vulnerability.
 
