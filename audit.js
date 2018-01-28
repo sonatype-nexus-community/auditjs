@@ -504,7 +504,6 @@ function extractDep(dep) {
  * provided name@version
  */
 function lookupSpecMatch(lookup, spec) {
-  console.error("LOOKUP: " + spec);
   // Direct match
   if (lookup[spec]) {
     return lookup[spec];
@@ -521,7 +520,6 @@ function lookupSpecMatch(lookup, spec) {
   var myName = spec.substring(0, lastIndex);
   var myVersion = spec.substring(lastIndex + 1);
   for(var k in lookup) {
-    console.error("  * " + k);
     lastIndex = k.lastIndexOf('@');
     var yourName = k.substring(0, lastIndex);
     var yourVersion = k.substring(lastIndex + 1);
