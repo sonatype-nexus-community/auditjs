@@ -345,6 +345,7 @@ function exitHandler(options, err) {
       process.exit(0);
     } else {
       logger.info(colors.bold.red(''));
+      process.exit(1);
     }
 }
 
