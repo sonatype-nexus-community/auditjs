@@ -481,7 +481,7 @@ function getDependencyList(depMap, depLookup) {
 
     var spec = o.version ? name + "@" + o.version : o;
     var version = o.version ? o.version : o;
-    var depPaths = o.depPaths ? o.depPaths : spec;
+    var depPaths = o.depPaths ? o.depPaths : [spec];
 
     // Only add a dependency once
     if(lookup[spec] == undefined) {
@@ -727,6 +727,9 @@ function resultCallback(err, pkg) {
                                 log();
 
                                 var detail = printTheseProblems[i];
+                                if (!detail.depPaths) {
+                                  detail.depPaths = [];
+                                }
                                 log(colors.red.bold(detail.title));
 
                                 if(detail.description != undefined) {
