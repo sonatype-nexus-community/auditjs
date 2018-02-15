@@ -358,17 +358,15 @@ function exitHandler(options, err) {
  * IDs (to themselves).
  */
 function prepareWhitelist(whitelist) {
-	if(whitelist){
+	if (whitelist) {
         logger.info(colors.bold('Applying whitelist filtering for JUnit reports. Take care to keep the whitelist up to date!'));
 
 		// The white-list is either a list or the old format, which is an object with more
 		// complex structures.
 	    whitelist = JSON.parse(whitelist);
 
-	    // If we are using the old white list format, then convert it to the simplified format
-	    if (!Array.isArray(whitelist)) {
-	    	whitelist = simplifyWhitelist(whitelist);
-	    }
+	    // Ensure whitelist is in the expected format
+	    whitelist = simplifyWhitelist(whitelist);
 
 	    // Convert the list to a map for easy lookup
 	    var whitelistMap = {};
@@ -378,6 +376,7 @@ function prepareWhitelist(whitelist) {
 	    }
 	    whitelist = whitelistMap;
 	}
+
 	return whitelist;
 }
 
@@ -386,16 +385,28 @@ function prepareWhitelist(whitelist) {
  */
 function simplifyWhitelist(whitelist) {
 	var results = [];
-	for (var project in whitelist) {
-		var vlist = whitelist[project];
-		for (var i = 0; i < vlist.length; i++) {
-			var id = vlist[i].id;
-			results.push({
-				"id": id,
-				"dependencyPaths": vlist[i].dependencyPaths
-			});
-		}
+
+	if (Array.isArray(whitelist)) {
+	  // whitelist is in Simplified format
+	  for (var i = 0; i < whitelist.length; i++) {
+	    results.push({
+	      "id": whitelist[i]
+	    });
+	  }
+	} else {
+	  // whitelist is in Verbose format
+	  for (var project in whitelist) {
+	    var vlist = whitelist[project];
+	    for (var i = 0; i < vlist.length; i++) {
+	      var id = vlist[i].id;
+	      results.push({
+	        "id": id,
+	        "dependencyPaths": vlist[i].dependencyPaths
+	      });
+	    }
+	  }
 	}
+
 	return results;
 }
 
