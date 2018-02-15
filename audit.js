@@ -302,9 +302,9 @@ function exitHandler(options, err) {
       console.error(err.toString());
     }
   }
-  var exitCode = 0
+  var exitCode = 0;
   if (vulnerabilityCount > 0 && !program['suppressExitError']) {
-    exitCode = 1
+    exitCode = 1;
   }
 
 	if (whitelistedVulnerabilities.length > 0) {
@@ -352,7 +352,7 @@ function exitHandler(options, err) {
     }
 
     logger.info(colors.bold.red(''));
-    process.exit(exitCode)
+    process.exit(exitCode);
 }
 
 /**
