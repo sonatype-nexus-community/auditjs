@@ -302,6 +302,11 @@ function exitHandler(options, err) {
       console.error(err.toString());
     }
   }
+  var exitCode = 0;
+  if (vulnerabilityCount > 0 && !program['suppressExitError']) {
+    exitCode = 1;
+  }
+
 	if (whitelistedVulnerabilities.length > 0) {
         logger.info(colors.bold.yellow("Filtering the following vulnerabilities"));
         logger.info(colors.bold.yellow('=================================================='));
@@ -346,11 +351,8 @@ function exitHandler(options, err) {
         vulnerabilityCount = 0;
     }
 
-    if (program['suppressExitError']) {
-      process.exit(0);
-    } else {
-      logger.info(colors.bold.red(''));
-    }
+    logger.info(colors.bold.red(''));
+    process.exit(exitCode);
 }
 
 /**
