@@ -32,8 +32,6 @@
  * a map of best case dependencies and indicate if there are any known
  * vulnerabilities.
  */
-// 1 = vulnerabilities found; 0 = no vulnerabilities found or found but whitelisted
-var exitStatus = 0;
 //create reports directory
 var mkdirp = require('mkdirp');
 var path = require('path');
@@ -351,7 +349,7 @@ function exitHandler(options, err) {
     if (program['suppressExitError']) {
       process.exit(0);
     } else {
-      process.exit(exitStatus);
+      logger.info(colors.bold.red(''));
     }
 }
 
@@ -650,7 +648,6 @@ function resultCallback(err, pkg) {
         var myVulnerabilities = getValidVulnerabilities(version, pkg.vulnerabilities, pkg.name, pkg.depPaths);
         var prefix = undefined;
         if(myVulnerabilities.length > 0) {
-                exitStatus = 1;
                 vulnerabilityCount += 1;
                 logger.error("------------------------------------------------------------");
                 prefix = "[" + actualAudits + "/" + expectedAudits + "] " + colors.bold.red(pkgName + " " + versionString + "  [VULNERABLE]") + "   ";
