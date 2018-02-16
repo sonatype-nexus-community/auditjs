@@ -342,14 +342,12 @@ function exitHandler(options, err) {
         JUnit = new XMLSerializer().serializeToString(dom);
         logger.info( `Wrote JUnit report to reports/${output}`);
         fs.writeFileSync('reports/' + output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
-        // Report mode is much like a test mode where builds shouldn't fail if the report was created.
-        vulnerabilityCount = 0;
     }
 
     if (program['suppressExitError']) {
       process.exit(0);
     } else {
-      logger.info(colors.bold.red(''));
+      process.exit(vulnerabilityCount);
     }
 }
 
