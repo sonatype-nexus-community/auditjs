@@ -325,7 +325,7 @@ function exitHandler(options, err) {
             ', Ignored: ' + whitelistedVulnerabilities.length);
 
     if(program['report']) {
-        var filtered = 0;
+        var filtered = whitelistedVulnerabilities.length;
         mkdirp('reports');
         if (JUnit[0] != '<') { // This is a hack in case this gets called twice
         	// Convert to XML
@@ -337,8 +337,8 @@ function exitHandler(options, err) {
         dom.documentElement.setAttribute('tests', expectedAudits);
         dom.documentElement.setAttribute('package', 'test');
         dom.documentElement.setAttribute('id', '');
-        dom.documentElement.setAttribute('skipped', expectedAudits-actualAudits);
-        dom.documentElement.setAttribute('failures', vulnerabilityCount-filtered);
+        dom.documentElement.setAttribute('skipped', filtered);
+        dom.documentElement.setAttribute('failures', vulnerabilityCount);
         JUnit = new XMLSerializer().serializeToString(dom);
         logger.info( `Wrote JUnit report to reports/${output}`);
         fs.writeFileSync('reports/' + output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
