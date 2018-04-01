@@ -438,34 +438,37 @@ function checkProperties(obj) {
  * Therefore we make a special lookup table
  * of package@version = [Object] which will be referenced later.
  */
-function buildDependencyObjectLookup(data, lookup, depPath) {
+function buildDependencyObjectLookup(data, lookup, parentPath) {
   if (lookup == undefined) {
     lookup = {};
   }
 
-  depPath = depPath || '';
+  parentPath = parentPath || '';
 
   for(var k in data.dependencies) {
     var dep = data.dependencies[k];
-    depPath += '/' + dep.name;
-    if (dep._from) {
-      var existing = lookup[dep._from];
-      if (existing) {
-        existing.depPaths.push(depPath);
-      } else {
-        lookup[dep._from] = dep;
-        lookup[dep._from].depPaths = [depPath];
-      }
+    depPath = parentPath + '/' + dep.name;
+
+    var lookupKey = 'UNKNOWN'; //If we can't find a key below, something's wrong.
+    var depToStore = dep;
+    if (dep.name) {
+      lookupKey = dep.name + '@' + dep.version
+    } else if (dep._from) {
+      lookupKey = dep._from;
     } else if (dep.requiredBy) {
-      var key = k + "@" + dep.requiredBy;
-      var existing = lookup[key];
-      if (existing) {
-        existing.depPaths.push(depPath);
-      } else {
-        lookup[key] = extractDep(data.dependencies[k]);
-        lookup[key].depPaths = [depPath];
-      }
+      // If we can't find the node_modules folder, we'll get 'requiredBy' instead.
+      lookupKey = k + "@" + dep.requiredBy;
+      depToStore = extractDep(data.dependencies[k]);
     }
+
+    var existing = lookup[lookupKey];
+    if (existing) {
+      existing.depPaths.push(depPath);
+    } else {
+      lookup[lookupKey] = depToStore;
+      lookup[lookupKey].depPaths = [depPath];
+    }
+
     buildDependencyObjectLookup(dep, lookup, depPath);
   }
   return lookup;
