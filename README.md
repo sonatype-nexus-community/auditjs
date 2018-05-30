@@ -1,7 +1,7 @@
 AuditJS
 =======
 
-Audits an NPM project using the [OSS Index v2 REST API](https://ossindex.net/docs/restapi2)
+Audits an NPM project using the [OSS Index v2 REST API](https://ossindex.net/public/restapi2)
 to identify known vulnerabilities and outdated package versions.
 
 ![Screenshot](screenshots/screenshot.png)
