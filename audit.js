@@ -67,6 +67,7 @@ var semver = require('semver');
 
 // dictionary of vulnerable packages for xml-report
 var JUnit = { 'testsuite':[] };
+var JReport = [];
 
 // Used to find installed packages and their dependencies
 var npm = require('npm');
@@ -112,6 +113,7 @@ program
         .option('--prod --production', 'Analyze production dependencies only')
         .option('-q --quiet', 'Supress console logging')
         .option('-r --report', 'Create JUnit reports in reports/ directory')
+        .option('--json', 'Output report in JSON')
         .option('-v --verbose', 'Print all vulnerabilities')
         .option('-w --whitelist <file>', 'Whitelist of vulnerabilities that should not break the build,\n\t\t\t\t e.g. XSS vulnerabilities for an app with no possbile input for XSS.\n\t\t\t\t See Example test_data/audit_package_whitelist.json.')
         .option('-l --level <level>', 'Logging level. Possible options: ' + LOGGER_LEVELS)
@@ -318,6 +320,11 @@ function exitHandler(options, err) {
           logger.info(colors.bold.yellow('=================================================='));
         };
 	}
+
+    if(program['json']) {
+        console.log(JSON.stringify(JReport));
+        process.exit(0)
+    }
 
   logger.info('');
   logger.info('Audited dependencies: ' + actualAudits +
@@ -657,6 +664,7 @@ function resultCallback(err, pkg) {
                   logger.verbose(prefix);
                   prefix = "";
                 }
+                JReport.push({pkg: pkg.name, version: pkg.version, bugs: myVulnerabilities});
                 JUnit['testsuite'].push({name: 'testcase', attrs: {name: pkg.name}, children: [{
                         name: 'failure', text: `Details:\n
                         ${JSON.stringify(myVulnerabilities, null, 2).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')}\n\n`,
@@ -781,7 +789,7 @@ function resultCallback(err, pkg) {
                                 logger.error();
                         }
                 }
-        } else {
+        } else if(!program['json']) {
                 logger.info(prefix + colors.grey("No known vulnerabilities..."));
         }
 
