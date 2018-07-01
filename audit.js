@@ -159,7 +159,7 @@ if (program['quiet']) {
 /** Hack code to allow us to check if a specific logger level is enabled.
  */
 logger.isLevelEnabled = function(level) {
-  if (this.transports) {
+  if (this.transports && this.transports.console) {
     var levels = this.transports.console.level;
     return levels == level;
   }
