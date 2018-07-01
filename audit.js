@@ -147,7 +147,6 @@ if (program['quiet']) {
     transports: [
       new (winston.transports.Console)({
         level: process.env.LOG_LEVEL ||
-          (program['quiet']?'error':false) ||
           (program['verbose']?'verbose':false) ||
           (LOGGER_LEVELS.includes(program['level'])?program['level']:false)
           || 'info',
