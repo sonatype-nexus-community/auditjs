@@ -29,11 +29,7 @@
 var ossi = require('./ossindex.js');
 
 var cache = require('persistent-cache');
-var myCache = cache({
-	base: require('os').homedir(),
-	name: '.ossi-cache',
-	duration: 1000 * 3600 * 24 //one day
-});
+var myCache = undefined;
 
 /**
  * Queries should be done in batches when possible to reduce the hits on the
@@ -53,6 +49,13 @@ module.exports = {
 		ossi.setHost(scheme, host, port);
 	},
 
+	setCache: function (path) {
+		myCache = cache({
+			base: path,
+			name: 'auditjs3x',
+			duration: 1000 * 3600 * 24 //one day
+		});
+	},
 
 		/** Audit a list of packages
 		 * Results are sent to a callback(err, single_package_data)
@@ -77,6 +80,13 @@ module.exports = {
 		 *                 (err, single_package_data).
 		 */
 		auditPackage: function(pkgManagerName, pkgName, versionRange, callback) {
+			if (!myCache) {
+				myCache = cache({
+					base: require('os').homedir() + "/.ossi-cache",
+					name: 'auditjs3x',
+					duration: 1000 * 3600 * 24 //one day
+				});
+			}
 			auditPackagesImpl([{pm: pkgManagerName, name: pkgName, version: versionRange}], callback);
 		},
 };

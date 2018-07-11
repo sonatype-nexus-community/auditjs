@@ -119,6 +119,7 @@ program
         .option('--scheme <scheme>', '[testing] http/https')
         .option('--host <host>', '[testing] data host')
         .option('--port <port>', '[testing] data port')
+        .option('--cacheDir <path>', 'Cache parent directory [default: <homedir>/.ossi-cache]')
         .action(function () {
         });
 
@@ -201,6 +202,10 @@ if (program['scheme'] || program['host'] || program['port']) {
   var host = program['host'] ? program['host'] : "ossindex.net";
   var port = program['port'] ? program['port'] : 443;
   auditor.setHost(scheme, host, port);
+}
+
+if (program['cacheDir']) {
+  auditor.setCache(program['cacheDir']);
 }
 
 
