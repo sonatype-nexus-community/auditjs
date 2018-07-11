@@ -495,17 +495,15 @@ function getDependencyList(depMap, depLookup) {
     var depPaths = o.depPaths ? o.depPaths : [spec];
 
     // Only add a dependency once
-    if(lookup[spec] == undefined) {
+    // We need both the local and global "auditLookup" tables.
+    // The global lookup is used to ensure we only audit a
+    // dependency once, but cannot be done at the same level
+    // as the local lookup since the sub-dependencies are not
+    // available at all locations of the dependency tree (depMap).
+    if(lookup[spec] == undefined && auditLookup[spec] == undefined) {
       lookup[spec] = true;
-      // We need both the local and global "auditLookup" tables.
-      // The global lookup is used to ensure we only audit a
-      // dependency once, but cannot be done at the same level
-      // as the local lookup since the sub-dependencies are not
-      // available at all locations of the dependency tree (depMap).
-      if (auditLookup[spec] == undefined) {
-				auditLookup[spec] = true;
-				results.push({"pm": pm, "name": name, "version": version, "depPaths": depPaths});
-			}
+			auditLookup[spec] = true;
+			results.push({"pm": pm, "name": name, "version": version, "depPaths": depPaths});
 
       // If there is a possibility of recursive dependencies...
       if (o.version) {
