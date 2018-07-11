@@ -36,6 +36,7 @@
     "semver": "^5.3.0",
     "xmldom": "^0.1.27",
     "winston": "^2.4.0",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "persistent-cache": "1.1.1"
   }
 }

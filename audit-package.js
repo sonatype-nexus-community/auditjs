@@ -28,6 +28,12 @@
 // Provides simplified REST API access
 var ossi = require('./ossindex.js');
 
+var cache = require('persistent-cache');
+var myCache = cache({
+	name: 'ossi-cache',
+	duration: 1000 * 3600 * 24 //one day
+});
+
 /**
  * Queries should be done in batches when possible to reduce the hits on the
  * server.
@@ -87,18 +93,39 @@ auditPackagesImpl = function(depList, callback) {
 		var pkgs = [];
 		for(var i = 0; i < BATCH_SIZE; i++)
 		{
+			if(depList.length == 0) break;
+
 			// Get the current package/version
 			var dep = depList.shift();
-			pkgs.push({pm: dep.pm, name: dep.name, version: dep.version, depPaths: dep.depPaths})
+			var purl = dep.pm + ":" + dep.name + "@" + dep.version;
 
-			if(depList.length == 0) break;
+			// If the result is cached then report that!
+			var cachedResult = myCache.getSync(purl);
+			if (cachedResult) {
+				callback(undefined, cachedResult);
+				i--; // Since this isn't being sent to the server, it doesn't count as one of the batch
+				continue;
+			}
+			pkgs.push({pm: dep.pm, name: dep.name, version: dep.version, depPaths: dep.depPaths})
 		}
 
-		// Audit the specified package/version
-		auditPackageBatchImpl(pkgs, callback, function(err) {
-			// Iterate to the next element in the list
-			auditPackagesImpl(depList, callback);
-		});
+		if (pkgs.length > 0) {
+			// Audit the specified package/version
+			auditPackageBatchImpl(pkgs,
+				// OnResult
+				function(err, pkg) {
+					if (!err) {
+						var purl = pkg.format + ":" + pkg.name + "@" + pkg.version;
+						myCache.putSync(purl, pkg);
+					}
+					callback(err, pkg);
+				},
+				// OnComplete
+				function(err) {
+				// Iterate to the next element in the list
+				auditPackagesImpl(depList, callback);
+			});
+		}
 	}
 };
 
@@ -114,6 +141,7 @@ auditPackageBatchImpl = function(pkgs, onResult, onComplete) {
 			for (var i = 0; i < data.length; i++) {
 				data[i].version = pkgs[i].version;
 				data[i].name = pkgs[i].name;
+				data[i].format = pkgs[i].pm;
 				data[i].depPaths = pkgs[i].depPaths;
 				onResult(undefined, data[i]);
 			}
