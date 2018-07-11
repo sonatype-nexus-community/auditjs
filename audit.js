@@ -320,7 +320,7 @@ function exitHandler(options, err) {
 
   logger.info('');
   logger.info('Audited dependencies: ' + actualAudits +
-            ', Vulnerabilities: ' + colors.bold.red(vulnerabilityCount) +
+            ', Vulnerable: ' + colors.bold.red(vulnerabilityCount) +
             ', Ignored: ' + whitelistedVulnerabilities.length);
 
     if(program['report']) {
@@ -674,6 +674,12 @@ function resultCallback(err, pkg) {
         if(err) {
                 if(err.error) {
                         logger.error(prefix + colors.bold.red("Error running audit: " + err.error + " (" + err.code + ")"));
+                        switch (err.code) {
+                          case 429:
+                            logger.error(colors.bold.red("Exceeded request rate limit. Please try again later. Use registered account for higher limit."));
+                            throw ("Exceeded request rate limit");
+                            break;
+                        }
                 }
                 else {
                         logger.error(prefix + colors.bold.red("Error running audit: " + err));
@@ -712,7 +718,7 @@ function resultCallback(err, pkg) {
                 // Special statuses
                 if(pkg.vulnerabilities.length == 0) {
                         // FIXME: We should always get some response. This should not happen.
-                        logger.info(prefix + colors.grey("No known vulnerabilities..."));
+                        logger.info(prefix + colors.grey("No known vulnerabilities against package/version..."));
                 }
                 // Vulnerabilities found
                 else {
@@ -721,7 +727,7 @@ function resultCallback(err, pkg) {
                         if (myVulnerabilities.length == 0) {
                           log = logger.info;
                         }
-                        log(prefix + pkg.vulnerabilities.length + " known vulnerabilities, " + myVulnerabilities.length + " affecting installed version");
+                        log(prefix + pkg.vulnerabilities.length + " known vulnerabilities affecting installed version");
 
                         // By default only print known problems
                         var printTheseProblems = myVulnerabilities;
@@ -747,6 +753,7 @@ function resultCallback(err, pkg) {
                                 log();
 
                                 log(colors.bold("ID") + ": " + detail.id);
+                                log(colors.bold("Details") + ": https://ossindex.sonatype.org/vuln/" + detail.id);
                                 for (var j = 0; j < detail.depPaths.length; j++) {
                                   log(colors.bold("Dependency path") + ": " + detail.depPaths[j]);
                                 }
@@ -779,7 +786,7 @@ function resultCallback(err, pkg) {
                         }
                 }
         } else {
-                logger.info(prefix + colors.grey("No known vulnerabilities..."));
+                logger.info(prefix + colors.grey("No known vulnerabilities against package/version..."));
         }
 
         // Print a separator
@@ -790,9 +797,6 @@ function resultCallback(err, pkg) {
 }
 
 /** Return list of vulnerabilities found to affect this version.
- *
- * The input 'version' or details 'versions' may be ranges, depending
- * on the situation.
  *
  * @param productRange A version range as defined by semantic versioning
  * @param details Vulnerability details
@@ -805,48 +809,37 @@ function getValidVulnerabilities(productRange, details, pkg, depPaths) {
                         var detail = details[i];
                         detail.depPaths = depPaths;
 
-                        if(detail.versions != undefined && detail.versions.length > 0) {
-                                for(var j = 0; j < detail.versions.length; j++) {
-                                        // Get the vulnerability range
-                                        var vulnRange = detail.versions[j]
+                  		// Do we white-list this match?
+                        var id = detail.id;
+                        if (whitelist && whitelist[id]) {
+                            var whitelistEntry = whitelist[id];
+                            if (whitelistEntry.dependencyPaths) {
+                              for (var whitelistIdx = 0; whitelistIdx < whitelistEntry.dependencyPaths.length; whitelistIdx++) {
+                                var wDep = whitelistEntry.dependencyPaths[whitelistIdx];
+                                var regex = new RegExp(wDep);
+                                detail.depPaths = detail.depPaths.filter(function(dDep) {
+                                  if (regex.test(dDep)){
+                                    detail.whitelistedPaths = detail.whitelistedPaths || [];
+                                    detail.whitelistedPaths.push(dDep);
+                                    return false;
+                                  }
 
-                                        if(rangesOverlap(productRange, vulnRange)) {
-                                        		// Do we white-list this match?
-	                                            var id = detail.id;
-	                                            if (whitelist && whitelist[id]) {
-	                                                var whitelistEntry = whitelist[id];
-	                                                if (whitelistEntry.dependencyPaths) {
-	                                                  for (var whitelistIdx = 0; whitelistIdx < whitelistEntry.dependencyPaths.length; whitelistIdx++) {
-	                                                    var wDep = whitelistEntry.dependencyPaths[whitelistIdx];
-	                                                    var regex = new RegExp(wDep);
-	                                                    detail.depPaths = detail.depPaths.filter(function(dDep) {
-	                                                      if (regex.test(dDep)){
-	                                                        detail.whitelistedPaths = detail.whitelistedPaths || [];
-	                                                        detail.whitelistedPaths.push(dDep);
-	                                                        return false;
-	                                                      }
+                                  return true;
+                                });
+                              }
 
-	                                                      return true;
-	                                                    });
-	                                                  }
-
-	                                                  detail["package"] = pkg;
-	                                                  whitelistedVulnerabilities.push(detail);
-	                                                  if (detail.depPaths.length == 0) {
-	                                                    console.log('SKIPPING BECAUSE ALL PATHS MATCHED')
-	                                                    break;
-	                                                  }
-	                                                } else {
-	                                                  detail["package"] = pkg;
-	                                                  whitelistedVulnerabilities.push(detail);
-	                                                  break;
-	                                                }
-	                                            }
-
-                                                results.push(detail);
-                                                break;
-                                        }
-                                }
+                              detail["package"] = pkg;
+                              whitelistedVulnerabilities.push(detail);
+                              if (detail.depPaths.length == 0) {
+                                console.log('SKIPPING BECAUSE ALL PATHS MATCHED')
+                              }
+                            } else {
+                              detail["package"] = pkg;
+                              whitelistedVulnerabilities.push(detail);
+                            }
+                        }
+                        else {
+                          results.push(detail);
                         }
                 }
         }

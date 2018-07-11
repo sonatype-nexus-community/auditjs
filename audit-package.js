@@ -26,17 +26,13 @@
  */
 
 // Provides simplified REST API access
-var ossi = require('ossindexjs');
-//var ossi = require('./ossindex.js');
-
-// Used in package version comparisons
-var semver = require('semver');
+var ossi = require('./ossindex.js');
 
 /**
  * Queries should be done in batches when possible to reduce the hits on the
  * server.
  */
-var BATCH_SIZE = 100;
+var BATCH_SIZE = 10;
 
 /**
  * EXPORT providing auditing of specified dependencies.
@@ -117,6 +113,7 @@ auditPackageBatchImpl = function(pkgs, onResult, onComplete) {
 		} else {
 			for (var i = 0; i < data.length; i++) {
 				data[i].version = pkgs[i].version;
+				data[i].name = pkgs[i].name;
 				data[i].depPaths = pkgs[i].depPaths;
 				onResult(undefined, data[i]);
 			}
