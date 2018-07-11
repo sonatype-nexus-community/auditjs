@@ -30,7 +30,8 @@ var ossi = require('./ossindex.js');
 
 var cache = require('persistent-cache');
 var myCache = cache({
-	name: 'ossi-cache',
+	base: require('os').homedir(),
+	name: '.ossi-cache',
 	duration: 1000 * 3600 * 24 //one day
 });
 
