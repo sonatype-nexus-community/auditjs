@@ -32,7 +32,7 @@ var ossi = require('./ossindex.js');
  * Queries should be done in batches when possible to reduce the hits on the
  * server.
  */
-var BATCH_SIZE = 10;
+var BATCH_SIZE = 120;
 
 /**
  * EXPORT providing auditing of specified dependencies.
