@@ -1,5 +1,6 @@
 /**
  *	Copyright (c) 2015-2017 Vör Security Inc.
+ *  Copyright (c) 2018-present Sonatype, Inc. All rights reserved.
  *	All rights reserved.
  *
  *	Redistribution and use in source and binary forms, with or without
@@ -34,26 +35,22 @@ var ossindex = "https://ossindex.sonatype.org";
 //DEBUG HOST
 //var ossindex = "http://localhost:8080";
 
+var username = undefined;
+var token = undefined;
+
 module.exports = {
 
   /** Override the data host.
 	 */
-	setHost: function (scheme, host, port) {
-		ossindex = scheme + "://" + host + ":" + port
+	 setHost: function (scheme, host, port) {
+ 		ossindex = scheme + "://" + host + ":" + port
+ 	},
+
+	setUser: function (myUsername, myToken) {
+		username = myUsername;
+		token = myToken;
 	},
 
-	/** POST /v2.0/package
-	 *
-	 *	[
-	 *	    {"pm": ":pm", "name": ":packageName1"},
-	 *	    {"pm": ":pm", "name": ":packageName2"},
-	 *	    ...
-	 *	]
-	 * Get packages and their vulnerabilities in bulk.
-	 *
-	 * @param pkgs An array of {pm: package manager, name: package name} objects
-	 * @callback to call on completion
-	 */
 	getPackageData: function (pkgs, callback) {
 
 		var data = {};
@@ -67,6 +64,12 @@ module.exports = {
 			body: data,
 			json: true
 		};
+
+		if (username) {
+			args.auth = {};
+			args.auth.user = username;
+			args.auth.pass = token;
+		}
 
 		var query = ossindex + "/api/v3/component-report";
 		client.post(query, args, function(error, response, json){

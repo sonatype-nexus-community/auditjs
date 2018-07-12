@@ -2,7 +2,8 @@
 ':' //; exec "$(command -v node || command -v nodejs)" "$0" "$@"
 
 /**
- *      Copyright (c) 2015-2017 Vör Security Inc.
+ *	    Copyright (c) 2015-2017 Vör Security Inc.
+ *      Copyright (c) 2018-present Sonatype, Inc. All rights reserved.
  *      All rights reserved.
  *
  *      Redistribution and use in source and binary forms, with or without
@@ -41,11 +42,11 @@ var XMLSerializer = require('xmldom').XMLSerializer;
 //write found vulnerabilities to JUnit xml
 var jsontoxml = require('jsontoxml');
 
-// File system access
-var fs = require('fs');
-
 // Use winston for logging
 const winston = require('winston');
+
+// File system access
+var fs = require('fs');
 
 // Next two requires used to get version from out package.json file
 var path = require('path');
@@ -98,134 +99,27 @@ var auditLookup = {};
  */
 var vulnerabilityCount = 0;
 
-const LOGGER_LEVELS = ['error', 'warn', 'info', 'verbose', 'debug'];
-
-//Parse command line options. We currently support only one argument so
-// this is a little overkill. It allows for future growth.
-var program = require('commander');
-program
-        .version(pkg.version)
-        .option('-b --bower', 'This flag is necessary to correctly audit bower\n\t\t\t\t packages. Use together with -p bower.json, since\n\t\t\t\t scanning bower_componfents is not supported')
-        .option('-n --noNode', 'Ignore node executable when scanning node_modules.')
-        .option('-p --package <file>', 'Specific package.json or bower.json file to audit')
-        .option('-d --dependencyTypes <list>', 'One or more of devDependencies, dependencies, peerDependencies, bundledDependencies, or optionalDependencies')
-        .option('--prod --production', 'Analyze production dependencies only')
-        .option('-q --quiet', 'Supress console logging')
-        .option('-r --report', 'Create JUnit reports in reports/ directory')
-        .option('-v --verbose', 'Print all vulnerabilities')
-        .option('-w --whitelist <file>', 'Whitelist of vulnerabilities that should not break the build,\n\t\t\t\t e.g. XSS vulnerabilities for an app with no possbile input for XSS.\n\t\t\t\t See Example test_data/audit_package_whitelist.json.')
-        .option('-l --level <level>', 'Logging level. Possible options: ' + LOGGER_LEVELS)
-        .option('--suppressExitError', 'Supress exit code when vulnerability found')
-        .option('--scheme <scheme>', '[testing] http/https')
-        .option('--host <host>', '[testing] data host')
-        .option('--port <port>', '[testing] data port')
-        .option('--cacheDir <path>', 'Cache parent directory [default: <homedir>/.ossi-cache]')
-        .action(function () {
-        });
-
-program.on('--help', function(){
-        usage();
-});
-
-program.parse(process.argv);
-if(program['bower'] && !program['package']){
-        throw Error('Use -b option together with -p bower.json. Bower dependencies are flat, therefore it is enough to only support the auditing of bower.json files.');
-}
-var programPackage = program['package'] ? path.basename(program['package']): 'scan_node_modules.json';
-var output = `${programPackage.toString().split('.json').slice(0, -1)}.xml`;
-var pm = program['bower'] ? 'bower' : 'npm';
-
-if (program['dependencyTypes'] && program['production']) {
-  throw Error('Cannot use --dependencyTypes and --production options together');
-}
-
-//Set logging level based on environmental value or flag
-let logger = undefined;
-if (program['quiet']) {
-  logger = new (winston.Logger)();
-} else {
-  logger = new (winston.Logger)({
-    transports: [
-      new (winston.transports.Console)({
-        level: process.env.LOG_LEVEL ||
-          (program['verbose']?'verbose':false) ||
-          (LOGGER_LEVELS.includes(program['level'])?program['level']:false)
-          || 'info',
-        formatter: logFormatter})
-    ]
-  });
-}
-
-/** Hack code to allow us to check if a specific logger level is enabled.
- */
-logger.isLevelEnabled = function(level) {
-  if (this.transports && this.transports.console) {
-    var levels = this.transports.console.level;
-    return levels == level;
-  }
-  return false;
-};
-
-// Categories are somewhat complicated in order to not break backward-compatibility.
-var categories = [];
-if (program['package']) {
-  // By default in package mode we only check production dependencies
-  categories = ['dependencies'];
-}
-
-// The --production option means do dependencies
-if (program['production']) {
-  categories = ['dependencies'];
-}
-
-categories = program['dependencyTypes'] ? program['dependencyTypes'].split(",") : categories;
-
-// For recursive dependencies 'dependencies' should be '_dependencies'
-if (!program['package']) {
-  newCategories = [];
-  for (var i = 0; i < categories.length; i++) {
-    switch (categories[i]) {
-      case 'dependencies':
-        newCategories.push('_dependencies');
-        break;
-      default:
-        newCategories.push(categories[i]);
-        break;
-    }
-  }
-  categories = newCategories;
-}
-
-// Override the host
-if (program['scheme'] || program['host'] || program['port']) {
-  var scheme = program['scheme'] ? program['scheme'] : "https";
-  var host = program['host'] ? program['host'] : "ossindex.net";
-  var port = program['port'] ? program['port'] : 443;
-  auditor.setHost(scheme, host, port);
-}
-
-if (program['cacheDir']) {
-  auditor.setCache(program['cacheDir']);
-}
-
-
-// Simplify the white-list so that it is a simple lookup table of vulnerability IDs.
-var whitelist = program['whitelist'] ? fs.readFileSync(program['whitelist'], 'utf-8') : null;
-whitelist = prepareWhitelist(whitelist);
+var config = require('./config');
+config.init(pkg, auditor);
+var logger = config.get("logger");
+var categories = config.get("categories");
+var whitelist = config.get("whitelist");
+var programPackage = config.get("programPackage");
+var output = config.get("output");
 
 // Remember all vulnerabilities that were white-listed
 var whitelistedVulnerabilities = [];
 
 // By default we run an audit against all installed packages and their
 // dependencies.
-if (!program["package"]) {
+if (!config.get("package")) {
         npm.load(function(err, npm) {
                 npm.commands.ls([], true, function(err, data, lite) {
                         // Get a flat list of dependencies instead of a map.
                         var depObjectLookup = buildDependencyObjectLookup(data);
                         var dataDeps = getDepsFromDataObject(data, depObjectLookup);
                         var deps = getDependencyList(dataDeps, depObjectLookup);
-                        if(program.noNode) {
+                        if(config.get("noNode")) {
                                 // Set the number of expected audits
                                 expectedAudits = deps.length;
 
@@ -254,7 +148,7 @@ if (!program["package"]) {
 else {
 
         //Load the target package file
-        var filename = program["package"];
+        var filename = config.get("package");
         var targetPkg = undefined;
 
         try {
@@ -328,7 +222,7 @@ function exitHandler(options, err) {
             ', Vulnerable: ' + colors.bold.red(vulnerabilityCount) +
             ', Ignored: ' + whitelistedVulnerabilities.length);
 
-    if(program['report']) {
+    if(config.get('report')) {
         var filtered = whitelistedVulnerabilities.length;
         mkdirp('reports');
         if (JUnit[0] != '<') { // This is a hack in case this gets called twice
@@ -348,68 +242,11 @@ function exitHandler(options, err) {
         fs.writeFileSync('reports/' + output, `<?xml version="1.0" encoding="UTF-8"?>\n${JUnit}`);
     }
 
-    if (program['suppressExitError']) {
+    if (config.get('suppressExitError')) {
       process.exit(0);
     } else {
       process.exit(vulnerabilityCount);
     }
-}
-
-/**
- * Do some preparations on the whitelist, which results in it being a map of vulnerability
- * IDs (to themselves).
- */
-function prepareWhitelist(whitelist) {
-	if (whitelist) {
-        logger.info(colors.bold('Applying whitelist filtering for JUnit reports. Take care to keep the whitelist up to date!'));
-
-		// The white-list is either a list or the old format, which is an object with more
-		// complex structures.
-	    whitelist = JSON.parse(whitelist);
-
-	    // Ensure whitelist is in the expected format
-	    whitelist = simplifyWhitelist(whitelist);
-
-	    // Convert the list to a map for easy lookup
-	    var whitelistMap = {};
-	    for (var i = 0; i < whitelist.length; i++) {
-	    	var key = whitelist[i].id;
-	    	whitelistMap[key] = whitelist[i];
-	    }
-	    whitelist = whitelistMap;
-	}
-
-	return whitelist;
-}
-
-/**
- * Simplify the white-list into a list of issue IDs.
- */
-function simplifyWhitelist(whitelist) {
-	var results = [];
-
-	if (Array.isArray(whitelist)) {
-	  // whitelist is in Simplified format
-	  for (var i = 0; i < whitelist.length; i++) {
-	    results.push({
-	      "id": whitelist[i]
-	    });
-	  }
-	} else {
-	  // whitelist is in Verbose format
-	  for (var project in whitelist) {
-	    var vlist = whitelist[project];
-	    for (var i = 0; i < vlist.length; i++) {
-	      var id = vlist[i].id;
-	      results.push({
-	        "id": id,
-	        "dependencyPaths": vlist[i].dependencyPaths
-	      });
-	    }
-	  }
-	}
-
-	return results;
 }
 
 function replacer(key, value) {
@@ -508,7 +345,7 @@ function getDependencyList(depMap, depLookup) {
     if(lookup[spec] == undefined && auditLookup[spec] == undefined) {
       lookup[spec] = true;
 			auditLookup[spec] = true;
-			results.push({"pm": pm, "name": name, "version": version, "depPaths": depPaths});
+			results.push({"pm": config.get("pm"), "name": name, "version": version, "depPaths": depPaths});
 
       // If there is a possibility of recursive dependencies...
       if (o.version) {
@@ -597,27 +434,6 @@ function getDepsFromDataObject(data, lookup) {
     }
   }
   return results;
-}
-
-/** Help text
- *
- * @returns
- */
-function usage() {
-        console.log("Audit installed packages and their dependencies to identify known");
-        console.log("vulnerabilities.");
-        console.log();
-        console.log("If a package.json file is specified as an argument, only the dependencies in");
-        console.log("the package file will be audited.");
-        console.log();
-        console.log(colors.bold.yellow("Limitations"));
-        console.log();
-        console.log("As this program depends on the OSS Index database, network access is");
-        console.log("required. Connection problems with OSS Index will result in an exception.");
-        console.log();
-        console.log("The vulnerabilities do not always indicate all (or any) of the affected");
-        console.log("versions it is best to read the vulnerability text itself to determine");
-        console.log("whether any particular version is known to be vulnerable.");
 }
 
 /** Write the audit results. This handles both standard and verbose
@@ -913,12 +729,4 @@ function forceSemanticVersion(range) {
                 return match[1] + "." + match[2] + "." + match[3];
         }
         return undefined;
-}
-
-/** Overriding the winston formatter to output a log message in the same manner
- * that console.log was working, to reduce the inpact on the code for the
- * initial move to winston.
- */
-function logFormatter(args) {
-  return args.message;
 }

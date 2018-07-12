@@ -37,6 +37,7 @@
     "xmldom": "^0.1.27",
     "winston": "^2.4.0",
     "request": "^2.83.0",
-    "persistent-cache": "1.1.1"
+    "persistent-cache": "1.1.1",
+    "config": "1.30.0"
   }
 }

@@ -1,5 +1,6 @@
 /**
  *	Copyright (c) 2015-2017 Vör Security Inc.
+ *  Copyright (c) 2018-present Sonatype, Inc. All rights reserved.
  *	All rights reserved.
  *
  *	Redistribution and use in source and binary forms, with or without
@@ -57,6 +58,10 @@ module.exports = {
 		});
 	},
 
+	setUser: function (myUsername, myToken) {
+		ossi.setUser(myUsername, myToken);
+	},
+
 		/** Audit a list of packages
 		 * Results are sent to a callback(err, single_package_data)
 		 *
@@ -66,6 +71,13 @@ module.exports = {
 		 *                 (err, single_package_data).
 		 */
 		auditPackages: function(depList, callback) {
+			if (!myCache) {
+				myCache = cache({
+					base: require('os').homedir() + "/.auditjs",
+					name: 'auditjs3x',
+					duration: 1000 * 3600 * 24 //one day
+				});
+			}
 			auditPackagesImpl(depList, callback);
 		},
 
@@ -82,7 +94,7 @@ module.exports = {
 		auditPackage: function(pkgManagerName, pkgName, versionRange, callback) {
 			if (!myCache) {
 				myCache = cache({
-					base: require('os').homedir() + "/.ossi-cache",
+					base: require('os').homedir() + "/.auditjs",
 					name: 'auditjs3x',
 					duration: 1000 * 3600 * 24 //one day
 				});
