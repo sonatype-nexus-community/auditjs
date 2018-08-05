@@ -6,8 +6,10 @@
   * [Config file](#config-file)
   * [OSS Index Credentials](#oss-index-credentials)
   * [Whitelisting](#whitelisting)
-    + [Simplified Whitelist Format](#simplified-whitelist-format)
-    + [Verbose Whitelist Format](#verbose-whitelist-format)
+    + [Whitelist in configuration](#whitelist-in-configuration)
+    + [Whitelist File](#whitelist-file)
+      - [Simplified Whitelist Format](#simplified-whitelist-format)
+      - [Verbose Whitelist Format](#verbose-whitelist-format)
   * [Limitations](#limitations)
   * [Credit](#credit)
 
@@ -201,10 +203,35 @@ Fixed root path disclosure vulnerability in express.static, res.sendfile, and re
 ==================================================
 ```
 
+The whitelist can either be specified in the configuration, or as a separate whitelist file.
+The whitelist file has two format alternatives.
+
+### Whitelist in configuration
+
+Vulnerabilities can be blocked (whitelisted) by specifying them directly in the configuration
+file as follows:
+
+
+```
+{
+  ...
+  "whitelist": {
+    "file": "./whitelist.json",
+    "ignore": [
+      "a81a18b3-26bf-43d8-b823-826ef69bf8e8",
+      "49da4413-af2b-4e55-acc0-9c752e30dde4"
+    ]
+  }
+  ...
+}
+```
+
+### Whitelist File
+
 The whitelist is a JSON document which is passed on the command line using the `-w <file>`
 option. The whitelist document itself can take one of two forms: simplified and verbose.
 
-### Simplified Whitelist Format
+#### Simplified Whitelist Format
 
 The simplified whitelist is a list of vulnerability IDs. The ID for a vulnerability can
 be seen by generating the report (`-r`) and viewing the embedded JSON describing a
@@ -213,23 +240,11 @@ particular vulnerability. For example:
 ```
 ...
   {
-    "id": 8398878757,
-    "title": "Cross Site Scripting (XSS) in JSONP",
-    "description": "JSONP allows untrusted resource URLs, which provides a vector for attack by malicious actors.",
-    "versions": [
-      "&lt;1.6.0-rc.0"
-    ],
-    "references": [
-      "https://github.com/angular/angular.js/commit/6476af83cd0418c84e034a955b12a842794385c4",
-      "https://github.com/angular/angular.js/issues/11352"
-    ],
-    "depPaths": [
-      "/colors/angular",
-      "/react/colors/angular",
-      "/react/brace-expansion/angular"
-    ],
-    "published": 0,
-    "updated": 1493261505026
+    "id": "a81a18b3-26bf-43d8-b823-826ef69bf8e8",
+    "title": "Denial of Service",
+    "description": "Kris Reeves and Trevor Norris pinpointed a bug in V8 in the way it decodes UTF strings. This impacts Node at the Buffer to UTF8 String conversion and can cause a process to crash. The security concern comes from the fact that a lot of data from outside of an application is delivered to Node via this mechanism which means that users can potentially deliver specially crafted input data that can cause an application to crash when it goes through this path.",
+    "cvssScore": 0,
+    "reference": "https://ossindex.sonatype.org/vuln/a81a18b3-26bf-43d8-b823-826ef69bf8e8"
   },
 ...
 ```
@@ -238,12 +253,12 @@ The vulnerability id is right at the top. A whitelist will look like this:
 
 ```
 [
-8398878757,
-8402907552
+"a81a18b3-26bf-43d8-b823-826ef69bf8e8",
+"49da4413-af2b-4e55-acc0-9c752e30dde4"
 ]
 ```
 
-### Verbose Whitelist Format
+#### Verbose Whitelist Format
 
 The verbose whitelist is useful because it acts as documentation on the details of the
 vulnerabilities that have been filtered, with the associated title, description, version
@@ -255,10 +270,10 @@ Here is the simplest example:
 {
   "packageName": [
   {
-    "id": 8398878757
+    "id": "a81a18b3-26bf-43d8-b823-826ef69bf8e8"
   },
   {
-    "id": 8402907552
+    "id": "49da4413-af2b-4e55-acc0-9c752e30dde4"
   }
   ]
 }
@@ -274,28 +289,21 @@ And now something a bit more useful.
 
 ```
 {
-  "expressjs": [
-    {
-      "id": 8301582599,
-      "title": "Root path disclosure vulnerability",
-      "description": "Fixed root path disclosure vulnerability in express.static, res.sendfile, and res.sendFile",
-      "versions": [
-        "&lt;3.19.1 || >=4.0.0 &lt;4.11.1"
-      ],
-      "dependencyPaths": [
-        "/colors/expressjs",
-        "/react/.*
-      ]
-    },
+  "node": [
+  {
+    "id": "a81a18b3-26bf-43d8-b823-826ef69bf8e8",
+    "title": "Denial of Service",
+    "description": "Kris Reeves and Trevor Norris pinpointed a bug in V8 in the way it decodes UTF strings. This impacts Node at the Buffer to UTF8 String conversion and can cause a process to crash. The security concern comes from the fact that a lot of data from outside of an application is delivered to Node via this mechanism which means that users can potentially deliver specially crafted input data that can cause an application to crash when it goes through this path."
+  },
     ...
   ]
 }
 ...
 ```
 
-Here we reproduced the title, description, dependency paths, and version range of the vulnerability that is being
-filtered. The data was copied straight from the JSON in the generated report. You can include any
-of the fields that you feel are most useful in documenting the vulnerability.
+Here we reproduced the title and description. You can include any
+of the fields that you feel are most useful in documenting the vulnerability, and
+even your own descriptive fields.
 
 Limitations
 -----------
