@@ -332,7 +332,7 @@ function getDependencyList(depMap, depLookup) {
     // The value of o depends on the type of structure we are passed
     var o = depMap[name];
 
-    var spec = o.version ? name + "@" + o.version : o;
+    var spec = o.version ? name + "@" + o.version : name + "@" + o;
     var version = o.version ? o.version : o;
     var depPaths = o.depPaths ? o.depPaths : [spec];
 
