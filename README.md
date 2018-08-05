@@ -18,28 +18,39 @@ npm install auditjs -g
 Usage
 -----
 
+Note that the OSS Index v3 API is rate limited. If you are seeing errors that
+indicate a problem (HTTP code 429) then you may need to make an account at
+OSS Index and supply the username and "token". See below for more details.
+
 ```terminal
   Usage [Linux]:   auditjs [options]
   Usage [Windows]: auditjs-win
 
   Options:
 
-    -V, --version                output the version number
-    -b --bower                   This flag is necessary to correctly audit bower
-    				 packages. Use together with -p bower.json, since
-    				 scanning bower_componfents is not supported
-    -n --noNode                  Ignore node executable when scanning node_modules.
-    -p --package <file>          Specific package.json or bower.json file to audit
-    -d --dependencyTypes <list>  One or more of devDependencies, dependencies, peerDependencies, bundledDependencies, or optionalDependencies
-    --prod --production          Analyze production dependencies only
-    -q --quiet                   Supress console logging
-    -r --report                  Create JUnit reports in reports/ directory
-    -v --verbose                 Print all vulnerabilities
-    -w --whitelist <file>        Whitelist of vulnerabilities that should not break the build,
-    				 e.g. XSS vulnerabilities for an app with no possbile input for XSS.
-    				 See Example test_data/audit_package_whitelist.json.
-    -l --level <level>           Logging level. Possible options: error,warn,info,verbose,debug
-    -h, --help                   output usage information
+  -V, --version                output the version number
+  -b --bower                   This flag is necessary to correctly audit bower
+           packages. Use together with -p bower.json, since
+           scanning bower_componfents is not supported
+  -n --noNode                  Ignore node executable when scanning node_modules.
+  -p --package <file>          Specific package.json or bower.json file to audit
+  -d --dependencyTypes <list>  One or more of devDependencies, dependencies, peerDependencies, bundledDependencies, or optionalDependencies
+  --prod --production          Analyze production dependencies only
+  -q --quiet                   Supress console logging
+  -r --report                  Create JUnit reports in reports/ directory
+  -v --verbose                 Print all vulnerabilities
+  -w --whitelist <file>        Whitelist of vulnerabilities that should not break the build,
+           e.g. XSS vulnerabilities for an app with no possbile input for XSS.
+           See Example test_data/audit_package_whitelist.json.
+  -l --level <level>           Logging level. Possible options: error,warn,info,verbose,debug
+  --suppressExitError          Supress exit code when vulnerability found
+  --cacheDir <path>            Cache parent directory [default: <homedir>/.auditjs]
+  --username <username>        Username for registered users
+  --token <token>              Password for registered users
+  --scheme <scheme>            [testing] http/https
+  --host <host>                [testing] data host
+  --port <port>                [testing] data port
+  -h, --help                   output usage information
 
 ```
 
@@ -70,6 +81,97 @@ vulnerability will be printed to the screen.
 Running in verbose mode prints more descriptive output, and some extra information
 such as ALL vulnerabilities for a package, whether they are identified as
 impacting the installed version or not.
+
+Config file
+-----------
+
+Support is now provided for configuration files. This reduces the need for
+command line options, and is particularly important when using authentication
+as it allows you to supply credentials without having them visible on the
+command line.
+
+Audit.js uses [node-config](https://github.com/lorenwest/node-config/wiki) to
+provide support for configuration files, though the original command line options
+still work. Configuration files are loaded from the
+[config directory](https://github.com/lorenwest/node-config/wiki/Configuration-Files)
+which by default is the application installation directory in a sub-directory
+called config, but can be controlled using the `NODE_CONFIG_DIR` environment variable.
+
+The default configuration file in the config directory should be called
+`default.json`, and might have contents like the following. You do not need
+to specify all configuration options, and subset is reasonable.
+
+```
+{
+  "auth": {
+    "user": "username@example.com",
+    "token": "ef40752eeb642ba1c3df1893d270c6f9fb7ab9e1"
+  },
+  "cache": {
+    "path": "./ossi-cache"
+  },
+  "dependencyTypes": [
+    "devDependencies",
+    "dependencies",
+    "peerDependencies",
+    "bundledDependencies",
+    "optionalDependencies"
+  ],
+  "server": {
+    "scheme": "https",
+    "host": "ossindex.sonatype.org",
+    "port": 443
+  },
+  "packages": {
+    "type": "npm",
+    "file": "./package.json",
+    "withNode": false
+  },
+  "logging": {
+    "level": "info",
+    "verbose": false,
+    "quiet": false
+  },
+  "whitelist": {
+    "file": "./whitelist.json",
+    "ignore": [
+      "a81a18b3-26bf-43d8-b823-826ef69bf8e8"
+    ]
+  }
+}
+```
+
+If you want to make different configurations for different situations, create
+set the NODE_ENV environment variable and change the configuration file name
+to use the same name as the selected environment.
+
+eg.
+```
+export NODE_ENV=production
+# File name: config/production.json
+```
+
+OSS Index Credentials
+---------------------
+
+The OSS Index API is rate limited to prevent abuse. Guests (non-authorized users)
+are restricted to 16 requests of 120 packages each, which replenish at a rate
+of one request per minute. This means if you have 600 dependencies then 5 requests
+will be used. No problem! If you have many projects which are run close to each
+other you could run into the limit.
+
+You can either wait for the cool-down period to expire, or make a free account at
+OSS Index. By going to the "settings" page for your account, you will see your
+"token". Using your username (email address) and this security token you would
+have access to 64 requests, which is likely plenty for most use cases.
+
+Audit.js caches results, which means if you run against multiple projects which
+have a common set of dependencies (and they almost certainly will) then you will
+not use up requests getting the same results more than once.
+
+You can specify your credentials on either the command line or the configuration
+file. It is almost certainly better to put the credentials in a configuration
+file as described above, as using them on the command line is less secure.
 
 Whitelisting
 ------------
