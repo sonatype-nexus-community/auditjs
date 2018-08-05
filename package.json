@@ -1,6 +1,6 @@
 {
   "name": "auditjs",
-  "version": "3.0.1",
+  "version": "3.0.3",
   "description": "Audit dependencies to identify known vulnerabilities and maintenance problems",
   "main": "audit-package.js",
   "bin": {
@@ -38,6 +38,7 @@
     "winston": "^2.4.0",
     "request": "^2.83.0",
     "persistent-cache": "1.1.1",
-    "config": "1.30.0"
+    "config": "1.30.0",
+    "npm-conf": "1.1.3"
   }
 }

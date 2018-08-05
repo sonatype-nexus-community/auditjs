@@ -29,6 +29,17 @@
 // Provides simplified REST API access
 var client = require('request');
 
+// We get proxy configuration fron npmConf
+const npmConf = require('npm-conf');
+const conf = npmConf();
+var proxy = conf.get('https_proxy');
+if (!proxy) {
+	proxy = conf.get('proxy');
+}
+if (proxy) {
+	client = client.defaults({'proxy': proxy});
+}
+
 //RELEASE HOST
 var ossindex = "https://ossindex.sonatype.org";
 
@@ -37,6 +48,7 @@ var ossindex = "https://ossindex.sonatype.org";
 
 var username = undefined;
 var token = undefined;
+
 
 module.exports = {
 
@@ -73,6 +85,9 @@ module.exports = {
 
 		var query = ossindex + "/api/v3/component-report";
 		client.post(query, args, function(error, response, json){
+			if (error) {
+				console.error(error);
+			}
 			// Handle the error response
 			if(response.statusCode < 200 || response.statusCode > 299) {
 				try {
@@ -82,6 +97,7 @@ module.exports = {
 					}
 				}
 				catch(err) {}
+
 				callback({error: "Server error", code: response.statusCode});
 				return;
 			}
