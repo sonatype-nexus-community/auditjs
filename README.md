@@ -1,5 +1,16 @@
 **New major release, which uses OSS Index API v3.x!!**
 
+- [AuditJS](#auditjs)
+  * [Installation](#installation)
+  * [Usage](#usage)
+  * [Config file](#config-file)
+  * [OSS Index Credentials](#oss-index-credentials)
+  * [Whitelisting](#whitelisting)
+    + [Simplified Whitelist Format](#simplified-whitelist-format)
+    + [Verbose Whitelist Format](#verbose-whitelist-format)
+  * [Limitations](#limitations)
+  * [Credit](#credit)
+
 AuditJS
 =======
 
@@ -292,10 +303,6 @@ Limitations
 As this program depends on the OSS Index database, network access is
 required. Connection problems with OSS Index will result in an exception.
 
-The current version of AuditJS only reports on top level dependencies.
-If feedback indicates people are interested we will extend auditing to run
-against the full dependency tree
-
 The NVD does not always indicate all (or any) of the affected versions
 it is best to read the vulnerability text itself to determine whether
 any particular version is known to be vulnerable.
@@ -303,14 +310,7 @@ any particular version is known to be vulnerable.
 Credit
 ------
 
-Many thanks to [Fredrik J](https://github.com/qacwnfq) for his great improvements, including:
-* Bower support
-* JUnit reports
-* Whitelisting
-
-Data in OSS Index has been retrieved and cross referenced from several
-sources, including but not limited to:
-
-* npm: https://www.npmjs.com/
-* The National Vulnerability Database (NVD): https://nvd.nist.gov/
-* Node Security Project: https://nodesecurity.io/
+Thank you to everybody who has contributed to this project, both with
+[code contributions](https://github.com/OSSIndex/auditjs/pulls?q=is%3Apr+is%3Aclosed)
+and also suggestions, testing help, and notifying us of new and/or missing
+vulnerabilities.
