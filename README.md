@@ -1,7 +1,9 @@
+**New major release, which uses OSS Index API v3.x!!**
+
 AuditJS
 =======
 
-Audits an NPM project using the [OSS Index v2 REST API](https://ossindex.net/public/restapi2)
+Audits an NPM project using the [OSS Index v3 REST API](https://ossindex.sonatype.org/rest)
 to identify known vulnerabilities and outdated package versions.
 
 ![Screenshot](screenshots/screenshot.png)
