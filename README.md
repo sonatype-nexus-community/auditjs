@@ -1,5 +1,9 @@
 **New major release, which uses OSS Index API v3.x!!**
 
+**IMPORTANT NOTE**: Vulnerability IDs have changed, so unfortunately your whitelist files
+will have to be updated. They are now UUIDs. This is a one time change; there are no
+plans to ever change the IDs again in the future. Sorry for the inconvenience.
+
 - [AuditJS](#auditjs)
   * [Installation](#installation)
   * [Usage](#usage)
