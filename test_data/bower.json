@@ -1,9 +1,0 @@
-{
-    "name": "bower demo bower.json",
-    "version": "1.0.0",
-    "description": "A demo bower.json for audit.js.",
-    "license": "MIT",
-    "dependencies": {
-        "vor-test-project-bower-please-ignore-1": "2.0.0"
-    }
-}

@@ -132,7 +132,11 @@ if (!config.get("package")) {
 
                                 // First check for node itself. We use the 'chocolatey' package manager
                                 // to hang this query on.
-                                auditor.auditPackage("chocolatey", "nodejs", process.version, function(err, data) {
+                                var version = process.version;
+                                if (version.startsWith('v')) {
+                                  version = version.substring(1);
+                                }
+                                auditor.auditPackage("chocolatey", "nodejs", version, function(err, data) {
                                         resultCallback(err, data);
 
                                         // Now check for the dependencies
