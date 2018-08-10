@@ -456,6 +456,9 @@ function resultCallback(err, pkg) {
         bestVersion = undefined;
         if(pkg) {
                 pkgName = pkg.name;
+                if (pkg.scope) {
+                  pkgName = "@" + pkg.scope + "/" + pkgName;
+                }
                 version = pkg.version;
                 versionString = version;
                 bestVersion = undefined;
@@ -578,18 +581,6 @@ function resultCallback(err, pkg) {
                                 log(colors.bold("Details") + ": https://ossindex.sonatype.org/vuln/" + detail.id);
                                 for (var j = 0; j < detail.depPaths.length; j++) {
                                   log(colors.bold("Dependency path") + ": " + detail.depPaths[j]);
-                                }
-
-                                // Print affected version information if available
-                                if(detail.versions != null && detail.versions.length > 0) {
-                                        var vers = detail.versions.join(",");
-                                        if(vers.trim() == "") {
-                                                vers = "unspecified";
-                                        }
-                                        log(colors.bold("Affected versions") + ": " + vers);
-                                }
-                                else {
-                                        log(colors.bold("Affected versions") + ": unspecified");
                                 }
 
                                 if (detail.references != undefined && detail.references.length > 0) {

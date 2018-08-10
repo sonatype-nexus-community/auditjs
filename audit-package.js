@@ -121,6 +121,15 @@ auditPackagesImpl = function(depList, callback) {
 			// Get the current package/version
 			var dep = depList.shift();
 			var purl = dep.pm + ":" + dep.name + "@" + dep.version;
+			var scope = undefined;
+			var name = dep.name;
+			if (name.startsWith("@")) {
+				var name = name.substring(1);
+				var index = name.indexOf("/");
+				scope = name.substring(0, index);
+				var name = name.substring(index + 1);
+				purl = dep.pm + ":" + scope + "/" + name + "@" + dep.version;
+			}
 
 			// If the result is cached then report that!
 			var cachedResult = myCache.getSync(purl);
@@ -129,7 +138,7 @@ auditPackagesImpl = function(depList, callback) {
 				i--; // Since this isn't being sent to the server, it doesn't count as one of the batch
 				continue;
 			}
-			pkgs.push({pm: dep.pm, name: dep.name, version: dep.version, depPaths: dep.depPaths})
+			pkgs.push({pm: dep.pm, scope: scope, name: name, version: dep.version, depPaths: dep.depPaths})
 		}
 
 		if (pkgs.length > 0) {
@@ -164,6 +173,7 @@ auditPackageBatchImpl = function(pkgs, onResult, onComplete) {
 			for (var i = 0; i < data.length; i++) {
 				data[i].version = pkgs[i].version;
 				data[i].name = pkgs[i].name;
+				data[i].scope = pkgs[i].scope;
 				data[i].format = pkgs[i].pm;
 				data[i].depPaths = pkgs[i].depPaths;
 				onResult(undefined, data[i]);
