@@ -34,7 +34,7 @@
     "npm": "^6.3.0",
     "semver": "^5.5.0",
     "xmldom": "^0.1.27",
-    "winston": "^3.0.0",
+    "winston": "^2.4.3",
     "request": "^2.87.0",
     "persistent-cache": "1.1.1",
     "config": "1.30.0",
