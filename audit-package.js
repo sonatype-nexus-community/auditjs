@@ -131,6 +131,21 @@ auditPackagesImpl = function(depList, callback) {
 				purl = dep.pm + ":" + scope + "/" + name + "@" + dep.version;
 			}
 
+			// For now we will ignore Git URL and local path dependencies. We do it
+			// in a fairly heavy handed way (any version with a slash)
+			console.error("DEP VERSION: " + dep.version);
+			if (dep.version.indexOf("/") !== -1) {
+				var data = {};
+				data.version = dep.version;
+				data.name = name;
+				data.scope = scope;
+				data.format = dep.pm;
+				data.depPaths = dep.depPaths;
+
+				callback(undefined, data);
+				continue;
+			}
+
 			// If the result is cached then report that!
 			var cachedResult = myCache.getSync(purl);
 			if (cachedResult) {
