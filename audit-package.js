@@ -103,13 +103,9 @@ module.exports = {
 		},
 };
 
-/** Identify a semantic version within the given range. This removes
-semantic range prefixes like ^ and ~ (etc.)
- *
- * @param range
- * @returns
+/** Remove any version prefixes
  */
-forceSemanticVersion = function(range) {
+getCleanVersion = function (range) {
 	var re = /([0-9]+)\.([0-9]+)\.([0-9]+)(.*)?/;
 	var match = range.match(re);
 	if(match != undefined) {
@@ -119,16 +115,23 @@ forceSemanticVersion = function(range) {
 			return match[1] + "." + match[2] + "." + match[3];
 		}
 	}
-	return undefined;
-};
-
-getCleanVersion = function (version) {
-	var sv = forceSemanticVersion(version);
-	if (sv) {
-		return sv;
-	}
 	return version;
 };
+
+createAuditPackage = function(dep) {
+	var data = {};
+	data.version = dep.version;
+	data.name = dep.name;
+	if (data.name.startsWith("@")) {
+		data.name = data.name.substring(1);
+		var index = data.name.indexOf("/");
+		data.scope = data.name.substring(0, index);
+		data.name = data.name.substring(index + 1);
+	}
+	data.format = dep.pm;
+	data.depPaths = dep.depPaths;
+	return data;
+}
 
 /** Iterate through the dependencies. Get the audit results for each.
  * We will be running the audit in batches for speed reasons.
@@ -147,32 +150,24 @@ auditPackagesImpl = function(depList, callback) {
 
 			var dep = depList.shift();
 
-			var version = getCleanVersion(dep.version);
-
-			// Get the current package/version
-			var purl = dep.pm + ":" + dep.name + "@" + version;
-			var scope = undefined;
-			var name = dep.name;
-			if (name.startsWith("@")) {
-				var name = name.substring(1);
-				var index = name.indexOf("/");
-				scope = name.substring(0, index);
-				var name = name.substring(index + 1);
-				purl = dep.pm + ":" + scope + "/" + name + "@" + version;
-			}
+			var auditPkg = createAuditPackage(dep);
 
 			// For now we will ignore Git URL and local path dependencies. We do it
 			// in a fairly heavy handed way (any version with a slash)
 			if (dep.version.indexOf("/") !== -1) {
-				var data = {};
-				data.version = version;
-				data.name = name;
-				data.scope = scope;
-				data.format = dep.pm;
-				data.depPaths = dep.depPaths;
-
-				callback(undefined, data);
+				callback(undefined, auditPkg);
 				continue;
+			}
+
+			// Get a clean version (that doesn't have any prefix noise)
+			auditPkg.version = getCleanVersion(auditPkg.version);
+
+			// Get the current package/version
+			var purl = undefined;
+			if (auditPkg.scope) {
+				purl = auditPkg.format + ":" + auditPkg.scope + "/" + auditPkg.name + "@" + auditPkg.version;
+			} else {
+				purl = auditPkg.format + ":" + auditPkg.name + "@" + auditPkg.version;
 			}
 
 			// If the result is cached then report that!
@@ -182,7 +177,13 @@ auditPackagesImpl = function(depList, callback) {
 				i--; // Since this isn't being sent to the server, it doesn't count as one of the batch
 				continue;
 			}
-			pkgs.push({pm: dep.pm, scope: scope, name: name, version: version, depPaths: dep.depPaths})
+			pkgs.push({
+				pm: auditPkg.pm,
+				scope: auditPkg.scope,
+				name: auditPkg.name,
+				version: auditPkg.version,
+				depPaths: auditPkg.depPaths
+			})
 		}
 
 		if (pkgs.length > 0) {
