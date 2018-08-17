@@ -133,7 +133,6 @@ auditPackagesImpl = function(depList, callback) {
 
 			// For now we will ignore Git URL and local path dependencies. We do it
 			// in a fairly heavy handed way (any version with a slash)
-			console.error("DEP VERSION: " + dep.version);
 			if (dep.version.indexOf("/") !== -1) {
 				var data = {};
 				data.version = dep.version;
