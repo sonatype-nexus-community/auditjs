@@ -178,7 +178,7 @@ auditPackagesImpl = function(depList, callback) {
 				continue;
 			}
 			pkgs.push({
-				pm: auditPkg.pm,
+				pm: auditPkg.format,
 				scope: auditPkg.scope,
 				name: auditPkg.name,
 				version: auditPkg.version,
