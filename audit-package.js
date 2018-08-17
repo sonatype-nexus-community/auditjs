@@ -103,6 +103,33 @@ module.exports = {
 		},
 };
 
+/** Identify a semantic version within the given range. This removes
+semantic range prefixes like ^ and ~ (etc.)
+ *
+ * @param range
+ * @returns
+ */
+forceSemanticVersion = function(range) {
+	var re = /([0-9]+)\.([0-9]+)\.([0-9]+)(.*)?/;
+	var match = range.match(re);
+	if(match != undefined) {
+		if (match[4]) {
+			return match[1] + "." + match[2] + "." + match[3] + match[4];
+		} else {
+			return match[1] + "." + match[2] + "." + match[3];
+		}
+	}
+	return undefined;
+};
+
+getCleanVersion = function (version) {
+	var sv = forceSemanticVersion(version);
+	if (sv) {
+		return sv;
+	}
+	return version;
+};
+
 /** Iterate through the dependencies. Get the audit results for each.
  * We will be running the audit in batches for speed reasons.
  *
@@ -118,9 +145,12 @@ auditPackagesImpl = function(depList, callback) {
 		{
 			if(depList.length == 0) break;
 
-			// Get the current package/version
 			var dep = depList.shift();
-			var purl = dep.pm + ":" + dep.name + "@" + dep.version;
+
+			var version = getCleanVersion(dep.version);
+
+			// Get the current package/version
+			var purl = dep.pm + ":" + dep.name + "@" + version;
 			var scope = undefined;
 			var name = dep.name;
 			if (name.startsWith("@")) {
@@ -128,14 +158,14 @@ auditPackagesImpl = function(depList, callback) {
 				var index = name.indexOf("/");
 				scope = name.substring(0, index);
 				var name = name.substring(index + 1);
-				purl = dep.pm + ":" + scope + "/" + name + "@" + dep.version;
+				purl = dep.pm + ":" + scope + "/" + name + "@" + version;
 			}
 
 			// For now we will ignore Git URL and local path dependencies. We do it
 			// in a fairly heavy handed way (any version with a slash)
 			if (dep.version.indexOf("/") !== -1) {
 				var data = {};
-				data.version = dep.version;
+				data.version = version;
 				data.name = name;
 				data.scope = scope;
 				data.format = dep.pm;
@@ -152,7 +182,7 @@ auditPackagesImpl = function(depList, callback) {
 				i--; // Since this isn't being sent to the server, it doesn't count as one of the batch
 				continue;
 			}
-			pkgs.push({pm: dep.pm, scope: scope, name: name, version: dep.version, depPaths: dep.depPaths})
+			pkgs.push({pm: dep.pm, scope: scope, name: name, version: version, depPaths: dep.depPaths})
 		}
 
 		if (pkgs.length > 0) {
