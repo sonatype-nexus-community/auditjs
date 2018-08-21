@@ -64,16 +64,11 @@ module.exports = {
 	},
 
 	getPackageData: function (pkgs, callback) {
-
 		var data = {};
 		data.coordinates = [];
 
 		for(var i = 0; i < pkgs.length; i++) {
-			if (pkgs[i].scope) {
-				data.coordinates.push(pkgs[i].pm + ":" + pkgs[i].scope + "/" + pkgs[i].name + "@" + pkgs[i].version);
-			} else {
-				data.coordinates.push(pkgs[i].pm + ":" + pkgs[i].name + "@" + pkgs[i].version);
-			}
+			data.coordinates.push(pkgs[i].purl);
 		}
 
 		var args = {

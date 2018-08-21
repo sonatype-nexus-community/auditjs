@@ -450,6 +450,12 @@ function getDepsFromDataObject(data, lookup) {
  * @returns
  */
 function resultCallback(err, pkg) {
+
+        if (err) {
+          logger.error(colors.bold.red(err));
+          return;
+        }
+
         pkgName = undefined;
         version = undefined;
         versionString = undefined;

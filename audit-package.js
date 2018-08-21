@@ -78,6 +78,7 @@ module.exports = {
 					duration: 1000 * 3600 * 24 //one day
 				});
 			}
+			cleanCache();
 			auditPackagesImpl(depList, callback);
 		},
 
@@ -99,9 +100,30 @@ module.exports = {
 					duration: 1000 * 3600 * 24 //one day
 				});
 			}
+			cleanCache();
 			auditPackagesImpl([{pm: pkgManagerName, name: pkgName, version: versionRange}], callback);
 		},
 };
+
+/** FIXME: Temporary method to clear out old cache data. Remove this code
+ *         once enough time has passed and user's cache are expected to be clean.
+ *
+ * This runs asynchronously. That's fine because we are removing deprecated
+ * files.
+ */
+cleanCache = function() {
+	myCache.keys(function(err, keys) {
+ 	  if (!err) {
+			for (var i = 0; i < keys.length; i++) {
+				if (keys[i].startsWith("npm")
+				 || keys[i].startsWith("bower")
+				 || keys[i].startsWith("chocolatey")) {
+					myCache.delete(keys[i], function(err) {/* Ignore errors */});
+				}
+		  }
+		}
+	});
+}
 
 /** Remove any version prefixes
  */
@@ -165,19 +187,20 @@ auditPackagesImpl = function(depList, callback) {
 			// Get the current package/version
 			var purl = undefined;
 			if (auditPkg.scope) {
-				purl = auditPkg.format + ":" + auditPkg.scope + "/" + auditPkg.name + "@" + auditPkg.version;
+				purl = "pkg:" + auditPkg.format + "/" + auditPkg.scope + "/" + auditPkg.name + "@" + auditPkg.version;
 			} else {
-				purl = auditPkg.format + ":" + auditPkg.name + "@" + auditPkg.version;
+				purl = "pkg:" + auditPkg.format + "/" + auditPkg.name + "@" + auditPkg.version;
 			}
 
 			// If the result is cached then report that!
-			var cachedResult = myCache.getSync(purl);
+			var cachedResult = myCache.getSync(purl.replace("/", ".").replace(":", "."));
 			if (cachedResult) {
 				callback(undefined, cachedResult);
 				i--; // Since this isn't being sent to the server, it doesn't count as one of the batch
 				continue;
 			}
 			pkgs.push({
+				purl: purl,
 				pm: auditPkg.format,
 				scope: auditPkg.scope,
 				name: auditPkg.name,
@@ -192,7 +215,12 @@ auditPackagesImpl = function(depList, callback) {
 				// OnResult
 				function(err, pkg) {
 					if (!err) {
-						var purl = pkg.format + ":" + pkg.name + "@" + pkg.version;
+						var purl = undefined;
+						if (pkg.scope) {
+							purl = "pkg." + pkg.format + "." + pkg.scope + "." + pkg.name + "@" + pkg.version;
+						} else {
+							purl = "pkg." + pkg.format + "." + pkg.name + "@" + pkg.version;
+						}
 						myCache.putSync(purl, pkg);
 					}
 					callback(err, pkg);
@@ -215,13 +243,26 @@ auditPackageBatchImpl = function(pkgs, onResult, onComplete) {
 			onComplete();
 			return;
 		} else {
+
+			// Lookup table
+			var lookup = {};
+			for (var i = 0; i < pkgs.length; i++) {
+				var pkg = pkgs[i];
+				lookup[pkg.purl] = pkg;
+			}
+
 			for (var i = 0; i < data.length; i++) {
-				data[i].version = pkgs[i].version;
-				data[i].name = pkgs[i].name;
-				data[i].scope = pkgs[i].scope;
-				data[i].format = pkgs[i].pm;
-				data[i].depPaths = pkgs[i].depPaths;
-				onResult(undefined, data[i]);
+				var pkg = lookup[data[i].coordinates];
+				if (pkg) {
+					data[i].version = pkg.version;
+					data[i].name = pkg.name;
+					data[i].scope = pkg.scope;
+					data[i].format = pkg.pm;
+					data[i].depPaths = pkg.depPaths;
+					onResult(undefined, data[i]);
+				} else {
+					onResult("Could not find package matching " + data[i].coordinates);
+				}
 			}
 			onComplete();
 		}
