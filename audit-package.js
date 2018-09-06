@@ -174,6 +174,13 @@ auditPackagesImpl = function(depList, callback) {
 
 			var auditPkg = createAuditPackage(dep);
 
+			// If the version is not a string, then we currently do not know how to
+			// deal with it. Ignore for now.
+			if (typeof dep.version !== "string") {
+				callback("Warning: Unsupported version format for " + auditPkg.name, auditPkg);
+				continue;
+			}
+
 			// For now we will ignore Git URL and local path dependencies. We do it
 			// in a fairly heavy handed way (any version with a slash)
 			if (dep.version.indexOf("/") !== -1) {
