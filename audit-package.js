@@ -248,11 +248,11 @@ auditPackageBatchImpl = function(pkgs, onResult, onComplete) {
 			var lookup = {};
 			for (var i = 0; i < pkgs.length; i++) {
 				var pkg = pkgs[i];
-				lookup[pkg.purl] = pkg;
+				lookup[pkg.purl.toLowerCase()] = pkg;
 			}
 
 			for (var i = 0; i < data.length; i++) {
-				var pkg = lookup[data[i].coordinates];
+				var pkg = lookup[data[i].coordinates.toLowerCase()];
 				if (pkg) {
 					data[i].version = pkg.version;
 					data[i].name = pkg.name;
