@@ -38,6 +38,8 @@ var myCache = undefined;
  */
 var BATCH_SIZE = 120;
 
+var CACHE_DURATION_HOURS = 24;
+
 /**
  * EXPORT providing auditing of specified dependencies.
  *
@@ -50,11 +52,15 @@ module.exports = {
 		ossi.setHost(scheme, host, port);
 	},
 
+	setCacheDuration: function (hours) {
+		CACHE_DURATION_HOURS = hours
+	},
+
 	setCache: function (path) {
 		myCache = cache({
 			base: path,
 			name: 'auditjs3x',
-			duration: 1000 * 3600 * 24 //one day
+			duration: 1000 * 3600 * CACHE_DURATION_HOURS //one day
 		});
 	},
 
@@ -75,7 +81,7 @@ module.exports = {
 				myCache = cache({
 					base: require('os').homedir() + "/.auditjs",
 					name: 'auditjs3x',
-					duration: 1000 * 3600 * 24 //one day
+					duration: 1000 * 3600 * CACHE_DURATION_HOURS //one day
 				});
 			}
 			cleanCache();
@@ -97,7 +103,7 @@ module.exports = {
 				myCache = cache({
 					base: require('os').homedir() + "/.auditjs",
 					name: 'auditjs3x',
-					duration: 1000 * 3600 * 24 //one day
+					duration: 1000 * 3600 * CACHE_DURATION_HOURS //one day
 				});
 			}
 			cleanCache();

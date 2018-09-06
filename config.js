@@ -185,6 +185,8 @@ function loadConfig() {
 
   underload('cacheDir', 'cache.path');
 
+  underload('cacheTimeout', 'cache.timeout')
+
   underload('username', 'auth.user');
   underload('token', 'auth.token');
 }
@@ -219,6 +221,7 @@ module.exports = {
            .option('-l --level <level>', 'Logging level. Possible options: ' + LOGGER_LEVELS)
            .option('--suppressExitError', 'Supress exit code when vulnerability found')
            .option('--cacheDir <path>', 'Cache parent directory [default: <homedir>/.auditjs]')
+           .option('--cacheTimeout <hours>', 'Expiration period for the cache')
            .option('--username <username>', 'Username for registered users')
            .option('--token <token>', 'Password for registered users')
            .option('--scheme <scheme>', '[testing] http/https')
@@ -317,6 +320,10 @@ module.exports = {
      var host = program['host'] ? program['host'] : "ossindex.net";
      var port = program['port'] ? program['port'] : 443;
      auditor.setHost(scheme, host, port);
+    }
+
+    if (program['cacheTimeout']) {
+      auditor.setCacheDuration(program['cacheTimeout']);
     }
 
     if (program['cacheDir']) {
