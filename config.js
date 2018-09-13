@@ -209,7 +209,7 @@ module.exports = {
     // should be refactored over time.
     program
            .version(pkg.version)
-           .option('-b --bower', 'This flag is necessary to correctly audit bower\n\t\t\t\t packages. Use together with -p bower.json, since\n\t\t\t\t scanning bower_componfents is not supported')
+           .option('-b --bower', 'This flag is necessary to correctly audit bower\n\t\t\t\t packages. Use together with -p bower.json, since\n\t\t\t\t scanning bower_components is not supported')
            .option('-n --noNode', 'Ignore node executable when scanning node_modules.')
            .option('-p --package <file>', 'Specific package.json or bower.json file to audit')
            .option('-d --dependencyTypes <list>', 'One or more of devDependencies, dependencies, peerDependencies, bundledDependencies, or optionalDependencies')
