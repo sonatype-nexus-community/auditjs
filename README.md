@@ -48,7 +48,7 @@ OSS Index and supply the username and "token". See below for more details.
   -V, --version                output the version number
   -b --bower                   This flag is necessary to correctly audit bower
            packages. Use together with -p bower.json, since
-           scanning bower_componfents is not supported
+           scanning bower_components is not supported
   -n --noNode                  Ignore node executable when scanning node_modules.
   -p --package <file>          Specific package.json or bower.json file to audit
   -d --dependencyTypes <list>  One or more of devDependencies, dependencies, peerDependencies, bundledDependencies, or optionalDependencies
