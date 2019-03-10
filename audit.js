@@ -159,14 +159,16 @@ else {
       let file = fs.readFileSync(packagePath, 'utf8');
       let json = lockfile.parse(file);
       var packages = json.object;
+      var pkgMap = {};
       for (var pkgVersion in packages) {
         var name = pkgVersion.substring(0, pkgVersion.lastIndexOf('@'));
         var pkg = packages[pkgVersion];
         var version = pkg.version;
 
         var dep = {"pm": "npm","name": name, "version": version};
-        deps.push(dep)
+        pkgMap[name + "@" + version] = dep;
       }
+      deps = Object.keys(pkgMap).map(function (k) { return pkgMap[k];});
       break;
     }
 
