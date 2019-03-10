@@ -72,6 +72,9 @@ var JUnit = { 'testsuite':[] };
 // Used to find installed packages and their dependencies
 var npm = require('npm');
 
+// Yarn file stuff
+const lockfile = require('@yarnpkg/lockfile');
+
 /**
  * Total number of dependencies being audited. This will be set
  * before starting the audit.
@@ -143,50 +146,78 @@ if (!config.get("package")) {
                 });
         });
 }
-
-// If a package.json file is specified, do an audit on the dependencies
-// in the file only.
 else {
+  var packagePath = config.get("package");
+  var packageFile = packagePath.substring(packagePath.lastIndexOf('/')+1);
+  var deps = [];
 
-        //Load the target package file
-        var filename = config.get("package");
-        var targetPkg = undefined;
+  // Technically it would be nice to figure out the file type from the contents,
+  // but for now we will shortcut it using the file names.
+  switch (packageFile) {
+    // Is this a yarn.lock file?
+    case "yarn.lock": {
+      let file = fs.readFileSync(packagePath, 'utf8');
+      let json = lockfile.parse(file);
+      var packages = json.object;
+      for (var pkgVersion in packages) {
+        var name = pkgVersion.substring(0, pkgVersion.lastIndexOf('@'));
+        var pkg = packages[pkgVersion];
+        var version = pkg.version;
 
-        try {
-                // default encoding is utf8
-                encoding = 'utf8';
+        var dep = {"pm": "npm","name": name, "version": version};
+        deps.push(dep)
+      }
+      break;
+    }
 
-                // read file synchroneously
-                var contents = fs.readFileSync(filename, encoding);
+    // Is this a package-lock.json file?
+    case "package-lock.json": {
+      break;
+    }
 
-                // parse contents as JSON
-                targetPkg = JSON.parse(contents);
+    // Otherwise this is a package.json or bower.json file. We can parse these
+    // with common code.
+    default: {
+      //Load the target package file
+      var filename = packageFile;
+      var targetPkg = undefined;
 
-        } catch (err) {
-                // an error occurred
-                throw err;
-        }
+      try {
+        // default encoding is utf8
+        encoding = 'utf8';
 
-        // Call the auditor library passing the dependency list from the
-        // package.json file. The second argument is a callback that will
-        // print the results to the console.
-        var deps = [];
-        for (var i = 0; i < categories.length; i++) {
-        	var category = categories[i];
-            if(targetPkg[category] != undefined) {
-                // Get a flat list of dependencies instead of a map.
-            	var myDeps = getDependencyList(targetPkg[category]);
-            	if (myDeps) {
-            		// getDependencyList avoids duplicates, so we can just append
-            		deps = deps.concat(myDeps);
-            	}
-            }
-        }
+        // read file synchroneously
+        var contents = fs.readFileSync(filename, encoding);
 
-        expectedAudits = deps.length;
-        auditor.auditPackages(deps, resultCallback);
+        // parse contents as JSON
+        targetPkg = JSON.parse(contents);
+      } catch (err) {
+        // an error occurred
+        throw err;
+      }
+
+      // Call the auditor library passing the dependency list from the
+      // package.json file. The second argument is a callback that will
+      // print the results to the console.
+      for (var i = 0; i < categories.length; i++) {
+      	var category = categories[i];
+          if(targetPkg[category] != undefined) {
+              // Get a flat list of dependencies instead of a map.
+          	var myDeps = getDependencyList(targetPkg[category]);
+          	if (myDeps) {
+          		// getDependencyList avoids duplicates, so we can just append
+          		deps = deps.concat(myDeps);
+          	}
+          }
+      }
+      break;
+    }
+  }
+
+  // Regardless which package file we parsed, the final stage is the same
+  expectedAudits = deps.length;
+  auditor.auditPackages(deps, resultCallback);
 }
-
 /** Set the return value
  *
  * @param options

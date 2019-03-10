@@ -183,16 +183,21 @@ auditPackagesImpl = function(depList, callback) {
 			// If the version is not a string, then we currently do not know how to
 			// deal with it. Ignore for now.
 			if (typeof dep.version !== "string") {
-				callback("Warning: Unsupported version format for " + auditPkg.name, auditPkg);
+				callback("Warning: Unsupported version format for '" + auditPkg.name + "'", auditPkg);
 				continue;
 			}
 
 			// For now we will ignore Git URL and local path dependencies. We do it
 			// in a fairly heavy handed way (any version with a slash)
 			if (dep.version.indexOf("/") !== -1) {
-				callback(undefined, auditPkg);
+				callback("Warning: Unsupported version for '" + auditPkg.name + "'", auditPkg);
 				continue;
 			}
+
+      if (!auditPkg.name) {
+        callback("Warning: Unsupported package name '" + auditPkg.name + "'", auditPkg);
+				continue;
+      }
 
 			// Get a clean version (that doesn't have any prefix noise)
 			auditPkg.version = getCleanVersion(auditPkg.version);
