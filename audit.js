@@ -174,6 +174,20 @@ else {
 
     // Is this a package-lock.json file?
     case "package-lock.json": {
+      try {
+        // default encoding is utf8
+        encoding = 'utf8';
+
+        // read file synchroneously
+        var contents = fs.readFileSync(packagePath, encoding);
+
+        // parse contents as JSON
+        var rootPkg = JSON.parse(contents);
+        deps = getLockfileDependencies(rootPkg);
+      } catch (err) {
+        // an error occurred
+        throw err;
+      }
       break;
     }
 
@@ -181,7 +195,6 @@ else {
     // with common code.
     default: {
       //Load the target package file
-      var filename = packageFile;
       var targetPkg = undefined;
 
       try {
@@ -189,7 +202,7 @@ else {
         encoding = 'utf8';
 
         // read file synchroneously
-        var contents = fs.readFileSync(filename, encoding);
+        var contents = fs.readFileSync(packagePath, encoding);
 
         // parse contents as JSON
         targetPkg = JSON.parse(contents);
@@ -220,6 +233,40 @@ else {
   expectedAudits = deps.length;
   auditor.auditPackages(deps, resultCallback);
 }
+
+/** Given packag-lock.json data, produce a list of dependencies
+ */
+function getLockfileDependencies(root) {
+  var deps = {};
+  if (root.name && root.version) {
+    deps[root.name + "@" + root.version] = {
+      "pm": "npm",
+      "name": root.name,
+      "version": root.version
+    };
+  }
+
+  if (root.dependencies) {
+    for (var name in root.dependencies) {
+      var dep = root.dependencies[name];
+      if (dep.version) {
+        deps[name + "@" + dep.version] = {
+          "pm": "npm",
+          "name": name,
+          "version": dep.version
+        };
+      }
+
+      var childDeps = getLockfileDependencies(root.dependencies[name]);
+      for (var attr in childDeps) {
+        deps[attr] = childDeps[attr];
+      }
+    }
+  }
+
+  return Object.keys(deps).map(function (k) { return deps[k];});
+}
+
 /** Set the return value
  *
  * @param options
