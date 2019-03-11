@@ -33,7 +33,7 @@
     "html-entities": "^1.2.0",
     "jsontoxml": "^1.0.0",
     "mkdirp": "^0.5.1",
-    "npm": "^6.3.0",
+    "npm": "^6.9.0",
     "npm-conf": "1.1.3",
     "persistent-cache": "1.1.1",
     "request": "^2.87.0",
