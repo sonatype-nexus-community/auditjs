@@ -134,16 +134,16 @@ cleanCache = function() {
 /** Remove any version prefixes
  */
 getCleanVersion = function (range) {
-	var re = /([0-9]+)\.([0-9]+)\.([0-9]+)(.*)?/;
+	var re = /([0-9]+)(\.[0-9]+)?(\.[0-9]+)?(.*)/;
 	var match = range.match(re);
 	if(match != undefined) {
-		if (match[4]) {
-			return match[1] + "." + match[2] + "." + match[3] + match[4];
-		} else {
-			return match[1] + "." + match[2] + "." + match[3];
-		}
+    var version = match[1];
+    if (match[2]) version += match[2];
+    if (match[3]) version += match[3];
+    if (match[4]) version += match[4];
+    return version;
 	}
-	return version;
+	return undefined;
 };
 
 createAuditPackage = function(dep) {
@@ -201,6 +201,10 @@ auditPackagesImpl = function(depList, callback) {
 
 			// Get a clean version (that doesn't have any prefix noise)
 			auditPkg.version = getCleanVersion(auditPkg.version);
+
+      if (!auditPkg.version) {
+        callback("Warning: Unsupported package version '" + auditPkg.version + "'", auditPkg);
+      }
 
 			// Get the current package/version
 			var purl = undefined;
