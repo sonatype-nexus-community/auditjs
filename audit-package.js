@@ -172,14 +172,17 @@ auditPackagesImpl = function(depList, callback) {
 
 			// Get the current package/version
 			var purl = undefined;
+			var encodedPurl = undefined;
 			if (auditPkg.scope) {
 				purl = "pkg:" + auditPkg.format + "/" + auditPkg.scope + "/" + auditPkg.name + "@" + auditPkg.version;
+				encodedPurl = "pkg." + auditPkg.format + "." + auditPkg.scope + "." + auditPkg.name + "@" + auditPkg.version;
 			} else {
 				purl = "pkg:" + auditPkg.format + "/" + auditPkg.name + "@" + auditPkg.version;
+				encodedPurl = "pkg." + auditPkg.format + "." + auditPkg.name + "@" + auditPkg.version;
 			}
 
 			// If the result is cached then report that!
-			var cachedResult = cache.get(purl.replace("/", ".").replace(":", "."));
+			var cachedResult = cache.get(encodedPurl);
 			if (cachedResult) {
 				callback(undefined, cachedResult);
 				i--; // Since this isn't being sent to the server, it doesn't count as one of the batch
