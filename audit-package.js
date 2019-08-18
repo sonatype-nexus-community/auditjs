@@ -29,8 +29,7 @@
 // Provides simplified REST API access
 var ossi = require('./ossindex.js');
 
-var cache = require('persistent-cache');
-var myCache = undefined;
+var cache = require('./file-cache');
 
 /**
  * Queries should be done in batches when possible to reduce the hits on the
@@ -57,11 +56,10 @@ module.exports = {
 	},
 
 	setCache: function (path) {
-		myCache = cache({
-			base: path,
-			name: 'auditjs3x',
-			duration: 1000 * 3600 * CACHE_DURATION_HOURS //one day
-		});
+		if (path) {
+			cache.setBase(path);
+		}
+		cache.setDuration(1000 * 3600 * CACHE_DURATION_HOURS); //one day
 	},
 
 	setUser: function (myUsername, myToken) {
@@ -77,14 +75,7 @@ module.exports = {
 		 *                 (err, single_package_data).
 		 */
 		auditPackages: function(depList, callback) {
-			if (!myCache) {
-				myCache = cache({
-					base: require('os').homedir() + "/.auditjs",
-					name: 'auditjs3x',
-					duration: 1000 * 3600 * CACHE_DURATION_HOURS //one day
-				});
-			}
-			cleanCache();
+			cache.cleanCache();
 			auditPackagesImpl(depList, callback);
 		},
 
@@ -99,37 +90,10 @@ module.exports = {
 		 *                 (err, single_package_data).
 		 */
 		auditPackage: function(pkgManagerName, pkgName, versionRange, callback) {
-			if (!myCache) {
-				myCache = cache({
-					base: require('os').homedir() + "/.auditjs",
-					name: 'auditjs3x',
-					duration: 1000 * 3600 * CACHE_DURATION_HOURS //one day
-				});
-			}
-			cleanCache();
+			cache.cleanCache();
 			auditPackagesImpl([{pm: pkgManagerName, name: pkgName, version: versionRange}], callback);
 		},
 };
-
-/** FIXME: Temporary method to clear out old cache data. Remove this code
- *         once enough time has passed and user's cache are expected to be clean.
- *
- * This runs asynchronously. That's fine because we are removing deprecated
- * files.
- */
-cleanCache = function() {
-	myCache.keys(function(err, keys) {
- 	  if (!err) {
-			for (var i = 0; i < keys.length; i++) {
-				if (keys[i].startsWith("npm")
-				 || keys[i].startsWith("bower")
-				 || keys[i].startsWith("chocolatey")) {
-					myCache.delete(keys[i], function(err) {/* Ignore errors */});
-				}
-		  }
-		}
-	});
-}
 
 /** Remove any version prefixes
  */
@@ -215,7 +179,7 @@ auditPackagesImpl = function(depList, callback) {
 			}
 
 			// If the result is cached then report that!
-			var cachedResult = myCache.getSync(purl.replace("/", ".").replace(":", "."));
+			var cachedResult = cache.get(purl.replace("/", ".").replace(":", "."));
 			if (cachedResult) {
 				callback(undefined, cachedResult);
 				i--; // Since this isn't being sent to the server, it doesn't count as one of the batch
@@ -243,7 +207,7 @@ auditPackagesImpl = function(depList, callback) {
 						} else {
 							purl = "pkg." + pkg.format + "." + pkg.name + "@" + pkg.version;
 						}
-						myCache.putSync(purl, pkg);
+						cache.put(purl, pkg);
 					}
 					callback(err, pkg);
 				},
