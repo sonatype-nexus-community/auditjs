@@ -33,7 +33,7 @@ var duration = 1000 * 3600 * CACHE_DURATION_HOURS;
 
 var path = require('os').homedir() + "/.auditjs/cache/auditjs3x";
 
-var DEBUG_AUDITJS_CACHE = true;
+var DEBUG_AUDITJS_CACHE = false;
 
 module.exports = {
 
