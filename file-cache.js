@@ -26,6 +26,7 @@
  *	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 const fs = require('fs');
+var mkdirp = require('mkdirp');
 
 var CACHE_DURATION_HOURS = 24;
 
@@ -86,6 +87,11 @@ module.exports = {
      cacheUntil: then,
      data: pkg
    };
+
+   if (!fs.existsSync(path)){
+     mkdirp.sync(path);
+   }
+
    fs.writeFileSync(fpath, JSON.stringify(json));
  }
 
