@@ -38,9 +38,13 @@ var DEBUG_AUDITJS_CACHE = false;
 
 module.exports = {
 
- setBase(newPath) {
+ init(newPath) {
    if (newPath) {
      path = newPath + "/cache/auditjs3x";
+   }
+
+   if (!fs.existsSync(path)){
+     mkdirp.sync(path);
    }
  },
 
@@ -87,10 +91,6 @@ module.exports = {
      cacheUntil: then,
      data: pkg
    };
-
-   if (!fs.existsSync(path)){
-     mkdirp.sync(path);
-   }
 
    fs.writeFileSync(fpath, JSON.stringify(json));
  }

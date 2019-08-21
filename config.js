@@ -327,7 +327,9 @@ module.exports = {
     }
 
     if (program['cacheDir']) {
-     auditor.setCache(program['cacheDir']);
+     auditor.initCache(program['cacheDir']);
+    } else {
+      auditor.initCache(undefined);
     }
 
     if (program['username']) {

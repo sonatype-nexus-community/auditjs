@@ -55,10 +55,8 @@ module.exports = {
 		CACHE_DURATION_HOURS = hours
 	},
 
-	setCache: function (path) {
-		if (path) {
-			cache.setBase(path);
-		}
+	initCache: function (path) {
+		cache.init(path);
 		cache.setDuration(1000 * 3600 * CACHE_DURATION_HOURS); //one day
 	},
 
