@@ -1,6 +1,6 @@
 {
   "name": "auditjs",
-  "version": "3.2.3",
+  "version": "3.2.4",
   "description": "Audit dependencies to identify known vulnerabilities and maintenance problems",
   "main": "audit-package.js",
   "bin": {
