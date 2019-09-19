@@ -39,6 +39,8 @@ var BATCH_SIZE = 120;
 
 var CACHE_DURATION_HOURS = 24;
 
+var githubRe = new RegExp('^([^/]+)/([^/#]+)#(.+)$');
+
 /**
  * EXPORT providing auditing of specified dependencies.
  *
@@ -112,14 +114,23 @@ createAuditPackage = function(dep) {
 	var data = {};
 	data.version = dep.version;
 	data.name = dep.name;
+  data.format = dep.pm;
+  data.depPaths = dep.depPaths;
+
 	if (data.name.startsWith("@")) {
 		data.name = data.name.substring(1);
 		var index = data.name.indexOf("/");
 		data.scope = data.name.substring(0, index);
 		data.name = data.name.substring(index + 1);
 	}
-	data.format = dep.pm;
-	data.depPaths = dep.depPaths;
+
+  var match = githubRe.exec(data.version)
+  if (match) {
+    data.format = 'github';
+    data.scope = match[1];
+    data.name = match[2];
+    data.version = match[3];
+  }
 	return data;
 }
 
@@ -144,14 +155,13 @@ auditPackagesImpl = function(depList, callback) {
 
 			// If the version is not a string, then we currently do not know how to
 			// deal with it. Ignore for now.
-			if (typeof dep.version !== "string") {
+			if (typeof auditPkg.version !== "string") {
 				callback("Warning: Unsupported version format for '" + auditPkg.name + "'", auditPkg);
 				continue;
 			}
 
-			// For now we will ignore Git URL and local path dependencies. We do it
-			// in a fairly heavy handed way (any version with a slash)
-			if (dep.version.indexOf("/") !== -1) {
+			// Look for bad versions. This is a hack. (any version with a slash)
+			if (auditPkg.version.indexOf("/") !== -1) {
 				callback("Warning: Unsupported version for '" + auditPkg.name + "'", auditPkg);
 				continue;
 			}
