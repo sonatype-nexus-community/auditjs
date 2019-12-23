@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/auditjs 
     docker:
-      - image: circleci/node:10.16.3
+      - image: circleci/node:12.14.0
     steps:
       - checkout
       - run:
