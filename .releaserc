@@ -6,7 +6,9 @@
 		["@semantic-release/commit-analyzer", {
       "preset": "angular"
     }],
-    ["@semantic-release/npm"],
+    ["@semantic-release/npm", { 
+      "tarballDir": "dist"
+    }],
     ["@semantic-release/release-notes-generator", {
       "preset": "angular",
       "writerOpts": {
@@ -16,7 +18,7 @@
 		[
 			"@semantic-release/github",
 			{
-				"assets": "pack/*.tgz"
+				"assets": "dist/*.tgz"
 			}
     ],
     [

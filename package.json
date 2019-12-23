@@ -6,12 +6,15 @@
   "bin": {
     "auditjs": "./bin/index.js"
   },
+  "files": ["bin/**/*"],
   "preferGlobal": true,
   "scripts": {
     "test": "mocha -r ts-node/register src/**/*.spec.ts",
     "build": "tsc -p tsconfig.json",
     "build-dev": "tsc -p tsconfig.development.json",
-    "start": "node ./bin/index.js"
+    "start": "node ./bin/index.js",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run test"
   },
   "keywords": [
     "Audit",
