@@ -1,3 +1,10 @@
+## [4.0.1-alpha.3](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.2...v4.0.1-alpha.3) (2019-12-23)
+
+
+### Bug Fixes
+
+* adjust changelog ([b05a4e7](https://github.com/sonatype-nexus-community/auditjs/commit/b05a4e74a06ddcc19ccc774c39a66cb2d9eb3211))
+
 ## [4.0.1-alpha.2](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.1...v4.0.1-alpha.2) (2019-12-23)
 
 
