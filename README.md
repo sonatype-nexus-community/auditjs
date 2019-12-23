@@ -15,7 +15,7 @@ Supports:
 ## Installation
 
 ```
-npm install auditjs -g
+npm install auditjs@alpha -g
 ```
 
 ## Usage
