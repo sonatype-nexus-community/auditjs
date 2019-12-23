@@ -1,3 +1,10 @@
+## [4.0.1-alpha.2](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.1...v4.0.1-alpha.2) (2019-12-23)
+
+
+### Bug Fixes
+
+* add typescript declarations, other tiny fixes ([ba622e9](https://github.com/sonatype-nexus-community/auditjs/commit/ba622e9419e25ca06a9d4a6c7ed1cdaed6a9a035))
+
 ## [4.0.1-alpha.1](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.0...v4.0.1-alpha.1) (2019-12-23)
 
 
