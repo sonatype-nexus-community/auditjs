@@ -37,7 +37,7 @@ jobs:
           name: Install dependencies
           command: npm install
       - run:
-          name: Build extension
+          name: Build auditjs
           command: npm run build
       - run: 
           name: Install publishing packages 
