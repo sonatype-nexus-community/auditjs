@@ -41,7 +41,7 @@ jobs:
           command: npm run build
       - run: 
           name: Install publishing packages 
-          command: npm install -g semantic-release@beta @semantic-release/changelog @semantic-release/git @semantic-release/npm
+          command: npm install -g semantic-release@beta @semantic-release/changelog@beta @semantic-release/git@beta @semantic-release/npm@beta
       - run: 
           name: Attempt publish
           command: npx semantic-release
