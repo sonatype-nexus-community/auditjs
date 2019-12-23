@@ -1,4 +1,4 @@
-**IMPORTANT NOTE**: Welcome to AuditJS 4.0.0, lots has changed since 3.0.0, mainly around usage. 
+**IMPORTANT NOTE**: Welcome to AuditJS 4.0.0-alpha, lots has changed since 3.0.0, mainly around usage. Make sure to read the new docs.
 
 # AuditJS
 

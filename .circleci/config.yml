@@ -1,0 +1,60 @@
+version: 2.1
+jobs:
+  build:
+    working_directory: ~/auditjs 
+    docker:
+      - image: circleci/node:12.14.0
+    steps:
+      - checkout
+      - run:
+          name: update-npm
+          command: 'sudo npm install -g npm@latest'
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: install-npm-wee
+          command: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: build
+          command: npm run build
+      - run:
+          name: test
+          command: npm run test
+  release:
+    working_directory: ~/auditjs
+    docker: 
+      - image: circleci/node:12.14.0 
+    steps:
+      - checkout
+      - run: 
+          name: Allow global installs of npm packages
+          command: sudo chown -R circleci:circleci /usr/local/lib && sudo chown -R circleci:circleci /usr/local/bin
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Build auditjs
+          command: npm run build
+      - run: 
+          name: Install publishing packages 
+          command: npm install -g semantic-release@beta @semantic-release/changelog @semantic-release/git @semantic-release/npm
+      - run: 
+          name: Attempt publish
+          command: npx semantic-release -d
+
+workflows:
+  version: 2.1
+  build_and_release:
+    jobs:
+      - build
+      - release:
+          filters:
+            branches:
+              only: alpha
+          context: auditjs
+          requires:
+            - build
