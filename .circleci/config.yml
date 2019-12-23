@@ -44,7 +44,7 @@ jobs:
           command: npm install -g semantic-release @semantic-release/changelog @semantic-release/git@7.0.17 @semantic-release/npm
       - run: 
           name: Attempt publish
-          command: npx semantic-release -d -b AuditJSFourDotOhDotOh
+          command: npx semantic-release -d -b SemanticRelease
 
 workflows:
   version: 2.1
@@ -54,7 +54,7 @@ workflows:
       - release:
           filters:
             branches:
-              only: AuditJSFourDotOhDotOh
+              only: SemanticRelease
           context: auditjs
           requires:
             - build
