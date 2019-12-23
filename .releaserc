@@ -1,4 +1,10 @@
 {
+  "release": {
+    "branches": [
+      "master",
+      {"branch": "SemanticRelease", "prerelease": true},
+    ]
+  },
 	"plugins": [
 		["@semantic-release/commit-analyzer", {
       "preset": "angular"
