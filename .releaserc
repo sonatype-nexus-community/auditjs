@@ -1,6 +1,6 @@
 {
   "branches": [
-    "master", { "name": "SemanticRelease", "prerelease": "alpha" },
+    "master", { "name": "SemanticRelease", "prerelease": "alpha", "channel": "alpha" },
   ],
 	"plugins": [
 		["@semantic-release/commit-analyzer", {
