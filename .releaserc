@@ -8,9 +8,7 @@
 		["@semantic-release/commit-analyzer", {
       "preset": "angular"
     }],
-    ["@semantic-release/npm", {
-      "npmPublish": true
-    }],
+    ["@semantic-release/npm"],
     ["@semantic-release/release-notes-generator", {
       "preset": "angular",
       "writerOpts": {
