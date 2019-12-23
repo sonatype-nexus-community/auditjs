@@ -45,3 +45,16 @@ jobs:
       - run: 
           name: Attempt publish
           command: npx semantic-release -d -b AuditJSFourDotOhDotOh
+
+workflows:
+  version: 2.1
+  build_and_release:
+    jobs:
+      - build
+      - release:
+          filters:
+            branches:
+              only: AuditJSFourDotOhDotOh
+          context: auditjs
+          requires:
+            - build
