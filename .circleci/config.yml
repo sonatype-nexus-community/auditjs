@@ -24,3 +24,24 @@ jobs:
       - run:
           name: test
           command: npm run test
+  release:
+    working_directory: ~/auditjs
+    docker: 
+      - image: circleci/node:12.14.0 
+    steps:
+      - checkout
+      - run: 
+          name: Allow global installs of npm packages
+          command: sudo chown -R circleci:circleci /usr/local/lib && sudo chown -R circleci:circleci /usr/local/bin
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Build extension
+          command: npm run build
+      - run: 
+          name: Install publishing packages 
+          command: npm install -g semantic-release @semantic-release/changelog @semantic-release/git@7.0.17 @semantic-release/npm
+      - run: 
+          name: Attempt publish
+          command: npx semantic-release -d -b AuditJSFourDotOhDotOh
