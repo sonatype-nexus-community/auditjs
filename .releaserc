@@ -1,7 +1,7 @@
 {
   "release": {
     "branches": [
-      "master", { "branch": "SemanticRelease", "prerelease": "alpha" },
+      { "branch": "SemanticRelease", "prerelease": "alpha" },
     ]
   },
 	"plugins": [
