@@ -44,7 +44,7 @@ jobs:
           command: npm install -g semantic-release@beta @semantic-release/changelog @semantic-release/git @semantic-release/npm
       - run: 
           name: Attempt publish
-          command: npx semantic-release -d
+          command: npx semantic-release
 
 workflows:
   version: 2.1
