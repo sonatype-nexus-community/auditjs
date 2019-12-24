@@ -34,6 +34,20 @@ const doAuditOSSIndex = (results: OssIndexServerResult[]): boolean => {
   return auditResult;
 }
 
+const ossIndexObject = {
+  coordinates: 'Test',
+  reference: 'reference',
+  vulnerabilities: [
+    { id: 'test_id', title: 'title', cvssScore: '9.8', reference: 'reference'}
+  ]
+}
+
+const ossIndexObjectNoVulnerabilities = {
+  coordinates: 'Test',
+  reference: 'reference',
+  vulnerabilities: []
+}
+
 describe("AuditOSSIndex", () => {
   beforeEach(() => {
     auditOSSIndex = new AuditOSSIndex();
@@ -41,13 +55,6 @@ describe("AuditOSSIndex", () => {
 
   it("should return true if OSS Index results have vulnerabilities", () => {
     let results = new Array<OssIndexServerResult>();
-    const ossIndexObject = {
-      coordinates: 'Test',
-      reference: 'reference',
-      vulnerabilities: [
-        { id: 'test_id', title: 'title', cvssScore: '9.8', reference: 'reference'}
-      ]
-    }
     let temp = new OssIndexServerResult(ossIndexObject);
     results.push(temp);
     
@@ -59,13 +66,6 @@ describe("AuditOSSIndex", () => {
   it("should return true if OSS Index results have vulnerabilities, and json print is chosen", () => {
     auditOSSIndex = new AuditOSSIndex(false, true);
     let results = new Array<OssIndexServerResult>();
-    const ossIndexObject = {
-      coordinates: 'Test',
-      reference: 'reference',
-      vulnerabilities: [
-        { id: 'test_id', title: 'title', cvssScore: '9.8', reference: 'reference'}
-      ]
-    }
     let temp = new OssIndexServerResult(ossIndexObject);
     results.push(temp);
     
@@ -76,12 +76,7 @@ describe("AuditOSSIndex", () => {
 
   it("should return false if OSS Index results have no vulnerabilities", () => {
     let results = new Array<OssIndexServerResult>();
-    const ossIndexObject = {
-      coordinates: 'Test',
-      reference: 'reference',
-      vulnerabilities: []
-    }
-    let temp = new OssIndexServerResult(ossIndexObject);
+    let temp = new OssIndexServerResult(ossIndexObjectNoVulnerabilities);
     results.push(temp);
     
     let result = doAuditOSSIndex(results);
@@ -92,12 +87,7 @@ describe("AuditOSSIndex", () => {
   it("should return false if OSS Index results have no vulnerabilities, and json print is chosen", () => {
     auditOSSIndex = new AuditOSSIndex(false, true);
     let results = new Array<OssIndexServerResult>();
-    const ossIndexObject = {
-      coordinates: 'Test',
-      reference: 'reference',
-      vulnerabilities: []
-    }
-    let temp = new OssIndexServerResult(ossIndexObject);
+    let temp = new OssIndexServerResult(ossIndexObjectNoVulnerabilities);
     results.push(temp);
     
     let result = doAuditOSSIndex(results);
