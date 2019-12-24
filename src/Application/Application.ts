@@ -28,7 +28,6 @@ import { YarnLock } from '../Munchers/YarnLock';
 import { Bower } from '../Munchers/Bower';
 import { setConsoleTransportLevel, logMessage, createAppLogger, DEBUG, ERROR, getAppLogger } from './Logger/Logger';
 import { Spinner } from './Spinner/Spinner';
-import { Options } from 'yargs';
 
 const pack = require('../../package.json');
 
