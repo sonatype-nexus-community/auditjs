@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import winston, { format } from 'winston';
 import path from 'path';
 import { homedir } from 'os';
+
+import winston, { format } from 'winston';
 
 export const DEBUG = 'debug';
 export const ERROR = 'error';

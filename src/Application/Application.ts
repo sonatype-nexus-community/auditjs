@@ -28,6 +28,7 @@ import { YarnLock } from '../Munchers/YarnLock';
 import { Bower } from '../Munchers/Bower';
 import { setConsoleTransportLevel, logMessage, createAppLogger, DEBUG, ERROR, getAppLogger } from './Logger/Logger';
 import { Spinner } from './Spinner/Spinner';
+import { Options } from 'yargs';
 
 const pack = require('../../package.json');
 
@@ -105,12 +106,15 @@ export class Application {
       return;
     }
     else if (this.artie) {
-      console.log(textSync(`ArtieJS`, { font: 'Ghost' }));
-      console.log(textSync(pack.version, { font: 'Ghost'}));
+      this.doPrintHeader('ArtieJS', 'Ghost');
     } else {
-      console.log(textSync(`AuditJS`, { font: '3D-ASCII' }));
-      console.log(textSync(pack.version, { font: '3D-ASCII'}));
+      this.doPrintHeader();
     }
+  }
+
+  private doPrintHeader(title: string = 'AuditJS', font: figlet.Fonts = '3D-ASCII') {
+    console.log(textSync(title, { font: font }));
+    console.log(textSync(pack.version, { font: font}));
   }
 
   private async populateCoordinates() {
