@@ -144,7 +144,7 @@ export class Application {
     this.spinner.maybeCreateMessageForSpinner('Submitting coordinates to Sonatype OSS Index');
 
     let format = (this.muncher instanceof Bower) ? "bower" : "npm";
-    logMessage('Format to query OSS Index picked', DEBUG, format);
+    logMessage('Format to query OSS Index picked', DEBUG, {format: format});
     try {
       logMessage('Attempting to query OSS Index or use Cache', DEBUG);
       let res = await requestService.callOSSIndexOrGetFromCache(this.results, format);
@@ -156,18 +156,18 @@ export class Application {
       let ossIndexResults: Array<OssIndexServerResult> = res.map((y: any) => {
         return new OssIndexServerResult(y);
       });
-      logMessage('Response morphoned into Array<OssIndexServerResult>', DEBUG, ossIndexResults);
+      logMessage('Response morphed into Array<OssIndexServerResult>', DEBUG, { ossIndexServerResults: ossIndexResults });
       this.spinner.maybeSucceed();
 
       this.spinner.maybeCreateMessageForSpinner('Auditing your results from Sonatype OSS Index');
-      logMessage('Instantiating OSS Index Request Service, with quiet option', DEBUG, args.quiet);
+      logMessage('Instantiating OSS Index Request Service, with quiet option', DEBUG, { quiet: args.quiet });
       let auditOSSIndex = new AuditOSSIndex((args.quiet) ? true : false, (args.json) ? true : false);
       this.spinner.maybeStop();
 
       logMessage('Attempting to audit results', DEBUG);
       let failed = auditOSSIndex.auditResults(ossIndexResults);
 
-      logMessage('Results audited', DEBUG, failed);
+      logMessage('Results audited', DEBUG, { failureCode: failed });
       getAppLogger().on('finish', () => {
         (failed) ? process.exit(1) : process.exit(0);
       });
@@ -192,30 +192,37 @@ export class Application {
     try {
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Getting your internal application ID');
+      logMessage('Attempting to obtain Nexus IQ Server internal applciation ID', DEBUG, args.application);
       let id = await requestService.getApplicationInternalId();
+      logMessage('Internal ID obtained', DEBUG, id);
 
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Submitting your dependencies to Nexus IQ Server');
+      logMessage('Submitting sbom to Nexus IQ Server third party API', DEBUG, this.sbom, id);
       let resultUrl = await requestService.submitToThirdPartyAPI(this.sbom, id);
       
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Checking for results (this could take a minute)');
+      logMessage('Polling Nexus IQ Server for report results', DEBUG, resultUrl);
       requestService.asyncPollForResults(`${args.server}/${resultUrl}`, (x) => {
         this.spinner.maybeSucceed();
         this.spinner.maybeCreateMessageForSpinner('Auditing your results');
         const results: ReportStatus = Object.assign(new ReportStatus(), x);
+        logMessage('Results from Nexus IQ Server obtained', DEBUG, results);
+
         let auditResults = new AuditIQServer();
 
         this.spinner.maybeStop();
+        logMessage('Auditing results', DEBUG, results);
         let failure = auditResults.auditThirdPartyResults(results);
+        logMessage('Audit finished', DEBUG, { failure: failure });
 
         (failure) ? process.exit(1) : process.exit(0);
       });
     } catch (e) {
       this.spinner.maybeFail();
-      console.group();
-      console.error(e.message);
-      console.groupEnd();
+      logMessage('There was an issue auditing your application with Nexus IQ Server', ERROR, {title: e.message, stack: e.stack});
+      process.exit(1);
     }
   }
 }

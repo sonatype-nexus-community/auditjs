@@ -23,23 +23,24 @@ export const ERROR = 'error';
 const transports = {
   console: new winston.transports.Console(
     {
-      level: 'error'
+      level: ERROR
     }
   ),
   file: new winston.transports.File(
     {
       filename: path.join(homedir(), '.ossindex', '.audit-js.error.log'), 
-      level: 'error'
+      level: ERROR
     }
   ),
   combinedFile: new winston.transports.File(
     {
-      filename: path.join(homedir(), '.ossindex', '.audit-js.combined.log')
+      filename: path.join(homedir(), '.ossindex', '.audit-js.combined.log'),
+      level: DEBUG
     }
   )
 };
 
-export const createAppLogger = (logLevel: string = "error", name: string = "auditjs") => {
+export const createAppLogger = (logLevel: string = DEBUG, name: string = "auditjs") => {
   winston.loggers.add(name, {
     level: logLevel,
     format: 
