@@ -16,7 +16,6 @@
 import expect from '../Tests/TestHelper';
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
 import { AuditOSSIndex } from './AuditOSSIndex';
-import { OssIndexRequestService } from '../Services/OssIndexRequestService';
 
 let auditOSSIndex: AuditOSSIndex;
 
