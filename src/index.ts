@@ -116,11 +116,13 @@ let argv = yargs
   .argv;
 
 if (argv) {
+  let silence = (argv.json || argv.quiet) ? true : false;
+  let artie = (argv.artie) ? true : false;
   let app: Application;
   if (argv.dev) {
-    app = new Application(argv.dev as boolean);
+    app = new Application(argv.dev as boolean, silence, artie);
   } else {
-    app = new Application();
+    app = new Application(false, silence, artie);
   }
   
   app.startApplication(argv);
