@@ -18,9 +18,12 @@ import chalk from 'chalk';
 
 export class AuditOSSIndex {
 
-  constructor(readonly quiet: boolean = false) {}
+  constructor(readonly quiet: boolean = false, readonly json: boolean = false) {}
   
   public auditResults(results: Array<OssIndexServerResult>): boolean {
+    if (this.json) {
+      return this.printJson(results);
+    }
     let total = results.length;
     results = results.sort((a, b) => {
       return (a.coordinates < b.coordinates ? -1 : 1);
@@ -45,6 +48,15 @@ export class AuditOSSIndex {
     this.printLine('-'.repeat(process.stdout.columns));
 
     return isVulnerable;
+  }
+
+  private printJson(results: Array<OssIndexServerResult>): boolean {
+    console.log(JSON.stringify(results, null, 2));
+
+    if (results.filter((x) => { return (x.vulnerabilities && x.vulnerabilities?.length > 0) }).length > 0) {
+      return true;
+    }
+    return false;
   }
 
   private getColorFromMaxScore(maxScore: number, defaultColor: string = 'darkblue'): string {

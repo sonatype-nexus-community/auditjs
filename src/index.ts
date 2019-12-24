@@ -103,6 +103,12 @@ let argv = yargs
           type: 'boolean',
           description: 'Set console logging level to verbose',
           demandOption: false,
+        },
+        json: {
+          alias: 'j',
+          type: 'boolean',
+          description: 'Set output to JSON',
+          demandOption: false
         }
       },
       )

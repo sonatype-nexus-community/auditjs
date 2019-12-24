@@ -99,6 +99,25 @@ export class Application {
     if (args.verbose) {
       transports.console.level = 'debug';
     }
+
+    if (args.json) {
+      if (args._[0] == 'iq') {
+        this.logger.debug('Attempting to start application');
+        this.logger.debug('Getting coordinates for Nexus IQ Server');
+        await this.populateCoordinatesForIQ();
+        this.logger.debug(`Coordinates obtained`, this.sbom);
+        this.logger.debug(`Auditing application`, args.application);
+        await this.auditWithIQ(args);
+      } else if (args._[0] == 'ossi') {
+        this.logger.debug('Attempting to start application');
+        this.logger.debug('Getting coordinates for Sonatype OSS Index');
+        await this.populateCoordinates();
+        this.logger.debug(`Coordinates obtained`, this.results);
+  
+        this.logger.debug('Auditing your application with Sonatype OSS Index');
+        await this.auditWithOSSIndex(args);
+      }
+    }
     // args has sensitive info in it, such as username/password, etc... do not log them in total
     if (args._[0] == 'iq') {
       this.printHeader(args);
@@ -172,6 +191,9 @@ export class Application {
   }
 
   private async auditWithOSSIndex(args: any) {
+    if (args.json) {
+      await this.auditWithOSSIndexJson(args);
+    }
     this.logger.debug('Instantiating OSS Index Request Service');
     let requestService = new OssIndexRequestService(args?.user, args?.password);
     this.spinner?.succeed();
@@ -212,6 +234,19 @@ export class Application {
         process.exit(1);
       });
     }
+  }
+
+  private async auditWithOSSIndexJson(args: any) {
+    let requestService = new OssIndexRequestService(args?.user, args?.password);
+    let format = (this.muncher instanceof Bower) ? "bower" : "npm";
+    let res = await requestService.callOSSIndexOrGetFromCache(this.results, format);
+    let ossIndexResults: Array<OssIndexServerResult> = res.map((y: any) => {
+      return new OssIndexServerResult(y);
+    });
+
+    let auditOSSIndex = new AuditOSSIndex((args.quiet) ? true : false, true);
+    let failed = auditOSSIndex.auditResults(ossIndexResults);
+    (failed) ? process.exit(1) : process.exit(0);
   }
 
   private async auditWithIQ(args: any) {
