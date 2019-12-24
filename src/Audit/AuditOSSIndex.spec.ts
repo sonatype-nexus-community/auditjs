@@ -16,6 +16,7 @@
 import expect from '../Tests/TestHelper';
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
 import { AuditOSSIndex } from './AuditOSSIndex';
+import { OssIndexRequestService } from '../Services/OssIndexRequestService';
 
 let auditOSSIndex: AuditOSSIndex;
 
@@ -55,6 +56,24 @@ describe("AuditOSSIndex", () => {
     expect(result).to.equal(true);
   });
 
+  it("should return true if OSS Index results have vulnerabilities, and json print is chosen", () => {
+    auditOSSIndex = new AuditOSSIndex(false, true);
+    let results = new Array<OssIndexServerResult>();
+    const ossIndexObject = {
+      coordinates: 'Test',
+      reference: 'reference',
+      vulnerabilities: [
+        { id: 'test_id', title: 'title', cvssScore: '9.8', reference: 'reference'}
+      ]
+    }
+    let temp = new OssIndexServerResult(ossIndexObject);
+    results.push(temp);
+    
+    let result = doAuditOSSIndex(results);
+
+    expect(result).to.equal(true);
+  });
+
   it("should return false if OSS Index results have no vulnerabilities", () => {
     let results = new Array<OssIndexServerResult>();
     const ossIndexObject = {
@@ -65,7 +84,23 @@ describe("AuditOSSIndex", () => {
     let temp = new OssIndexServerResult(ossIndexObject);
     results.push(temp);
     
-    let result = doAuditOSSIndex(results)
+    let result = doAuditOSSIndex(results);
+
+    expect(result).to.equal(false);
+  });
+
+  it("should return false if OSS Index results have no vulnerabilities, and json print is chosen", () => {
+    auditOSSIndex = new AuditOSSIndex(false, true);
+    let results = new Array<OssIndexServerResult>();
+    const ossIndexObject = {
+      coordinates: 'Test',
+      reference: 'reference',
+      vulnerabilities: []
+    }
+    let temp = new OssIndexServerResult(ossIndexObject);
+    results.push(temp);
+    
+    let result = doAuditOSSIndex(results);
 
     expect(result).to.equal(false);
   });
