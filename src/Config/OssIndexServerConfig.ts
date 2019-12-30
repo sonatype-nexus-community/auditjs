@@ -14,21 +14,33 @@
  * limitations under the License.
  */
 import { Config } from "../Types/Config";
+import { writeFileSync, readFileSync } from "fs";
 
 export class OssIndexServerConfig extends Config {
-
-  constructor(
-    readonly username: string, 
-    readonly token: string) 
-  {
+  constructor(readonly username: string, readonly token: string) {
     super(username, token);
   }
 
-  saveConfigToFile(saveLocation: string = this.getSaveLocation()): boolean {
-    throw new Error("Method not implemented.");
+  public saveConfigToFile(
+    saveLocation: string = this.getSaveLocation()
+  ): boolean {
+    let ableToWrite = false;    const stringToSave = `Username: ${this.username}
+    Password: ${this.token}`;
+
+    try {
+      writeFileSync(saveLocation, stringToSave, {flag: 'wx'});
+    } finally { 
+      ableToWrite = true;
+    }
+
+    return ableToWrite;
   }
+
+  public getConfigFromFile(
+    saveLocation: string = this.getSaveLocation()
+  ): Config {
+    let fileString = readFileSync(saveLocation, 'utf8');
+    let splitString = fileString.split('\n');
     
-  getConfigFromFile(saveLocation: string = this.getSaveLocation()): Config {
-    return new OssIndexServerConfig("test", "password");
   }
 }

@@ -14,3 +14,30 @@
  * limitations under the License.
  */
 import expect from '../Tests/TestHelper';
+import { OssIndexServerConfig } from './OssIndexServerConfig';
+import { Config } from "../Types/Config";
+import path from 'path';
+import { unlinkSync } from 'fs';
+
+const TEST_FILE = path.join(__dirname, "test.txt");
+
+describe("OssIndexServerConfig", () => {
+  after(() => {
+    try {
+      unlinkSync(TEST_FILE);
+      console.log("Test config file deleted")
+    } catch {
+      console.log("There was no test config file to delete")
+    }
+  })
+
+  it("should return true when it is able to save a config file", () => {
+    expect(OssIndexServerConfig.saveConfigToFile(TEST_FILE)).to.equal(true);
+  })
+
+  it("should get credentials from a config file", () => {
+    let {username, token} = OssIndexServerConfig.getConfigFromFile(TEST_FILE)
+    expect(username).to.equal("testing");
+    expect(token).to.equal("password");
+  })
+});
