@@ -28,6 +28,7 @@ import { YarnLock } from '../Munchers/YarnLock';
 import { Bower } from '../Munchers/Bower';
 import { setConsoleTransportLevel, logMessage, createAppLogger, DEBUG, ERROR, getAppLogger } from './Logger/Logger';
 import { Spinner } from './Spinner/Spinner';
+import { VulnerabilityExcluder } from '../Whitelist/VulnerabilityExcluder';
 
 const pack = require('../../package.json');
 
@@ -162,15 +163,15 @@ export class Application {
       logMessage('Response morphed into Array<OssIndexServerResult>', DEBUG, { ossIndexServerResults: ossIndexResults });
       this.spinner.maybeSucceed();
 
+      this.spinner.maybeCreateMessageForSpinner('Removing whitelisted vulnerabilities');
+      logMessage('Response being ran against whitelist', DEBUG, { ossIndexServerResults: ossIndexResults });
+      ossIndexResults = VulnerabilityExcluder.filterVulnerabilities(ossIndexResults);
+      logMessage('Response has been whitelisted', DEBUG, { ossIndexServerResults: ossIndexResults });
+      this.spinner.maybeSucceed();
+
       this.spinner.maybeCreateMessageForSpinner('Auditing your results from Sonatype OSS Index');
       logMessage('Instantiating OSS Index Request Service, with quiet option', DEBUG, { quiet: args.quiet });
-      let auditOSSIndex: AuditOSSIndex;
-      if (args.whitelist) {
-        auditOSSIndex = new AuditOSSIndex((args.quiet) ? true : false, (args.json) ? true : false, args.whitelist);
-      } else {
-        auditOSSIndex = new AuditOSSIndex((args.quiet) ? true : false, (args.json) ? true : false)
-      }
-      
+      let auditOSSIndex = new AuditOSSIndex((args.quiet) ? true : false, (args.json) ? true : false);
       this.spinner.maybeStop();
 
       logMessage('Attempting to audit results', DEBUG);

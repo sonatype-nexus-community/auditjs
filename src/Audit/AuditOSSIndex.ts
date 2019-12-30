@@ -19,21 +19,19 @@ import path from 'path';
 import { existsSync, readFileSync } from "fs";
 import { Whitelist } from "../Types/Whitelist";
 
-const whitelistFilePathPwd = path.join(process.cwd(), 'auditjs.json');
+
 
 export class AuditOSSIndex {
 
   constructor(
     readonly quiet: boolean = false, 
-    readonly json: boolean = false,
-    readonly whitelistFilePath: string = whitelistFilePathPwd) 
+    readonly json: boolean = false) 
   {}
   
   public auditResults(results: Array<OssIndexServerResult>): boolean {
     if (this.json) {
-      return this.printJson(this.filterVulnerabilities(results));
+      return this.printJson(results);
     }
-    results = this.filterVulnerabilities(results);
     let total = results.length;
     results = results.sort((a, b) => {
       return (a.coordinates < b.coordinates ? -1 : 1);
@@ -100,44 +98,6 @@ export class AuditOSSIndex {
 
     console.log(chalk.keyword(this.getColorFromMaxScore(maxScore))(`[${i + 1}/${total}] - ${result.toAuditLog()}`));
     result.vulnerabilities && printVuln(result.vulnerabilities);
-  }
-
-  private filterVulnerabilities(results: Array<OssIndexServerResult>): Array<OssIndexServerResult> {
-    if (existsSync(this.whitelistFilePath)) {
-      let json = readFileSync(this.whitelistFilePath);
-
-      let whitelist = JSON.parse(json.toString());
-
-      let whitelistArray = new Array<Whitelist>();
-      whitelist.ignore.forEach((id: any) => {
-        whitelistArray.push(Object.assign(Whitelist, id));
-      });
-
-      let newResults = new Array<OssIndexServerResult>();
-      results.map((result) => {
-        if (result.vulnerabilities && result.vulnerabilities.length > 0) {
-          let vulns = new Array<Vulnerability>();
-          vulns = result.vulnerabilities.filter((vuln) => {
-            return !whitelistArray.some((val) => {
-              return val.id === vuln.id;
-            });
-          });
-
-          let newResult: any = {};
-          newResult.coordinates = result.coordinates;
-          newResult.reference = result.reference;
-          newResult.description = result.description;
-          newResult.vulnerabilities = vulns;
-
-          newResults.push(new OssIndexServerResult(newResult));
-        } else {
-          newResults.push(result);
-        }
-      });
-
-      return newResults;
-    }
-    return results;
   }
 
   private printLine(line: any) {
