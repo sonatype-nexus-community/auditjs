@@ -164,7 +164,13 @@ export class Application {
 
       this.spinner.maybeCreateMessageForSpinner('Auditing your results from Sonatype OSS Index');
       logMessage('Instantiating OSS Index Request Service, with quiet option', DEBUG, { quiet: args.quiet });
-      let auditOSSIndex = new AuditOSSIndex((args.quiet) ? true : false, (args.json) ? true : false);
+      let auditOSSIndex: AuditOSSIndex;
+      if (args.whitelist) {
+        auditOSSIndex = new AuditOSSIndex((args.quiet) ? true : false, (args.json) ? true : false, args.whitelist);
+      } else {
+        auditOSSIndex = new AuditOSSIndex((args.quiet) ? true : false, (args.json) ? true : false)
+      }
+      
       this.spinner.maybeStop();
 
       logMessage('Attempting to audit results', DEBUG);

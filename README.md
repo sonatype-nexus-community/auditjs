@@ -44,12 +44,14 @@ auditjs ossi [options]
 Audit this application using Sonatype OSS Index
 
 Options:
-  --version       Show version number                                  [boolean]
-  --help          Show help                                            [boolean]
-  --user, -u      Specify OSS Index username                            [string]
-  --password, -p  Specify OSS Index password or token                   [string]
-  --quiet, -q     Only print out vulnerable dependencies               [boolean]
-  --verbose, -V   Set console logging level to verbose                 [boolean]
+  --version        Show version number                                 [boolean]
+  --help           Show help                                           [boolean]
+  --user, -u       Specify OSS Index username                           [string]
+  --password, -p   Specify OSS Index password or token                  [string]
+  --quiet, -q      Only print out vulnerable dependencies              [boolean]
+  --verbose, -V    Set console logging level to verbose                [boolean]
+  --json, -j       Set output to JSON                                  [boolean]
+  --whitelist, -w  Set path to whitelist file                           [string]
 ```
 
 ### Nexus IQ Server Usage
@@ -127,7 +129,11 @@ file as described above, as using them on the command line is less secure.
 
 ## Whitelisting
 
-Whitelisting of vulnerabilities can be done! To accomplish this thus far we have implemented the ability to have a file named `auditjs.json` checked in to your repo ideally, so that it would be at the root where you run `auditjs`.
+Whitelisting of vulnerabilities can be done! To accomplish this thus far we have implemented the ability to have a file named `auditjs.json` checked in to your repo ideally, so that it would be at the root where you run `auditjs`. Alternatively you can run `auditjs` with a whitelist file at a different location, with an example such as:
+
+```terminal 
+$ auditjs ossi --whitelist /Users/cooldeveloperperson/code/sonatype-nexus-community/auditjs/auditjs.json
+```
 
 The file should look like:
 
