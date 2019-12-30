@@ -18,8 +18,13 @@ import { writeFileSync, readFileSync } from "fs";
 import { logMessage, ERROR } from "../Application/Logger/Logger";
 
 export class OssIndexServerConfig extends Config {
-  constructor(readonly username: string, readonly token: string) {
-    super(username, token);
+  private username: string;
+  private token: string;
+
+  constructor() {
+    super();
+    this.username = '';
+    this.token = '';
   }
 
   public saveConfigToFile(
@@ -40,11 +45,23 @@ export class OssIndexServerConfig extends Config {
   public getConfigFromFile(
     saveLocation: string = this.getSaveLocation()
   ): Config {
-    let fileString = readFileSync(saveLocation, "utf8");
-    let splitString = fileString.split("\n");
+    let fileString = readFileSync(saveLocation, 'utf8');
+    let splitString = fileString.split('\n');
+    this.username = splitString[0].split(':')[1].trim();
+    this.token = splitString[1].split(':')[1].trim();
+
+    return this;
   }
 
   public getStringToSave(): string {
     return `Username: ${this.username}\nPassword: ${this.token}`;
+  }
+
+  public getUsername(): string {
+    return this.username;
+  }
+
+  public getToken(): string {
+    return this.token;
   }
 }

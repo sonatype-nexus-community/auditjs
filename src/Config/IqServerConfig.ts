@@ -17,11 +17,9 @@ import { Config } from "../Types/Config";
 
 export class IqServerConfig extends Config {
 
-  constructor(
-    readonly username: string, 
-    readonly token: string) 
+  constructor()
   {
-    super(username, token);
+    super();
   }
 
   saveConfigToFile(saveLocation: string = this.getSaveLocation('.iq-server-config')): boolean {
@@ -29,6 +27,13 @@ export class IqServerConfig extends Config {
   }
   
   getConfigFromFile(saveLocation: string = this.getSaveLocation('.iq-server-config')): Config {
-    return new IqServerConfig("test", "password");
+    return new IqServerConfig();
+  }
+
+  getUsername(): string {
+    throw new Error("Method not implemented.");
+  }
+  getToken(): string {
+    throw new Error("Method not implemented.");
   }
 }
