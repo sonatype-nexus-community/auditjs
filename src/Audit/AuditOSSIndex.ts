@@ -15,10 +15,18 @@
  */
 import { OssIndexServerResult, Vulnerability } from "../Types/OssIndexServerResult";
 import chalk from 'chalk';
+import path from 'path';
+import { existsSync, readFileSync } from "fs";
+import { Whitelist } from "../Types/Whitelist";
+
+
 
 export class AuditOSSIndex {
 
-  constructor(readonly quiet: boolean = false, readonly json: boolean = false) {}
+  constructor(
+    readonly quiet: boolean = false, 
+    readonly json: boolean = false) 
+  {}
   
   public auditResults(results: Array<OssIndexServerResult>): boolean {
     if (this.json) {
