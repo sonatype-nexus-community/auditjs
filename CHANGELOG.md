@@ -1,3 +1,10 @@
+## [4.0.1-alpha.5](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.4...v4.0.1-alpha.5) (2019-12-30)
+
+
+### Bug Fixes
+
+* Allow output of OSS Index results as json ([#96](https://github.com/sonatype-nexus-community/auditjs/issues/96)) ([89f79c7](https://github.com/sonatype-nexus-community/auditjs/commit/89f79c75014bf5355f458f390be53e15efe706f4))
+
 ## [4.0.1-alpha.4](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.3...v4.0.1-alpha.4) (2019-12-24)
 
 
