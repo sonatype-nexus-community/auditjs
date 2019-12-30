@@ -15,6 +15,7 @@
  */
 import { Config } from "../Types/Config";
 import { writeFileSync, readFileSync } from "fs";
+import { logMessage, ERROR } from "../Application/Logger/Logger";
 
 export class OssIndexServerConfig extends Config {
   constructor(readonly username: string, readonly token: string) {
@@ -24,13 +25,13 @@ export class OssIndexServerConfig extends Config {
   public saveConfigToFile(
     saveLocation: string = this.getSaveLocation()
   ): boolean {
-    let ableToWrite = false;    const stringToSave = `Username: ${this.username}
-    Password: ${this.token}`;
+    let ableToWrite = false;
 
     try {
-      writeFileSync(saveLocation, stringToSave, {flag: 'wx'});
-    } finally { 
+      writeFileSync(saveLocation, this.getStringToSave, { flag: "wx" });
       ableToWrite = true;
+    } catch (e) {
+      logMessage(e, ERROR);
     }
 
     return ableToWrite;
@@ -39,8 +40,11 @@ export class OssIndexServerConfig extends Config {
   public getConfigFromFile(
     saveLocation: string = this.getSaveLocation()
   ): Config {
-    let fileString = readFileSync(saveLocation, 'utf8');
-    let splitString = fileString.split('\n');
-    
+    let fileString = readFileSync(saveLocation, "utf8");
+    let splitString = fileString.split("\n");
+  }
+
+  public getStringToSave(): string {
+    return `Username: ${this.username}\nPassword: ${this.token}`;
   }
 }
