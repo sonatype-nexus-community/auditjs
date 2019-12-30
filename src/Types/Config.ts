@@ -12,4 +12,5 @@ export abstract class Config {
   abstract getConfigFromFile(saveLocation?: string): Config;
   abstract getUsername(): string;
   abstract getToken(): string;
+  abstract getBasicAuth(): string[];
 }

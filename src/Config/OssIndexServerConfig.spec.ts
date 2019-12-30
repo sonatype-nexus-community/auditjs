@@ -42,5 +42,22 @@ describe("OssIndexServerConfig", () => {
     expect(config.getToken()).to.equal("password");
     mock.restore();
     osmock.restore();
-  })
+  });
+
+  it("should get return a basic authorization string[] from a config file", () => {
+    mock({
+      '/nonsense': {
+        '.oss-index-config': 'Username: testing\nPassword: password'
+      }
+    })
+
+    let osmock = sinon.mock(os);
+    osmock.expects('homedir').returns('/nonsense');
+
+    let config = new OssIndexServerConfig().getConfigFromFile('/nonsense/.oss-index-config');
+    
+    expect(config.getBasicAuth()).to.deep.equal(['Authorization', 'Basic testing:password']);
+    mock.restore();
+    osmock.restore();
+  });
 });

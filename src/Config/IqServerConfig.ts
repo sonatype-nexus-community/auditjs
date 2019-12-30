@@ -16,7 +16,6 @@
 import { Config } from "../Types/Config";
 
 export class IqServerConfig extends Config {
-
   constructor()
   {
     super();
@@ -33,7 +32,12 @@ export class IqServerConfig extends Config {
   getUsername(): string {
     throw new Error("Method not implemented.");
   }
+  
   getToken(): string {
+    throw new Error("Method not implemented.");
+  }
+
+  getBasicAuth(): string[] {
     throw new Error("Method not implemented.");
   }
 }

@@ -64,4 +64,8 @@ export class OssIndexServerConfig extends Config {
   public getToken(): string {
     return this.token;
   }
+
+  public getBasicAuth(): string[] {
+    return ['Authorization', `Basic ${this.username}:${this.token}`];
+  }
 }
