@@ -127,7 +127,21 @@ file as described above, as using them on the command line is less secure.
 
 ## Whitelisting
 
-TBD
+Whitelisting of vulnerabilities can be done! To accomplish this thus far we have implemented the ability to have a file named `auditjs.json` checked in to your repo ideally, so that it would be at the root where you run `auditjs`.
+
+The file should look like:
+
+```json
+{
+  "ignore": [
+    { "id": "78a61524-80c5-4371-b6d1-6b32af349043", "reason": "Insert reason here" }
+  ]
+}
+```
+
+The only field that actually matters is `id` and that is the ID you recieve from OSS Index for a vulnerability. You can add fields such as `reason` so that you later can understand why you whitelisted a vulnerability.
+
+Any `id` that is whitelisted will be squelched from the results, and not cause a failure.
 
 ## Limitations
 
