@@ -178,6 +178,8 @@ export class Application {
       let failed = auditOSSIndex.auditResults(ossIndexResults);
 
       logMessage('Results audited', DEBUG, { failureCode: failed });
+      
+      getAppLogger().end();
       getAppLogger().on('finish', () => {
         (failed) ? process.exit(1) : process.exit(0);
       });
