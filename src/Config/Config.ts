@@ -49,7 +49,6 @@ export abstract class Config {
     saveLocation: string = '.oss-index-config'
   ): boolean {
     try {
-      console.log(saveLocation);
       writeFileSync(this.getSaveLocation(saveLocation), stringToSave);
       return true;
     } catch (e) {

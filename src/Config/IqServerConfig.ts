@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Config } from "../Types/Config";
+import { Config } from "./Config";
 import { readFileSync } from "fs";
 import { Logger } from "winston";
 import { getAppLogger } from "../Application/Logger/Logger";
