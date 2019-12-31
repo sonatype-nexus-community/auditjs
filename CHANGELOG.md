@@ -1,3 +1,10 @@
+## [4.0.1-alpha.8](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.7...v4.0.1-alpha.8) (2019-12-31)
+
+
+### Bug Fixes
+
+* see if this helps the image show up on npmjs.com ([c8fdd60](https://github.com/sonatype-nexus-community/auditjs/commit/c8fdd603ed756c485e247f7f8f45883deb6950c2))
+
 ## [4.0.1-alpha.7](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.6...v4.0.1-alpha.7) (2019-12-31)
 
 
