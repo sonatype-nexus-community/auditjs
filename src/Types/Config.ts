@@ -62,8 +62,4 @@ export abstract class Config {
   abstract getStringToSave(): string;
 
   abstract saveFile(): boolean;
-
-  public getBasicAuth(): string[] {
-    return ['Authorization', `Basic ` + Buffer.from(this.username + ":" + this.token).toString('base64') ];
-  }
 }

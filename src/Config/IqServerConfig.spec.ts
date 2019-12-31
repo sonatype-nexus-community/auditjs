@@ -20,39 +20,18 @@ import { readFileSync } from 'fs';
 import sinon from 'sinon';
 import os from 'os';
 
-let osmock = sinon.mock(os);
-
 describe("IqServerConfig", async () => {
-  beforeEach( async () => {
-    osmock.expects('homedir').returns('/nonsense');
-  });
-
-  after(async () => {
-    osmock.restore();
-  })
-
   it("should return true when it is able to save a config file", async () => {
+    sinon.stub(os, 'homedir').returns('/nonsense');
     mock({ '/nonsense': {}});
 
     let config = new IqServerConfig("username", "password", "http://localhost:8070");
     expect(config.saveFile()).to.equal(true);
 
-    let file = readFileSync('/nonsense/.iq-server-config');
+    let file = readFileSync('/nonsense/.iqserver/.iq-server-config');
 
-    expect(file.toString()).to.equal('Username: username\nPassword: password\nHost: http://localhost:8070');
+    expect(file.toString()).to.equal('Username: username\nPassword: password\nHost: http://localhost:8070\n');
     mock.restore();
-  });
-
-  it("should get valid basic auth credentials from a config file", async () => {
-    mock({ '/nonsense': {
-      '.iq-server-config': 'Username: username\nPassword: password\nHost: http://localhost:8070'
-    }});
-
-    let config = new IqServerConfig().getConfigFromFile();
-    
-    expect(config.getBasicAuth()[0]).to.equal("Authorization");
-    expect(config.getBasicAuth()[1]).to.equal("Basic dXNlcm5hbWU6cGFzc3dvcmQ=");
-
-    mock.restore();
+    sinon.restore();
   });
 });
