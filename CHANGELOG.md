@@ -1,3 +1,10 @@
+## [4.0.1-alpha.7](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.6...v4.0.1-alpha.7) (2019-12-31)
+
+
+### Bug Fixes
+
+* adding feature to allow for config files to be written to and read from ([#98](https://github.com/sonatype-nexus-community/auditjs/issues/98)) ([ce88966](https://github.com/sonatype-nexus-community/auditjs/commit/ce8896624f4c4cb05f9017f8904cf2ceba77eea7))
+
 ## [4.0.1-alpha.6](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.5...v4.0.1-alpha.6) (2019-12-31)
 
 
