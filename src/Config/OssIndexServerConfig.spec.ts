@@ -27,6 +27,10 @@ describe("OssIndexServerConfig", async () => {
     osmock.expects('homedir').returns('/nonsense');
   });
 
+  after(async () => {
+    osmock.restore();
+  })
+
   it("should return true when it is able to save a config file", async () => {
     mock({ '/nonsense': {}});
 
