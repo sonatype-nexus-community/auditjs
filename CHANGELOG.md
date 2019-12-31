@@ -1,3 +1,10 @@
+## [4.0.1-alpha.6](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.5...v4.0.1-alpha.6) (2019-12-31)
+
+
+### Bug Fixes
+
+* Filter vulnerabilities ([#97](https://github.com/sonatype-nexus-community/auditjs/issues/97)) ([952fa3a](https://github.com/sonatype-nexus-community/auditjs/commit/952fa3a2a01e28efe9aa3c04ab098069ae59f932))
+
 ## [4.0.1-alpha.5](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.4...v4.0.1-alpha.5) (2019-12-30)
 
 
