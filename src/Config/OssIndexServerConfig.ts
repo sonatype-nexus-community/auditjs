@@ -15,11 +15,15 @@
  */
 import { Config } from "../Types/Config";
 import { writeFileSync, readFileSync } from "fs";
-import { logMessage, ERROR } from "../Application/Logger/Logger";
+import { getAppLogger, logMessage, ERROR } from "../Application/Logger/Logger";
+import { Logger } from "winston";
 
 export class OssIndexServerConfig extends Config {
 
-  constructor(private username: string = '', private token: string = '') {
+  constructor(
+    private username: string = '', 
+    private token: string = '',
+    private logger: Logger = getAppLogger()) {
     super();
   }
 
@@ -32,7 +36,7 @@ export class OssIndexServerConfig extends Config {
       writeFileSync(saveLocation, this.getStringToSave(), { flag: "wx" });
       ableToWrite = true;
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
 
     return ableToWrite;
