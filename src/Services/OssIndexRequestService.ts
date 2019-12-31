@@ -17,7 +17,6 @@ import { OssIndexCoordinates } from "../Types/OssIndexCoordinates";
 import { Coordinates } from "../Types/Coordinates";
 import fetch from "node-fetch";
 import { Response } from "node-fetch";
-import _ from "lodash";
 import NodePersist from 'node-persist';
 import path from "path";
 import { OssIndexServerResult } from "../Types/OssIndexServerResult";
