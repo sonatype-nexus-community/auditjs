@@ -36,7 +36,7 @@ export class OssIndexServerConfig extends Config {
       writeFileSync(saveLocation, this.getStringToSave(), { flag: "wx" });
       ableToWrite = true;
     } catch (e) {
-      this.logger.error(e);
+      logMessage(e, ERROR);
     }
 
     return ableToWrite;
