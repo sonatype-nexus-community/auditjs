@@ -15,15 +15,44 @@
  */
 import path from 'path';
 import { homedir } from 'os';
+import { Logger } from 'winston';
+import { writeFileSync } from "fs";
+import { getAppLogger, logMessage, ERROR } from "../Application/Logger/Logger";
 
 export abstract class Config {
-  constructor() {
+  constructor(
+    protected username: string, 
+    protected token: string,
+    readonly logger: Logger = getAppLogger()) {
   }
   
   getSaveLocation(configName: string = `.oss-index-config`): string {
     return path.join(homedir(), configName);
   }
-  abstract saveConfigToFile(saveLocation?: string): boolean;
+
+  protected saveConfigToFile(
+    stringToSave: string,
+    saveLocation: string = this.getSaveLocation()
+  ): boolean {
+    let ableToWrite = false;
+
+    try {
+      writeFileSync(saveLocation, stringToSave, { flag: "wx" });
+      ableToWrite = true;
+    } catch (e) {
+      logMessage(e, ERROR);
+    }
+
+    return ableToWrite;
+  }
+
   abstract getConfigFromFile(saveLocation?: string): Config;
-  abstract getBasicAuth(): string[];
+
+  abstract getStringToSave(): string;
+
+  abstract saveFile(): boolean;
+
+  public getBasicAuth(): string[] {
+    return ['Authorization', `Basic ` + Buffer.from(this.username + ":" + this.token).toString('base64') ];
+  }
 }

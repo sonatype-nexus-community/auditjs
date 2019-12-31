@@ -14,30 +14,37 @@
  * limitations under the License.
  */
 import { Config } from "../Types/Config";
+import { readFileSync } from "fs";
+import { Logger } from "winston";
+import { getAppLogger } from "../Application/Logger/Logger";
 
 export class IqServerConfig extends Config {
-  constructor()
+  constructor(
+    protected username: string, 
+    protected token: string, 
+    private host: string, 
+    readonly logger: Logger = getAppLogger())
   {
-    super();
+    super(username, token);
   }
 
-  saveConfigToFile(saveLocation: string = this.getSaveLocation('.iq-server-config')): boolean {
-    throw new Error("Method not implemented.");
+  public saveFile(stringToSave: string = this.getStringToSave()): boolean {
+    return super.saveConfigToFile(stringToSave);
   }
   
-  getConfigFromFile(saveLocation: string = this.getSaveLocation('.iq-server-config')): Config {
-    return new IqServerConfig();
+  public getConfigFromFile(
+    saveLocation: string = this.getSaveLocation()
+  ): Config {
+    let fileString = readFileSync(saveLocation, 'utf8');
+    let splitString = fileString.split('\n');
+    super.username = splitString[0].split(':')[1].trim();
+    super.token = splitString[1].split(':')[1].trim();
+    this.host = splitString[2].split(':')[1].trim();
+
+    return this;
   }
 
-  getUsername(): string {
-    throw new Error("Method not implemented.");
-  }
-  
-  getToken(): string {
-    throw new Error("Method not implemented.");
-  }
-
-  getBasicAuth(): string[] {
-    throw new Error("Method not implemented.");
+  public getStringToSave(): string {
+    return `Username: ${this.username}\nPassword: ${this.token}\nHost: ${this.host}`;
   }
 }

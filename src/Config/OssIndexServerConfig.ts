@@ -14,32 +14,21 @@
  * limitations under the License.
  */
 import { Config } from "../Types/Config";
-import { writeFileSync, readFileSync } from "fs";
-import { getAppLogger, logMessage, ERROR } from "../Application/Logger/Logger";
+import { readFileSync } from "fs";
+import { getAppLogger } from "../Application/Logger/Logger";
 import { Logger } from "winston";
 
 export class OssIndexServerConfig extends Config {
 
   constructor(
-    private username: string = '', 
-    private token: string = '',
-    private logger: Logger = getAppLogger()) {
-    super();
+    protected username: string = '', 
+    protected token: string = '',
+    readonly logger: Logger = getAppLogger()) {
+    super(username, token, logger);
   }
 
-  public saveConfigToFile(
-    saveLocation: string = this.getSaveLocation()
-  ): boolean {
-    let ableToWrite = false;
-
-    try {
-      writeFileSync(saveLocation, this.getStringToSave(), { flag: "wx" });
-      ableToWrite = true;
-    } catch (e) {
-      logMessage(e, ERROR);
-    }
-
-    return ableToWrite;
+  public saveFile(stringToSave: string = this.getStringToSave()): boolean {
+    return super.saveConfigToFile(stringToSave);
   }
 
   public getConfigFromFile(
@@ -47,17 +36,13 @@ export class OssIndexServerConfig extends Config {
   ): Config {
     let fileString = readFileSync(saveLocation, 'utf8');
     let splitString = fileString.split('\n');
-    this.username = splitString[0].split(':')[1].trim();
-    this.token = splitString[1].split(':')[1].trim();
+    super.username = splitString[0].split(':')[1].trim();
+    super.token = splitString[1].split(':')[1].trim();
 
     return this;
   }
 
   public getStringToSave(): string {
     return `Username: ${this.username}\nPassword: ${this.token}`;
-  }
-
-  public getBasicAuth(): string[] {
-    return ['Authorization', `Basic ` + Buffer.from(this.username + ":" + this.token).toString('base64') ];
   }
 }

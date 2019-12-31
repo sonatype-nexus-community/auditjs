@@ -35,7 +35,7 @@ describe("OssIndexServerConfig", async () => {
     mock({ '/nonsense': {}});
 
     let config = new OssIndexServerConfig("username", "password");
-    expect(config.saveConfigToFile()).to.equal(true);
+    expect(config.saveFile()).to.equal(true);
 
     let file = readFileSync('/nonsense/.oss-index-config');
 
