@@ -17,7 +17,6 @@ import { Muncher } from "./Muncher";
 import { Coordinates } from "../Types/Coordinates";
 import path from 'path';
 import fs from 'fs';
-import _ from "lodash";
 
 export class Bower implements Muncher {
 
