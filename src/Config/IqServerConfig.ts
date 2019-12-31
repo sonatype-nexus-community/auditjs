@@ -20,20 +20,20 @@ import { getAppLogger } from "../Application/Logger/Logger";
 
 export class IqServerConfig extends Config {
   constructor(
-    protected username: string, 
-    protected token: string, 
-    private host: string, 
+    protected username: string = '', 
+    protected token: string = '', 
+    private host: string = '', 
     readonly logger: Logger = getAppLogger())
   {
-    super(username, token);
+    super(username, token, logger);
   }
 
   public saveFile(stringToSave: string = this.getStringToSave()): boolean {
-    return super.saveConfigToFile(stringToSave);
+    return super.saveConfigToFile(stringToSave, '.iq-server-config');
   }
   
   public getConfigFromFile(
-    saveLocation: string = this.getSaveLocation()
+    saveLocation: string = this.getSaveLocation('.iq-server-config')
   ): Config {
     let fileString = readFileSync(saveLocation, 'utf8');
     let splitString = fileString.split('\n');

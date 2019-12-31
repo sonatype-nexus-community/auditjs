@@ -17,27 +17,28 @@ import path from 'path';
 import { homedir } from 'os';
 import { Logger } from 'winston';
 import { writeFileSync } from "fs";
-import { getAppLogger, logMessage, ERROR } from "../Application/Logger/Logger";
+import { logMessage, ERROR } from "../Application/Logger/Logger";
 
 export abstract class Config {
   constructor(
     protected username: string, 
     protected token: string,
-    readonly logger: Logger = getAppLogger()) {
+    readonly logger: Logger) {
   }
   
-  getSaveLocation(configName: string = `.oss-index-config`): string {
+  getSaveLocation(configName: string): string {
     return path.join(homedir(), configName);
   }
 
   protected saveConfigToFile(
     stringToSave: string,
-    saveLocation: string = this.getSaveLocation()
+    saveLocation: string = '.oss-index-config'
   ): boolean {
     let ableToWrite = false;
 
     try {
-      writeFileSync(saveLocation, stringToSave, { flag: "wx" });
+      console.log(saveLocation);
+      writeFileSync(this.getSaveLocation(saveLocation), stringToSave, { flag: "wx" });
       ableToWrite = true;
     } catch (e) {
       logMessage(e, ERROR);

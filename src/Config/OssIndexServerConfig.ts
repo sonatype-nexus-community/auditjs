@@ -32,7 +32,7 @@ export class OssIndexServerConfig extends Config {
   }
 
   public getConfigFromFile(
-    saveLocation: string = this.getSaveLocation()
+    saveLocation: string = this.getSaveLocation('.oss-index-config')
   ): Config {
     let fileString = readFileSync(saveLocation, 'utf8');
     let splitString = fileString.split('\n');
