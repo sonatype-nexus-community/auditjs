@@ -10,7 +10,7 @@ Supports:
 - yarn
 - bower
 
-<img src="https://github.com/sonatype-nexus-community/auditjs/blob/alpha/assets/images/auditjs.png" width="640">
+<img src="https://github.com/sonatype-nexus-community/auditjs/blob/alpha/assets/images/auditjs.png?raw=true" width="640">
 
 ## Installation
 
