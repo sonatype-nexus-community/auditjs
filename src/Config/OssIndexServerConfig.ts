@@ -27,13 +27,21 @@ export class OssIndexServerConfig extends Config {
     super(username, token, logger);
   }
 
+  public getUsername(): string {
+    return this.username;
+  }
+
+  public getToken(): string {
+    return this.token;
+  }
+
   public saveFile(stringToSave: string = this.getStringToSave()): boolean {
     return super.saveConfigToFile(stringToSave);
   }
 
   public getConfigFromFile(
     saveLocation: string = this.getSaveLocation('.oss-index-config')
-  ): Config {
+  ): OssIndexServerConfig {
     let fileString = readFileSync(saveLocation, 'utf8');
     let splitString = fileString.split('\n');
     super.username = splitString[0].split(':')[1].trim();
@@ -43,6 +51,6 @@ export class OssIndexServerConfig extends Config {
   }
 
   public getStringToSave(): string {
-    return `Username: ${this.username}\nPassword: ${this.token}`;
+    return `Username: ${this.username}\nPassword: ${this.token}\n`;
   }
 }

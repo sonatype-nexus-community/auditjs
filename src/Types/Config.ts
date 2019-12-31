@@ -15,9 +15,9 @@
  */
 import path from 'path';
 import { homedir } from 'os';
+import { mkdirSync, existsSync } from 'fs';
 import { Logger } from 'winston';
 import { writeFileSync } from "fs";
-import { logMessage, ERROR } from "../Application/Logger/Logger";
 
 export abstract class Config {
   constructor(
@@ -27,24 +27,34 @@ export abstract class Config {
   }
   
   getSaveLocation(configName: string): string {
-    return path.join(homedir(), configName);
+    if (configName == '.oss-index-config') {
+      this.tryCreateDirectory('.ossindex');
+      return path.join(homedir(), '.ossindex', configName);
+    }
+    this.tryCreateDirectory('.iqserver');
+    return path.join(homedir(), '.iqserver', configName);
+  }
+
+  tryCreateDirectory(dir: string): void {
+    if (existsSync(path.join(homedir(), dir))) {
+      return;
+    } else {
+      mkdirSync(path.join(homedir(), dir));
+      return;
+    }
   }
 
   protected saveConfigToFile(
     stringToSave: string,
     saveLocation: string = '.oss-index-config'
   ): boolean {
-    let ableToWrite = false;
-
     try {
       console.log(saveLocation);
-      writeFileSync(this.getSaveLocation(saveLocation), stringToSave, { flag: "wx" });
-      ableToWrite = true;
+      writeFileSync(this.getSaveLocation(saveLocation), stringToSave);
+      return true;
     } catch (e) {
-      logMessage(e, ERROR);
+      throw new Error(e);
     }
-
-    return ableToWrite;
   }
 
   abstract getConfigFromFile(saveLocation?: string): Config;

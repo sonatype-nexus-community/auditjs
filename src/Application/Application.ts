@@ -29,6 +29,8 @@ import { Bower } from '../Munchers/Bower';
 import { setConsoleTransportLevel, logMessage, createAppLogger, DEBUG, ERROR, getAppLogger } from './Logger/Logger';
 import { Spinner } from './Spinner/Spinner';
 import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
+import { IqServerConfig } from '../Config/IqServerConfig';
+import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 
 const pack = require('../../package.json');
 
@@ -141,7 +143,7 @@ export class Application {
 
   private async auditWithOSSIndex(args: any) {
     logMessage('Instantiating OSS Index Request Service', DEBUG);
-    let requestService = new OssIndexRequestService(args?.user, args?.password);
+    let requestService = this.getOssIndexRequestService(args);
     this.spinner.maybeSucceed();
 
     logMessage('Submitting coordinates to Sonatype OSS Index', DEBUG);
@@ -193,14 +195,9 @@ export class Application {
   }
 
   private async auditWithIQ(args: any) {
-    let requestService = new IqRequestService(
-      args.user as string, 
-      args.password as string, 
-      args.server as string, 
-      args.application as string,
-      args.stage as string);
-    
     try {
+      let requestService = this.getIqRequestService(args);
+
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Getting your internal application ID');
       logMessage('Attempting to obtain Nexus IQ Server internal applciation ID', DEBUG, args.application);
@@ -234,6 +231,46 @@ export class Application {
       this.spinner.maybeFail();
       logMessage('There was an issue auditing your application with Nexus IQ Server', ERROR, {title: e.message, stack: e.stack});
       process.exit(1);
+    }
+  }
+
+  private getOssIndexRequestService(args: any): OssIndexRequestService {
+    if (args.user && args.password) {
+      return new OssIndexRequestService(args?.user, args?.password);
+    }
+    try {
+      let config = new OssIndexServerConfig();
+
+      config.getConfigFromFile();
+
+      return new OssIndexRequestService(config.getUsername(), config.getToken());
+    } catch (e) {
+      return new OssIndexRequestService();
+    }
+  }
+
+  private getIqRequestService(args: any): IqRequestService {
+    if (args.user && args.password && args.server) {
+      return new IqRequestService(
+        args.user as string, 
+        args.password as string, 
+        args.server as string, 
+        args.application as string,
+        args.stage as string);
+    }
+    try {
+      let config = new IqServerConfig();
+
+      config.getConfigFromFile();
+
+      return new IqRequestService(
+        config.getUsername(), 
+        config.getToken(), 
+        config.getHost(), 
+        args.application as string,
+        args.stage as string);
+    } catch (e) {
+      throw new Error(e);
     }
   }
 }

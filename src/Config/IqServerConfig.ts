@@ -31,20 +31,33 @@ export class IqServerConfig extends Config {
   public saveFile(stringToSave: string = this.getStringToSave()): boolean {
     return super.saveConfigToFile(stringToSave, '.iq-server-config');
   }
+
+  public getUsername(): string {
+    return this.username;
+  }
+
+  public getToken(): string {
+    return this.token;
+  }
+
+  public getHost(): string {
+    return this.host;
+  }
   
   public getConfigFromFile(
     saveLocation: string = this.getSaveLocation('.iq-server-config')
-  ): Config {
+  ): IqServerConfig {
     let fileString = readFileSync(saveLocation, 'utf8');
     let splitString = fileString.split('\n');
     super.username = splitString[0].split(':')[1].trim();
     super.token = splitString[1].split(':')[1].trim();
-    this.host = splitString[2].split(':')[1].trim();
+    let temp = splitString[2].split(':');
+    this.host = temp.slice(1).join(':').trim();
 
     return this;
   }
 
   public getStringToSave(): string {
-    return `Username: ${this.username}\nPassword: ${this.token}\nHost: ${this.host}`;
+    return `Username: ${this.username}\nPassword: ${this.token}\nHost: ${this.host}\n`;
   }
 }

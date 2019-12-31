@@ -17,6 +17,7 @@
 import yargs from 'yargs';
 import { Argv } from 'yargs';
 import { Application } from './Application/Application';
+import { AppConfig } from './Config/AppConfig';
 
 // TODO: Flesh out the remaining set of args that NEED to be moved over, look at them with a fine toothed comb and lots of skepticism
 let argv = yargs
@@ -76,6 +77,10 @@ let argv = yargs
     })
   })
   .command(
+    'config',
+    'Set config for OSS Index or Nexus IQ Server'
+  )
+  .command(
     'ossi [options]', 
     "Audit this application using Sonatype OSS Index",
     (y: Argv) => {
@@ -122,14 +127,27 @@ let argv = yargs
   .argv;
 
 if (argv) {
-  let silence = (argv.json || argv.quiet) ? true : false;
-  let artie = (argv.artie) ? true : false;
-  let app: Application;
-  if (argv.dev) {
-    app = new Application(argv.dev as boolean, silence, artie);
+  if (argv._[0] == 'config') {
+    let config = new AppConfig();
+
+    config.getConfigFromCommandLine()
+      .then((val) => {
+      (val) ? process.exit(0) : process.exit(1);
+      })
+      .catch((e) => {
+        throw new Error(e);
+      });
   } else {
-    app = new Application(false, silence, artie);
+    let silence = (argv.json || argv.quiet) ? true : false;
+    let artie = (argv.artie) ? true : false;
+
+    let app: Application;
+
+    if (argv.dev) {
+      app = new Application(argv.dev as boolean, silence, artie);
+    } else {
+      app = new Application(false, silence, artie);
+    }
+    app.startApplication(argv);
   }
-  
-  app.startApplication(argv);
 }
