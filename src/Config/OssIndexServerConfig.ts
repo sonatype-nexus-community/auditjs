@@ -18,13 +18,9 @@ import { writeFileSync, readFileSync } from "fs";
 import { logMessage, ERROR } from "../Application/Logger/Logger";
 
 export class OssIndexServerConfig extends Config {
-  private username: string;
-  private token: string;
 
-  constructor() {
+  constructor(private username: string = '', private token: string = '') {
     super();
-    this.username = '';
-    this.token = '';
   }
 
   public saveConfigToFile(
@@ -33,10 +29,10 @@ export class OssIndexServerConfig extends Config {
     let ableToWrite = false;
 
     try {
-      writeFileSync(saveLocation, this.getStringToSave, { flag: "wx" });
+      writeFileSync(saveLocation, this.getStringToSave(), { flag: "wx" });
       ableToWrite = true;
     } catch (e) {
-      logMessage(e, ERROR);
+      console.error(e);
     }
 
     return ableToWrite;
@@ -57,15 +53,7 @@ export class OssIndexServerConfig extends Config {
     return `Username: ${this.username}\nPassword: ${this.token}`;
   }
 
-  public getUsername(): string {
-    return this.username;
-  }
-
-  public getToken(): string {
-    return this.token;
-  }
-
   public getBasicAuth(): string[] {
-    return ['Authorization', `Basic ${this.username}:${this.token}`];
+    return ['Authorization', `Basic ` + Buffer.from(this.username + ":" + this.token).toString('base64') ];
   }
 }

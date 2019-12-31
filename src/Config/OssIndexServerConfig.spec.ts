@@ -15,49 +15,40 @@
  */
 import expect from '../Tests/TestHelper';
 import { OssIndexServerConfig } from './OssIndexServerConfig';
-import path from 'path';
 import mock from 'mock-fs';
+import { readFileSync } from 'fs';
 import sinon from 'sinon';
 import os from 'os';
 
-describe("OssIndexServerConfig", () => {
+let osmock = sinon.mock(os);
 
-  // it("should return true when it is able to save a config file", () => {
-  //   expect(new OssIndexServerConfig().saveConfigToFile(TEST_FILE)).to.equal(true);
-  // })
-
-  it("should get credentials from a config file", () => {
-    mock({
-      '/nonsense': {
-        '.oss-index-config': 'Username: testing\nPassword: password'
-      }
-    })
-
-    let osmock = sinon.mock(os);
-    osmock.expects('homedir').returns('/nonsense');
-
-    let config = new OssIndexServerConfig().getConfigFromFile('/nonsense/.oss-index-config');
-    
-    expect(config.getUsername()).to.equal("testing");
-    expect(config.getToken()).to.equal("password");
-    mock.restore();
-    osmock.restore();
+describe("OssIndexServerConfig", async () => {
+  beforeEach( async () => {
+    osmock.expects('homedir').returns('/tmp');
   });
 
-  it("should get return a basic authorization string[] from a config file", () => {
-    mock({
-      '/nonsense': {
-        '.oss-index-config': 'Username: testing\nPassword: password'
-      }
-    })
+  it("should return true when it is able to save a config file", async () => {
+    mock({ '/tmp': {}});
 
-    let osmock = sinon.mock(os);
-    osmock.expects('homedir').returns('/nonsense');
+    let config = new OssIndexServerConfig("username", "password");
+    expect(config.saveConfigToFile()).to.equal(true);
 
-    let config = new OssIndexServerConfig().getConfigFromFile('/nonsense/.oss-index-config');
-    
-    expect(config.getBasicAuth()).to.deep.equal(['Authorization', 'Basic testing:password']);
+    let file = readFileSync('/tmp/.oss-index-config');
+
+    expect(file.toString()).to.equal('Username: username\nPassword: password');
     mock.restore();
-    osmock.restore();
+  });
+
+  it("should get valid basic auth credentials from a config file", async () => {
+    mock({ '/tmp': {
+      '.oss-index-config': 'Username: username\nPassword: password'
+    }});
+
+    let config = new OssIndexServerConfig().getConfigFromFile();
+    
+    expect(config.getBasicAuth()[0]).to.equal("Authorization");
+    expect(config.getBasicAuth()[1]).to.equal("Basic dXNlcm5hbWU6cGFzc3dvcmQ=");
+
+    mock.restore();
   });
 });
