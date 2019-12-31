@@ -1,6 +1,6 @@
 {
   "name": "auditjs",
-  "version": "4.0.1-alpha.5",
+  "version": "4.0.1-alpha.6",
   "description": "Audit dependencies to identify known vulnerabilities and maintenance problems",
   "main": "./bin/index.js",
   "bin": {
@@ -42,7 +42,6 @@
     "@types/mocha": "5.2.7",
     "@types/mock-fs": "^4.10.0",
     "@types/rimraf": "^2.0.3",
-    "@types/sinon": "^7.5.1",
     "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
     "mocha": "6.2.2",

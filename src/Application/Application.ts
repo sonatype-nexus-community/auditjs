@@ -28,7 +28,7 @@ import { YarnLock } from '../Munchers/YarnLock';
 import { Bower } from '../Munchers/Bower';
 import { setConsoleTransportLevel, logMessage, createAppLogger, DEBUG, ERROR, getAppLogger } from './Logger/Logger';
 import { Spinner } from './Spinner/Spinner';
-import { VulnerabilityExcluder } from '../Whitelist/VulnerabilityExcluder';
+import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 
 const pack = require('../../package.json');
 
@@ -165,7 +165,7 @@ export class Application {
 
       this.spinner.maybeCreateMessageForSpinner('Removing whitelisted vulnerabilities');
       logMessage('Response being ran against whitelist', DEBUG, { ossIndexServerResults: ossIndexResults });
-      ossIndexResults = VulnerabilityExcluder.filterVulnerabilities(ossIndexResults);
+      ossIndexResults = await filterVulnerabilities(ossIndexResults);
       logMessage('Response has been whitelisted', DEBUG, { ossIndexServerResults: ossIndexResults });
       this.spinner.maybeSucceed();
 
@@ -178,7 +178,6 @@ export class Application {
       let failed = auditOSSIndex.auditResults(ossIndexResults);
 
       logMessage('Results audited', DEBUG, { failureCode: failed });
-      
       getAppLogger().end();
       getAppLogger().on('finish', () => {
         (failed) ? process.exit(1) : process.exit(0);
