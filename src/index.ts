@@ -109,6 +109,12 @@ let argv = yargs
           type: 'boolean',
           description: 'Set output to JSON',
           demandOption: false
+        },
+        whitelist: {
+          alias: 'w',
+          type: 'string',
+          description: 'Set path to whitelist file',
+          demandOption: false
         }
       },
       )

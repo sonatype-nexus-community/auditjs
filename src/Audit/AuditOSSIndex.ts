@@ -18,7 +18,10 @@ import chalk from 'chalk';
 
 export class AuditOSSIndex {
 
-  constructor(readonly quiet: boolean = false, readonly json: boolean = false) {}
+  constructor(
+    readonly quiet: boolean = false, 
+    readonly json: boolean = false) 
+  {}
   
   public auditResults(results: Array<OssIndexServerResult>): boolean {
     if (this.json) {

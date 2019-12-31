@@ -18,6 +18,7 @@ export class OssIndexServerResult {
   readonly description?: string;
   readonly reference: string;
   readonly vulnerabilities?: Array<Vulnerability>;
+
   constructor(result: any) {
     this.coordinates = result.coordinates;
     this.description = result.description;
