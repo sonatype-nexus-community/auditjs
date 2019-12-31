@@ -30,6 +30,7 @@ auditjs [command]
 
 Commands:
   auditjs iq [options]    Audit this application using Nexus IQ Server
+  auditjs config          Set config for OSS Index or Nexus IQ Server
   auditjs ossi [options]  Audit this application using Sonatype OSS Index
 
 Options:
@@ -104,7 +105,9 @@ The format in these files is similar to:
 
 ## Config file
 
-TBD
+Config is now set via the command line, you can do so by running `auditjs config`. You will be prompted if you'd like to set Nexus IQ Server config or Sonatype OSS Index config. Reasonable defaults are provided for Sonatype Nexus IQ Server that will work for an out of the box install. It is STRONGLY suggested that you do not save your password in config (although it will work), but rather use a token from OSS Index or Nexus IQ Server.
+
+Config passed in via the command line will be respected over filesystem based config so that you can override specific calls to either Sonatype OSS Index or Nexus IQ Server. Please see usage of either command to see how to set this command line config.
 
 ## OSS Index Credentials
 
