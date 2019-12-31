@@ -24,23 +24,23 @@ let osmock = sinon.mock(os);
 
 describe("OssIndexServerConfig", async () => {
   beforeEach( async () => {
-    osmock.expects('homedir').returns('/tmp');
+    osmock.expects('homedir').returns('/nonsense');
   });
 
   it("should return true when it is able to save a config file", async () => {
-    mock({ '/tmp': {}});
+    mock({ '/nonsense': {}});
 
     let config = new OssIndexServerConfig("username", "password");
     expect(config.saveConfigToFile()).to.equal(true);
 
-    let file = readFileSync('/tmp/.oss-index-config');
+    let file = readFileSync('/nonsense/.oss-index-config');
 
     expect(file.toString()).to.equal('Username: username\nPassword: password');
     mock.restore();
   });
 
   it("should get valid basic auth credentials from a config file", async () => {
-    mock({ '/tmp': {
+    mock({ '/nonsense': {
       '.oss-index-config': 'Username: username\nPassword: password'
     }});
 
