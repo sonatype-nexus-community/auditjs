@@ -5,10 +5,10 @@
       "type": "node",
       "request": "launch",
       "name": "Launch With OSS Index",
-      "args": ["ossi"],
+      "args": ["ossi", "--dev"],
       "program": "${workspaceFolder}/src/index.ts",
       "preLaunchTask": "tsc: build - tsconfig.json",
-      "outFiles": ["${workspaceFolder}/bin/**/*.js"]
+      "outFiles": ["${workspaceFolder}/bin/**/*.js"],
     },
     {
       "type": "node",
