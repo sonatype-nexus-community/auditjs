@@ -250,15 +250,16 @@ export class Application {
   }
 
   private getIqRequestService(args: any): IqRequestService {
-    if (args.user && args.password && args.server) {
-      return new IqRequestService(
-        args.user as string, 
-        args.password as string, 
-        args.server as string, 
-        args.application as string,
-        args.stage as string);
-    }
     try {
+      if (!this.checkDefaultIQValuesFromCommandLine(args)) {
+        return new IqRequestService(
+          args.user as string, 
+          args.password as string, 
+          args.server as string, 
+          args.application as string,
+          args.stage as string);
+      }
+
       let config = new IqServerConfig();
 
       config.getConfigFromFile();
@@ -270,7 +271,20 @@ export class Application {
         args.application as string,
         args.stage as string);
     } catch (e) {
-      throw new Error(e);
+      return new IqRequestService(
+        args.user as string, 
+        args.password as string, 
+        args.server as string, 
+        args.application as string,
+        args.stage as string);
     }
+  }
+
+  private checkDefaultIQValuesFromCommandLine(args: any): boolean {
+    if (args.user === 'admin' && args.password === 'admin123' && args.server === 'http://localhost:8070') {
+      // TODO: Probably issue some warning to user about doing very silly things with config
+      return true;
+    }
+    return false;
   }
 }

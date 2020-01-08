@@ -16,6 +16,7 @@
 import readline from 'readline';
 import { OssIndexServerConfig } from './OssIndexServerConfig';
 import { IqServerConfig } from './IqServerConfig';
+import { ConfigPersist } from './ConfigPersist';
 
 export class AppConfig {
   private rl: readline.Interface;
@@ -58,14 +59,12 @@ export class AppConfig {
       );
   
       this.rl.close();
-  
-      let config = new IqServerConfig(
-        username, 
-        token, 
-        host.endsWith('/') ? host.slice(0, host.length - 1) : host
-      );
+
+      let iqConfig = new ConfigPersist(username, token, host.endsWith('/') ? host.slice(0, host.length - 1) : host)
+
+      let config = new IqServerConfig();
       
-      return config.saveFile();
+      return config.saveFile(iqConfig);
     } else {
       username = await this.setVariable(
         'What is your username? '
@@ -77,9 +76,11 @@ export class AppConfig {
   
       this.rl.close();
   
+      let ossIndexConfig = new ConfigPersist(username, token);
+
       let config = new OssIndexServerConfig(username, token);
       
-      return config.saveFile();
+      return config.saveFile(ossIndexConfig);
     }
   }
 

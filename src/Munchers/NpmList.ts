@@ -25,7 +25,7 @@ export class NpmList implements Muncher {
 
   constructor(readonly devDependencies: boolean = false) {}
 
-  public async getDepList(): Promise<Coordinates[]> {
+  public async getDepList(): Promise<any> {
     return await this.getInstalledDeps();
   }
 
@@ -51,62 +51,102 @@ export class NpmList implements Muncher {
   }
 
   // turns object tree from read-installed into an array of coordinates represented node-managed deps
-  public async getInstalledDeps(): Promise<any> {
+  public async getInstalledDeps() {
+    let data = await this.getReadInstalledResults();
+
+    this.recurseObjectTree(data, this.depsArray, true);
+
+    return this.depsArray;
+  }
+
+  private getReadInstalledResults() {
+    // Calls read-installed module, passes returned object tree to data, passes in current directory
     return new Promise((resolve, reject) => {
-      // Calls read-installed module, passes returned object tree to data, passes in current directory
       readInstalled(process.cwd(), { dev: this.devDependencies }, async (err: any, data: any) => {
         if (err) {
           reject(err);
         }
-        // parses object tree into coordinates array and puts into results
-        let results = this.parseObjectTree(data);
-        
-        results = results.filter((val, index, self) => {
-          return index === self.findIndex((t) => {
-            return t.toPurl() === val.toPurl()
-          })
-        });
-
-        resolve(results);
+  
+        resolve(data);
       });
-    }); 
-  }
-
-  // initializes dep array and enters the object tree recursion
-  private parseObjectTree(objectTree: any): Array<Coordinates> {
-    this.recurseObjectTree(objectTree, true);
-    return this.depsArray;
+    });
   }
 
   // recursive unit that traverses tree and terminates when object has no dependencies
-  private recurseObjectTree(objectTree: any, isRootPkg: boolean = false, i: number = 0) {
+  private recurseObjectTree(objectTree: any, list: Array<Coordinates>, isRootPkg: boolean = false) {
+    if (objectTree.extraneous) {
+      return;
+    }
+    if (!isRootPkg) {
+      if (this.maybePushNewCoordinate(objectTree, list)) {
+        // NO OP
+      }
+      else {
+        return;
+      }
+    }
     if (objectTree.dependencies) {
-      // maps the object we're at into an array looping through dependencies
-      // dep[1] is the object that has the info for the purl and is passed into the next recursive step
       Object.keys(objectTree.dependencies)
         .map((x) => objectTree.dependencies[x])
+        .filter((x) => typeof(x) !== 'string')
         .map((dep) => {
-        if (this.depsArray.find((x) => { return (x.name == dep.name && x.version == dep.version)})) {
-          return;
-        }
-        
-        if (dep.extraneous) {
-          return;
-        }
-        
-        // the name will either have the group/name or it won't, the mapped array also has version
-        if (dep.name && dep.name.includes('/')) {
-          let name = dep.name.split('/');
-          this.depsArray.push(new Coordinates(name[1], dep.version, name[0]));
-        }
-        else if (dep.name) {
-          this.depsArray.push(new Coordinates(dep.name, dep.version, ""));
-        }
-        else {
-          return;
-        }
-        this.recurseObjectTree(dep, false, i++);
+          if (
+            this.toPurlObjTree(objectTree) == '' || 
+            list.find((x) => { 
+              return x.toPurl() == this.toPurlObjTree(objectTree) 
+              })
+            ) {
+            return; 
+          } else {
+            this.recurseObjectTree(dep, list, false);
+          }
       });
     }
+    return;
+  }
+
+  private maybePushNewCoordinate(pkg: any, list: Array<Coordinates>): boolean {
+    if (pkg.name && pkg.name.includes('/')) {
+      let name = pkg.name.split('/');
+      if (list.find((x) => { 
+        return (x.name == name[1] && x.version == pkg.version && x.group == name[0])
+        })
+      ) { 
+        return false 
+      }
+      list.push(new Coordinates(name[1], pkg.version, name[0]));
+      return true;
+    }
+    else if (pkg.name) {
+      if (list.find((x) => { 
+        return (x.name == pkg.name && x.version == pkg.version)
+        })
+      ) { 
+        return false 
+      }
+      list.push(new Coordinates(pkg.name, pkg.version, ''))
+      return true;
+    }
+    return false;
+  }
+
+  private toPurlObjTree(objectTree: any): string {
+    if (objectTree.name && objectTree.name.includes('/')) {
+      let name = objectTree.name.split('/');
+
+      return this.toPurl(name[1], objectTree.version, name[0]);
+    }
+    else if (objectTree.name) {
+      return this.toPurl(objectTree.name, objectTree.version);
+    } else {
+      return '';
+    }
+  }
+
+  private toPurl(name: string, version: string, group: string = ''): string {
+    if (group != '') {
+      return `${group}/${name}/${version}`;
+    }
+    return `${name}/${version}`;
   }
 }

@@ -19,6 +19,7 @@ import mock from 'mock-fs';
 import { readFileSync } from 'fs';
 import sinon from 'sinon';
 import os from 'os';
+import { ConfigPersist } from './ConfigPersist';
 
 describe("IqServerConfig", async () => {
   it("should return true when it is able to save a config file", async () => {
@@ -26,11 +27,14 @@ describe("IqServerConfig", async () => {
     mock({ '/nonsense': {}});
 
     let config = new IqServerConfig("username", "password", "http://localhost:8070");
-    expect(config.saveFile()).to.equal(true);
+    let configPersist = new ConfigPersist("username", "password", "http://localhost:8070")
+    expect(config.saveFile(configPersist)).to.equal(true);
 
-    let file = readFileSync('/nonsense/.iqserver/.iq-server-config');
+    let conf = config.getConfigFromFile('/nonsense/.iqserver/.iq-server-config');
 
-    expect(file.toString()).to.equal('Username: username\nPassword: password\nHost: http://localhost:8070\n');
+    expect(conf.getUsername()).to.equal('username');
+    expect(conf.getToken()).to.equal('password');
+    expect(conf.getHost()).to.equal('http://localhost:8070');
     mock.restore();
     sinon.restore();
   });

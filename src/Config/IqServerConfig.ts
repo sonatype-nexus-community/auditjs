@@ -17,6 +17,8 @@ import { Config } from "./Config";
 import { readFileSync } from "fs";
 import { Logger } from "winston";
 import { getAppLogger } from "../Application/Logger/Logger";
+import { ConfigPersist } from "./ConfigPersist";
+import { safeLoad } from 'js-yaml';
 
 export class IqServerConfig extends Config {
   constructor(
@@ -28,8 +30,8 @@ export class IqServerConfig extends Config {
     super(username, token, logger);
   }
 
-  public saveFile(stringToSave: string = this.getStringToSave()): boolean {
-    return super.saveConfigToFile(stringToSave, '.iq-server-config');
+  public saveFile(iqServerConfig: ConfigPersist): boolean {
+    return super.saveConfigToFile(iqServerConfig, '.iq-server-config');
   }
 
   public getUsername(): string {
@@ -47,17 +49,11 @@ export class IqServerConfig extends Config {
   public getConfigFromFile(
     saveLocation: string = this.getSaveLocation('.iq-server-config')
   ): IqServerConfig {
-    let fileString = readFileSync(saveLocation, 'utf8');
-    let splitString = fileString.split('\n');
-    super.username = splitString[0].split(':')[1].trim();
-    super.token = splitString[1].split(':')[1].trim();
-    let temp = splitString[2].split(':');
-    this.host = temp.slice(1).join(':').trim();
+    const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
+    super.username = doc.Username;
+    super.token = doc.Token;
+    this.host = doc.Server;
 
     return this;
-  }
-
-  public getStringToSave(): string {
-    return `Username: ${this.username}\nPassword: ${this.token}\nHost: ${this.host}\n`;
   }
 }

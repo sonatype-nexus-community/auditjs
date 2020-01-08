@@ -19,6 +19,7 @@ import mock from 'mock-fs';
 import { readFileSync } from 'fs';
 import sinon from 'sinon';
 import os from 'os';
+import { ConfigPersist } from './ConfigPersist';
 
 describe("OssIndexServerConfig", async () => {
   it("should return true when it is able to save a config file", async () => {
@@ -26,11 +27,13 @@ describe("OssIndexServerConfig", async () => {
     mock({ '/nonsense': {}});
 
     let config = new OssIndexServerConfig("username", "password");
-    expect(config.saveFile()).to.equal(true);
+    let configPersist = new ConfigPersist("username", "password")
+    expect(config.saveFile(configPersist)).to.equal(true);
 
-    let file = readFileSync('/nonsense/.ossindex/.oss-index-config');
+    let conf = config.getConfigFromFile('/nonsense/.ossindex/.oss-index-config');
 
-    expect(file.toString()).to.equal('Username: username\nPassword: password\n');
+    expect(conf.getUsername()).to.equal('username');
+    expect(conf.getToken()).to.equal('password');
     mock.restore();
     sinon.restore();
   });
