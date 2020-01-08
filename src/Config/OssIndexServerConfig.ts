@@ -17,6 +17,8 @@ import { Config } from "./Config";
 import { readFileSync } from "fs";
 import { getAppLogger } from "../Application/Logger/Logger";
 import { Logger } from "winston";
+import { ConfigPersist } from "./ConfigPersist";
+import { safeLoad } from 'js-yaml';
 
 export class OssIndexServerConfig extends Config {
 
@@ -35,22 +37,17 @@ export class OssIndexServerConfig extends Config {
     return this.token;
   }
 
-  public saveFile(stringToSave: string = this.getStringToSave()): boolean {
-    return super.saveConfigToFile(stringToSave);
+  public saveFile(ossIndexConfig: ConfigPersist): boolean {
+    return super.saveConfigToFile(ossIndexConfig);
   }
 
   public getConfigFromFile(
     saveLocation: string = this.getSaveLocation('.oss-index-config')
   ): OssIndexServerConfig {
-    let fileString = readFileSync(saveLocation, 'utf8');
-    let splitString = fileString.split('\n');
-    super.username = splitString[0].split(':')[1].trim();
-    super.token = splitString[1].split(':')[1].trim();
+    const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
+    super.username = doc.Username;
+    super.token = doc.Token;
 
     return this;
-  }
-
-  public getStringToSave(): string {
-    return `Username: ${this.username}\nPassword: ${this.token}\n`;
   }
 }

@@ -78,14 +78,8 @@ export class NpmList implements Muncher {
       return;
     }
     if (!isRootPkg) {
-      if (objectTree.name && objectTree.name.includes('/')) {
-        let name = objectTree.name.split('/');
-        if (list.find((x) => { return (x.name == name[1] && x.version == objectTree.version && x.group == name[0])})) { return; }
-        list.push(new Coordinates(name[1], objectTree.version, name[0]));
-      }
-      else if (objectTree.name) {
-        if (list.find((x) => { return (x.name == objectTree.name && x.version == objectTree.version)})) { return; }
-        list.push(new Coordinates(objectTree.name, objectTree.version, ''))
+      if (this.maybePushNewCoordinate(objectTree, list)) {
+        // NO OP
       }
       else {
         return;
@@ -96,7 +90,12 @@ export class NpmList implements Muncher {
         .map((x) => objectTree.dependencies[x])
         .filter((x) => typeof(x) !== 'string')
         .map((dep) => {
-          if (this.toPurlObjTre(objectTree) == '' || list.find((x) => { return x.toPurl() == this.toPurlObjTre(objectTree) })) {
+          if (
+            this.toPurlObjTree(objectTree) == '' || 
+            list.find((x) => { 
+              return x.toPurl() == this.toPurlObjTree(objectTree) 
+              })
+            ) {
             return; 
           } else {
             this.recurseObjectTree(dep, list, false);
@@ -106,7 +105,32 @@ export class NpmList implements Muncher {
     return;
   }
 
-  private toPurlObjTre(objectTree: any): string {
+  private maybePushNewCoordinate(pkg: any, list: Array<Coordinates>): boolean {
+    if (pkg.name && pkg.name.includes('/')) {
+      let name = pkg.name.split('/');
+      if (list.find((x) => { 
+        return (x.name == name[1] && x.version == pkg.version && x.group == name[0])
+        })
+      ) { 
+        return false 
+      }
+      list.push(new Coordinates(name[1], pkg.version, name[0]));
+      return true;
+    }
+    else if (pkg.name) {
+      if (list.find((x) => { 
+        return (x.name == pkg.name && x.version == pkg.version)
+        })
+      ) { 
+        return false 
+      }
+      list.push(new Coordinates(pkg.name, pkg.version, ''))
+      return true;
+    }
+    return false;
+  }
+
+  private toPurlObjTree(objectTree: any): string {
     if (objectTree.name && objectTree.name.includes('/')) {
       let name = objectTree.name.split('/');
 
