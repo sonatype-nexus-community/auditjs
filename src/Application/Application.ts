@@ -250,27 +250,33 @@ export class Application {
   }
 
   private getIqRequestService(args: any): IqRequestService {
-    let config = new IqServerConfig();
+    try {
+      let config = new IqServerConfig();
 
-    config.getConfigFromFile();
-    
-    if (this.checkDefaultIQValues(config)) {
+      config.getConfigFromFile();
+
+      if (this.checkDefaultIQValues(config)) {
+        return new IqRequestService(
+          args.user as string, 
+          args.password as string, 
+          args.server as string, 
+          args.application as string,
+          args.stage as string);
+      } else {
+        return new IqRequestService(
+          config.getUsername(), 
+          config.getToken(), 
+          config.getHost(), 
+          args.application as string,
+          args.stage as string);
+      }
+    } catch (e) {
       return new IqRequestService(
         args.user as string, 
         args.password as string, 
         args.server as string, 
         args.application as string,
         args.stage as string);
-    }
-    try {
-      return new IqRequestService(
-        config.getUsername(), 
-        config.getToken(), 
-        config.getHost(), 
-        args.application as string,
-        args.stage as string);
-    } catch (e) {
-      throw new Error(e);
     }
   }
 
