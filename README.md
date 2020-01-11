@@ -2,6 +2,8 @@
 
 # AuditJS
 
+[![CircleCI](https://circleci.com/gh/sonatype-nexus-community/auditjs.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/auditjs) 
+
 Audits JavaScript projects using the [OSS Index v3 REST API](https://ossindex.sonatype.org/rest)
 to identify known vulnerabilities and outdated package versions.
 
