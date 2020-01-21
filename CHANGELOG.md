@@ -1,3 +1,10 @@
+## [4.0.1-alpha.11](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.10...v4.0.1-alpha.11) (2020-01-21)
+
+
+### Bug Fixes
+
+* release [#106](https://github.com/sonatype-nexus-community/auditjs/issues/106) to resolve [#103](https://github.com/sonatype-nexus-community/auditjs/issues/103) where iq polling was still hitting the default url instead of the one in the config ([e31ee2a](https://github.com/sonatype-nexus-community/auditjs/commit/e31ee2ac507c0bf97d31d7263610ff8a9ded2d66))
+
 ## [4.0.1-alpha.10](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.9...v4.0.1-alpha.10) (2020-01-08)
 
 
