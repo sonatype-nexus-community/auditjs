@@ -212,7 +212,7 @@ export class Application {
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Checking for results (this could take a minute)');
       logMessage('Polling Nexus IQ Server for report results', DEBUG, resultUrl);
-      requestService.asyncPollForResults(`${args.server}/${resultUrl}`, (x) => {
+      requestService.asyncPollForResults(`${requestService.host}/${resultUrl}`, (x) => {
         this.spinner.maybeSucceed();
         this.spinner.maybeCreateMessageForSpinner('Auditing your results');
         const results: ReportStatus = Object.assign(new ReportStatus(), x);
