@@ -95,7 +95,7 @@ export class IqRequestService {
     try {
       return new URL(url);
     } catch (e) {
-      if (url.substr(0, 1) === '/') {
+      if (url[0] === '/') {
         return new URL(this.host.concat(url)); 
       }
       return new URL(this.host.concat('/' + url)); 
