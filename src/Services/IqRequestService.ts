@@ -78,7 +78,7 @@ export class IqRequestService {
   public async asyncPollForResults(url: string, pollingFinished: (body: any) => any) {
     // https://www.youtube.com/watch?v=Pubd-spHN-0
     const response = await fetch(
-      url, { 
+      this.getURLOrMerge(url).href, { 
         method: 'get', 
         headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()]
       });
@@ -88,6 +88,17 @@ export class IqRequestService {
     } else {
       let json = await response.json();
       pollingFinished(json);
+    }
+  }
+
+  private getURLOrMerge(url: string): URL {
+    try {
+      return new URL(url);
+    } catch (e) {
+      if (url.substr(0, 1) === '/') {
+        return new URL(this.host.concat(url)); 
+      }
+      return new URL(this.host.concat('/' + url)); 
     }
   }
 
