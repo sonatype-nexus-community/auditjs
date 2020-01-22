@@ -60,7 +60,7 @@ export class AppConfig {
   
       this.rl.close();
 
-      let iqConfig = new ConfigPersist(username, token, host.endsWith('/') ? host.slice(0, host.length - 1) : host)
+      let iqConfig = new ConfigPersist(username, token, this.removeTrailingSlash(host));
 
       let config = new IqServerConfig();
       
@@ -82,6 +82,10 @@ export class AppConfig {
       
       return config.saveFile(ossIndexConfig);
     }
+  }
+
+  private removeTrailingSlash(host: string): string {
+    return host.replace(/\/+$/, '');
   }
 
   private setVariable(message: string, defaultValue: string = ''): Promise<string> {
