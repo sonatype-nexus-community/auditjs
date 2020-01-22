@@ -255,7 +255,7 @@ export class Application {
         return new IqRequestService(
           args.user as string, 
           args.password as string, 
-          this.chompHost(args.server), 
+          args.server as string, 
           args.application as string,
           args.stage as string);
       }
@@ -274,17 +274,10 @@ export class Application {
       return new IqRequestService(
         args.user as string, 
         args.password as string, 
-        this.chompHost(args.server), 
+        args.server as string, 
         args.application as string,
         args.stage as string);
     }
-  }
-
-  private chompHost(host: string): string {
-    if (host.endsWith('/')) {
-      return host.substr(0, host.length -1);
-    }
-    return host;
   }
 
   private checkDefaultIQValuesFromCommandLine(args: any): boolean {
