@@ -48,8 +48,8 @@ export class IqRequestService {
   public async submitToThirdPartyAPI(data: any, internalId: string) {
     const response = await fetch(
       `${this.host}/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${this.stage}`,
-      { method: 'post', headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ["Content-Type", "application/xml"]], body: data});
-    
+      { method: 'post', headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ["Content-Type", "application/xml"]], body: data}
+    );
     if (response.ok) {
       let json = await response.json();
       return json.statusUrl as string;
