@@ -54,6 +54,7 @@ Options:
   --quiet, -q      Only print out vulnerable dependencies              [boolean]
   --verbose, -V    Set console logging level to verbose                [boolean]
   --json, -j       Set output to JSON                                  [boolean]
+  --xml, -x        Set output to JUnit XML format                      [boolean]
   --whitelist, -w  Set path to whitelist file                           [string]
 ```
 
