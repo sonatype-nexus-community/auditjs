@@ -1,3 +1,10 @@
+## [4.0.1-alpha.12](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.11...v4.0.1-alpha.12) (2020-01-23)
+
+
+### Bug Fixes
+
+* strip ending slash from server command line flag ([44c9a2f](https://github.com/sonatype-nexus-community/auditjs/commit/44c9a2fad9f77b4f3af9aa405c101c3bfa8f2a39))
+
 ## [4.0.1-alpha.11](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.10...v4.0.1-alpha.11) (2020-01-21)
 
 
