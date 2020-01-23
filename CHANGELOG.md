@@ -1,3 +1,10 @@
+## [4.0.1-beta.2](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.1...v4.0.1-beta.2) (2020-01-23)
+
+
+### Bug Fixes
+
+* uppercase fix ([4c65ebd](https://github.com/sonatype-nexus-community/auditjs/commit/4c65ebd08ed90837d48998d6e9ce05fbeb630ece))
+
 ## [4.0.1-beta.1](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.0...v4.0.1-beta.1) (2020-01-23)
 
 
