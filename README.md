@@ -116,7 +116,8 @@ The format in these files is similar to:
 TBD
 
 #### CircleCI
-TBD
+
+We've provided an example repo with a working CircleCI config on a "fake" but real project, you can see how it is all setup by clicking [this link](https://github.com/sonatype-nexus-community/example-auditjs-repo#usage-in-circleci).
 
 #### TravisCI
 TBD
