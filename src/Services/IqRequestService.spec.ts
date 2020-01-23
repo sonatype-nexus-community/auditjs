@@ -25,7 +25,7 @@ describe("IQRequestService", () => {
     const scope = nock("http://testlocation:8070")
       .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
       .replyWithError("you messed up!");
-    const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage);
+    const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage, 300);
     const coords = [new Coordinates("commander", "2.12.2", "@types")];
 
     return expect(requestService.submitToThirdPartyAPI(coords, internalId)).to.eventually.be
@@ -37,7 +37,7 @@ describe("IQRequestService", () => {
     const scope = nock("http://testlocation:8070")
       .get(`/api/v2/applications?publicId=testapp`)
       .replyWithError("you messed up!");
-    const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage);
+    const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage, 300);
 
     return expect(requestService.getApplicationInternalId()).to.eventually.be
       .rejected;

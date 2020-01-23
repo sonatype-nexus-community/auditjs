@@ -27,7 +27,7 @@ export class IqRequestService {
     readonly host: string,
     readonly application: string,
     readonly stage: string,
-    readonly timeout: number = 300
+    readonly timeout: number
   ) {}
 
   private timeoutAttempts: number = 0;
