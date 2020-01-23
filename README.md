@@ -110,6 +110,52 @@ The format in these files is similar to:
   timestamp: '2019-12-22T20:09:33.447Z' }
 ```
 
+<<<<<<< HEAD
+=======
+### Usage in CI
+
+#### Jenkins
+TBD
+
+#### CircleCI
+
+We've provided an example repo with a working CircleCI config on a "fake" but real project, you can see how it is all setup by clicking [this link](https://github.com/sonatype-nexus-community/example-auditjs-repo#usage-in-circleci).
+
+#### TravisCI
+TBD
+
+#### GitHub Actions
+TBD
+
+### Usage As A NPM Script
+
+`auditjs` can be added as a devDependency to your project, and then an npm script can be added so you can leverage it in your npm scripts.
+
+You would install `auditjs` like so:
+
+```
+$ npm i auditjs -D
+```
+
+An example snippet from a `package.json`:
+
+```
+  },
+  "scripts": {
+    "test": "mocha -r ts-node/register src/**/*.spec.ts",
+    "build": "tsc -p tsconfig.json",
+    "build-dev": "tsc -p tsconfig.development.json",
+    "start": "node ./bin/index.js",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run test",
+    "scan": "auditjs ossi"
+  },
+  "keywords": [
+```
+
+Now that we've added a `scan` script, you can run `npm run scan` and your project will invoke `auditjs` and scan your dependencies. This can be handy for local work, or for if you want to run `auditjs` in CI/CD without installing it globally.
+
+>>>>>>> b02c9c1... CircleCI example
 ## Config file
 
 Config is now set via the command line, you can do so by running `auditjs config`. You will be prompted if you'd like to set Nexus IQ Server config or Sonatype OSS Index config. Reasonable defaults are provided for Sonatype Nexus IQ Server that will work for an out of the box install. It is STRONGLY suggested that you do not save your password in config (although it will work), but rather use a token from OSS Index or Nexus IQ Server.
