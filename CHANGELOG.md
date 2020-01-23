@@ -1,3 +1,10 @@
+## [4.0.1-beta.8](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.7...v4.0.1-beta.8) (2020-01-23)
+
+
+### Bug Fixes
+
+* use endsWith ([7a6083b](https://github.com/sonatype-nexus-community/auditjs/commit/7a6083b5bc5c441787ec8b6c1641c0334dbed198))
+
 ## [4.0.1-beta.7](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.6...v4.0.1-beta.7) (2020-01-23)
 
 
