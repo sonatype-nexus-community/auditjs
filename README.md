@@ -1,4 +1,4 @@
-**IMPORTANT NOTE**: Welcome to AuditJS 4.0.0-alpha, lots has changed since 3.0.0, mainly around usage. Make sure to read the new docs.
+**IMPORTANT NOTE**: Welcome to AuditJS 4.0.0-beta, lots has changed since 3.0.0, mainly around usage. Make sure to read the new docs.
 
 # AuditJS
 
@@ -156,6 +156,22 @@ The file should look like:
 The only field that actually matters is `id` and that is the ID you recieve from OSS Index for a vulnerability. You can add fields such as `reason` so that you later can understand why you whitelisted a vulnerability.
 
 Any `id` that is whitelisted will be squelched from the results, and not cause a failure.
+
+## Alternative output formats
+
+`auditjs` can output directly as `json` or as `xml` specifically formatted for JUnit test cases.
+
+JSON:
+```
+auditjs ossi --json > file.json
+```
+
+XML:
+```
+auditjs ossi --xml > file.xml
+```
+
+We chose to allow output directly to the stdout, so that the user can decide what they want to do with it. If you'd like it to be written to a file by `auditjs` itself, pop in to [this issue](https://github.com/sonatype-nexus-community/auditjs/issues/115) and let us know your thoughts!
 
 ## Limitations
 
