@@ -1,3 +1,10 @@
+## [4.0.1-beta.10](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.9...v4.0.1-beta.10) (2020-01-23)
+
+
+### Bug Fixes
+
+* switch logger method ([5384d02](https://github.com/sonatype-nexus-community/auditjs/commit/5384d02c774c71e892cf557fbf74a3ae2afcad2e))
+
 ## [4.0.1-beta.9](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.8...v4.0.1-beta.9) (2020-01-23)
 
 
