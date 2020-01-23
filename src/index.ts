@@ -141,6 +141,10 @@ let argv = yargs
   .argv;
 
 if (argv) {
+  if (argv._[0] == undefined) {
+    yargs.showHelp();
+    process.exit(0);
+  }
   if (argv._[0] == 'config') {
     let config = new AppConfig();
 
