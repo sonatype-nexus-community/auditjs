@@ -1,3 +1,10 @@
+## [4.0.1-beta.6](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.5...v4.0.1-beta.6) (2020-01-23)
+
+
+### Bug Fixes
+
+* handle getURLOrMerge failure ([fac89a4](https://github.com/sonatype-nexus-community/auditjs/commit/fac89a4b838dcc68aaecd7c93cfd14b07581dd5a))
+
 ## [4.0.1-beta.5](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.4...v4.0.1-beta.5) (2020-01-23)
 
 
