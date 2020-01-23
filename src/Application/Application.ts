@@ -32,8 +32,6 @@ import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 
-const pack = require('../../package.json');
-
 export class Application {
   private results: Array<Coordinates> = new Array();
   private sbom: string = "";
