@@ -1,3 +1,10 @@
+## [4.0.1-alpha.16](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.15...v4.0.1-alpha.16) (2020-01-23)
+
+
+### Bug Fixes
+
+* Ok, no need for yarn if we just use read-installed ([#136](https://github.com/sonatype-nexus-community/auditjs/issues/136)) ([f3d1a2e](https://github.com/sonatype-nexus-community/auditjs/commit/f3d1a2e288f39115d7d1394bc8c790173387952b))
+
 ## [4.0.1-alpha.15](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.14...v4.0.1-alpha.15) (2020-01-23)
 
 
