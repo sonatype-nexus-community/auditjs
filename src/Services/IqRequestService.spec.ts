@@ -32,6 +32,25 @@ describe("IQRequestService", () => {
       .rejected;
   });
 
+  it("should have it's third party API request accepted when the IQ Server is up", async () => {
+    let internalId = "123456"
+    let stage = "build"
+    let response = {
+      statusCode: 202,
+      body: {
+        "statusUrl": "api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb"
+      }
+    }
+
+    const scope = nock("http://testlocation:8070")
+      .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
+      .reply(response.statusCode, response.body);
+    const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage, 300);
+    const coords = [new Coordinates("commander", "2.12.2", "@types")];
+
+    return expect(requestService.submitToThirdPartyAPI(coords, internalId)).to.eventually.equal("api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb");
+  });
+
   it("should have it's internal ID API request rejected when the IQ Server is down", async () => {
     let stage = "build"
     const scope = nock("http://testlocation:8070")
@@ -41,5 +60,63 @@ describe("IQRequestService", () => {
 
     return expect(requestService.getApplicationInternalId()).to.eventually.be
       .rejected;
+  });
+
+  it("should have it's internal ID API request accepted when the IQ Server is not down", async () => {
+    let response = {
+      statusCode: 200,
+      body: {
+        "applications": [
+          {
+            "id": "4bb67dcfc86344e3a483832f8c496419",
+            "publicId": "testapp",
+            "name": "TestApp",
+            "organizationId": "bb41817bd3e2403a8a52fe8bcd8fe25a",
+            "contactUserName": "NewAppContact",
+            "applicationTags": [
+              {
+                "id": "9beee80c6fc148dfa51e8b0359ee4d4e",
+                "tagId": "cfea8fa79df64283bd64e5b6b624ba48",
+                "applicationId": "4bb67dcfc86344e3a483832f8c496419"
+              }
+            ]
+          }
+        ]
+      }
+    }
+
+    let stage = "build"
+    const scope = nock("http://testlocation:8070")
+      .get(`/api/v2/applications?publicId=testapp`)
+      .reply(response.statusCode, response.body);
+
+    const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage, 300);
+
+    return expect(requestService.getApplicationInternalId()).to.eventually.equal("4bb67dcfc86344e3a483832f8c496419");
+  });
+
+  it("should have return a proper result when polling IQ Server and the request is eventually valid", async () => {
+    let response = {
+      statusCode: 200,
+      body: {
+        "policyAction": "None",
+        "reportHtmlUrl": "http://localhost:8070/ui/links/application/test-app/report/95c4c14e",
+        "isError": false
+      }
+    }
+
+    let stage = "build"
+    const scope = nock("http://testlocation:8070")
+      .get(`/api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb`)
+      .reply(response.statusCode, response.body);
+
+    const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage, 300);
+
+    requestService.asyncPollForResults('api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb', (x) => {
+      return false;
+    }, 
+    (x) => {
+      return expect(x.reportHtmlUrl).to.equal("http://localhost:8070/ui/links/application/test-app/report/95c4c14e");
+    });
   });
 });
