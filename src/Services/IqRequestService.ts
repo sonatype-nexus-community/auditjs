@@ -15,12 +15,15 @@
  */
 import fetch from 'node-fetch';
 import { RequestHelpers } from './RequestHelpers';
+import { getAppLogger } from '../Application/Logger/Logger';
 
 const APPLICATION_INTERNAL_ID_ENDPOINT = '/api/v2/applications?publicId=';
 
 const APPLICATION_EVALUATION_ENDPOINT = '/api/v2/evaluation/applications/';
 
 export class IqRequestService {
+  private logger = getAppLogger();
+
   constructor(
     readonly user: string, 
     readonly password: string, 
@@ -79,12 +82,17 @@ export class IqRequestService {
   }
 
   public async asyncPollForResults(url: string, errorHandler: (error: any) => any, pollingFinished: (body: any) => any) {
+    this.logger.debug(url);
+    this.logger.debug(this.getURLOrMerge(url));
+
     // https://www.youtube.com/watch?v=Pubd-spHN-0
     const response = await fetch(
       this.getURLOrMerge(url).href, { 
         method: 'get', 
         headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()]
       });
+  
+    this.logger.debug(response);
     const body = response.ok;
     // TODO: right now I think we cover 500s and 400s the same and we'd continue polling as a result. We should likely switch
     // to checking explicitly for a 404 and if we get a 500/401 or other throw an error
