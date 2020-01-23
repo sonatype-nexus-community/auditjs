@@ -1,3 +1,10 @@
+## [4.0.1-beta.3](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.2...v4.0.1-beta.3) (2020-01-23)
+
+
+### Bug Fixes
+
+* muncher validation ([#133](https://github.com/sonatype-nexus-community/auditjs/issues/133)) ([0686b61](https://github.com/sonatype-nexus-community/auditjs/commit/0686b6100f34a29e00476b314b295029e02f9fe9))
+
 ## [4.0.1-beta.2](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.1...v4.0.1-beta.2) (2020-01-23)
 
 
