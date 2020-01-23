@@ -24,7 +24,6 @@ import { AuditIQServer } from '../Audit/AuditIQServer';
 import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
 import { ReportStatus } from '../Types/ReportStatus';
-import { YarnLock } from '../Munchers/YarnLock';
 import { Bower } from '../Munchers/Bower';
 import { setConsoleTransportLevel, logMessage, createAppLogger, DEBUG, ERROR, getAppLogger } from './Logger/Logger';
 import { Spinner } from './Spinner/Spinner';
@@ -45,7 +44,6 @@ export class Application {
     ) {
     createAppLogger();
     let npmList = new NpmList(devDependency);
-    let yarnLock = new YarnLock(devDependency);
     let bower = new Bower();
 
     this.printHeader();
@@ -55,10 +53,7 @@ export class Application {
       logMessage('Setting Muncher to npm list', DEBUG);
       this.muncher = npmList;
     } 
-    else if (yarnLock.isValid()) {
-      logMessage('Setting Muncher to yarn lock', DEBUG)
-      this.muncher = yarnLock;
-    } else if (bower.isValid()) {
+    else if (bower.isValid()) {
       logMessage('Setting Muncher to bower', DEBUG);
       this.muncher = bower;
     }
