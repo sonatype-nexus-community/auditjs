@@ -1,3 +1,16 @@
+## [4.0.1-alpha.15](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.14...v4.0.1-alpha.15) (2020-01-23)
+
+
+### Bug Fixes
+
+* add logging ([50654b7](https://github.com/sonatype-nexus-community/auditjs/commit/50654b78d6d816dbb049d90f7b888124fc66f5b0))
+* got out of whack, fixing releaserc ([58b5945](https://github.com/sonatype-nexus-community/auditjs/commit/58b594525807b71f4b9bf52fe6bad074cb2c0b73))
+* Junit xml format output ([#130](https://github.com/sonatype-nexus-community/auditjs/issues/130)) ([2a10a77](https://github.com/sonatype-nexus-community/auditjs/commit/2a10a771d88e027bef2cfed46c3b9334b50cb306))
+* muncher validation ([#133](https://github.com/sonatype-nexus-community/auditjs/issues/133)) ([0686b61](https://github.com/sonatype-nexus-community/auditjs/commit/0686b6100f34a29e00476b314b295029e02f9fe9))
+* note node version supported ([0f13acc](https://github.com/sonatype-nexus-community/auditjs/commit/0f13acca3a4299a2de89fbfb37170775f66793e1))
+* straight to alpha, address running without commands ([e1a9fc5](https://github.com/sonatype-nexus-community/auditjs/commit/e1a9fc51360700d722baccc0deadf6025c3cf2d0))
+* uppercase fix ([4c65ebd](https://github.com/sonatype-nexus-community/auditjs/commit/4c65ebd08ed90837d48998d6e9ce05fbeb630ece))
+
 ## [4.0.1-beta.2](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.1...v4.0.1-beta.2) (2020-01-23)
 
 
