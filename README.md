@@ -110,8 +110,6 @@ The format in these files is similar to:
   timestamp: '2019-12-22T20:09:33.447Z' }
 ```
 
-<<<<<<< HEAD
-=======
 ### Usage in CI
 
 #### Jenkins
@@ -157,7 +155,8 @@ An example snippet from a `package.json`:
 
 Now that we've added a `scan` script, you can run `npm run scan` and your project will invoke `auditjs` and scan your dependencies. This can be handy for local work, or for if you want to run `auditjs` in CI/CD without installing it globally.
 
->>>>>>> b02c9c1... CircleCI example
+Note: these reference implementation are applicable to running an IQ scan as well.  The caveat is that the config for the IQ url and auth needs to either be in the home directory of the user running the job, or stored as (preferably secret) environmental variables.  
+
 ## Config file
 
 Config is now set via the command line, you can do so by running `auditjs config`. You will be prompted if you'd like to set Nexus IQ Server config or Sonatype OSS Index config. Reasonable defaults are provided for Sonatype Nexus IQ Server that will work for an out of the box install. It is STRONGLY suggested that you do not save your password in config (although it will work), but rather use a token from OSS Index or Nexus IQ Server.
