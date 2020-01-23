@@ -62,7 +62,7 @@ export class AuditOSSIndex {
   private printJson(results: Array<OssIndexServerResult>): boolean {
     console.log(JSON.stringify(results, null, 2));
 
-    if (results.filter((x) => { return (x.vulnerabilities && x.vulnerabilities?.length > 0) }).length > 0) {
+    if (this.getNumberOfVulnerablePackagesFromResults(results) > 0) {
       return true;
     }
     return false;
@@ -71,6 +71,8 @@ export class AuditOSSIndex {
   private printJUnitXML(results: Array<OssIndexServerResult>): boolean {
     let testsuite = builder.create('testsuite');
     testsuite.att('tests', results.length);
+    testsuite.att('timestamp', new Date().toISOString());
+    testsuite.att('failures', this.getNumberOfVulnerablePackagesFromResults(results));
 
     for(let i: number = 0; i < results.length; i++) {
       let testcase = testsuite.ele("testcase", {"classname": results[i].coordinates, "name": results[i].coordinates});
@@ -89,10 +91,14 @@ export class AuditOSSIndex {
     
     console.log(xml);
 
-    if (results.filter((x) => { return (x.vulnerabilities && x.vulnerabilities?.length > 0) }).length > 0) {
+    if (this.getNumberOfVulnerablePackagesFromResults(results) > 0) {
       return true;
     }
     return false;
+  }
+
+  private getNumberOfVulnerablePackagesFromResults(results: Array<OssIndexServerResult>): number {
+    return results.filter((x) => { return (x.vulnerabilities && x.vulnerabilities?.length > 0) }).length;
   }
 
   private getVulnerabilityForXmlBlock(vuln: Vulnerability): string {
