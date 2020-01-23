@@ -129,6 +129,12 @@ let argv = yargs
           description: 'Set output to JSON',
           demandOption: false
         },
+        xml: {
+          alias: 'x',
+          type: 'boolean',
+          description: 'Set output to JUnit XML format',
+          demandOption: false
+        },
         whitelist: {
           alias: 'w',
           type: 'string',
@@ -156,7 +162,7 @@ if (argv) {
         throw new Error(e);
       });
   } else {
-    let silence = (argv.json || argv.quiet) ? true : false;
+    let silence = (argv.json || argv.quiet || argv.xml) ? true : false;
     let artie = (argv.artie) ? true : false;
 
     if (argv.server) {
