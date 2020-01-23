@@ -1,3 +1,10 @@
+## [4.0.1-beta.12](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.11...v4.0.1-beta.12) (2020-01-23)
+
+
+### Bug Fixes
+
+* update README with examples of alternate formats ([d9e1362](https://github.com/sonatype-nexus-community/auditjs/commit/d9e136223c447f79aec0ddb6a5401f4d522e2be7))
+
 ## [4.0.1-beta.11](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.10...v4.0.1-beta.11) (2020-01-23)
 
 
