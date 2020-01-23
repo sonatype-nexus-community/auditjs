@@ -26,8 +26,11 @@ export class IqRequestService {
     readonly password: string, 
     readonly host: string,
     readonly application: string,
-    readonly stage: string
+    readonly stage: string,
+    readonly timeout: number = 300
   ) {}
+
+  private timeoutAttempts: number = 0;
 
   public async getApplicationInternalId(): Promise<string> {
     const response = await fetch(
@@ -75,7 +78,7 @@ export class IqRequestService {
     }
   }
 
-  public async asyncPollForResults(url: string, pollingFinished: (body: any) => any) {
+  public async asyncPollForResults(url: string, errorHandler: (error: any) => any, pollingFinished: (body: any) => any) {
     // https://www.youtube.com/watch?v=Pubd-spHN-0
     const response = await fetch(
       url, { 
@@ -83,8 +86,14 @@ export class IqRequestService {
         headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()]
       });
     const body = response.ok;
+    // TODO: right now I think we cover 500s and 400s the same and we'd continue polling as a result. We should likely switch
+    // to checking explicitly for a 404 and if we get a 500/401 or other throw an error
     if (!body) {
-      setTimeout(() => this.asyncPollForResults(url, pollingFinished), 1000);
+      this.timeoutAttempts += 1;
+      if (this.timeoutAttempts > this.timeout) {
+        errorHandler({message: "Polling attempts exceeded, please either provide a higher limit via the command line using the timeout flag, or re-examine your project and logs to see if another error happened"})
+      }
+      setTimeout(() => this.asyncPollForResults(url, errorHandler, pollingFinished), 1000);
     } else {
       let json = await response.json();
       pollingFinished(json);

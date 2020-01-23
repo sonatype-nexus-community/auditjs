@@ -212,7 +212,13 @@ export class Application {
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Checking for results (this could take a minute)');
       logMessage('Polling Nexus IQ Server for report results', DEBUG, resultUrl);
-      requestService.asyncPollForResults(`${requestService.host}/${resultUrl}`, (x) => {
+
+      requestService.asyncPollForResults(`${requestService.host}/${resultUrl}`, (e) => {
+        this.spinner.maybeFail();
+        logMessage('There was an issue auditing your application with Nexus IQ Server', ERROR, {title: e.message});
+        process.exit(1);
+      },
+      (x) => {
         this.spinner.maybeSucceed();
         this.spinner.maybeCreateMessageForSpinner('Auditing your results');
         const results: ReportStatus = Object.assign(new ReportStatus(), x);
@@ -257,7 +263,8 @@ export class Application {
           args.password as string, 
           args.server as string, 
           args.application as string,
-          args.stage as string);
+          args.stage as string,
+          args.timeout as number);
       }
 
       let config = new IqServerConfig();
@@ -269,14 +276,16 @@ export class Application {
         config.getToken(), 
         config.getHost(), 
         args.application as string,
-        args.stage as string);
+        args.stage as string,
+        args.timeout as number);
     } catch (e) {
       return new IqRequestService(
         args.user as string, 
         args.password as string, 
         args.server as string, 
         args.application as string,
-        args.stage as string);
+        args.stage as string,
+        args.timeout as number);
     }
   }
 
