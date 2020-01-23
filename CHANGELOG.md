@@ -1,3 +1,10 @@
+## [4.0.1-beta.5](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.4...v4.0.1-beta.5) (2020-01-23)
+
+
+### Bug Fixes
+
+* beef up logging a tad ([088f1ce](https://github.com/sonatype-nexus-community/auditjs/commit/088f1ce4d48c556f8def98d89e52632df9a735e3))
+
 ## [4.0.1-beta.4](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.3...v4.0.1-beta.4) (2020-01-23)
 
 
