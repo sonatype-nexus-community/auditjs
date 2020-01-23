@@ -36,12 +36,11 @@ describe("IQRequestService", () => {
     let internalId = "123456"
     let stage = "build"
     let response = {
-      statusCode: 200,
+      statusCode: 202,
       body: {
         "statusUrl": "api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb"
       }
     }
-
 
     const scope = nock("http://testlocation:8070")
       .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
