@@ -1,3 +1,10 @@
+## [4.0.1-beta.13](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.12...v4.0.1-beta.13) (2020-01-23)
+
+
+### Bug Fixes
+
+* note node version supported ([60e0e2f](https://github.com/sonatype-nexus-community/auditjs/commit/60e0e2f74554bac2a3f178ab69dc7711694996e7))
+
 ## [4.0.1-beta.12](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.11...v4.0.1-beta.12) (2020-01-23)
 
 
