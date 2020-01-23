@@ -32,6 +32,26 @@ describe("IQRequestService", () => {
       .rejected;
   });
 
+  it("should have it's third party API request accepted when the IQ Server is up", async () => {
+    let internalId = "123456"
+    let stage = "build"
+    let response = {
+      statusCode: 200,
+      body: {
+        "statusUrl": "api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb"
+      }
+    }
+
+
+    const scope = nock("http://testlocation:8070")
+      .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
+      .reply(response.statusCode, response.body);
+    const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage, 300);
+    const coords = [new Coordinates("commander", "2.12.2", "@types")];
+
+    return expect(requestService.submitToThirdPartyAPI(coords, internalId)).to.eventually.equal("api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb");
+  });
+
   it("should have it's internal ID API request rejected when the IQ Server is down", async () => {
     let stage = "build"
     const scope = nock("http://testlocation:8070")
