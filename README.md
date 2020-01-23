@@ -71,6 +71,8 @@ Options:
   [choices: "develop", "build", "stage-release", "release"] [default: "develop"]
   --server, -h       Specify IQ server url/port
                                      [string] [default: "http://localhost:8070"]
+  --timeout, -t      Specify an optional timeout in seconds for IQ Server
+                     Polling                             [number] [default: 300]
   --user, -u         Specify username for request    [string] [default: "admin"]
   --password, -p     Specify password for request [string] [default: "admin123"]
   --artie, -x        Artie                                             [boolean]

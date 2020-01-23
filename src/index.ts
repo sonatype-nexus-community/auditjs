@@ -55,6 +55,13 @@ let argv = yargs
         description: 'Specify IQ server url/port',
         demandOption: false
       },
+      timeout: {
+        alias: 't',
+        type: 'number',
+        description: 'Specify an optional timeout in seconds for IQ Server Polling',
+        default: 300,
+        demandOption: false
+      },
       user: {
         alias: 'u',
         type: 'string',
