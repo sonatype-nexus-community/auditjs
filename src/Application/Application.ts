@@ -213,11 +213,11 @@ export class Application {
       this.spinner.maybeCreateMessageForSpinner('Checking for results (this could take a minute)');
       logMessage('Polling Nexus IQ Server for report results', DEBUG, resultUrl);
 
-      requestService.asyncPollForResults(`${requestService.host}/${resultUrl}`, (e) => {
+      requestService.asyncPollForResults(`${resultUrl}`, (e) => {
         this.spinner.maybeFail();
         logMessage('There was an issue auditing your application with Nexus IQ Server', ERROR, {title: e.message});
         process.exit(1);
-      },
+      }, 
       (x) => {
         this.spinner.maybeSucceed();
         this.spinner.maybeCreateMessageForSpinner('Auditing your results');

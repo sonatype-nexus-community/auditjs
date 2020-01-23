@@ -131,6 +131,13 @@ let argv = yargs
       },
       )
     })
+  .check((argv) => {
+    if (argv.server && (argv.server as string).endsWith('/')) {
+      throw new Error("Server url should be missing trailing slash");
+    } else {
+      return true;
+    }
+  })
   .argv;
 
 if (argv) {
