@@ -20,6 +20,13 @@ import { Application } from './Application/Application';
 import { AppConfig } from './Config/AppConfig';
 
 // TODO: Flesh out the remaining set of args that NEED to be moved over, look at them with a fine toothed comb and lots of skepticism
+const normalizeHostAddress = (address: string) => {
+  if (address.endsWith("/")) {
+    return address.slice(0, address.length - 1);
+  }
+  return address;
+}
+
 let argv = yargs
   .help()
   .scriptName('auditjs')
@@ -124,13 +131,6 @@ let argv = yargs
       },
       )
     })
-  .check((argv) => {
-    if (argv.server && (argv.server as string).endsWith('/')) {
-      throw new Error("Server url should be missing trailing slash");
-    } else {
-      return true;
-    }
-  })
   .argv;
 
 if (argv) {
@@ -148,11 +148,16 @@ if (argv) {
     let silence = (argv.json || argv.quiet) ? true : false;
     let artie = (argv.artie) ? true : false;
 
+    if (argv.server) {
+      argv.server = normalizeHostAddress(argv.server as string);
+    } 
+
     let app: Application;
 
     if (argv.dev) {
       app = new Application(argv.dev as boolean, silence, artie);
     } else {
+      console.log(argv);
       app = new Application(false, silence, artie);
     }
     app.startApplication(argv);
