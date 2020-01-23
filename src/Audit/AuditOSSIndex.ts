@@ -15,18 +15,24 @@
  */
 import { OssIndexServerResult, Vulnerability } from "../Types/OssIndexServerResult";
 import chalk from 'chalk';
+import * as builder from 'xmlbuilder';
 
 export class AuditOSSIndex {
 
   constructor(
     readonly quiet: boolean = false, 
-    readonly json: boolean = false) 
+    readonly json: boolean = false,
+    readonly xml: boolean = false) 
   {}
   
   public auditResults(results: Array<OssIndexServerResult>): boolean {
     if (this.json) {
       return this.printJson(results);
     }
+    if (this.xml) {
+      return this.printJUnitXML(results);
+    }
+
     let total = results.length;
     results = results.sort((a, b) => {
       return (a.coordinates < b.coordinates ? -1 : 1);
@@ -55,6 +61,33 @@ export class AuditOSSIndex {
 
   private printJson(results: Array<OssIndexServerResult>): boolean {
     console.log(JSON.stringify(results, null, 2));
+
+    if (results.filter((x) => { return (x.vulnerabilities && x.vulnerabilities?.length > 0) }).length > 0) {
+      return true;
+    }
+    return false;
+  }
+
+  private printJUnitXML(results: Array<OssIndexServerResult>): boolean {
+    let testsuite = builder.create('testsuite');
+    testsuite.att('tests', results.length);
+
+    for(let i: number = 0; i < results.length; i++) {
+      let testcase = testsuite.ele("testcase", {"classname": results[i].coordinates, "name": results[i].coordinates});
+      let vulns = results[i].vulnerabilities;
+
+      if (vulns) {
+        if (vulns.length > 0) {
+          for (let j: number = 0; j < vulns.length; j++) {
+            let failure = testcase.ele("failure", { "type": vulns[j].title }, vulns[j].description);
+          }
+        }
+      }
+    }
+
+    let xml = testsuite.end({ pretty: true });
+    
+    console.log(xml);
 
     if (results.filter((x) => { return (x.vulnerabilities && x.vulnerabilities?.length > 0) }).length > 0) {
       return true;
