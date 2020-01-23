@@ -1,3 +1,10 @@
+## [4.0.1-beta.4](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.3...v4.0.1-beta.4) (2020-01-23)
+
+
+### Bug Fixes
+
+* straight to alpha, address running without commands ([db7dab2](https://github.com/sonatype-nexus-community/auditjs/commit/db7dab245dd89616af44a3e5246b774db27963bf))
+
 ## [4.0.1-beta.3](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.2...v4.0.1-beta.3) (2020-01-23)
 
 
