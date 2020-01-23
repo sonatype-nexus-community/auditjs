@@ -1,3 +1,10 @@
+## [4.0.1-alpha.13](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.12...v4.0.1-alpha.13) (2020-01-23)
+
+
+### Bug Fixes
+
+* YOLO way too soon, remove console.log ([7c6b6f1](https://github.com/sonatype-nexus-community/auditjs/commit/7c6b6f142ec6eb82a87cc6a3e438831953348177))
+
 ## [4.0.1-alpha.12](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.11...v4.0.1-alpha.12) (2020-01-23)
 
 
