@@ -1,3 +1,10 @@
+## [4.0.1-beta.15](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.14...v4.0.1-beta.15) (2020-01-23)
+
+
+### Bug Fixes
+
+* remove whitespace ([26b8120](https://github.com/sonatype-nexus-community/auditjs/commit/26b8120bb208691d14e17e3a3499316f46d078a5))
+
 ## [4.0.1-beta.14](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.13...v4.0.1-beta.14) (2020-01-23)
 
 
