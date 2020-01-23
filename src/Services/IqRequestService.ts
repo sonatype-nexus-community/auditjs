@@ -48,8 +48,8 @@ export class IqRequestService {
   public async submitToThirdPartyAPI(data: any, internalId: string) {
     const response = await fetch(
       `${this.host}/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${this.stage}`,
-      { method: 'post', headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ["Content-Type", "application/xml"]], body: data});
-    
+      { method: 'post', headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ["Content-Type", "application/xml"]], body: data}
+    );
     if (response.ok) {
       let json = await response.json();
       return json.statusUrl as string;
@@ -78,7 +78,7 @@ export class IqRequestService {
   public async asyncPollForResults(url: string, pollingFinished: (body: any) => any) {
     // https://www.youtube.com/watch?v=Pubd-spHN-0
     const response = await fetch(
-      url, { 
+      this.getURLOrMerge(url).href, { 
         method: 'get', 
         headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()]
       });
@@ -88,6 +88,17 @@ export class IqRequestService {
     } else {
       let json = await response.json();
       pollingFinished(json);
+    }
+  }
+
+  private getURLOrMerge(url: string): URL {
+    try {
+      return new URL(url);
+    } catch (e) {
+      if (url[0] === '/') {
+        return new URL(this.host.concat(url)); 
+      }
+      return new URL(this.host.concat('/' + url)); 
     }
   }
 
