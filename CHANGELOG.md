@@ -1,3 +1,10 @@
+## [4.0.1-beta.7](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.6...v4.0.1-beta.7) (2020-01-23)
+
+
+### Bug Fixes
+
+* for great justice ([3e84f4a](https://github.com/sonatype-nexus-community/auditjs/commit/3e84f4a4f3a90e752b12e8dec4da2885892dacf2))
+
 ## [4.0.1-beta.6](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.5...v4.0.1-beta.6) (2020-01-23)
 
 
