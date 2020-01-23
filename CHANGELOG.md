@@ -1,3 +1,10 @@
+## [4.0.1-beta.16](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.15...v4.0.1-beta.16) (2020-01-23)
+
+
+### Bug Fixes
+
+* IQServerRequestService Unit Tests ([#139](https://github.com/sonatype-nexus-community/auditjs/issues/139)) ([3008bcd](https://github.com/sonatype-nexus-community/auditjs/commit/3008bcd996becaee6b9b9f335e5817424b1b1798))
+
 ## [4.0.1-beta.15](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.14...v4.0.1-beta.15) (2020-01-23)
 
 
