@@ -10,6 +10,9 @@
     "bin/**/*"
   ],
   "preferGlobal": true,
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "scripts": {
     "test": "mocha -r ts-node/register src/**/*.spec.ts",
     "build": "tsc -p tsconfig.json",
