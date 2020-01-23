@@ -1,3 +1,10 @@
+## [4.0.1-beta.11](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.10...v4.0.1-beta.11) (2020-01-23)
+
+
+### Bug Fixes
+
+* Junit xml format output ([#130](https://github.com/sonatype-nexus-community/auditjs/issues/130)) ([7e26c6c](https://github.com/sonatype-nexus-community/auditjs/commit/7e26c6ca22b196456f7e165f45397076bc045f75))
+
 ## [4.0.1-beta.10](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.9...v4.0.1-beta.10) (2020-01-23)
 
 
