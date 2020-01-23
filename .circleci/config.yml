@@ -57,7 +57,7 @@ workflows:
       - release:
           filters:
             branches:
-              only: alpha
+              only: beta
           context: auditjs
           requires:
             - build
