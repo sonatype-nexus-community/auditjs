@@ -22,6 +22,8 @@ npm install -g auditjs@beta
 
 ## Usage
 
+`auditjs` supports node LTS versions of 8.x forward at the moment. Usage outside of these node versions will error.
+
 Note that the OSS Index v3 API is rate limited. If you are seeing errors that
 indicate a problem (HTTP code 429) then you may need to make an account at
 OSS Index and supply the username and "token". See below for more details.
