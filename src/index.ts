@@ -160,12 +160,16 @@ if (argv) {
     } 
 
     let app: Application;
-
-    if (argv.dev) {
-      app = new Application(argv.dev as boolean, silence, artie);
-    } else {
-      app = new Application(false, silence, artie);
+    try {
+      if (argv.dev) {
+        app = new Application(argv.dev as boolean, silence, artie);
+      } else {
+        app = new Application(false, silence, artie);
+      }
+      app.startApplication(argv);
     }
-    app.startApplication(argv);
+    catch(error) {
+      console.error(error.message);
+    }
   }
 }
