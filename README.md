@@ -155,7 +155,7 @@ An example snippet from a `package.json`:
 
 Now that we've added a `scan` script, you can run `npm run scan` and your project will invoke `auditjs` and scan your dependencies. This can be handy for local work, or for if you want to run `auditjs` in CI/CD without installing it globally.
 
-Note: these reference implementations are applicable to running an IQ scan as well.  The caveat is that the config for the IQ url and auth needs to either be in the home directory of the user running the job, or stored as (preferably secret) environmental variables.  
+Note: these reference implementations are applicable to running an IQ scan as well.  The caveat is that the config for the IQ url and auth needs to either be in the home directory of the user running the job, or stored as (preferably secret) environmental variables.
 
 ## Config file
 
