@@ -1,3 +1,10 @@
+## [4.0.1-alpha.14](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.13...v4.0.1-alpha.14) (2020-01-23)
+
+
+### Bug Fixes
+
+* Configurable timeout ([#129](https://github.com/sonatype-nexus-community/auditjs/issues/129)) ([3eca5ae](https://github.com/sonatype-nexus-community/auditjs/commit/3eca5ae1d71e554e6002914b6c636bc25d6d4d37))
+
 ## [4.0.1-alpha.13](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.12...v4.0.1-alpha.13) (2020-01-23)
 
 
