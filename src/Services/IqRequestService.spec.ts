@@ -64,7 +64,6 @@ describe("IQRequestService", () => {
   });
 
   it("should have it's internal ID API request accepted when the IQ Server is not down", async () => {
-
     let response = {
       statusCode: 200,
       body: {
@@ -95,5 +94,30 @@ describe("IQRequestService", () => {
     const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage, 300);
 
     return expect(requestService.getApplicationInternalId()).to.eventually.equal("4bb67dcfc86344e3a483832f8c496419");
+  });
+
+  it("should have return a proper result when polling IQ Server and the request is eventually valid", async () => {
+    let response = {
+      statusCode: 200,
+      body: {
+        "policyAction": "None",
+        "reportHtmlUrl": "http://localhost:8070/ui/links/application/test-app/report/95c4c14e",
+        "isError": false
+      }
+    }
+
+    let stage = "build"
+    const scope = nock("http://testlocation:8070")
+      .get(`/api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb`)
+      .reply(response.statusCode, response.body);
+
+    const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage, 300);
+
+    requestService.asyncPollForResults('api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb', (x) => {
+      return false;
+    }, 
+    (x) => {
+      return expect(x.reportHtmlUrl).to.equal("http://localhost:8070/ui/links/application/test-app/report/95c4c14e");
+    });
   });
 });
