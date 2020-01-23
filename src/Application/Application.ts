@@ -65,7 +65,7 @@ export class Application {
       this.muncher = bower;
     }
     else {
-      logMessage('Could not instantiate muncher', 'error');
+      logMessage('Failed project directory validation.  Are you in a (built) node, yarn, or bower project directory?', 'error');
       throw new Error("Could not instantiate muncher");
     }
   }

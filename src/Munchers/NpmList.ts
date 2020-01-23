@@ -30,8 +30,8 @@ export class NpmList implements Muncher {
   }
 
   public isValid(): boolean {
-    let tempPath = path.join(process.cwd(), "package-lock.json");
-    return fs.existsSync(tempPath);
+    let nodeModulesPath = path.join(process.cwd(), "node_modules");
+    return fs.existsSync(nodeModulesPath);
   }
 
   // TODO: There is a 1 component discrepency in what gets identified by our installed deps implementation
