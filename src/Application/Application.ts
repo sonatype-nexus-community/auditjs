@@ -32,8 +32,6 @@ import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 
-const pack = require('../../package.json');
-
 export class Application {
   private results: Array<Coordinates> = new Array();
   private sbom: string = "";
@@ -65,7 +63,7 @@ export class Application {
       this.muncher = bower;
     }
     else {
-      logMessage('Could not instantiate muncher', 'error');
+      logMessage('Failed project directory validation.  Are you in a (built) node, yarn, or bower project directory?', 'error');
       throw new Error("Could not instantiate muncher");
     }
   }
