@@ -79,7 +79,7 @@ export class AuditOSSIndex {
       if (vulns) {
         if (vulns.length > 0) {
           for (let j: number = 0; j < vulns.length; j++) {
-            let failure = testcase.ele("failure", { "type": vulns[j].title }, vulns[j].description);
+            let failure = testcase.ele("failure", { "type": vulns[j].title }, this.getVulnerabilityForXmlBlock(vulns[j]));
           }
         }
       }
@@ -93,6 +93,19 @@ export class AuditOSSIndex {
       return true;
     }
     return false;
+  }
+
+  private getVulnerabilityForXmlBlock(vuln: Vulnerability): string {
+    let vulnBlock = "";
+    vulnBlock += `Vulnerability Title: ${vuln.title}\n`;
+    vulnBlock += `ID: ${vuln.id}\n`;
+    vulnBlock += `Description: ${vuln.description}\n`;
+    vulnBlock += `CVSS Score: ${vuln.cvssScore}\n`;
+    vulnBlock += `CVSS Vector: ${vuln.cvssVector}\n`;
+    vulnBlock += `CVE: ${vuln.cve}\n`;
+    vulnBlock += `Reference: ${vuln.reference}\n`;
+
+    return vulnBlock;
   }
 
   private getColorFromMaxScore(maxScore: number, defaultColor: string = 'darkblue'): string {
