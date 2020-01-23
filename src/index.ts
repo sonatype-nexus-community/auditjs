@@ -157,7 +157,6 @@ if (argv) {
     if (argv.dev) {
       app = new Application(argv.dev as boolean, silence, artie);
     } else {
-      console.log(argv);
       app = new Application(false, silence, artie);
     }
     app.startApplication(argv);
