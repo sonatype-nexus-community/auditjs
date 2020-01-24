@@ -1,3 +1,10 @@
+## [4.0.1-beta.17](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.16...v4.0.1-beta.17) (2020-01-24)
+
+
+### Bug Fixes
+
+* return accurate test result failure count ([c82349b](https://github.com/sonatype-nexus-community/auditjs/commit/c82349b05c158777a1275a62f82f1268f1f938eb))
+
 ## [4.0.1-beta.16](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.15...v4.0.1-beta.16) (2020-01-23)
 
 
