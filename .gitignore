@@ -7,4 +7,4 @@ auditjs.json
 
 # Instanbul code coverage report
 .nyc_output/
-test-results.xml
+reports/
