@@ -30,7 +30,6 @@ jobs:
       - run:
           name: code coverage
           command: |
-            mkdir coverage
             npm run coverage
             npm run generate-coverage-report
       - store_test_results:
@@ -38,7 +37,7 @@ jobs:
       - store_artifacts:
           path: ./reports/test-results.xml
       - store_artifacts:
-          path: ./coverage/lcov.info
+          path: ./lcov.info
           prefix: tests
       - run:
           name: dogfood scan

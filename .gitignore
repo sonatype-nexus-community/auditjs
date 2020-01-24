@@ -8,3 +8,4 @@ auditjs.json
 # Instanbul code coverage report
 .nyc_output/
 reports/
+lcov.info
