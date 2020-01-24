@@ -16,7 +16,6 @@
 import { OssIndexServerResult, Vulnerability } from "../Types/OssIndexServerResult";
 import chalk from 'chalk';
 import * as builder from 'xmlbuilder';
-import { fail } from "assert";
 
 export class AuditOSSIndex {
 
