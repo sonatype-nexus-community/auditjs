@@ -16,6 +16,7 @@
 import { OssIndexServerResult, Vulnerability } from "../Types/OssIndexServerResult";
 import chalk from 'chalk';
 import * as builder from 'xmlbuilder';
+import { fail } from "assert";
 
 export class AuditOSSIndex {
 
@@ -72,7 +73,7 @@ export class AuditOSSIndex {
     let testsuite = builder.create('testsuite');
     testsuite.att('tests', results.length);
     testsuite.att('timestamp', new Date().toISOString());
-    testsuite.att('failures', this.getNumberOfVulnerabilitiesFromResults(results));
+    testsuite.att('failures', this.getNumberOfVulnerablePackagesFromResults(results));
 
     for(let i: number = 0; i < results.length; i++) {
       let testcase = testsuite.ele("testcase", {"classname": results[i].coordinates, "name": results[i].coordinates});
@@ -80,9 +81,13 @@ export class AuditOSSIndex {
 
       if (vulns) {
         if (vulns.length > 0) {
+          let failure = testcase.ele("failure");
+          let failureText = "";
           for (let j: number = 0; j < vulns.length; j++) {
-            let failure = testcase.ele("failure", { "type": vulns[j].title }, this.getVulnerabilityForXmlBlock(vulns[j]));
+            failureText += this.getVulnerabilityForXmlBlock(vulns[j]) + "\n";
           }
+          failure.text(failureText);
+          failure.att("type", "Vulnerability detected");
         }
       }
     }
@@ -99,14 +104,6 @@ export class AuditOSSIndex {
 
   private getNumberOfVulnerablePackagesFromResults(results: Array<OssIndexServerResult>): number {
     return results.filter((x) => { return (x.vulnerabilities && x.vulnerabilities?.length > 0) }).length;
-  }
-
-  private getNumberOfVulnerabilitiesFromResults(results: Array<OssIndexServerResult>): number {
-    let res = results
-      .map((item) => { return item.vulnerabilities})
-      .filter((x) => { return (x && x?.length > 0)})
-      .reduce((accumulator, current) => { return accumulator?.concat(current!) });
-    return (res) ? res.length : 0;
   }
 
   private getVulnerabilityForXmlBlock(vuln: Vulnerability): string {
