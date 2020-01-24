@@ -14,7 +14,9 @@
     "node": ">=8.0.0"
   },
   "scripts": {
-    "test": "nyc mocha -r ts-node/register src/**/*.spec.ts",
+    "test": "mocha -r ts-node/register src/**/*.spec.ts",
+    "coverage": "nyc mocha -r ts-node/register src/**/*.spec.ts",
+    "test-ci": "MOCHA_FILE=./reports/test-results.xml mocha -r ts-node/register src/**/*.spec.ts --reporter mocha-junit-reporter",
     "build": "tsc -p tsconfig.json",
     "build-dev": "tsc -p tsconfig.development.json",
     "start": "node ./bin/index.js",
@@ -49,6 +51,7 @@
     "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
     "mocha": "6.2.2",
+    "mocha-junit-reporter": "^1.23.3",
     "mock-fs": "^4.10.4",
     "nock": "11.7.0",
     "nyc": "^15.0.0",

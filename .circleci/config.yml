@@ -22,8 +22,30 @@ jobs:
           name: build
           command: npm run build
       - run:
+          name: make test reports directory
+          command: mkdir reports
+      - run:
           name: test
-          command: npm run test
+          command: npm run test-ci
+      - run:
+          name: Setup Code Climate test-reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+            ./cc-test-reporter before-build
+      - run:
+          name: code coverage
+          command: |
+            npm run coverage
+            ./node_modules/.bin/nyc report --reporter=text-lcov > coverage/lcov.info
+            ./cc-test-reporter after-build -t lcov
+      - store_test_results:
+          path: reports
+      - store_artifacts:
+          path: ./reports/test-results.xml
+      - store_artifacts:
+          path: ./coverage/lcov.info
+          prefix: tests
       - run:
           name: dogfood scan
           command: npm run start -- ossi
