@@ -16,6 +16,7 @@
   "scripts": {
     "test": "mocha -r ts-node/register src/**/*.spec.ts",
     "coverage": "nyc mocha -r ts-node/register src/**/*.spec.ts",
+    "generate-coverage-report": "nyc report --reporter=text-lcov > coverage/lcov.info",
     "test-ci": "MOCHA_FILE=./reports/test-results.xml mocha -r ts-node/register src/**/*.spec.ts --reporter mocha-junit-reporter",
     "build": "tsc -p tsconfig.json",
     "build-dev": "tsc -p tsconfig.development.json",
