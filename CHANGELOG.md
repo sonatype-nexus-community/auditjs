@@ -1,3 +1,10 @@
+## [4.0.1-alpha.20](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.19...v4.0.1-alpha.20) (2020-01-24)
+
+
+### Bug Fixes
+
+* junit assumes only one failure, although their xsd says otherwise, coerce failures into one so someone can see them all ([5769d24](https://github.com/sonatype-nexus-community/auditjs/commit/5769d2411dc6332be75924cc2a2380cf0c9b1ebd))
+
 ## [4.0.1-alpha.19](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.18...v4.0.1-alpha.19) (2020-01-24)
 
 
