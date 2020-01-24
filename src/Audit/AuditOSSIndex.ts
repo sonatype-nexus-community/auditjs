@@ -72,7 +72,7 @@ export class AuditOSSIndex {
     let testsuite = builder.create('testsuite');
     testsuite.att('tests', results.length);
     testsuite.att('timestamp', new Date().toISOString());
-    testsuite.att('failures', this.getNumberOfVulnerablePackagesFromResults(results));
+    testsuite.att('failures', this.getNumberOfVulnerabilitiesFromResults(results));
 
     for(let i: number = 0; i < results.length; i++) {
       let testcase = testsuite.ele("testcase", {"classname": results[i].coordinates, "name": results[i].coordinates});
@@ -99,6 +99,14 @@ export class AuditOSSIndex {
 
   private getNumberOfVulnerablePackagesFromResults(results: Array<OssIndexServerResult>): number {
     return results.filter((x) => { return (x.vulnerabilities && x.vulnerabilities?.length > 0) }).length;
+  }
+
+  private getNumberOfVulnerabilitiesFromResults(results: Array<OssIndexServerResult>): number {
+    let res = results
+      .map((item) => { return item.vulnerabilities})
+      .filter((x) => { return (x && x?.length > 0)})
+      .reduce((accumulator, current) => { return accumulator?.concat(current!) });
+    return (res) ? res.length : 0;
   }
 
   private getVulnerabilityForXmlBlock(vuln: Vulnerability): string {
