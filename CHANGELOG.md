@@ -1,3 +1,10 @@
+## [4.0.1-alpha.21](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.20...v4.0.1-alpha.21) (2020-01-27)
+
+
+### Bug Fixes
+
+* updated readme and iq policy action message ([d86f671](https://github.com/sonatype-nexus-community/auditjs/commit/d86f671baa3e8260b2fb155c139c3908da6e9a3e))
+
 ## [4.0.1-alpha.20](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.19...v4.0.1-alpha.20) (2020-01-24)
 
 
