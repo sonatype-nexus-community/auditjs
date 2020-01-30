@@ -76,7 +76,7 @@ export class Application {
       logMessage('Attempting to start application', DEBUG);
       logMessage('Getting coordinates for Nexus IQ Server', DEBUG);
       this.spinner.maybeCreateMessageForSpinner('Getting coordinates for Nexus IQ Server');
-      await this.populateCoordinatesForIQ();
+      await this.populateCoordinatesForIQ(args.deep);
       logMessage(`Coordinates obtained`, DEBUG, this.sbom);
 
       this.spinner.maybeSucceed();
@@ -137,20 +137,21 @@ export class Application {
     return Promise.all(promises);
   }
 
-  private async populateCoordinatesForIQ() {
+  private async populateCoordinatesForIQ(deepPath: string = '') {
     try {
       logMessage('Trying to get sbom from cyclonedx/bom', DEBUG);
-      let files = Lister.getListOfFilesInBasePath(join(process.cwd(), 'bin'));
 
-      console.log(files);
-
-      await Promise.all([this.getHashesFromPath(files, 'bin'), this.muncher.getSbomFromCommand()])
+      if (deepPath != '') {
+        let path = join(process.cwd(), deepPath);
+        let files = Lister.getListOfFilesInBasePath(join(deepPath));
+        await Promise.all([this.getHashesFromPath(files, deepPath), this.muncher.getSbomFromCommand()])
         .then(async (values) => {
           let merger = new Merger();
           this.sbom = await merger.mergeHashesIntoSbom(values[0], values[1]);
-
-          console.log(this.sbom);
-      });
+        });
+      } else {
+        this.sbom = await this.muncher.getSbomFromCommand();
+      }
 
       logMessage('Successfully got sbom from cyclonedx/bom', DEBUG);
     } catch(e) {
