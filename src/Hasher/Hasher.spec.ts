@@ -14,30 +14,35 @@
  * limitations under the License.
  */
 import expect from '../Tests/TestHelper';
-import { Lister } from './Lister';
+import { Hasher } from './Hasher';
 import mock from 'mock-fs';
 
-describe("Lister", () => {
-  it("should return a set of paths to js files and no directories given a base path", async () => {
+const json = `{"thing": "value"}`;
+
+const json2 = `{"anotherThing": "anotherValue"}`;
+
+const json3 = `{"yetAnotherThing": "yetAnotherValue"}`;
+
+describe("Hasher", () => {
+  it("should return a sha1 hash for a provided path", async () => {
     mock({'/nonsensical': {
-      'auditjs.js': '{}',
+      'auditjs.js': json,
       'directory': {
-        'anotherpath.js': '{}',
-        'fakething.notjs': '{}',
+        'anotherpath.js': json2,
+        'fakething.js': json3,
         'anotherdirectory': {}
         }
       } 
     });
 
-    let expected = new Set();
+    let expected = '54bbc009e6ba2ee4e892a0347279819bd30e5e29';
 
-    expected.add('auditjs.js');
-    expected.add('directory/anotherpath.js');
+    let hasher = new Hasher('sha1');
 
-    let result = Lister.getListOfFilesInBasePath('/nonsensical');
+    let result = await hasher.getHashFromPath('/nonsensical/auditjs.js');
 
     expect(result)
-      .to.deep.eq(expected);
+      .to.eq(expected);
 
     mock.restore();
   });
