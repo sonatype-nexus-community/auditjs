@@ -18,7 +18,7 @@ import { Lister } from './Lister';
 import mock from 'mock-fs';
 
 describe("Lister", () => {
-  it("should return a set of files and no directories given a base path", async () => {
+  it("should return a set of paths to js files and no directories given a base path", async () => {
     mock({'/nonsensical': {
       'auditjs.js': '{}',
       'directory': {
