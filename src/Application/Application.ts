@@ -33,6 +33,7 @@ import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 import { Lister } from '../Hasher/Lister';
 import { Hasher } from '../Hasher/Hasher';
 import { Merger } from '../Merger/Merger';
+import { join } from 'path';
 
 export class Application {
   private results: Array<Coordinates> = new Array();
@@ -125,12 +126,12 @@ export class Application {
     }
   }
 
-  private getHashesFromPath(paths: Set<string>) {
+  private getHashesFromPath(paths: Set<string>, basePath: string = '') {
     let promises: any[] = [];
     let hasher = new Hasher('sha1');
     
     paths.forEach((path) => {
-      promises.push(hasher.getHashFromPath(path));
+      promises.push(hasher.getHashFromPath(join(process.cwd(), basePath, path)));
     })
 
     return Promise.all(promises);
@@ -139,12 +140,16 @@ export class Application {
   private async populateCoordinatesForIQ() {
     try {
       logMessage('Trying to get sbom from cyclonedx/bom', DEBUG);
-      let files = Lister.getListOfFilesInBasePath(process.cwd());
+      let files = Lister.getListOfFilesInBasePath(join(process.cwd(), 'bin'));
 
-      await Promise.all([this.getHashesFromPath(files), this.muncher.getSbomFromCommand()])
+      console.log(files);
+
+      await Promise.all([this.getHashesFromPath(files, 'bin'), this.muncher.getSbomFromCommand()])
         .then(async (values) => {
           let merger = new Merger();
           this.sbom = await merger.mergeHashesIntoSbom(values[0], values[1]);
+
+          console.log(this.sbom);
       });
 
       logMessage('Successfully got sbom from cyclonedx/bom', DEBUG);
