@@ -41,8 +41,11 @@ describe("Hasher", () => {
 
     let result = await hasher.getHashFromPath('/nonsensical/auditjs.js');
 
-    expect(result)
+    expect(result.hash)
       .to.eq(expected);
+
+    expect(result.path)
+      .to.eq('/nonsensical/auditjs.js');
 
     mock.restore();
   });

@@ -16,11 +16,12 @@
 
 import fs from 'fs';
 import crypto from 'crypto';
+import { HashCoordinate } from '../Types/HashCoordinate';
 
 export class Hasher {
   constructor(readonly algorithm: string = 'sha1') {}
 
-  public getHashFromPath(path: string): Promise<string> {
+  public getHashFromPath(path: string): Promise<HashCoordinate> {
     return new Promise((resolve, reject) => {
       let fd = fs.createReadStream(path);
       let hash = crypto.createHash(this.algorithm);
@@ -28,7 +29,7 @@ export class Hasher {
 
       fd.on('end', () => {
         hash.end();
-        resolve(hash.read());
+        resolve(new HashCoordinate(hash.read(), path));
       });
 
       fd.on('error', (err) => {

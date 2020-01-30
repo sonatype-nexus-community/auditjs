@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 import elementtree from 'elementtree';
+import { HashCoordinate } from '../Types/HashCoordinate';
 
 export class Merger {
-  public async mergeHashesIntoSbom(hashes: string[], xml: string): Promise<string> {
+
+  constructor(readonly algorithm: string = 'SHA-1') {}
+
+  public async mergeHashesIntoSbom(hashes: HashCoordinate[], xml: string): Promise<string> {
     return new Promise((resolve, reject) => {
       let tree = elementtree.parse(xml);
       let components = tree.find('./components');
@@ -27,9 +31,10 @@ export class Merger {
         if (components) {
           let component = elementtree.SubElement(components, 'component')
           let name = elementtree.SubElement(component, 'name');
+          name.text = val.path;
           let version = elementtree.SubElement(component, 'version');
-          let hash = elementtree.SubElement(component, 'hash');
-          hash.text = val;
+          let hash = elementtree.SubElement(component, 'hash', {'alg': this.algorithm});
+          hash.text = val.hash;
         } 
       });
       resolve(tree.write());
