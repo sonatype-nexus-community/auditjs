@@ -30,6 +30,8 @@ import { Spinner } from './Spinner/Spinner';
 import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
+import { Lister } from '../Hasher/Lister';
+import { Hasher } from '../Hasher/Hasher';
 
 export class Application {
   private results: Array<Coordinates> = new Array();
@@ -123,10 +125,27 @@ export class Application {
     }
   }
 
+  private getHashesFromPath(paths: Set<string>) {
+    let promises: any[] = [];
+    let hasher = new Hasher('sha1');
+    
+    paths.forEach((path) => {
+      promises.push(hasher.getHashFromPath(path));
+    })
+
+    return Promise.all(promises);
+  }
+
   private async populateCoordinatesForIQ() {
     try {
       logMessage('Trying to get sbom from cyclonedx/bom', DEBUG);
-      this.sbom = await this.muncher.getSbomFromCommand();
+      let files = Lister.getListOfFilesInBasePath(process.cwd());
+
+      await Promise.all([this.getHashesFromPath(files), this.muncher.getSbomFromCommand()])
+        .then((values) => {
+          // TODO: Merge Hashes and SBOM
+      });
+      
       logMessage('Successfully got sbom from cyclonedx/bom', DEBUG);
     } catch(e) {
       logMessage(`An error was encountered while gathering your dependencies into an SBOM`, ERROR, {title: e.message, stack: e.stack});
