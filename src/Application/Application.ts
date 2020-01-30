@@ -32,6 +32,7 @@ import { IqServerConfig } from '../Config/IqServerConfig';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 import { Lister } from '../Hasher/Lister';
 import { Hasher } from '../Hasher/Hasher';
+import { Merger } from '../Merger/Merger';
 
 export class Application {
   private results: Array<Coordinates> = new Array();
@@ -111,7 +112,6 @@ export class Application {
 
   private doPrintHeader(title: string = 'AuditJS', font: figlet.Fonts = '3D-ASCII') {
     console.log(textSync(title, { font: font }));
-    // console.log(textSync(pack.version, { font: font}));
   }
 
   private async populateCoordinates() {
@@ -142,10 +142,11 @@ export class Application {
       let files = Lister.getListOfFilesInBasePath(process.cwd());
 
       await Promise.all([this.getHashesFromPath(files), this.muncher.getSbomFromCommand()])
-        .then((values) => {
-          // TODO: Merge Hashes and SBOM
+        .then(async (values) => {
+          let merger = new Merger();
+          this.sbom = await merger.mergeHashesIntoSbom(values[0], values[1]);
       });
-      
+
       logMessage('Successfully got sbom from cyclonedx/bom', DEBUG);
     } catch(e) {
       logMessage(`An error was encountered while gathering your dependencies into an SBOM`, ERROR, {title: e.message, stack: e.stack});
