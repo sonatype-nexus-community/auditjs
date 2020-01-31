@@ -30,6 +30,10 @@ import { Spinner } from './Spinner/Spinner';
 import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
+import { Lister } from '../Hasher/Lister';
+import { Hasher } from '../Hasher/Hasher';
+import { Merger } from '../Merger/Merger';
+import { join } from 'path';
 
 export class Application {
   private results: Array<Coordinates> = new Array();
@@ -72,7 +76,7 @@ export class Application {
       logMessage('Attempting to start application', DEBUG);
       logMessage('Getting coordinates for Nexus IQ Server', DEBUG);
       this.spinner.maybeCreateMessageForSpinner('Getting coordinates for Nexus IQ Server');
-      await this.populateCoordinatesForIQ();
+      await this.populateCoordinatesForIQ(args.deep);
       logMessage(`Coordinates obtained`, DEBUG, this.sbom);
 
       this.spinner.maybeSucceed();
@@ -109,7 +113,6 @@ export class Application {
 
   private doPrintHeader(title: string = 'AuditJS', font: figlet.Fonts = '3D-ASCII') {
     console.log(textSync(title, { font: font }));
-    // console.log(textSync(pack.version, { font: font}));
   }
 
   private async populateCoordinates() {
@@ -123,11 +126,36 @@ export class Application {
     }
   }
 
-  private async populateCoordinatesForIQ() {
+  private getHashesFromPath(paths: Set<string>, basePath: string = '') {
+    let promises: any[] = [];
+    let hasher = new Hasher('sha1');
+    
+    paths.forEach((path) => {
+      promises.push(hasher.getHashFromPath(join(process.cwd(), basePath, path)));
+    })
+
+    return Promise.all(promises);
+  }
+
+  private async populateCoordinatesForIQ(deepPath: string = '') {
     try {
-      logMessage('Trying to get sbom from cyclonedx/bom', DEBUG);
-      this.sbom = await this.muncher.getSbomFromCommand();
-      logMessage('Successfully got sbom from cyclonedx/bom', DEBUG);
+      if (deepPath != '') {
+        logMessage('Trying to get sbom from cyclonedx/bom and list of hashes from deepPath', DEBUG);
+        let files = Lister.getListOfFilesInBasePath(join(deepPath));
+        logMessage('Got list of files to get hashes from', DEBUG, {files: files});
+        logMessage('Attempting to generate sbom and get hashes', DEBUG);
+        await Promise.all([this.getHashesFromPath(files, deepPath), this.muncher.getSbomFromCommand()])
+        .then(async (values) => {
+          logMessage('Got sbom and hashes, attempting to merge them', DEBUG);
+          let merger = new Merger();
+          this.sbom = await merger.mergeHashesIntoSbom(values[0], values[1]);
+          logMessage('Merge of sbom and hashes successful, our work is done here', DEBUG);
+        });
+      } else {
+        logMessage('Trying to get sbom from cyclonedx/bom', DEBUG);
+        this.sbom = await this.muncher.getSbomFromCommand();
+        logMessage('Successfully got sbom from cyclonedx/bom', DEBUG);
+      }
     } catch(e) {
       logMessage(`An error was encountered while gathering your dependencies into an SBOM`, ERROR, {title: e.message, stack: e.stack});
       process.exit(1);
