@@ -70,14 +70,14 @@ export class Application {
     // args has sensitive info in it, such as username/password, etc... do not log them in total
     if (args._[0] == 'iq') {
       logMessage('Attempting to start application', DEBUG);
-      logMessage('Getting coordinates for Nexus IQ Server', DEBUG);
-      this.spinner.maybeCreateMessageForSpinner('Getting coordinates for Nexus IQ Server');
+      logMessage('Getting coordinates for Sonatype IQ', DEBUG);
+      this.spinner.maybeCreateMessageForSpinner('Getting coordinates for Sonatype IQ');
       await this.populateCoordinatesForIQ();
       logMessage(`Coordinates obtained`, DEBUG, this.sbom);
 
       this.spinner.maybeSucceed();
       logMessage(`Auditing application`, DEBUG, args.application);
-      this.spinner.maybeCreateMessageForSpinner('Auditing your application with Nexus IQ Server');
+      this.spinner.maybeCreateMessageForSpinner('Auditing your application with Sonatype IQ');
       await this.auditWithIQ(args);
     } else if (args._[0] == 'ossi') {
       logMessage('Attempting to start application', DEBUG);
@@ -190,19 +190,19 @@ export class Application {
   private async auditWithIQ(args: any) {
     try {
       this.spinner.maybeSucceed();
-      this.spinner.maybeCreateMessageForSpinner('Authenticating with Nexus IQ');
-      logMessage('Attempting to connect to Nexus IQ', DEBUG, args.application);
+      this.spinner.maybeCreateMessageForSpinner('Authenticating with Sonatype IQ');
+      logMessage('Attempting to connect to Sonatype IQ', DEBUG, args.application);
       let requestService = this.getIqRequestService(args);
       await requestService.init();
 
       this.spinner.maybeSucceed();
-      this.spinner.maybeCreateMessageForSpinner('Submitting your dependencies to Nexus IQ Server');
-      logMessage('Submitting SBOM to Nexus IQ', DEBUG, this.sbom);
+      this.spinner.maybeCreateMessageForSpinner('Submitting your dependencies');
+      logMessage('Submitting SBOM to Sonatype IQ', DEBUG, this.sbom);
       let resultUrl = await requestService.submitToThirdPartyAPI(this.sbom);
       
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Checking for results (this could take a minute)');
-      logMessage('Polling Nexus IQ for report results', DEBUG, resultUrl);
+      logMessage('Polling IQ for report results', DEBUG, resultUrl);
 
       requestService.asyncPollForResults(`${resultUrl}`, (e) => {
         this.spinner.maybeFail();
@@ -213,7 +213,7 @@ export class Application {
         this.spinner.maybeSucceed();
         this.spinner.maybeCreateMessageForSpinner('Auditing your results');
         const results: ReportStatus = Object.assign(new ReportStatus(), x);
-        logMessage('Nexus IQ results obtained!', DEBUG, results);
+        logMessage('Sonatype IQ results obtained!', DEBUG, results);
 
         let auditResults = new AuditIQServer();
 
