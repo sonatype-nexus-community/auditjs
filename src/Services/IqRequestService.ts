@@ -28,9 +28,11 @@ export class IqRequestService {
     readonly host: string,
     readonly application: string,
     readonly stage: string,
-    readonly timeout: number,
+    readonly timeout: number
   ) {}
 
+  //TODO: I would really prefer that we abstracted this away from the rest of the program as it's an internal ID
+  // but trying to figure out how to call this init function from the constructor was a nightmare...
   public init = async () => {
     this.internalId = await this.getApplicationInternalId();
   };

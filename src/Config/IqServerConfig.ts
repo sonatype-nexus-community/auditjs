@@ -19,10 +19,10 @@ import { Logger } from "winston";
 import { getAppLogger } from "../Application/Logger/Logger";
 import { ConfigPersist } from "./ConfigPersist";
 import { safeLoad } from 'js-yaml';
-import { AppConfig } from "./AppConfig";
 
 export class IqServerConfig extends Config {
   constructor(
+    // TODO: Decide if we want to put default values here or leave them blank.. regardless empty strings are not easy to handle
     protected username: string = '', 
     protected token: string = '', 
     private host: string = '', 
@@ -50,6 +50,7 @@ export class IqServerConfig extends Config {
   public getConfigFromFile(
     saveLocation: string = this.getSaveLocation('.iq-server-config')
   ): IqServerConfig {
+    // TODO: we should really have a public function to check if the config exists
     try {
       const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
       super.username = doc.Username;
