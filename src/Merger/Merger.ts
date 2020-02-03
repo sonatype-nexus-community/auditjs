@@ -29,11 +29,12 @@ export class Merger {
       }
       hashes.map((val) => {
         if (components) {
-          let component = elementtree.SubElement(components, 'component')
+          let component = elementtree.SubElement(components, 'component', {'type': 'library'});
           let name = elementtree.SubElement(component, 'name');
           name.text = val.path;
           let version = elementtree.SubElement(component, 'version');
-          let hash = elementtree.SubElement(component, 'hash', {'alg': this.algorithm});
+          let hashes = elementtree.SubElement(component, 'hashes');
+          let hash = elementtree.SubElement(hashes, 'hash', {'alg': this.algorithm});
           hash.text = val.hash;
         } 
       });

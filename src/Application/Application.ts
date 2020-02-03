@@ -149,6 +149,7 @@ export class Application {
           logMessage('Got sbom and hashes, attempting to merge them', DEBUG);
           let merger = new Merger();
           this.sbom = await merger.mergeHashesIntoSbom(values[0], values[1]);
+          logMessage('Sbom merged', DEBUG, {sbom: this.sbom});
           logMessage('Merge of sbom and hashes successful, our work is done here', DEBUG);
         });
       } else {

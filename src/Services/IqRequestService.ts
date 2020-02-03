@@ -93,7 +93,6 @@ export class IqRequestService {
           headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()]
         });
   
-      logMessage("response", DEBUG, { response: response });
       const body = response.ok;
       // TODO: right now I think we cover 500s and 400s the same and we'd continue polling as a result. We should likely switch
       // to checking explicitly for a 404 and if we get a 500/401 or other throw an error
