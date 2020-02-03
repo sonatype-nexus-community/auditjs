@@ -190,30 +190,30 @@ export class Application {
   private async auditWithIQ(args: any) {
     try {
       this.spinner.maybeSucceed();
-      this.spinner.maybeCreateMessageForSpinner('Authenticating into IQ Server');
+      this.spinner.maybeCreateMessageForSpinner('Authenticating with Nexus IQ');
       logMessage('Attempting to connect to Nexus IQ', DEBUG, args.application);
       let requestService = this.getIqRequestService(args);
       await requestService.init();
 
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Submitting your dependencies to Nexus IQ Server');
-      logMessage('Submitting sbom to Nexus IQ Server third party API', DEBUG, this.sbom);
+      logMessage('Submitting SBOM to Nexus IQ', DEBUG, this.sbom);
       let resultUrl = await requestService.submitToThirdPartyAPI(this.sbom);
       
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Checking for results (this could take a minute)');
-      logMessage('Polling Nexus IQ Server for report results', DEBUG, resultUrl);
+      logMessage('Polling Nexus IQ for report results', DEBUG, resultUrl);
 
       requestService.asyncPollForResults(`${resultUrl}`, (e) => {
         this.spinner.maybeFail();
-        logMessage('There was an issue auditing your application with Nexus IQ Server', ERROR, {title: e.message});
+        logMessage('There was an issue auditing your application!', ERROR, {title: e.message});
         process.exit(1);
       }, 
       (x) => {
         this.spinner.maybeSucceed();
         this.spinner.maybeCreateMessageForSpinner('Auditing your results');
         const results: ReportStatus = Object.assign(new ReportStatus(), x);
-        logMessage('Results from Nexus IQ Server obtained', DEBUG, results);
+        logMessage('Nexus IQ results obtained!', DEBUG, results);
 
         let auditResults = new AuditIQServer();
 
@@ -226,7 +226,7 @@ export class Application {
       });
     } catch (e) {
       this.spinner.maybeFail();
-      logMessage('There was an issue auditing your application with Nexus IQ Server', ERROR, {title: e.message, stack: e.stack});
+      logMessage('There was an issue auditing your application!', ERROR, {title: e.message, stack: e.stack});
       process.exit(1);
     }
   }
@@ -251,6 +251,8 @@ export class Application {
     try {
       config.getConfigFromFile();
     }
+    // TODO: what would be really cool is if we can kick off the config from command line prompts if someone
+    // tries to run it with no config and none of the below arguments rather than erroring out
     catch (e) {
       if (!(args.user && args.password && args.server))
       {
