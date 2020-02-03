@@ -27,16 +27,17 @@ hashes.push(new HashCoordinate("hash1", "path1"));
 hashes.push(new HashCoordinate("hash2", "path2"));
 hashes.push(new HashCoordinate("hash3", "path3"));
 
-describe("Hasher", () => {
-  it("should take an array of HashCoordinates, the existing xml sbom, and merge them together", async () => {
+describe("Merger", () => {
+  it("should take an array of HashCoordinates and merge them together with the existing xml sbom", async () => {
     let sbom = readFileSync(join(__dirname, 'validsbom.xml'), 'utf8').toString();
-
-    console.log(sbom);
 
     let merger = new Merger();
 
     let results = await merger.mergeHashesIntoSbom(hashes, sbom);
 
-    expect(results).to.eq('');
+    expect(results).to.include(`<name>path</name>`);
+    expect(results).to.include(`<hashes><hash alg="SHA-1">hash</hash></hashes>`);
+    expect(results).to.include(`<name>path3</name>`);
+    expect(results).to.include(`<hashes><hash alg="SHA-1">hash3</hash></hashes>`);
   })
 });
