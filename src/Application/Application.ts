@@ -192,7 +192,7 @@ export class Application {
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Authenticating with Sonatype IQ');
       logMessage('Attempting to connect to Sonatype IQ', DEBUG, args.application);
-      let requestService = await this.getIqRequestService(args).init();
+      let requestService = this.getIqRequestService(args);
 
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Submitting your dependencies');

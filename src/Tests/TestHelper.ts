@@ -36,6 +36,28 @@ export const ossIndexObjectNoVulnerabilities: OssIndexServerResult = new OssInde
   vulnerabilities: []
 });
 
+export const applicationInternalIdResponse = {
+  statusCode: 200,
+  body: {
+    "applications": [
+      {
+        "id": "4bb67dcfc86344e3a483832f8c496419",
+        "publicId": "testapp",
+        "name": "TestApp",
+        "organizationId": "bb41817bd3e2403a8a52fe8bcd8fe25a",
+        "contactUserName": "NewAppContact",
+        "applicationTags": [
+          {
+            "id": "9beee80c6fc148dfa51e8b0359ee4d4e",
+            "tagId": "cfea8fa79df64283bd64e5b6b624ba48",
+            "applicationId": "4bb67dcfc86344e3a483832f8c496419"
+          }
+        ]
+      }
+    ]
+  }
+}
+
 export const ossIndexServerResults = [ossIndexObjectNoVulnerabilities, ossIndexObject];
 
 export default expect; 

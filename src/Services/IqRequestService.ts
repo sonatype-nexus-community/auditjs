@@ -21,7 +21,9 @@ import { URL } from 'url';
 const APPLICATION_INTERNAL_ID_ENDPOINT = '/api/v2/applications?publicId=';
 
 export class IqRequestService {
-  private internalId!: string;
+  private internalId: string = "";
+  private isInitialized: boolean = false;
+
   constructor(
     readonly user: string, 
     readonly password: string, 
@@ -31,17 +33,14 @@ export class IqRequestService {
     readonly timeout: number
   ) {}
 
-  //TODO: I would really prefer that we abstracted this away from the rest of the program as it's an internal ID
-  // but trying to figure out how to call this init function from the constructor was a nightmare...
-  public async init() {
+  private async init() {
     this.internalId = await this.getApplicationInternalId();
-    return this as IqRequestService;
+    this.isInitialized = true;
   };
 
   private timeoutAttempts: number = 0;
 
-  //TODO: want to make this private but the spec is failing
-  public async getApplicationInternalId(): Promise<string> {
+  private async getApplicationInternalId(): Promise<string> {
     const response = await fetch(
       `${this.host}${APPLICATION_INTERNAL_ID_ENDPOINT}${this.application}`,
       { method: 'get', headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()]});
@@ -59,6 +58,9 @@ export class IqRequestService {
   }
 
   public async submitToThirdPartyAPI(data: any) {
+    if(!this.isInitialized) {
+      await this.init();
+    }
     const response = await fetch(
       `${this.host}/api/v2/scan/applications/${this.internalId}/sources/auditjs?stageId=${this.stage}`,
       { method: 'post', headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ["Content-Type", "application/xml"]], body: data}
