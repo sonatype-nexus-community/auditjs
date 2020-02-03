@@ -19,6 +19,7 @@ import { Logger } from "winston";
 import { getAppLogger } from "../Application/Logger/Logger";
 import { ConfigPersist } from "./ConfigPersist";
 import { safeLoad } from 'js-yaml';
+import { AppConfig } from "./AppConfig";
 
 export class IqServerConfig extends Config {
   constructor(
@@ -49,11 +50,15 @@ export class IqServerConfig extends Config {
   public getConfigFromFile(
     saveLocation: string = this.getSaveLocation('.iq-server-config')
   ): IqServerConfig {
-    const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
-    super.username = doc.Username;
-    super.token = doc.Token;
-    this.host = doc.Server;
-
+    try {
+      const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
+      super.username = doc.Username;
+      super.token = doc.Token;
+      this.host = doc.Server;
+    }
+    catch (e) {
+      throw new Error('IQ Config file does not exist.  Run \'auditjs config\'.');
+    }
     return this;
   }
 }
