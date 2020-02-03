@@ -28,7 +28,7 @@ describe("IQRequestService", () => {
     const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage, 300);
     const coords = [new Coordinates("commander", "2.12.2", "@types")];
 
-    return expect(requestService.submitToThirdPartyAPI(coords, internalId)).to.eventually.be
+    return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.be
       .rejected;
   });
 
@@ -48,7 +48,7 @@ describe("IQRequestService", () => {
     const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage, 300);
     const coords = [new Coordinates("commander", "2.12.2", "@types")];
 
-    return expect(requestService.submitToThirdPartyAPI(coords, internalId)).to.eventually.equal("api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb");
+    return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.equal("api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb");
   });
 
   it("should have it's internal ID API request rejected when the IQ Server is down", async () => {

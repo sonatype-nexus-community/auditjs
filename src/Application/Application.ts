@@ -189,18 +189,16 @@ export class Application {
 
   private async auditWithIQ(args: any) {
     try {
-      let requestService = this.getIqRequestService(args);
-
       this.spinner.maybeSucceed();
-      this.spinner.maybeCreateMessageForSpinner('Getting your internal application ID');
-      logMessage('Attempting to obtain Nexus IQ Server internal applciation ID', DEBUG, args.application);
-      let id = await requestService.getApplicationInternalId();
-      logMessage('Internal ID obtained', DEBUG, id);
+      this.spinner.maybeCreateMessageForSpinner('Authenticating into IQ Server');
+      logMessage('Attempting to connect to Nexus IQ', DEBUG, args.application);
+      let requestService = this.getIqRequestService(args);
+      await requestService.init();
 
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Submitting your dependencies to Nexus IQ Server');
-      logMessage('Submitting sbom to Nexus IQ Server third party API', DEBUG, this.sbom, id);
-      let resultUrl = await requestService.submitToThirdPartyAPI(this.sbom, id);
+      logMessage('Submitting sbom to Nexus IQ Server third party API', DEBUG, this.sbom);
+      let resultUrl = await requestService.submitToThirdPartyAPI(this.sbom);
       
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Checking for results (this could take a minute)');
@@ -249,44 +247,24 @@ export class Application {
   }
 
   private getIqRequestService(args: any): IqRequestService {
+    let config = new IqServerConfig();
     try {
-      if (!this.checkDefaultIQValuesFromCommandLine(args)) {
-        return new IqRequestService(
-          args.user as string, 
-          args.password as string, 
-          args.server as string, 
-          args.application as string,
-          args.stage as string,
-          args.timeout as number);
-      }
-
-      let config = new IqServerConfig();
-
       config.getConfigFromFile();
-
-      return new IqRequestService(
-        config.getUsername(), 
-        config.getToken(), 
-        config.getHost(), 
-        args.application as string,
-        args.stage as string,
-        args.timeout as number);
-    } catch (e) {
-      return new IqRequestService(
-        args.user as string, 
-        args.password as string, 
-        args.server as string, 
-        args.application as string,
-        args.stage as string,
-        args.timeout as number);
     }
-  }
-
-  private checkDefaultIQValuesFromCommandLine(args: any): boolean {
-    if (args.user === 'admin' && args.password === 'admin123' && args.server === 'http://localhost:8070') {
-      // TODO: Probably issue some warning to user about doing very silly things with config
-      return true;
+    catch (e) {
+      if (!(args.user && args.password && args.server))
+      {
+        throw new Error('No config file is defined and you are missing one of the -h (host), -u (user), or -p (password) parameters.');
+      }
     }
-    return false;
+
+    return new IqRequestService(
+      (args.user !== undefined) ? args.user as string : config.getUsername(),
+      (args.password !== undefined) ? args.password as string : config.getToken(), 
+      (args.server !== undefined) ? args.server as string : config.getHost(),
+      args.application as string,
+      args.stage as string,
+      args.timeout as number
+    );
   }
 }
