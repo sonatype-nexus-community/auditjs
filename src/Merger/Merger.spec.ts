@@ -16,14 +16,27 @@
 import expect from '../Tests/TestHelper';
 import { Merger } from './Merger';
 import mock from 'mock-fs';
+import { HashCoordinate } from '../Types/HashCoordinate';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
-const json = `{"thing": "value"}`;
+let hashes = new Array<HashCoordinate>();
 
-const json2 = `{"anotherThing": "anotherValue"}`;
-
-const json3 = `{"yetAnotherThing": "yetAnotherValue"}`;
+hashes.push(new HashCoordinate("hash", "path"));
+hashes.push(new HashCoordinate("hash1", "path1"));
+hashes.push(new HashCoordinate("hash2", "path2"));
+hashes.push(new HashCoordinate("hash3", "path3"));
 
 describe("Hasher", () => {
   it("should take an array of HashCoordinates, the existing xml sbom, and merge them together", async () => {
+    let sbom = readFileSync(join(__dirname, 'validsbom.xml'), 'utf8').toString();
+
+    console.log(sbom);
+
+    let merger = new Merger();
+
+    let results = await merger.mergeHashesIntoSbom(hashes, sbom);
+
+    expect(results).to.eq('');
   })
 });
