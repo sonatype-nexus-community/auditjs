@@ -63,23 +63,6 @@ export class IqRequestService {
     }
   }
 
-  public async submitForEvaluation(data: any, internalId: string) {
-    const response = await fetch(
-      `${this.host}${APPLICATION_EVALUATION_ENDPOINT}${internalId}`,
-      { 
-        method: 'post', 
-        body: JSON.stringify(data), 
-        headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ["Content-Type", "application/json"]]
-      }
-    )
-    if (response.ok) {
-      let res = await response.json();
-      return res.resultsUrl;
-    } else {
-      return response;
-    }
-  }
-
   public async asyncPollForResults(url: string, errorHandler: (error: any) => any, pollingFinished: (body: any) => any) {
     logMessage(url, DEBUG);
     let mergeUrl: URL;
