@@ -33,8 +33,9 @@ export class IqRequestService {
 
   //TODO: I would really prefer that we abstracted this away from the rest of the program as it's an internal ID
   // but trying to figure out how to call this init function from the constructor was a nightmare...
-  public init = async () => {
+  public async init() {
     this.internalId = await this.getApplicationInternalId();
+    return this as IqRequestService;
   };
 
   private timeoutAttempts: number = 0;
