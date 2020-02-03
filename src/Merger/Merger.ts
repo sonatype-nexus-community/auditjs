@@ -33,6 +33,7 @@ export class Merger {
           let name = elementtree.SubElement(component, 'name');
           name.text = val.path;
           let version = elementtree.SubElement(component, 'version');
+          version.text = "0";
           let hashes = elementtree.SubElement(component, 'hashes');
           let hash = elementtree.SubElement(hashes, 'hash', {'alg': this.algorithm});
           hash.text = val.hash;
