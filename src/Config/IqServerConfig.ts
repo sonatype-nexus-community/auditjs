@@ -28,9 +28,9 @@ export class IqServerConfig extends Config {
     super(username, token);
   }
 
-  public saveFile(iqServerConfig: ConfigPersist): boolean {
-    return super.saveConfigToFile(iqServerConfig, '.iq-server-config');
-  }
+  // public saveFile(iqServerConfig: ConfigPersist): boolean {
+  //   return super.saveConfigToFile(iqServerConfig, '.iq-server-config');
+  // }
 
   public getHost(): string {
     return this.host;

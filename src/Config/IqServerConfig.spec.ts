@@ -28,7 +28,7 @@ describe("IqServerConfig", async () => {
 
     let config = new IqServerConfig("username", "password", "http://localhost:8070");
     let configPersist = new ConfigPersist("username", "password", "http://localhost:8070")
-    expect(config.saveFile(configPersist)).to.equal(true);
+    expect(config.saveFile(configPersist, 'iq')).to.equal(true);
 
     let conf = config.getConfigFromFile('/nonsense/.iqserver/.iq-server-config');
 

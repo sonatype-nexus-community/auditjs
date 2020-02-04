@@ -13,30 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import path from 'path';
-import { homedir } from 'os';
-import { mkdirSync, existsSync } from 'fs';
+import path from "path";
+import { homedir } from "os";
+import { mkdirSync, existsSync } from "fs";
 import { getAppLogger } from "../Application/Logger/Logger";
-import { Logger } from 'winston';
+import { Logger } from "winston";
 import { writeFileSync } from "fs";
-import { safeDump } from 'js-yaml';
+import { safeDump } from "js-yaml";
 
-import { ConfigPersist } from './ConfigPersist';
+import { ConfigPersist } from "./ConfigPersist";
 
 export abstract class Config {
   constructor(
-    protected username: string, 
+    protected username: string,
     protected token: string,
-    readonly logger: Logger = getAppLogger()) {
-  }
-  
+    readonly logger: Logger = getAppLogger()
+  ) {}
+
   getSaveLocation(configName: string): string {
-    if (configName == '.oss-index-config') {
-      this.tryCreateDirectory('.ossindex');
-      return path.join(homedir(), '.ossindex', configName);
+    if (configName == ".oss-index-config") {
+      this.tryCreateDirectory(".ossindex");
+      return path.join(homedir(), ".ossindex", configName);
     }
-    this.tryCreateDirectory('.iqserver');
-    return path.join(homedir(), '.iqserver', configName);
+    this.tryCreateDirectory(".iqserver");
+    return path.join(homedir(), ".iqserver", configName);
   }
 
   tryCreateDirectory(dir: string): void {
@@ -56,17 +56,25 @@ export abstract class Config {
 
   protected saveConfigToFile(
     objectToSave: ConfigPersist,
-    saveLocation: string = '.oss-index-config'
+    saveLocation: string = ".oss-index-config"
   ): boolean {
     try {
-      writeFileSync(this.getSaveLocation(saveLocation), safeDump(objectToSave, { skipInvalid: true}));
+      writeFileSync(
+        this.getSaveLocation(saveLocation),
+        safeDump(objectToSave, { skipInvalid: true })
+      );
       return true;
     } catch (e) {
       throw new Error(e);
     }
   }
 
-  abstract getConfigFromFile(saveLocation?: string): Config;
+  public saveFile(config: ConfigPersist, flag: string): boolean {
+    if (flag === "ossi") {
+      return this.saveConfigToFile(config, ".oss-index-config");
+    }
+    return this.saveConfigToFile(config, '.iq-server-config');
+  }
 
-  abstract saveFile(configToSave: ConfigPersist): boolean;
+  abstract getConfigFromFile(saveLocation?: string): Config;
 }

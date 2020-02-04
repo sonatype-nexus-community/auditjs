@@ -26,9 +26,9 @@ export class OssIndexServerConfig extends Config {
     super(username, token);
   }
 
-  public saveFile(ossIndexConfig: ConfigPersist): boolean {
-    return super.saveConfigToFile(ossIndexConfig);
-  }
+  // public saveFile(ossIndexConfig: ConfigPersist): boolean {
+  //   return super.saveConfigToFile(ossIndexConfig);
+  // }
 
   public getConfigFromFile(
     saveLocation: string = this.getSaveLocation('.oss-index-config')

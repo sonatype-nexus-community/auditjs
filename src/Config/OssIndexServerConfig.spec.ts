@@ -27,7 +27,7 @@ describe("OssIndexServerConfig", async () => {
 
     let config = new OssIndexServerConfig("username", "password");
     let configPersist = new ConfigPersist("username", "password")
-    expect(config.saveFile(configPersist)).to.equal(true);
+    expect(config.saveFile(configPersist, 'ossi')).to.equal(true);
 
     let conf = config.getConfigFromFile('/nonsense/.ossindex/.oss-index-config');
 
