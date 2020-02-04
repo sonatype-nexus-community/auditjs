@@ -15,8 +15,6 @@
  */
 import { Config } from "./Config";
 import { readFileSync } from "fs";
-import { Logger } from "winston";
-import { getAppLogger } from "../Application/Logger/Logger";
 import { ConfigPersist } from "./ConfigPersist";
 import { safeLoad } from 'js-yaml';
 
@@ -26,21 +24,12 @@ export class IqServerConfig extends Config {
     protected username: string = '', 
     protected token: string = '', 
     private host: string = '', 
-    readonly logger: Logger = getAppLogger())
-  {
-    super(username, token, logger);
+  ){
+    super(username, token);
   }
 
   public saveFile(iqServerConfig: ConfigPersist): boolean {
     return super.saveConfigToFile(iqServerConfig, '.iq-server-config');
-  }
-
-  public getUsername(): string {
-    return this.username;
-  }
-
-  public getToken(): string {
-    return this.token;
   }
 
   public getHost(): string {
