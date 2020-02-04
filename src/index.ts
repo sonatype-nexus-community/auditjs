@@ -108,6 +108,12 @@ let argv = yargs
           description: 'Specify OSS Index password or token',
           demandOption: false,
         },
+        cache: {
+          alias: 'c',
+          type: 'string',
+          description: 'Specify location of cache',
+          demandOption: false
+        },
         quiet: {
           alias: 'q',
           type: 'boolean',
