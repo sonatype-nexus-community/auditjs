@@ -51,7 +51,6 @@ let argv = yargs
       server: {
         alias: 'h',
         type: 'string',
-        default: 'http://localhost:8070',
         description: 'Specify IQ server url/port',
         demandOption: false
       },
@@ -65,14 +64,12 @@ let argv = yargs
       user: {
         alias: 'u',
         type: 'string',
-        default: 'admin',
         description: 'Specify username for request',
         demandOption: false
       },
       password: {
         alias: 'p',
         type: 'string',
-        default: 'admin123',
         description: 'Specify password for request',
         demandOption: false
       },

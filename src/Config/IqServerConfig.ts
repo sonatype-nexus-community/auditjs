@@ -22,6 +22,7 @@ import { safeLoad } from 'js-yaml';
 
 export class IqServerConfig extends Config {
   constructor(
+    // TODO: Decide if we want to put default values here or leave them blank.. regardless empty strings are not easy to handle
     protected username: string = '', 
     protected token: string = '', 
     private host: string = '', 
@@ -49,11 +50,16 @@ export class IqServerConfig extends Config {
   public getConfigFromFile(
     saveLocation: string = this.getSaveLocation('.iq-server-config')
   ): IqServerConfig {
-    const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
-    super.username = doc.Username;
-    super.token = doc.Token;
-    this.host = doc.Server;
-
+    // TODO: we should really have a public function to check if the config exists
+    try {
+      const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
+      super.username = doc.Username;
+      super.token = doc.Token;
+      this.host = doc.Server;
+    }
+    catch (e) {
+      throw new Error('IQ Config file does not exist.  Run \'auditjs config\'.');
+    }
     return this;
   }
 }
