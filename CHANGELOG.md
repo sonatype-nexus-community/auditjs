@@ -1,3 +1,10 @@
+## [4.0.1-beta.20](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.19...v4.0.1-beta.20) (2020-02-04)
+
+
+### Bug Fixes
+
+* [#116](https://github.com/sonatype-nexus-community/auditjs/issues/116) as well as numerous config changes, abstracting away the internal id call in iqRequests ([dca4c11](https://github.com/sonatype-nexus-community/auditjs/commit/dca4c11667a3eaa7c2244210ea125e3db7f080d1))
+
 ## [4.0.1-beta.19](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.18...v4.0.1-beta.19) (2020-01-27)
 
 
