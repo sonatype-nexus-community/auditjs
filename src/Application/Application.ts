@@ -70,14 +70,14 @@ export class Application {
     // args has sensitive info in it, such as username/password, etc... do not log them in total
     if (args._[0] == 'iq') {
       logMessage('Attempting to start application', DEBUG);
-      logMessage('Getting coordinates for Nexus IQ Server', DEBUG);
-      this.spinner.maybeCreateMessageForSpinner('Getting coordinates for Nexus IQ Server');
+      logMessage('Getting coordinates for Sonatype IQ', DEBUG);
+      this.spinner.maybeCreateMessageForSpinner('Getting coordinates for Sonatype IQ');
       await this.populateCoordinatesForIQ();
       logMessage(`Coordinates obtained`, DEBUG, this.sbom);
 
       this.spinner.maybeSucceed();
       logMessage(`Auditing application`, DEBUG, args.application);
-      this.spinner.maybeCreateMessageForSpinner('Auditing your application with Nexus IQ Server');
+      this.spinner.maybeCreateMessageForSpinner('Auditing your application with Sonatype IQ');
       await this.auditWithIQ(args);
     } else if (args._[0] == 'ossi') {
       logMessage('Attempting to start application', DEBUG);
@@ -189,33 +189,30 @@ export class Application {
 
   private async auditWithIQ(args: any) {
     try {
+      this.spinner.maybeSucceed();
+      this.spinner.maybeCreateMessageForSpinner('Authenticating with Sonatype IQ');
+      logMessage('Attempting to connect to Sonatype IQ', DEBUG, args.application);
       let requestService = this.getIqRequestService(args);
 
       this.spinner.maybeSucceed();
-      this.spinner.maybeCreateMessageForSpinner('Getting your internal application ID');
-      logMessage('Attempting to obtain Nexus IQ Server internal applciation ID', DEBUG, args.application);
-      let id = await requestService.getApplicationInternalId();
-      logMessage('Internal ID obtained', DEBUG, id);
-
-      this.spinner.maybeSucceed();
-      this.spinner.maybeCreateMessageForSpinner('Submitting your dependencies to Nexus IQ Server');
-      logMessage('Submitting sbom to Nexus IQ Server third party API', DEBUG, this.sbom, id);
-      let resultUrl = await requestService.submitToThirdPartyAPI(this.sbom, id);
+      this.spinner.maybeCreateMessageForSpinner('Submitting your dependencies');
+      logMessage('Submitting SBOM to Sonatype IQ', DEBUG, this.sbom);
+      let resultUrl = await requestService.submitToThirdPartyAPI(this.sbom);
       
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Checking for results (this could take a minute)');
-      logMessage('Polling Nexus IQ Server for report results', DEBUG, resultUrl);
+      logMessage('Polling IQ for report results', DEBUG, resultUrl);
 
       requestService.asyncPollForResults(`${resultUrl}`, (e) => {
         this.spinner.maybeFail();
-        logMessage('There was an issue auditing your application with Nexus IQ Server', ERROR, {title: e.message});
+        logMessage('There was an issue auditing your application!', ERROR, {title: e.message});
         process.exit(1);
       }, 
       (x) => {
         this.spinner.maybeSucceed();
         this.spinner.maybeCreateMessageForSpinner('Auditing your results');
         const results: ReportStatus = Object.assign(new ReportStatus(), x);
-        logMessage('Results from Nexus IQ Server obtained', DEBUG, results);
+        logMessage('Sonatype IQ results obtained!', DEBUG, results);
 
         let auditResults = new AuditIQServer();
 
@@ -228,7 +225,7 @@ export class Application {
       });
     } catch (e) {
       this.spinner.maybeFail();
-      logMessage('There was an issue auditing your application with Nexus IQ Server', ERROR, {title: e.message, stack: e.stack});
+      logMessage('There was an issue auditing your application!', ERROR, {title: e.message, stack: e.stack});
       process.exit(1);
     }
   }
@@ -249,44 +246,26 @@ export class Application {
   }
 
   private getIqRequestService(args: any): IqRequestService {
+    let config = new IqServerConfig();
     try {
-      if (!this.checkDefaultIQValuesFromCommandLine(args)) {
-        return new IqRequestService(
-          args.user as string, 
-          args.password as string, 
-          args.server as string, 
-          args.application as string,
-          args.stage as string,
-          args.timeout as number);
-      }
-
-      let config = new IqServerConfig();
-
       config.getConfigFromFile();
-
-      return new IqRequestService(
-        config.getUsername(), 
-        config.getToken(), 
-        config.getHost(), 
-        args.application as string,
-        args.stage as string,
-        args.timeout as number);
-    } catch (e) {
-      return new IqRequestService(
-        args.user as string, 
-        args.password as string, 
-        args.server as string, 
-        args.application as string,
-        args.stage as string,
-        args.timeout as number);
     }
-  }
-
-  private checkDefaultIQValuesFromCommandLine(args: any): boolean {
-    if (args.user === 'admin' && args.password === 'admin123' && args.server === 'http://localhost:8070') {
-      // TODO: Probably issue some warning to user about doing very silly things with config
-      return true;
+    // TODO: what would be really cool is if we can kick off the config from command line prompts if someone
+    // tries to run it with no config and none of the below arguments rather than erroring out
+    catch (e) {
+      if (!(args.user && args.password && args.server))
+      {
+        throw new Error('No config file is defined and you are missing one of the -h (host), -u (user), or -p (password) parameters.');
+      }
     }
-    return false;
+
+    return new IqRequestService(
+      (args.user !== undefined) ? args.user as string : config.getUsername(),
+      (args.password !== undefined) ? args.password as string : config.getToken(), 
+      (args.server !== undefined) ? args.server as string : config.getHost(),
+      args.application as string,
+      args.stage as string,
+      args.timeout as number
+    );
   }
 }
