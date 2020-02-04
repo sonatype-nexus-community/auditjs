@@ -46,11 +46,11 @@ export abstract class Config {
     return;
   }
 
-  getUsername(): string {
+  public getUsername(): string {
     return this.username;
   }
 
-  getToken(): string {
+  public getToken(): string {
     return this.token;
   }
 
