@@ -15,8 +15,6 @@
  */
 import { Config } from "./Config";
 import { readFileSync } from "fs";
-import { getAppLogger } from "../Application/Logger/Logger";
-import { Logger } from "winston";
 import { ConfigPersist } from "./ConfigPersist";
 import { safeLoad } from 'js-yaml';
 
@@ -24,9 +22,8 @@ export class OssIndexServerConfig extends Config {
 
   constructor(
     protected username: string = '', 
-    protected token: string = '',
-    readonly logger: Logger) {
-    super(username, token, logger);
+    protected token: string = '') {
+    super(username, token);
   }
 
   public saveFile(ossIndexConfig: ConfigPersist): boolean {
