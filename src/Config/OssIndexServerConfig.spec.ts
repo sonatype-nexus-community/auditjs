@@ -16,7 +16,6 @@
 import expect from '../Tests/TestHelper';
 import { OssIndexServerConfig } from './OssIndexServerConfig';
 import mock from 'mock-fs';
-import { readFileSync } from 'fs';
 import sinon from 'sinon';
 import os from 'os';
 import { ConfigPersist } from './ConfigPersist';

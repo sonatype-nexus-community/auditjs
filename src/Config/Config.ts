@@ -16,6 +16,7 @@
 import path from 'path';
 import { homedir } from 'os';
 import { mkdirSync, existsSync } from 'fs';
+import { getAppLogger } from "../Application/Logger/Logger";
 import { Logger } from 'winston';
 import { writeFileSync } from "fs";
 import { safeDump } from 'js-yaml';
@@ -26,7 +27,7 @@ export abstract class Config {
   constructor(
     protected username: string, 
     protected token: string,
-    readonly logger: Logger) {
+    readonly logger: Logger = getAppLogger()) {
   }
   
   getSaveLocation(configName: string): string {
@@ -39,12 +40,18 @@ export abstract class Config {
   }
 
   tryCreateDirectory(dir: string): void {
-    if (existsSync(path.join(homedir(), dir))) {
-      return;
-    } else {
+    if (!existsSync(path.join(homedir(), dir))) {
       mkdirSync(path.join(homedir(), dir));
-      return;
     }
+    return;
+  }
+
+  getUsername(): string {
+    return this.username;
+  }
+
+  getToken(): string {
+    return this.token;
   }
 
   protected saveConfigToFile(
