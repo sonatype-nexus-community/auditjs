@@ -68,7 +68,7 @@ export class AppConfig {
       
       return config.saveFile(iqConfig);
     } else {
-      let cacheLocation = join(homedir(), '.ossindex');
+      let cacheLocation = join(homedir(), '.ossindex', 'auditjs');
       username = await this.setVariable(
         'What is your username? '
       );

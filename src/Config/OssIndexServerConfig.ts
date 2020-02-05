@@ -52,7 +52,7 @@ export class OssIndexServerConfig extends Config {
     const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
     super.username = doc.Username;
     super.token = doc.Token;
-
+    this.cacheLocation = doc.CacheLocation;
     return this;
   }
 }
