@@ -39,7 +39,7 @@ export class OssIndexRequestService {
     readonly user?: string, 
     readonly password?: string, 
     private baseURL: string = OSS_INDEX_BASE_URL, 
-    private cacheLocation: string = PATH) 
+    private cacheLocation: string = PATH)
   {}
 
   private checkStatus(res: Response): Response {

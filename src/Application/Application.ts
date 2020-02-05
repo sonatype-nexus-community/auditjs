@@ -239,7 +239,7 @@ export class Application {
 
       config.getConfigFromFile();
 
-      return new OssIndexRequestService(config.getUsername(), config.getToken());
+      return new OssIndexRequestService(config.getUsername(), config.getToken(), undefined, config.getCacheLocation());
     } catch (e) {
       return new OssIndexRequestService();
     }

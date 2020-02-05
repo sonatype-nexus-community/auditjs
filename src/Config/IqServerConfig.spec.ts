@@ -16,7 +16,6 @@
 import expect from '../Tests/TestHelper';
 import { IqServerConfig } from './IqServerConfig';
 import mock from 'mock-fs';
-import { readFileSync } from 'fs';
 import sinon from 'sinon';
 import os from 'os';
 import { ConfigPersist } from './ConfigPersist';
@@ -27,7 +26,7 @@ describe("IqServerConfig", async () => {
     mock({ '/nonsense': {}});
 
     let config = new IqServerConfig("username", "password", "http://localhost:8070");
-    let configPersist = new ConfigPersist("username", "password", "http://localhost:8070")
+    let configPersist = new ConfigPersist("username", "password", undefined, "http://localhost:8070")
     expect(config.saveFile(configPersist)).to.equal(true);
 
     let conf = config.getConfigFromFile('/nonsense/.iqserver/.iq-server-config');
