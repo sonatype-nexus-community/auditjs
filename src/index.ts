@@ -18,7 +18,6 @@ import yargs from 'yargs';
 import { Argv } from 'yargs';
 import { Application } from './Application/Application';
 import { AppConfig } from './Config/AppConfig';
-import { existsSync } from 'fs';
 
 // TODO: Flesh out the remaining set of args that NEED to be moved over, look at them with a fine toothed comb and lots of skepticism
 const normalizeHostAddress = (address: string) => {
@@ -26,10 +25,6 @@ const normalizeHostAddress = (address: string) => {
     return address.slice(0, address.length - 1);
   }
   return address;
-}
-
-const cacheLocationExists = (cacheLocation: string) => {
-  return existsSync(cacheLocation);
 }
 
 let argv = yargs

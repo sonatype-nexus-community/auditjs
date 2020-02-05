@@ -40,8 +40,7 @@ export class Application {
   constructor(
     readonly devDependency: boolean = false, 
     readonly silent: boolean = false,
-    readonly artie: boolean = false,
-    public cacheLocation?: string
+    readonly artie: boolean = false
     ) {
     createAppLogger();
     let npmList = new NpmList(devDependency);
@@ -81,9 +80,6 @@ export class Application {
       this.spinner.maybeCreateMessageForSpinner('Auditing your application with Sonatype IQ');
       await this.auditWithIQ(args);
     } else if (args._[0] == 'ossi') {
-      if (args?.cache) {
-        this.cacheLocation = args?.cache;
-      }
       logMessage('Attempting to start application', DEBUG);
 
       logMessage('Getting coordinates for Sonatype OSS Index', DEBUG);
