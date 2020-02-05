@@ -231,11 +231,14 @@ export class Application {
   }
 
   private getOssIndexRequestService(args: any): OssIndexRequestService {
-    if (args.user && args.password && args.cache) {
-      console.log('HELLO CACHE', args?.cache);
-      return new OssIndexRequestService(args?.user, args?.password, undefined, args?.cache);
-    } else if (args.user && args.password) {
-      return new OssIndexRequestService(args?.user, args?.password);
+    let cacheLocation = undefined;
+    if (args?.cache) {
+      cacheLocation = args?.cache
+    }
+
+    if (args.user && args.password) {
+      console.log('HELLO CACHE', cacheLocation);
+      return new OssIndexRequestService(args?.user, args?.password, undefined, cacheLocation);
     }
     try {
       let config = new OssIndexServerConfig();
