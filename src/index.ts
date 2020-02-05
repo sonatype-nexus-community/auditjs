@@ -18,6 +18,7 @@ import yargs from 'yargs';
 import { Argv } from 'yargs';
 import { Application } from './Application/Application';
 import { AppConfig } from './Config/AppConfig';
+import { existsSync } from 'fs';
 
 // TODO: Flesh out the remaining set of args that NEED to be moved over, look at them with a fine toothed comb and lots of skepticism
 const normalizeHostAddress = (address: string) => {
@@ -25,6 +26,10 @@ const normalizeHostAddress = (address: string) => {
     return address.slice(0, address.length - 1);
   }
   return address;
+}
+
+const cacheLocationExists = (cacheLocation: string) => {
+  return existsSync(cacheLocation);
 }
 
 let argv = yargs
@@ -147,6 +152,13 @@ let argv = yargs
       },
       )
     })
+  .check( (argv) => {
+    if (cacheLocationExists(argv.cache as string)) {
+      return true
+    } else {
+      throw (new Error("Cache Location Error: Please enter a valid directory for the cache"))
+    }
+  })
   .argv;
 
 if (argv) {
