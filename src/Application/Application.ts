@@ -40,7 +40,8 @@ export class Application {
   constructor(
     readonly devDependency: boolean = false, 
     readonly silent: boolean = false,
-    readonly artie: boolean = false
+    readonly artie: boolean = false,
+    public cacheLocation?: string
     ) {
     createAppLogger();
     let npmList = new NpmList(devDependency);
@@ -80,6 +81,9 @@ export class Application {
       this.spinner.maybeCreateMessageForSpinner('Auditing your application with Sonatype IQ');
       await this.auditWithIQ(args);
     } else if (args._[0] == 'ossi') {
+      if (args?.cache) {
+        this.cacheLocation = args?.cache;
+      }
       logMessage('Attempting to start application', DEBUG);
 
       logMessage('Getting coordinates for Sonatype OSS Index', DEBUG);
@@ -231,23 +235,19 @@ export class Application {
   }
 
   private getOssIndexRequestService(args: any): OssIndexRequestService {
-    let cacheLocation = undefined;
-    if (args?.cache) {
-      cacheLocation = args?.cache
-    }
+    console.log('HELLO CACHE', this.cacheLocation);
 
     if (args.user && args.password) {
-      console.log('HELLO CACHE', cacheLocation);
-      return new OssIndexRequestService(args?.user, args?.password, undefined, cacheLocation);
+      return new OssIndexRequestService(args?.user, args?.password, undefined, this.cacheLocation);
     }
     try {
       let config = new OssIndexServerConfig();
 
       config.getConfigFromFile();
 
-      return new OssIndexRequestService(config.getUsername(), config.getToken());
+      return new OssIndexRequestService(config.getUsername(), config.getToken(), undefined, this.cacheLocation);
     } catch (e) {
-      return new OssIndexRequestService();
+      return new OssIndexRequestService(undefined, undefined, undefined, this.cacheLocation);
     }
   }
 
