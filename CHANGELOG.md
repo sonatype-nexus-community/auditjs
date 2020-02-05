@@ -1,3 +1,10 @@
+## [4.0.1-alpha.23](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.22...v4.0.1-alpha.23) (2020-02-05)
+
+
+### Bug Fixes
+
+* allow users to set the location for their cache ([#146](https://github.com/sonatype-nexus-community/auditjs/issues/146)) ([080313c](https://github.com/sonatype-nexus-community/auditjs/commit/080313c5679f0803e4b5c496cb296a0669c686d3))
+
 ## [4.0.1-alpha.22](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.21...v4.0.1-alpha.22) (2020-02-04)
 
 
