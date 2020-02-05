@@ -39,7 +39,7 @@ export class OssIndexRequestService {
     readonly user?: string, 
     readonly password?: string, 
     private baseURL: string = OSS_INDEX_BASE_URL, 
-    private cacheLocation: string = PATH) 
+    private cacheLocation: string = PATH)
   {}
 
   private checkStatus(res: Response): Response {
@@ -57,7 +57,6 @@ export class OssIndexRequestService {
   }
 
   private getResultsFromOSSIndex(data: OssIndexCoordinates): Promise<object> {
-    console.log("THIS IS CACHE", this.cacheLocation);
     const response = fetch(`${this.baseURL}${COMPONENT_REPORT_ENDPOINT}`, {
       method: "post",
       body: JSON.stringify(data.toConsumeableRequestObject()),

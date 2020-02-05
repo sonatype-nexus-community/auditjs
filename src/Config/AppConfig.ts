@@ -17,6 +17,8 @@ import readline from 'readline';
 import { OssIndexServerConfig } from './OssIndexServerConfig';
 import { IqServerConfig } from './IqServerConfig';
 import { ConfigPersist } from './ConfigPersist';
+import { join } from 'path';
+import { homedir } from 'os';
 
 export class AppConfig {
   private rl: readline.Interface;
@@ -66,6 +68,7 @@ export class AppConfig {
       
       return config.saveFile(iqConfig);
     } else {
+      let cacheLocation = join(homedir(), '.ossindex');
       username = await this.setVariable(
         'What is your username? '
       );
@@ -73,12 +76,17 @@ export class AppConfig {
       token = await this.setVariable(
         'What is your token? '
       );
+
+      cacheLocation = await this.setVariable(
+        `Where would you like your OSS Index cache saved to (default: ${cacheLocation})? `,
+        cacheLocation
+      );
   
       this.rl.close();
   
-      let ossIndexConfig = new ConfigPersist(username, token);
+      let ossIndexConfig = new ConfigPersist(username, token, cacheLocation);
 
-      let config = new OssIndexServerConfig(username, token);
+      let config = new OssIndexServerConfig(username, token, cacheLocation);
       
       return config.saveFile(ossIndexConfig);
     }

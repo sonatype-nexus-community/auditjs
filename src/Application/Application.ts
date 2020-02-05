@@ -235,19 +235,17 @@ export class Application {
   }
 
   private getOssIndexRequestService(args: any): OssIndexRequestService {
-    console.log('HELLO CACHE', this.cacheLocation);
-
     if (args.user && args.password) {
-      return new OssIndexRequestService(args?.user, args?.password, undefined, this.cacheLocation);
+      return new OssIndexRequestService(args?.user, args?.password);
     }
     try {
       let config = new OssIndexServerConfig();
 
       config.getConfigFromFile();
 
-      return new OssIndexRequestService(config.getUsername(), config.getToken(), undefined, this.cacheLocation);
+      return new OssIndexRequestService(config.getUsername(), config.getToken(), undefined, config.getCacheLocation());
     } catch (e) {
-      return new OssIndexRequestService(undefined, undefined, undefined, this.cacheLocation);
+      return new OssIndexRequestService();
     }
   }
 

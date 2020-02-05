@@ -113,12 +113,6 @@ let argv = yargs
           description: 'Specify OSS Index password or token',
           demandOption: false,
         },
-        cache: {
-          alias: 'c',
-          type: 'string',
-          description: 'Specify location of cache',
-          demandOption: false
-        },
         quiet: {
           alias: 'q',
           type: 'boolean',
@@ -152,13 +146,6 @@ let argv = yargs
       },
       )
     })
-  .check( (argv) => {
-    if (cacheLocationExists(argv.cache as string)) {
-      return true
-    } else {
-      throw (new Error("Cache Location Error: Please enter a valid directory for the cache"))
-    }
-  })
   .argv;
 
 if (argv) {

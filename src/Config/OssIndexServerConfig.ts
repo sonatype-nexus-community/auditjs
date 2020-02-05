@@ -25,6 +25,7 @@ export class OssIndexServerConfig extends Config {
   constructor(
     protected username: string = '', 
     protected token: string = '',
+    protected cacheLocation: string = '',
     readonly logger: Logger = getAppLogger()) {
     super(username, token, logger);
   }
@@ -35,6 +36,10 @@ export class OssIndexServerConfig extends Config {
 
   public getToken(): string {
     return this.token;
+  }
+
+  public getCacheLocation(): string {
+    return this.cacheLocation;
   }
 
   public saveFile(ossIndexConfig: ConfigPersist): boolean {
