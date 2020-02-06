@@ -17,7 +17,6 @@ import { Config } from "./Config";
 import { readFileSync } from "fs";
 import { getAppLogger } from "../Application/Logger/Logger";
 import { Logger } from "winston";
-import { ConfigPersist } from "./ConfigPersist";
 import { safeLoad } from 'js-yaml';
 
 export class OssIndexServerConfig extends Config {

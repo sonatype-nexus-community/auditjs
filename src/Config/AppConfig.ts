@@ -62,7 +62,7 @@ export class AppConfig {
   
       this.rl.close();
 
-      let iqConfig = new ConfigPersist(username, token, host.endsWith('/') ? host.slice(0, host.length - 1) : host)
+      let iqConfig = new ConfigPersist(username, token, (host.endsWith('/') ? host.slice(0, host.length - 1) : host))
 
       let config = new IqServerConfig();
       
@@ -84,7 +84,7 @@ export class AppConfig {
   
       this.rl.close();
   
-      let ossIndexConfig = new ConfigPersist(username, token, cacheLocation);
+      let ossIndexConfig = new ConfigPersist(username, token, undefined, cacheLocation);
 
       let config = new OssIndexServerConfig(username, token, cacheLocation);
       

@@ -16,7 +16,7 @@
 import path from 'path';
 import { homedir } from 'os';
 import { mkdirSync, existsSync } from 'fs';
-import { Logger } from 'winston';
+import { Logger, config } from 'winston';
 import { writeFileSync } from "fs";
 import { safeDump } from 'js-yaml';
 
@@ -27,7 +27,7 @@ export abstract class Config {
   private fileName: string = ".oss-index-config";
   private configLocation: string;
   constructor(
-    protected type: string = 'ossi',
+    protected type: string,
     protected username: string, 
     protected token: string,
     readonly logger: Logger
@@ -54,14 +54,16 @@ export abstract class Config {
   public saveFile(
     objectToSave: ConfigPersist,
   ): boolean {
-    try {
-      writeFileSync(
-        this.getConfigLocation(), 
-        safeDump(objectToSave, { skipInvalid: true }));
-      return true;
-    } catch (e) {
-      throw new Error(e);
-    }
+    writeFileSync(
+      this.getConfigLocation(), 
+      safeDump(objectToSave, { skipInvalid: true })
+    );
+    this.getConfigFromFile();
+    return true;
+  }
+
+  public exists(): boolean {
+    return existsSync(this.configLocation);
   }
 
   abstract getConfigFromFile(saveLocation?: string): Config;
