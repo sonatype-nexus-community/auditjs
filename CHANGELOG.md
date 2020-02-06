@@ -1,3 +1,10 @@
+## [4.0.1-alpha.24](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.23...v4.0.1-alpha.24) (2020-02-06)
+
+
+### Bug Fixes
+
+* Refactor config to manage errors and input validation ([#147](https://github.com/sonatype-nexus-community/auditjs/issues/147)) ([662271e](https://github.com/sonatype-nexus-community/auditjs/commit/662271e3074503f864df727e4cf67ce23e65e83f))
+
 ## [4.0.1-alpha.23](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.22...v4.0.1-alpha.23) (2020-02-05)
 
 
