@@ -86,7 +86,7 @@ export class AppConfig {
   
       let ossIndexConfig = new ConfigPersist(username, token, undefined, cacheLocation);
 
-      let config = new OssIndexServerConfig(username, token, cacheLocation);
+      let config = new OssIndexServerConfig();
       
       return config.saveFile(ossIndexConfig);
     }

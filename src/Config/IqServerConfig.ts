@@ -28,8 +28,9 @@ export class IqServerConfig extends Config {
     readonly logger: Logger = getAppLogger())
   {
     super('iq', username, token, logger);
-    if(this.exists())
+    if(this.exists()) {
       this.getConfigFromFile();
+    }
   }
 
   public getUsername(): string {

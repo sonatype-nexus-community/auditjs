@@ -27,6 +27,10 @@ export class OssIndexServerConfig extends Config {
     protected cacheLocation: string = '',
     readonly logger: Logger = getAppLogger()) {
     super('ossi', username, token, logger);
+    if(this.exists())
+    {
+      this.getConfigFromFile();
+    }
   }
 
   public getUsername(): string {
