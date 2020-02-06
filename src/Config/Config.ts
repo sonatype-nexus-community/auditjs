@@ -24,24 +24,30 @@ import { safeDump } from "js-yaml";
 import { ConfigPersist } from "./ConfigPersist";
 
 export abstract class Config {
+  private directoryName: string = ".ossindex";
+  private fileName: string = ".oss-index-config";
+  private configLocation: string;
   constructor(
+    protected type: string = 'ossi',
     protected username: string,
     protected token: string,
-    readonly logger: Logger = getAppLogger()
-  ) {}
-
-  getSaveLocation(configName: string): string {
-    if (configName == ".oss-index-config") {
-      this.tryCreateDirectory(".ossindex");
-      return path.join(homedir(), ".ossindex", configName);
+    readonly logger: Logger = getAppLogger(),
+  ) {
+    if (this.type == 'iq') {
+      this.directoryName = ".iqserver";
+      this.fileName = ".iq-server-config";
     }
-    this.tryCreateDirectory(".iqserver");
-    return path.join(homedir(), ".iqserver", configName);
+    this.configLocation = path.join(homedir(), this.directoryName, this.fileName);
   }
 
-  tryCreateDirectory(dir: string): void {
-    if (!existsSync(path.join(homedir(), dir))) {
-      mkdirSync(path.join(homedir(), dir));
+  protected getConfigLocation(): string {
+    this.tryCreateDirectory();
+    return this.configLocation;
+  }
+
+  private tryCreateDirectory(): void {
+    if (!existsSync(path.join(homedir(), this.directoryName))) {
+      mkdirSync(path.join(homedir(), this.directoryName));
     }
     return;
   }
@@ -54,26 +60,18 @@ export abstract class Config {
     return this.token;
   }
 
-  protected saveConfigToFile(
-    objectToSave: ConfigPersist,
-    saveLocation: string = ".oss-index-config"
+  public saveConfigToFile(
+    objectToSave: ConfigPersist
   ): boolean {
     try {
       writeFileSync(
-        this.getSaveLocation(saveLocation),
+        this.getConfigLocation(),
         safeDump(objectToSave, { skipInvalid: true })
       );
       return true;
     } catch (e) {
       throw new Error(e);
     }
-  }
-
-  public saveFile(config: ConfigPersist, flag: string): boolean {
-    if (flag === "ossi") {
-      return this.saveConfigToFile(config, ".oss-index-config");
-    }
-    return this.saveConfigToFile(config, '.iq-server-config');
   }
 
   abstract getConfigFromFile(saveLocation?: string): Config;

@@ -15,7 +15,6 @@
  */
 import { Config } from "./Config";
 import { readFileSync } from "fs";
-import { ConfigPersist } from "./ConfigPersist";
 import { safeLoad } from 'js-yaml';
 
 export class IqServerConfig extends Config {
@@ -25,19 +24,15 @@ export class IqServerConfig extends Config {
     protected token: string = '', 
     private host: string = '', 
   ){
-    super(username, token);
+    super('iq', username, token);
   }
-
-  // public saveFile(iqServerConfig: ConfigPersist): boolean {
-  //   return super.saveConfigToFile(iqServerConfig, '.iq-server-config');
-  // }
 
   public getHost(): string {
     return this.host;
   }
   
   public getConfigFromFile(
-    saveLocation: string = this.getSaveLocation('.iq-server-config')
+    saveLocation: string = this.getConfigLocation()
   ): IqServerConfig {
     // TODO: we should really have a public function to check if the config exists
     try {

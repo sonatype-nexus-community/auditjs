@@ -15,7 +15,6 @@
  */
 import { Config } from "./Config";
 import { readFileSync } from "fs";
-import { ConfigPersist } from "./ConfigPersist";
 import { safeLoad } from 'js-yaml';
 
 export class OssIndexServerConfig extends Config {
@@ -23,15 +22,11 @@ export class OssIndexServerConfig extends Config {
   constructor(
     protected username: string = '', 
     protected token: string = '') {
-    super(username, token);
+    super('ossi', username, token);
   }
 
-  // public saveFile(ossIndexConfig: ConfigPersist): boolean {
-  //   return super.saveConfigToFile(ossIndexConfig);
-  // }
-
   public getConfigFromFile(
-    saveLocation: string = this.getSaveLocation('.oss-index-config')
+    saveLocation: string = this.getConfigLocation()
   ): OssIndexServerConfig {
     const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
     super.username = doc.Username;

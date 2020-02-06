@@ -64,7 +64,7 @@ export class AppConfig {
 
       let config = new IqServerConfig();
       
-      return config.saveFile(iqConfig, 'iq');
+      return config.saveConfigToFile(iqConfig);
     } else {
       username = await this.setVariable(
         'What is your username? '
@@ -80,7 +80,7 @@ export class AppConfig {
 
       let config = new OssIndexServerConfig(username, token);
       
-      return config.saveFile(ossIndexConfig, 'ossi');
+      return config.saveConfigToFile(ossIndexConfig);
     }
   }
 
