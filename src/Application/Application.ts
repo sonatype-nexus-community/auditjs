@@ -251,17 +251,9 @@ export class Application {
 
   private getIqRequestService(args: any): IqRequestService {
     let config = new IqServerConfig();
-    try {
-      config.getConfigFromFile();
-    }
-    // TODO: what would be really cool is if we can kick off the config from command line prompts if someone
-    // tries to run it with no config and none of the below arguments rather than erroring out
-    catch (e) {
-      if (!(args.user && args.password && args.server))
-      {
-        throw new Error('No config file is defined and you are missing one of the -h (host), -u (user), or -p (password) parameters.');
-      }
-    }
+    //config.getConfigFromFile();
+    if (!config.exists() && !(args.user && args.password && args.server))
+      throw new Error('No config file is defined and you are missing one of the -h (host), -u (user), or -p (password) parameters.');
 
     return new IqRequestService(
       (args.user !== undefined) ? args.user as string : config.getUsername(),

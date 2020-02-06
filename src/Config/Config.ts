@@ -13,53 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import path from 'path';
-import { homedir } from 'os';
-import { mkdirSync, existsSync } from 'fs';
-import { Logger } from 'winston';
+import path from "path";
+import { homedir } from "os";
+import { mkdirSync, existsSync } from "fs";
+import { Logger } from "winston";
 import { writeFileSync } from "fs";
-import { safeDump } from 'js-yaml';
+import { safeDump } from "js-yaml";
 
-import { ConfigPersist } from './ConfigPersist';
+import { ConfigPersist } from "./ConfigPersist";
 
 export abstract class Config {
+  private directoryName: string = ".ossindex";
+  private fileName: string = ".oss-index-config";
+  private configLocation: string;
   constructor(
-    protected username: string, 
+    protected type: string,
+    protected username: string,
     protected token: string,
-    readonly logger: Logger) {
-  }
-  
-  getSaveLocation(configName: string): string {
-    if (configName == '.oss-index-config') {
-      this.tryCreateDirectory('.ossindex');
-      return path.join(homedir(), '.ossindex', configName);
+    readonly logger: Logger
+  ) {
+    if (this.type == "iq") {
+      this.directoryName = ".iqserver";
+      this.fileName = ".iq-server-config";
     }
-    this.tryCreateDirectory('.iqserver');
-    return path.join(homedir(), '.iqserver', configName);
-  }
-
-  tryCreateDirectory(dir: string): void {
-    if (existsSync(path.join(homedir(), dir))) {
-      return;
-    } else {
-      mkdirSync(path.join(homedir(), dir));
-      return;
-    }
+    this.configLocation = path.join(
+      homedir(),
+      this.directoryName,
+      this.fileName
+    );
   }
 
-  protected saveConfigToFile(
-    objectToSave: ConfigPersist,
-    saveLocation: string = '.oss-index-config'
-  ): boolean {
-    try {
-      writeFileSync(this.getSaveLocation(saveLocation), safeDump(objectToSave, { skipInvalid: true}));
-      return true;
-    } catch (e) {
-      throw new Error(e);
+  protected getConfigLocation(): string {
+    this.tryCreateDirectory();
+    return this.configLocation;
+  }
+
+  private tryCreateDirectory(): void {
+    if (!existsSync(path.join(homedir(), this.directoryName))) {
+      mkdirSync(path.join(homedir(), this.directoryName));
     }
+    return;
+  }
+
+  public saveFile(objectToSave: ConfigPersist): boolean {
+    writeFileSync(
+      this.getConfigLocation(),
+      safeDump(objectToSave, { skipInvalid: true })
+    );
+    this.getConfigFromFile();
+    return true;
+  }
+
+  public exists(): boolean {
+    return existsSync(this.configLocation);
   }
 
   abstract getConfigFromFile(saveLocation?: string): Config;
-
-  abstract saveFile(configToSave: ConfigPersist): boolean;
 }

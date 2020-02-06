@@ -26,7 +26,7 @@ describe("OssIndexServerConfig", async () => {
     sinon.stub(os, 'homedir').returns('/nonsense');
     mock({ '/nonsense': {}});
 
-    let config = new OssIndexServerConfig("username", "password");
+    let config = new OssIndexServerConfig();
     let configPersist = new ConfigPersist("username", "password")
     expect(config.saveFile(configPersist)).to.equal(true);
 
