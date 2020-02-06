@@ -28,11 +28,7 @@ export class IqServerConfig extends Config {
     private host: string = '', 
     readonly logger: Logger = getAppLogger())
   {
-    super(username, token, logger);
-  }
-
-  public saveFile(iqServerConfig: ConfigPersist): boolean {
-    return super.saveConfigToFile(iqServerConfig, '.iq-server-config');
+    super('iq', username, token, logger);
   }
 
   public getUsername(): string {
@@ -48,7 +44,7 @@ export class IqServerConfig extends Config {
   }
   
   public getConfigFromFile(
-    saveLocation: string = this.getSaveLocation('.iq-server-config')
+    saveLocation: string = this.getConfigLocation()
   ): IqServerConfig {
     // TODO: we should really have a public function to check if the config exists
     try {

@@ -27,7 +27,7 @@ export class OssIndexServerConfig extends Config {
     protected token: string = '',
     protected cacheLocation: string = '',
     readonly logger: Logger = getAppLogger()) {
-    super(username, token, logger);
+    super('ossi', username, token, logger);
   }
 
   public getUsername(): string {
@@ -42,12 +42,8 @@ export class OssIndexServerConfig extends Config {
     return this.cacheLocation;
   }
 
-  public saveFile(ossIndexConfig: ConfigPersist): boolean {
-    return super.saveConfigToFile(ossIndexConfig);
-  }
-
   public getConfigFromFile(
-    saveLocation: string = this.getSaveLocation('.oss-index-config')
+    saveLocation: string = this.getConfigLocation()
   ): OssIndexServerConfig {
     const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
     super.username = doc.Username;

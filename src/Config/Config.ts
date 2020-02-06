@@ -23,36 +23,41 @@ import { safeDump } from 'js-yaml';
 import { ConfigPersist } from './ConfigPersist';
 
 export abstract class Config {
+  private directoryName: string = ".ossindex";
+  private fileName: string = ".oss-index-config";
+  private configLocation: string;
   constructor(
+    protected type: string = 'ossi',
     protected username: string, 
     protected token: string,
-    readonly logger: Logger) {
-  }
+    readonly logger: Logger
+  ) {
+      if (this.type == 'iq') {
+        this.directoryName = ".iqserver";
+        this.fileName = ".iq-server-config";
+      }
+      this.configLocation = path.join(homedir(), this.directoryName, this.fileName);
+    }
   
-  getSaveLocation(configName: string): string {
-    if (configName == '.oss-index-config') {
-      this.tryCreateDirectory('.ossindex');
-      return path.join(homedir(), '.ossindex', configName);
-    }
-    this.tryCreateDirectory('.iqserver');
-    return path.join(homedir(), '.iqserver', configName);
+  protected getConfigLocation(): string {
+    this.tryCreateDirectory();
+    return this.configLocation;
   }
 
-  tryCreateDirectory(dir: string): void {
-    if (existsSync(path.join(homedir(), dir))) {
-      return;
-    } else {
-      mkdirSync(path.join(homedir(), dir));
-      return;
+  private tryCreateDirectory(): void {
+    if (!existsSync(path.join(homedir(), this.directoryName))) {
+      mkdirSync(path.join(homedir(), this.directoryName));
     }
+    return;
   }
 
-  protected saveConfigToFile(
+  public saveFile(
     objectToSave: ConfigPersist,
-    saveLocation: string = '.oss-index-config'
   ): boolean {
     try {
-      writeFileSync(this.getSaveLocation(saveLocation), safeDump(objectToSave, { skipInvalid: true}));
+      writeFileSync(
+        this.getConfigLocation(), 
+        safeDump(objectToSave, { skipInvalid: true }));
       return true;
     } catch (e) {
       throw new Error(e);
@@ -60,6 +65,4 @@ export abstract class Config {
   }
 
   abstract getConfigFromFile(saveLocation?: string): Config;
-
-  abstract saveFile(configToSave: ConfigPersist): boolean;
 }
