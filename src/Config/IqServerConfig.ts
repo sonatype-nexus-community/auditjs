@@ -17,7 +17,6 @@ import { Config } from "./Config";
 import { readFileSync } from "fs";
 import { Logger } from "winston";
 import { getAppLogger } from "../Application/Logger/Logger";
-import { ConfigPersist } from "./ConfigPersist";
 import { safeLoad } from 'js-yaml';
 
 export class IqServerConfig extends Config {
@@ -28,11 +27,10 @@ export class IqServerConfig extends Config {
     private host: string = '', 
     readonly logger: Logger = getAppLogger())
   {
-    super(username, token, logger);
-  }
-
-  public saveFile(iqServerConfig: ConfigPersist): boolean {
-    return super.saveConfigToFile(iqServerConfig, '.iq-server-config');
+    super('iq', username, token, logger);
+    if(this.exists()) {
+      this.getConfigFromFile();
+    }
   }
 
   public getUsername(): string {
@@ -48,18 +46,14 @@ export class IqServerConfig extends Config {
   }
   
   public getConfigFromFile(
-    saveLocation: string = this.getSaveLocation('.iq-server-config')
+    saveLocation: string = this.getConfigLocation()
   ): IqServerConfig {
-    // TODO: we should really have a public function to check if the config exists
-    try {
-      const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
-      super.username = doc.Username;
-      super.token = doc.Token;
-      this.host = doc.Server;
-    }
-    catch (e) {
-      throw new Error('IQ Config file does not exist.  Run \'auditjs config\'.');
-    }
+
+    const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
+    super.username = doc.Username;
+    super.token = doc.Token;
+    this.host = doc.Server;
+
     return this;
   }
 }
