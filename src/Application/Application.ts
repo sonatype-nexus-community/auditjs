@@ -109,7 +109,7 @@ export class Application {
 
   private doPrintHeader(title: string = 'AuditJS', font: figlet.Fonts = '3D-ASCII') {
     console.log(textSync(title, {font: font, horizontalLayout: 'fitted'}));
-    console.log(textSync('By Sonatype', {font: 'Small Slant'}));
+    console.log(textSync('By Sonatype & Friends', {font: 'Pepper'}));
   }
 
   private async populateCoordinates() {
