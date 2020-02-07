@@ -1,3 +1,10 @@
+## [4.0.1-beta.22](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.21...v4.0.1-beta.22) (2020-02-07)
+
+
+### Bug Fixes
+
+* add version back in, but small-ly ([c754b50](https://github.com/sonatype-nexus-community/auditjs/commit/c754b507f01e1f82fa7a94041d36d9eecd19577f))
+
 ## [4.0.1-beta.21](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.20...v4.0.1-beta.21) (2020-02-07)
 
 
