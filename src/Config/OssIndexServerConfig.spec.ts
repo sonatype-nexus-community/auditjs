@@ -26,13 +26,14 @@ describe("OssIndexServerConfig", async () => {
     mock({ '/nonsense': {}});
 
     let config = new OssIndexServerConfig();
-    let configPersist = new ConfigPersist("username", "password")
+    let configPersist = new ConfigPersist("username", "password", undefined, "/tmp/value");
     expect(config.saveFile(configPersist)).to.equal(true);
 
     let conf = config.getConfigFromFile('/nonsense/.ossindex/.oss-index-config');
 
     expect(conf.getUsername()).to.equal('username');
     expect(conf.getToken()).to.equal('password');
+    expect(conf.getCacheLocation()).to.equal('/tmp/value');
     mock.restore();
     sinon.restore();
   });
