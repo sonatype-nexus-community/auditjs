@@ -46,7 +46,7 @@ export class Application {
     ) {
     createAppLogger();
     let npmList = new NpmList(devDependency);
-    let bower = new Bower();
+    let bower = new Bower(devDependency);
 
     this.printHeader();
     this.spinner = new Spinner(silent);
