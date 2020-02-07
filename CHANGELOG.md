@@ -1,3 +1,10 @@
+## [4.0.1-alpha.25](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.24...v4.0.1-alpha.25) (2020-02-07)
+
+
+### Bug Fixes
+
+* add by friends to tag line ([411222b](https://github.com/sonatype-nexus-community/auditjs/commit/411222bf04d6339e42616ff3d88ca668227e50dc))
+
 ## [4.0.1-alpha.24](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.23...v4.0.1-alpha.24) (2020-02-06)
 
 
