@@ -31,6 +31,8 @@ import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 
+const pj = require('../../package.json');
+
 export class Application {
   private results: Array<Coordinates> = new Array();
   private sbom: string = "";
@@ -110,6 +112,7 @@ export class Application {
   private doPrintHeader(title: string = 'AuditJS', font: figlet.Fonts = '3D-ASCII') {
     console.log(textSync(title, {font: font, horizontalLayout: 'fitted'}));
     console.log(textSync('By Sonatype & Friends', {font: 'Pepper'}));
+    console.log(`${title} version: ${pj.version}`);
   }
 
   private async populateCoordinates() {
