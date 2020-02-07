@@ -4,13 +4,8 @@
 auditjs.json
 # ci config for local ci build
 /.circleci/local-config.yml
-<<<<<<< HEAD
 
 # Instanbul code coverage report
 .nyc_output/
 reports/
 lcov.info
-=======
-# istanbul code coverage
-.nyc_output
->>>>>>> alpha
