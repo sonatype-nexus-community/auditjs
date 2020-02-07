@@ -25,7 +25,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch With config",
-      "args": ["config", "--"],
+      "args": ["config"],
       "program": "${workspaceFolder}/src/index.ts",
       "preLaunchTask": "tsc: build - tsconfig.json",
       "console": "integratedTerminal",
