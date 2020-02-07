@@ -8,15 +8,27 @@
       "args": ["ossi", "--dev"],
       "program": "${workspaceFolder}/src/index.ts",
       "preLaunchTask": "tsc: build - tsconfig.json",
+      "console": "integratedTerminal",
       "outFiles": ["${workspaceFolder}/bin/**/*.js"],
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Launch With IQ Server",
-      "args": ["iq", "-a", "sandbox-application"],
+      "args": ["iq", "-a", "auditjs"],
       "program": "${workspaceFolder}/src/index.ts",
       "preLaunchTask": "tsc: build - tsconfig.json",
+      "console": "integratedTerminal",
+      "outFiles": ["${workspaceFolder}/bin/**/*.js"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch With config",
+      "args": ["config"],
+      "program": "${workspaceFolder}/src/index.ts",
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      "console": "integratedTerminal",
       "outFiles": ["${workspaceFolder}/bin/**/*.js"]
     }
   ]

@@ -16,5 +16,6 @@
 export class ConfigPersist {
   constructor(readonly Username: string,
     readonly Token: string,
-    readonly Server?: string) {}
+    readonly Server?: string,
+    readonly CacheLocation?: string,) {}
 }

@@ -1,3 +1,45 @@
+## [4.0.1-alpha.26](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.25...v4.0.1-alpha.26) (2020-02-07)
+
+
+### Bug Fixes
+
+* add version back in, but small-ly ([83091da](https://github.com/sonatype-nexus-community/auditjs/commit/83091daec35128ae9c89f7688eff8695d7f93c4c))
+
+## [4.0.1-alpha.25](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.24...v4.0.1-alpha.25) (2020-02-07)
+
+
+### Bug Fixes
+
+* add by friends to tag line ([411222b](https://github.com/sonatype-nexus-community/auditjs/commit/411222bf04d6339e42616ff3d88ca668227e50dc))
+
+## [4.0.1-alpha.24](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.23...v4.0.1-alpha.24) (2020-02-06)
+
+
+### Bug Fixes
+
+* Refactor config to manage errors and input validation ([#147](https://github.com/sonatype-nexus-community/auditjs/issues/147)) ([662271e](https://github.com/sonatype-nexus-community/auditjs/commit/662271e3074503f864df727e4cf67ce23e65e83f))
+
+## [4.0.1-alpha.23](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.22...v4.0.1-alpha.23) (2020-02-05)
+
+
+### Bug Fixes
+
+* allow users to set the location for their cache ([#146](https://github.com/sonatype-nexus-community/auditjs/issues/146)) ([080313c](https://github.com/sonatype-nexus-community/auditjs/commit/080313c5679f0803e4b5c496cb296a0669c686d3))
+
+## [4.0.1-alpha.22](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.21...v4.0.1-alpha.22) (2020-02-04)
+
+
+### Bug Fixes
+
+* [#116](https://github.com/sonatype-nexus-community/auditjs/issues/116) as well as numerous config changes, abstracting away the internal id call in iqRequests ([4558042](https://github.com/sonatype-nexus-community/auditjs/commit/4558042caa53dce498a7ea22701af9bee3a6c071))
+
+## [4.0.1-alpha.21](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.20...v4.0.1-alpha.21) (2020-01-27)
+
+
+### Bug Fixes
+
+* updated readme and iq policy action message ([d86f671](https://github.com/sonatype-nexus-community/auditjs/commit/d86f671baa3e8260b2fb155c139c3908da6e9a3e))
+
 ## [4.0.1-alpha.20](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.19...v4.0.1-alpha.20) (2020-01-24)
 
 

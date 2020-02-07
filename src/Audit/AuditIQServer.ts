@@ -23,11 +23,11 @@ export class AuditIQServer {
       return true;
     }
     if (results.policyAction === 'Failure') {
-      console.error("Sonabot here, you have some policy violations to clean up!");
+      console.error("Sonabot here, you have some build-breaking policy violations to clean up!");
       console.error(`Report URL: ${results.reportHtmlUrl}`);
       return true;
     }
-    console.log("Wonderbar! No policy violations reported for this audit!");
+    console.log("Wonderbar! No build-breaking violations for this stage. You may still have non-breaking policy violations in the report.");
     console.log(`Report URL: ${results.reportHtmlUrl}`);
     return false;
   }

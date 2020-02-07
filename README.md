@@ -7,8 +7,9 @@
 Audits JavaScript projects using the [OSS Index v3 REST API](https://ossindex.sonatype.org/rest)
 to identify known vulnerabilities and outdated package versions.
 
-Supports:
+Supports any project with package managers that install npm dependencies into a node_modules folder including:
 - npm
+- Angular
 - yarn
 - bower
 

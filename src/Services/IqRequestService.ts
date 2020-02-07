@@ -20,9 +20,10 @@ import { URL } from 'url';
 
 const APPLICATION_INTERNAL_ID_ENDPOINT = '/api/v2/applications?publicId=';
 
-const APPLICATION_EVALUATION_ENDPOINT = '/api/v2/evaluation/applications/';
-
 export class IqRequestService {
+  private internalId: string = "";
+  private isInitialized: boolean = false;
+
   constructor(
     readonly user: string, 
     readonly password: string, 
@@ -32,9 +33,14 @@ export class IqRequestService {
     readonly timeout: number
   ) {}
 
+  private async init() {
+    this.internalId = await this.getApplicationInternalId();
+    this.isInitialized = true;
+  };
+
   private timeoutAttempts: number = 0;
 
-  public async getApplicationInternalId(): Promise<string> {
+  private async getApplicationInternalId(): Promise<string> {
     const response = await fetch(
       `${this.host}${APPLICATION_INTERNAL_ID_ENDPOINT}${this.application}`,
       { method: 'get', headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()]});
@@ -43,16 +49,20 @@ export class IqRequestService {
       try {
         return res.applications[0].id;
       } catch(e) {
-        throw new Error(`No valid ID on response from Nexus IQ Server, potentially check the public application ID you are using`);
+        throw new Error(`No valid ID on response from Nexus IQ, potentially check the public application ID you are using`);
       }
     } else {
-      throw new Error(response.type);
+      throw new Error('Unable to connect to IQ Server with http status ' + response.status
+       + '. Check your credentials and network connectivity by hitting Nexus IQ at ' + this.host + ' in your browser.');
     }
   }
 
-  public async submitToThirdPartyAPI(data: any, internalId: string) {
+  public async submitToThirdPartyAPI(data: any) {
+    if(!this.isInitialized) {
+      await this.init();
+    }
     const response = await fetch(
-      `${this.host}/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${this.stage}`,
+      `${this.host}/api/v2/scan/applications/${this.internalId}/sources/auditjs?stageId=${this.stage}`,
       { method: 'post', headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ["Content-Type", "application/xml"]], body: data}
     );
     if (response.ok) {
@@ -60,23 +70,6 @@ export class IqRequestService {
       return json.statusUrl as string;
     } else {
       throw new Error(`Unable to submit to Third Party API`);
-    }
-  }
-
-  public async submitForEvaluation(data: any, internalId: string) {
-    const response = await fetch(
-      `${this.host}${APPLICATION_EVALUATION_ENDPOINT}${internalId}`,
-      { 
-        method: 'post', 
-        body: JSON.stringify(data), 
-        headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ["Content-Type", "application/json"]]
-      }
-    )
-    if (response.ok) {
-      let res = await response.json();
-      return res.resultsUrl;
-    } else {
-      return response;
     }
   }
 
@@ -93,7 +86,6 @@ export class IqRequestService {
           headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()]
         });
   
-      logMessage("response", DEBUG, { response: response });
       const body = response.ok;
       // TODO: right now I think we cover 500s and 400s the same and we'd continue polling as a result. We should likely switch
       // to checking explicitly for a 404 and if we get a 500/401 or other throw an error

@@ -16,7 +16,6 @@
 import expect from '../Tests/TestHelper';
 import { OssIndexServerConfig } from './OssIndexServerConfig';
 import mock from 'mock-fs';
-import { readFileSync } from 'fs';
 import sinon from 'sinon';
 import os from 'os';
 import { ConfigPersist } from './ConfigPersist';
@@ -26,7 +25,7 @@ describe("OssIndexServerConfig", async () => {
     sinon.stub(os, 'homedir').returns('/nonsense');
     mock({ '/nonsense': {}});
 
-    let config = new OssIndexServerConfig("username", "password");
+    let config = new OssIndexServerConfig();
     let configPersist = new ConfigPersist("username", "password")
     expect(config.saveFile(configPersist)).to.equal(true);
 
