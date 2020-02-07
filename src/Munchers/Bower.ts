@@ -20,6 +20,8 @@ import fs from 'fs';
 
 export class Bower implements Muncher {
 
+  constructor(readonly devDependencies: boolean = false) {}
+
   getSbomFromCommand(): Promise<any> {
     throw new Error("Method not implemented.");
   }
@@ -37,10 +39,18 @@ export class Bower implements Muncher {
     let depsArray: Array<Coordinates> = new Array();
     let file = fs.readFileSync(path.join(process.cwd(), 'bower.json'));
     let json = JSON.parse(file.toString());
+
     Object.keys(json.dependencies).map((x: any) => {
       let version: string = json.dependencies[x];
       depsArray.push(new Coordinates(x, version.replace("~", ""), ""));
     });
+
+    if (this.devDependencies) {
+      Object.keys(json.devDependencies).map((x: any) => {
+        let version: string = json.devDependencies[x];
+        depsArray.push(new Coordinates(x, version.replace("~", ""), ""));
+      });
+    }
 
     return depsArray;
   }
