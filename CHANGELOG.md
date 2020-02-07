@@ -1,3 +1,10 @@
+## [4.0.1-beta.23](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.22...v4.0.1-beta.23) (2020-02-07)
+
+
+### Bug Fixes
+
+* add ability to scan for Bower Dev Dependencies ([#148](https://github.com/sonatype-nexus-community/auditjs/issues/148)) ([4f4eb0e](https://github.com/sonatype-nexus-community/auditjs/commit/4f4eb0efc4d22a4cfdb71730ca93e36c818aea96))
+
 ## [4.0.1-beta.22](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.21...v4.0.1-beta.22) (2020-02-07)
 
 
