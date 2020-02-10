@@ -15,20 +15,20 @@
  */
 import { IqServerResult } from "../Types/IqServerResult";
 import { ReportStatus } from "../Types/ReportStatus";
+import chalk = require("chalk");
+import { visuallySeperateText } from "../Visual/VisualHelper";
 
 export class AuditIQServer {
   public auditThirdPartyResults(results: ReportStatus): boolean {
     if (results.isError) {
-      console.error(results.errorMessage);
+      visuallySeperateText(true, [results.errorMessage]);
       return true;
     }
     if (results.policyAction === 'Failure') {
-      console.error("Sonabot here, you have some build-breaking policy violations to clean up!");
-      console.error(`Report URL: ${results.reportHtmlUrl}`);
+      visuallySeperateText(true, [`Sonabot here, you have some build-breaking policy violations to clean up!`, chalk.keyword('orange').bold(`Report URL: ${results.reportHtmlUrl}`)]);
       return true;
     }
-    console.log("Wonderbar! No build-breaking violations for this stage. You may still have non-breaking policy violations in the report.");
-    console.log(`Report URL: ${results.reportHtmlUrl}`);
+    visuallySeperateText(false, [`Wonderbar! No build-breaking violations for this stage. You may still have non-breaking policy violations in the report.`, chalk.keyword('green').bold(`Report URL: ${results.reportHtmlUrl}`)]);
     return false;
   }
 
@@ -38,8 +38,7 @@ export class AuditIQServer {
       return (a.component.packageUrl < b.component.packageUrl ? -1 : 1);
     });
 
-    console.log('Sonabot here, beep boop beep boop, here are your Nexus IQ Server results:');
-    console.log(`Total dependencies audited: ${total}`);
+    visuallySeperateText(false, ['Sonabot here, beep boop beep boop, here are your Nexus IQ Server results:\n', `Total dependencies audited: ${total}`])
 
     console.log('-'.repeat(process.stdout.columns));
     
