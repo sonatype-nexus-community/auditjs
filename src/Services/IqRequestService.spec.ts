@@ -33,7 +33,25 @@ describe("IQRequestService", () => {
 
     const scope2 = nock("http://testlocation:8070")
       .get(`/api/v2/applications?publicId=testapp`)
-      .reply(applicationInternalIdResponse.statusCode, applicationInternalIdResponse.body);
+      .reply(404, applicationInternalIdResponse.body);
+    
+    const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage, 300);
+    const coords = [new Coordinates("commander", "2.12.2", "@types")];
+
+    return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.be
+      .rejected;
+  });
+
+  it("should respond with an error if the response for an ID is bad", async () => {
+    let internalId = "123456"
+    let stage = "build"
+    const scope = nock("http://testlocation:8070")
+      .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
+      .replyWithError("you messed up!");
+
+    const scope2 = nock("http://testlocation:8070")
+      .get(`/api/v2/applications?publicId=testapp`)
+      .reply(applicationInternalIdResponse.statusCode, {thereisnoid: 'none'});
     
     const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage, 300);
     const coords = [new Coordinates("commander", "2.12.2", "@types")];
