@@ -25,13 +25,9 @@ describe("IQRequestService", () => {
   })
 
   it("should have it's third party API request rejected when the IQ Server is down", async () => {
-    let internalId = "123456"
     let stage = "build"
-    const scope = nock("http://testlocation:8070")
-      .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
-      .replyWithError("you messed up!");
 
-    const scope2 = nock("http://testlocation:8070")
+    const scope = nock("http://testlocation:8070")
       .get(`/api/v2/applications?publicId=testapp`)
       .reply(404, applicationInternalIdResponse.body);
     
@@ -43,13 +39,9 @@ describe("IQRequestService", () => {
   });
 
   it("should respond with an error if the response for an ID is bad", async () => {
-    let internalId = "123456"
     let stage = "build"
-    const scope = nock("http://testlocation:8070")
-      .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
-      .replyWithError("you messed up!");
 
-    const scope2 = nock("http://testlocation:8070")
+    const scope = nock("http://testlocation:8070")
       .get(`/api/v2/applications?publicId=testapp`)
       .reply(applicationInternalIdResponse.statusCode, {thereisnoid: 'none'});
     
@@ -82,6 +74,31 @@ describe("IQRequestService", () => {
     const coords = [new Coordinates("commander", "2.12.2", "@types")];
 
     return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.equal("api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb");
+  });
+
+
+  it("should have it's third party API request rejected when IQ Server is up but API gives bad response", async () => {
+    let internalId = "4bb67dcfc86344e3a483832f8c496419"
+    let stage = "build"
+    let response = {
+      statusCode: 202,
+      body: {
+        "statusUrl": "api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb"
+      }
+    }
+
+    const scope = nock("http://testlocation:8070")
+      .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
+      .reply(404, response.body);
+
+    const scope2 = nock("http://testlocation:8070")
+      .get(`/api/v2/applications?publicId=testapp`)
+      .reply(applicationInternalIdResponse.statusCode, applicationInternalIdResponse.body);
+
+    const requestService = new IqRequestService("admin", "admin123", "http://testlocation:8070", "testapp", stage, 300);
+    const coords = [new Coordinates("commander", "2.12.2", "@types")];
+
+    return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.be.rejectedWith('Unable to submit to Third Party API');
   });
 
   it("should have return a proper result when polling IQ Server and the request is eventually valid", async () => {
