@@ -139,14 +139,15 @@ export class AuditOSSIndex {
     let maxScore: number = Math.max(...result.vulnerabilities!.map((x: Vulnerability) => { return +x.cvssScore; }));
     let printVuln = (x: Array<Vulnerability>) => {
       x.forEach((y: Vulnerability) => {
+        let color: string = this.getColorFromMaxScore(+y.cvssScore);
         console.group();
-        console.log(chalk.keyword(this.getColorFromMaxScore(maxScore))(`Vulnerability Title: `), (`${y.title}`));
-        console.log(chalk.keyword(this.getColorFromMaxScore(maxScore))(`ID: `), (`${y.id}`));
-        console.log(chalk.keyword(this.getColorFromMaxScore(maxScore))(`Description: `), (`${y.description}`));
-        console.log(chalk.keyword(this.getColorFromMaxScore(maxScore))(`CVSS Score: `), (`${y.cvssScore}`));
-        console.log(chalk.keyword(this.getColorFromMaxScore(maxScore))(`CVSS Vector: `), (`${y.cvssVector}`));
-        console.log(chalk.keyword(this.getColorFromMaxScore(maxScore))(`CVE: `), (`${y.cve}`));
-        console.log(chalk.keyword(this.getColorFromMaxScore(maxScore))(`Reference: `), (`${y.reference}`));
+        console.log(chalk.keyword(color)(`Vulnerability Title: `), (`${y.title}`));
+        console.log(chalk.keyword(color)(`ID: `), (`${y.id}`));
+        console.log(chalk.keyword(color)(`Description: `), (`${y.description}`));
+        console.log(chalk.keyword(color)(`CVSS Score: `), (`${y.cvssScore}`));
+        console.log(chalk.keyword(color)(`CVSS Vector: `), (`${y.cvssVector}`));
+        console.log(chalk.keyword(color)(`CVE: `), (`${y.cve}`));
+        console.log(chalk.keyword(color)(`Reference: `), (`${y.reference}`));
         console.log();
         console.groupEnd();
       });
