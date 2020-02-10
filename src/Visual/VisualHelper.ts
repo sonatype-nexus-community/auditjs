@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-export const visuallySeperateText = (text: any, ...additionalParams: any[]) => {
+export const visuallySeperateText = (error: boolean, text: any, ...additionalParams: any[]) => {
   console.log();
   console.group();
-  console.log(text, ...additionalParams);
+  (error) ? console.error(text, ...additionalParams) : console.log(text, ...additionalParams);
   console.groupEnd();
   console.log();
 }
