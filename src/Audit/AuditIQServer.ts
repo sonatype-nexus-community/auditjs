@@ -15,20 +15,33 @@
  */
 import { IqServerResult } from "../Types/IqServerResult";
 import { ReportStatus } from "../Types/ReportStatus";
+import chalk = require("chalk");
 
 export class AuditIQServer {
   public auditThirdPartyResults(results: ReportStatus): boolean {
     if (results.isError) {
+      console.log();
+      console.group();
       console.error(results.errorMessage);
+      console.groupEnd();
+      console.log();
       return true;
     }
     if (results.policyAction === 'Failure') {
+      console.log();
+      console.group();
       console.error("Sonabot here, you have some build-breaking policy violations to clean up!");
-      console.error(`Report URL: ${results.reportHtmlUrl}`);
+      console.error(chalk.keyword('orange').bold(`Report URL: ${results.reportHtmlUrl}`));
+      console.groupEnd();
+      console.log();
       return true;
     }
+    console.log();
+    console.group();
     console.log("Wonderbar! No build-breaking violations for this stage. You may still have non-breaking policy violations in the report.");
-    console.log(`Report URL: ${results.reportHtmlUrl}`);
+    console.log(chalk.keyword('green').bold(`Report URL: ${results.reportHtmlUrl}`));
+    console.groupEnd();
+    console.log();
     return false;
   }
 
@@ -38,8 +51,12 @@ export class AuditIQServer {
       return (a.component.packageUrl < b.component.packageUrl ? -1 : 1);
     });
 
+    console.log();
+    console.group();
     console.log('Sonabot here, beep boop beep boop, here are your Nexus IQ Server results:');
     console.log(`Total dependencies audited: ${total}`);
+    console.groupEnd();
+    console.log();
 
     console.log('-'.repeat(process.stdout.columns));
     
