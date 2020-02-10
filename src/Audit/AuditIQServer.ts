@@ -21,14 +21,14 @@ import { visuallySeperateText } from "../Visual/VisualHelper";
 export class AuditIQServer {
   public auditThirdPartyResults(results: ReportStatus): boolean {
     if (results.isError) {
-      visuallySeperateText(true, results.errorMessage);
+      visuallySeperateText(true, [results.errorMessage]);
       return true;
     }
     if (results.policyAction === 'Failure') {
-      visuallySeperateText(true, (`Sonabot here, you have some build-breaking policy violations to clean up!\n`), chalk.keyword('orange').bold(`Report URL: ${results.reportHtmlUrl}`));
+      visuallySeperateText(true, [`Sonabot here, you have some build-breaking policy violations to clean up!`, chalk.keyword('orange').bold(`Report URL: ${results.reportHtmlUrl}`)]);
       return true;
     }
-    visuallySeperateText(false, (`Wonderbar! No build-breaking violations for this stage. You may still have non-breaking policy violations in the report.\n`), chalk.keyword('green').bold(`Report URL: ${results.reportHtmlUrl}`));
+    visuallySeperateText(false, [`Wonderbar! No build-breaking violations for this stage. You may still have non-breaking policy violations in the report.`, chalk.keyword('green').bold(`Report URL: ${results.reportHtmlUrl}`)]);
     return false;
   }
 
@@ -38,7 +38,7 @@ export class AuditIQServer {
       return (a.component.packageUrl < b.component.packageUrl ? -1 : 1);
     });
 
-    visuallySeperateText(false, 'Sonabot here, beep boop beep boop, here are your Nexus IQ Server results:\n', `Total dependencies audited: ${total}`)
+    visuallySeperateText(false, ['Sonabot here, beep boop beep boop, here are your Nexus IQ Server results:\n', `Total dependencies audited: ${total}`])
 
     console.log('-'.repeat(process.stdout.columns));
     
