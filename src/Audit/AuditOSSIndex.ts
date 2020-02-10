@@ -16,7 +16,6 @@
 import { OssIndexServerResult, Vulnerability } from "../Types/OssIndexServerResult";
 import chalk from 'chalk';
 import * as builder from 'xmlbuilder';
-import { fail } from "assert";
 
 export class AuditOSSIndex {
 
@@ -39,8 +38,12 @@ export class AuditOSSIndex {
       return (a.coordinates < b.coordinates ? -1 : 1);
     });
 
+    console.log();
+    console.group();
     this.printLine('Sonabot here, beep boop beep boop, here are your Sonatype OSS Index results:');
     this.printLine(`Total dependencies audited: ${total}`);
+    console.groupEnd();
+    console.log();
 
     this.printLine('-'.repeat(process.stdout.columns));
     
@@ -51,7 +54,7 @@ export class AuditOSSIndex {
         isVulnerable = true;
         this.printVulnerability(i, total, x);
       } else {
-        this.printLine(chalk.keyword('lightblue')(`[${i + 1}/${total}] - ${x.toAuditLog()}`));
+        this.printLine(chalk.keyword('green')(`[${i + 1}/${total}] - ${x.toAuditLog()}`));
       }
     });
 
@@ -136,19 +139,22 @@ export class AuditOSSIndex {
     let maxScore: number = Math.max(...result.vulnerabilities!.map((x: Vulnerability) => { return +x.cvssScore; }));
     let printVuln = (x: Array<Vulnerability>) => {
       x.forEach((y: Vulnerability) => {
+        let color: string = this.getColorFromMaxScore(+y.cvssScore);
         console.group();
-        console.log(`Vulnerability Title: ${y.title}`);
-        console.log(`ID: ${y.id}`);
-        console.log(`Description: ${y.description}`);
-        console.log(`CVSS Score: ${y.cvssScore}`);
-        console.log(`CVSS Vector: ${y.cvssVector}`);
-        console.log(`CVE: ${y.cve}`);
-        console.log(`Reference: ${y.reference}`);
+        console.log(chalk.keyword(color)(`Vulnerability Title: `), (`${y.title}`));
+        console.log(chalk.keyword(color)(`ID: `), (`${y.id}`));
+        console.log(chalk.keyword(color)(`Description: `), (`${y.description}`));
+        console.log(chalk.keyword(color)(`CVSS Score: `), (`${y.cvssScore}`));
+        console.log(chalk.keyword(color)(`CVSS Vector: `), (`${y.cvssVector}`));
+        console.log(chalk.keyword(color)(`CVE: `), (`${y.cve}`));
+        console.log(chalk.keyword(color)(`Reference: `), (`${y.reference}`));
+        console.log();
         console.groupEnd();
       });
     }
 
-    console.log(chalk.keyword(this.getColorFromMaxScore(maxScore))(`[${i + 1}/${total}] - ${result.toAuditLog()}`));
+    console.log(chalk.keyword(this.getColorFromMaxScore(maxScore)).bold(`[${i + 1}/${total}] - ${result.toAuditLog()}`));
+    console.log();
     result.vulnerabilities && printVuln(result.vulnerabilities);
   }
 
