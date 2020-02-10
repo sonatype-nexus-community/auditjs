@@ -57,7 +57,7 @@ describe("IQRequestService", () => {
     const coords = [new Coordinates("commander", "2.12.2", "@types")];
 
     return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.be
-      .rejected;
+      .rejectedWith('No valid ID on response from Nexus IQ, potentially check the public application ID you are using');
   });
 
   it("should have it's third party API request accepted when the IQ Server is up", async () => {
