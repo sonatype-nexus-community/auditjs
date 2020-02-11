@@ -13,7 +13,7 @@ Supports any project with package managers that install npm dependencies into a 
 - yarn
 - bower
 
-<img src="https://github.com/sonatype-nexus-community/auditjs/blob/alpha/assets/images/auditjs.png?raw=true" width="640">
+<img src="https://github.com/sonatype-nexus-community/auditjs/blob/beta/assets/images/auditjsnew.png?raw=true" width="640">
 
 ## Installation
 
