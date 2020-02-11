@@ -86,7 +86,7 @@ export class NpmList implements Muncher {
       }
     }
     if (objectTree.dependencies) {
-      let thing = Object.keys(objectTree.dependencies)
+      Object.keys(objectTree.dependencies)
         .map((x) => objectTree.dependencies[x])
         .filter((x) => typeof(x) !== 'string')
         .map((dep) => {
