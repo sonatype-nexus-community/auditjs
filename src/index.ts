@@ -18,6 +18,7 @@ import yargs from 'yargs';
 import { Argv } from 'yargs';
 import { Application } from './Application/Application';
 import { AppConfig } from './Config/AppConfig';
+import { OssIndexServerConfig } from './Config/OssIndexServerConfig';
 
 // TODO: Flesh out the remaining set of args that NEED to be moved over, look at them with a fine toothed comb and lots of skepticism
 const normalizeHostAddress = (address: string) => {
@@ -92,6 +93,10 @@ let argv = yargs
     'Set config for OSS Index or Nexus IQ Server'
   )
   .command(
+    'clear',
+    'Clear the cache if a location is set in config'
+  )
+  .command(
     'ossi [options]', 
     "Audit this application using Sonatype OSS Index",
     (y: Argv) => {
@@ -158,6 +163,15 @@ if (argv) {
       .catch((e) => {
         throw new Error(e);
       });
+  } else if (argv._[0] === 'clear') {
+    let config = new OssIndexServerConfig();
+    config.getConfigFromFile();
+    console.log('Cache location:', config.getCacheLocation());
+    if (config.clearCache()) {
+      console.log(`The cache at ${config.getCacheLocation} has been cleared`)
+    } else {
+      throw new Error('There was a problem clearing cache, did you remember to set the location in your config file?')
+    }
   } else {
     let silence = (argv.json || argv.quiet || argv.xml) ? true : false;
     let artie = (argv.artie) ? true : false;

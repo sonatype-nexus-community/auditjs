@@ -18,6 +18,7 @@ import { readFileSync } from "fs";
 import { getAppLogger } from "../Application/Logger/Logger";
 import { Logger } from "winston";
 import { safeLoad } from 'js-yaml';
+import storage from 'node-persist';
 
 export class OssIndexServerConfig extends Config {
 
@@ -43,6 +44,15 @@ export class OssIndexServerConfig extends Config {
 
   public getCacheLocation(): string {
     return this.cacheLocation;
+  }
+
+  public clearCache(): boolean {
+    if (this.cacheLocation) {
+      storage.init({ dir: this.cacheLocation });
+      storage.clear();
+      return true;
+    }
+    return false;
   }
 
   public getConfigFromFile(
