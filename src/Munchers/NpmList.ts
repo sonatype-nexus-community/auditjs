@@ -74,7 +74,7 @@ export class NpmList implements Muncher {
 
   // recursive unit that traverses tree and terminates when object has no dependencies
   private recurseObjectTree(objectTree: any, list: Array<Coordinates>, isRootPkg: boolean = false) {
-    if (objectTree.extraneous) {
+    if (objectTree.extraneous && !this.devDependencies) {
       return;
     }
     if (!isRootPkg) {
@@ -86,21 +86,21 @@ export class NpmList implements Muncher {
       }
     }
     if (objectTree.dependencies) {
-      Object.keys(objectTree.dependencies)
+      let thing = Object.keys(objectTree.dependencies)
         .map((x) => objectTree.dependencies[x])
         .filter((x) => typeof(x) !== 'string')
-        .map((dep) => {
-          if (
-            this.toPurlObjTree(objectTree) == '' || 
-            list.find((x) => { 
-              return x.toPurl() == this.toPurlObjTree(objectTree) 
-              })
-            ) {
-            return; 
-          } else {
-            this.recurseObjectTree(dep, list, false);
-          }
-      });
+      
+      for (let dep of thing) {
+        if (
+          this.toPurlObjTree(dep) == '' || 
+          list.find((x) => { 
+            return x.toPurl() == this.toPurlObjTree(dep) 
+            })
+          ) {
+          break; 
+        }
+        this.recurseObjectTree(dep, list, false);
+      }
     }
     return;
   }
