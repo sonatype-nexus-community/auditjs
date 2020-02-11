@@ -142,6 +142,11 @@ let argv = yargs
           type: 'string',
           description: 'Set path to whitelist file',
           demandOption: false
+        },
+        clear : {
+          description: 'Clears cache location if it has been set in config',
+          type: 'boolean',
+          demandOption: false
         }
       },
       )
@@ -163,7 +168,7 @@ if (argv) {
       .catch((e) => {
         throw new Error(e);
       });
-  } else if (argv._[0] === 'clear') {
+  } else if (argv.clear) {
     let config = new OssIndexServerConfig();
     config.getConfigFromFile();
     console.log('Cache location:', config.getCacheLocation());

@@ -36,7 +36,6 @@ auditjs [command]
 Commands:
   auditjs iq [options]    Audit this application using Nexus IQ Server
   auditjs config          Set config for OSS Index or Nexus IQ Server
-  auditjs clear           Clear the cache if a location has been set in config
   auditjs ossi [options]  Audit this application using Sonatype OSS Index
 
 Options:
@@ -60,6 +59,7 @@ Options:
   --json, -j       Set output to JSON                                  [boolean]
   --xml, -x        Set output to JUnit XML format                      [boolean]
   --whitelist, -w  Set path to whitelist file                           [string]
+  --clear          Clears cache location if it has been set in config
 ```
 
 ### Nexus IQ Server Usage
