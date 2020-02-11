@@ -47,11 +47,15 @@ export class OssIndexServerConfig extends Config {
   }
 
   public async clearCache(): Promise<void> {
-    if (this.cacheLocation) {
-      await storage.init({ dir: this.cacheLocation });
-      return await storage.clear();
+    try {
+      if (this.exists()) {
+        await storage.init({ dir: this.cacheLocation });
+        return await storage.clear();
+      }
     }
-    throw new Error('There was an error clearing the Cache, did you remember to set the location in config?')
+    catch {
+      throw new Error('There was an error clearing the Cache, did you remember to set the location in config? Clear will only clear the location set in config')
+    }
   }
 
   public getConfigFromFile(
