@@ -122,7 +122,7 @@ export class AuditOSSIndex {
     return vulnBlock;
   }
 
-  private getColorFromMaxScore(maxScore: number, defaultColor: string = 'darkblue'): string {
+  private getColorFromMaxScore(maxScore: number, defaultColor: string = 'chartreuse'): string {
     if (maxScore > 8) {
       defaultColor = 'red';
     }
