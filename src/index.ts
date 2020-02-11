@@ -177,7 +177,7 @@ if (argv) {
         console.log(`The cache at ${config.getCacheLocation()} has been cleared`)
       })
       .catch((e) => {
-        throw new Error(e)
+        console.log(e);
       })
   } else {
     let silence = (argv.json || argv.quiet || argv.xml) ? true : false;
