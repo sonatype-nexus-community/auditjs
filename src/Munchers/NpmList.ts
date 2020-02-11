@@ -55,6 +55,7 @@ export class NpmList implements Muncher {
     let data = await this.getReadInstalledResults();
 
     this.recurseObjectTree(data, this.depsArray, true);
+    console.log(this.depsArray);
 
     return this.depsArray;
   }
@@ -119,7 +120,7 @@ export class NpmList implements Muncher {
     }
     else if (pkg.name) {
       if (list.find((x) => { 
-        return (x.name == pkg.name && x.version == pkg.version)
+        return (x.name == pkg.name && x.version == pkg.version && x.group == '')
         })
       ) { 
         return false 
@@ -133,7 +134,6 @@ export class NpmList implements Muncher {
   private toPurlObjTree(objectTree: any): string {
     if (objectTree.name && objectTree.name.includes('/')) {
       let name = objectTree.name.split('/');
-
       return this.toPurl(name[1], objectTree.version, name[0]);
     }
     else if (objectTree.name) {
