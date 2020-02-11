@@ -155,7 +155,7 @@ export class AuditOSSIndex {
 
     console.log(chalk.keyword(this.getColorFromMaxScore(maxScore)).bold(`[${i + 1}/${total}] - ${result.toAuditLog()}`));
     console.log();
-    result.vulnerabilities && printVuln(result.vulnerabilities);
+    result.vulnerabilities && printVuln(result.vulnerabilities.sort((x, y) => { return +y.cvssScore - +x.cvssScore; }));
   }
 
   private printLine(line: any) {
