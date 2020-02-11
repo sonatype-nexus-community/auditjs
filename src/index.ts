@@ -167,11 +167,13 @@ if (argv) {
     let config = new OssIndexServerConfig();
     config.getConfigFromFile();
     console.log('Cache location:', config.getCacheLocation());
-    if (config.clearCache()) {
-      console.log(`The cache at ${config.getCacheLocation} has been cleared`)
-    } else {
-      throw new Error('There was a problem clearing cache, did you remember to set the location in your config file?')
-    }
+    config.clearCache()
+      .then(() => {
+        console.log(`The cache at ${config.getCacheLocation()} has been cleared`)
+      })
+      .catch((e) => {
+        throw new Error(e)
+      })
   } else {
     let silence = (argv.json || argv.quiet || argv.xml) ? true : false;
     let artie = (argv.artie) ? true : false;
