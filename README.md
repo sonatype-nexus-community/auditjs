@@ -59,7 +59,7 @@ Options:
   --json, -j       Set output to JSON                                  [boolean]
   --xml, -x        Set output to JUnit XML format                      [boolean]
   --whitelist, -w  Set path to whitelist file                           [string]
-  --clear          Clears cache location if it has been set in config
+  --clear          Clears cache location if it has been set in config  [boolean]
 ```
 
 ### Nexus IQ Server Usage
