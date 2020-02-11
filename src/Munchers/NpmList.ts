@@ -89,18 +89,17 @@ export class NpmList implements Muncher {
       let thing = Object.keys(objectTree.dependencies)
         .map((x) => objectTree.dependencies[x])
         .filter((x) => typeof(x) !== 'string')
-      
-      for (let dep of thing) {
-        if (
-          this.toPurlObjTree(dep) == '' || 
-          list.find((x) => { 
-            return x.toPurl() == this.toPurlObjTree(dep) 
-            })
-          ) {
-          break; 
-        }
-        this.recurseObjectTree(dep, list, false);
-      }
+        .map((dep) => {
+          if (
+            this.toPurlObjTree(dep) == '' || 
+            list.find((x) => { 
+              return x.toPurl() == this.toPurlObjTree(dep) 
+              })
+            ) {
+            return;
+          }
+          this.recurseObjectTree(dep, list, false);
+        });
     }
     return;
   }
