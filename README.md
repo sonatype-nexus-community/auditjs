@@ -36,6 +36,7 @@ auditjs [command]
 Commands:
   auditjs iq [options]    Audit this application using Nexus IQ Server
   auditjs config          Set config for OSS Index or Nexus IQ Server
+  auditjs clear           Clear the cache if a location has been set in config
   auditjs ossi [options]  Audit this application using Sonatype OSS Index
 
 Options:
