@@ -1,3 +1,10 @@
+## [4.0.1-alpha.29](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.28...v4.0.1-alpha.29) (2020-02-11)
+
+
+### Bug Fixes
+
+* bug where if @types/lib and lib exist and have same version, only one showed up ([#152](https://github.com/sonatype-nexus-community/auditjs/issues/152)) ([61f4510](https://github.com/sonatype-nexus-community/auditjs/commit/61f45105b17abd61a359ec7b3aa868e6171bf32b))
+
 ## [4.0.1-alpha.28](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.27...v4.0.1-alpha.28) (2020-02-10)
 
 
