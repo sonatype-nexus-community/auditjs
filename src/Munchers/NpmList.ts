@@ -55,7 +55,6 @@ export class NpmList implements Muncher {
     let data = await this.getReadInstalledResults();
 
     this.recurseObjectTree(data, this.depsArray, true);
-    console.log(this.depsArray);
 
     return this.depsArray;
   }
