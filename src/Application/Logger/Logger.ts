@@ -29,13 +29,15 @@ const transports = {
   ),
   file: new winston.transports.File(
     {
-      filename: path.join(homedir(), '.ossindex', '.audit-js.error.log'), 
+      filename: path.join(homedir(), '.ossindex', '.audit-js.error.log'),
+      options: { flags: 'w' }, 
       level: ERROR
     }
   ),
   combinedFile: new winston.transports.File(
     {
       filename: path.join(homedir(), '.ossindex', '.audit-js.combined.log'),
+      options: { flags: 'w' },
       level: DEBUG
     }
   )
