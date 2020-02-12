@@ -51,16 +51,13 @@ export class OssIndexServerConfig extends Config {
       try {      
         await storage.init({ dir: this.cacheLocation });
         await storage.clear();
-        this.logger.debug("Cache cleared", {cacheLocation: this.cacheLocation});
         return true;
       }
       // It's likely an error would only ever occur if there was a permission based issue, so log it and move on
       catch (error) {
-        this.logger.error(error, {cacheLocation: this.cacheLocation});
         return false;
       }
     }
-    this.logger.debug("Config did not exist, exiting clear cache function");
     return false;
   }
 

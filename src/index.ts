@@ -169,8 +169,6 @@ if (argv) {
   } else if (argv.clear) {
     let config = new OssIndexServerConfig();
     config.getConfigFromFile();
-    createAppLogger();
-    setConsoleTransportLevel(DEBUG);
 
     console.log('Cache location:', config.getCacheLocation());
 
