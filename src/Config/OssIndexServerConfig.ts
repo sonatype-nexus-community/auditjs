@@ -48,11 +48,13 @@ export class OssIndexServerConfig extends Config {
 
   public async clearCache(): Promise<void> {
     if (this.exists()) {
-      await storage.init({ dir: this.cacheLocation });
-      try {
+      try {      
+        await storage.init({ dir: this.cacheLocation });
         await storage.clear();
-      } catch (error) {
-        return error;
+        return;
+      }
+      catch (error) {
+        throw new Error(error);
       }
     }
   }
