@@ -19,6 +19,7 @@ import { Argv } from 'yargs';
 import { Application } from './Application/Application';
 import { AppConfig } from './Config/AppConfig';
 import { OssIndexServerConfig } from './Config/OssIndexServerConfig';
+import { ossIndexObject } from './Tests/TestHelper';
 
 // TODO: Flesh out the remaining set of args that NEED to be moved over, look at them with a fine toothed comb and lots of skepticism
 const normalizeHostAddress = (address: string) => {
@@ -174,14 +175,10 @@ if (argv) {
 
     console.log('Cache location:', config.getCacheLocation());
 
-    async () => {
-      try {
-        await config.clearCache();
-      }
-      catch (e) {
-        console.error(e);
-      }
-    } 
+    config.clearCache()
+      .then((success) => {
+        (success) ? process.exit(0) : process.exit(1);
+      });
   } else {
     let silence = (argv.json || argv.quiet || argv.xml) ? true : false;
     let artie = (argv.artie) ? true : false;
