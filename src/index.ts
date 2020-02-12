@@ -20,7 +20,7 @@ import { Application } from './Application/Application';
 import { AppConfig } from './Config/AppConfig';
 import { OssIndexServerConfig } from './Config/OssIndexServerConfig';
 import { ossIndexObject } from './Tests/TestHelper';
-import { createAppLogger } from './Application/Logger/Logger';
+import { createAppLogger, setConsoleTransportLevel, DEBUG } from './Application/Logger/Logger';
 
 // TODO: Flesh out the remaining set of args that NEED to be moved over, look at them with a fine toothed comb and lots of skepticism
 const normalizeHostAddress = (address: string) => {
@@ -170,6 +170,7 @@ if (argv) {
     let config = new OssIndexServerConfig();
     config.getConfigFromFile();
     createAppLogger();
+    setConsoleTransportLevel(DEBUG);
 
     console.log('Cache location:', config.getCacheLocation());
 
