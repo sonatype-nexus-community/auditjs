@@ -94,10 +94,6 @@ let argv = yargs
     'Set config for OSS Index or Nexus IQ Server'
   )
   .command(
-    'clear',
-    'Clear the cache if a location is set in config'
-  )
-  .command(
     'ossi [options]', 
     "Audit this application using Sonatype OSS Index",
     (y: Argv) => {
