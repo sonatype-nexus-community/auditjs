@@ -174,7 +174,7 @@ if (argv) {
 
     config.clearCache()
       .then((success) => {
-        (success) ? process.exit(0) : process.exit(1);
+        (success) ? (console.log("Cache cleared"), process.exit(0)) : process.exit(1);
       });
   } else {
     let silence = (argv.json || argv.quiet || argv.xml) ? true : false;
