@@ -47,19 +47,17 @@ export class OssIndexServerConfig extends Config {
   }
 
   public async clearCache(): Promise<boolean> {
-    if (this.exists()) {
-      try {      
-        await storage.init({ dir: this.cacheLocation });
-        await storage.clear();
-        return true;
-      }
-      // It's likely an error would only ever occur if there was a permission based issue, so log it and move on
-      catch (error) {
-        return false;
-      }
+    try {      
+      await storage.init({ dir: this.cacheLocation });
+      await storage.clear();
+      return true;
     }
-    return false;
+    // It's likely an error would only ever occur if there was a permission based issue, so log it and move on
+    catch (error) {
+      return false;
+    }
   }
+
 
   public getConfigFromFile(
     saveLocation: string = this.getConfigLocation()
