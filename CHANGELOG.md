@@ -1,3 +1,10 @@
+## [4.0.1-alpha.31](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.30...v4.0.1-alpha.31) (2020-02-13)
+
+
+### Bug Fixes
+
+* Reorg things a bit to get a better show usage experience ([#159](https://github.com/sonatype-nexus-community/auditjs/issues/159)) ([ce4448b](https://github.com/sonatype-nexus-community/auditjs/commit/ce4448b2de9ec9175f943457031f791daa8f8dd0))
+
 ## [4.0.1-alpha.30](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.29...v4.0.1-alpha.30) (2020-02-13)
 
 
