@@ -4,7 +4,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch With OSS Index",
+      "name": "Launch with OSS Index",
       "args": ["ossi", "--dev"],
       "program": "${workspaceFolder}/src/index.ts",
       "preLaunchTask": "tsc: build - tsconfig.json",
@@ -14,7 +14,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch With IQ Server",
+      "name": "Launch with Nexus IQ Server",
       "args": ["iq", "-a", "auditjs"],
       "program": "${workspaceFolder}/src/index.ts",
       "preLaunchTask": "tsc: build - tsconfig.json",
@@ -24,12 +24,22 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch With config",
+      "name": "Launch With Config",
       "args": ["config"],
       "program": "${workspaceFolder}/src/index.ts",
       "preLaunchTask": "tsc: build - tsconfig.json",
       "console": "integratedTerminal",
       "outFiles": ["${workspaceFolder}/bin/**/*.js"]
-    }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch with Cache clearing",
+      "args": ["ossi", "--clear"],
+      "program": "${workspaceFolder}/src/index.ts",
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      "console": "integratedTerminal",
+      "outFiles": ["${workspaceFolder}/bin/**/*.js"],
+    },
   ]
 }

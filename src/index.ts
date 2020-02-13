@@ -146,16 +146,11 @@ let argv = yargs
           type: 'boolean',
           demandOption: false
         }
-      },
-      )
+      })
     })
   .argv;
 
 if (argv) {
-  if (argv._[0] == undefined) {
-    yargs.showHelp();
-    process.exit(0);
-  }
   if (argv._[0] == 'config') {
     let config = new AppConfig();
 
@@ -176,7 +171,7 @@ if (argv) {
       .then((success) => {
         (success) ? (console.log("Cache cleared"), process.exit(0)) : process.exit(1);
       });
-  } else {
+  } else if (argv._[0] == 'iq' || argv._[0] == 'ossi') {
     let silence = (argv.json || argv.quiet || argv.xml) ? true : false;
     let artie = (argv.artie) ? true : false;
 
@@ -196,5 +191,8 @@ if (argv) {
     catch(error) {
       console.error(error.message);
     }
+  } else {
+    yargs.showHelp();
+    process.exit(0);
   }
 }
