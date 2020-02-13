@@ -1,3 +1,10 @@
+## [4.0.1-alpha.32](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.31...v4.0.1-alpha.32) (2020-02-13)
+
+
+### Bug Fixes
+
+* Add ability to clear cache ([#153](https://github.com/sonatype-nexus-community/auditjs/issues/153)) ([56be7ce](https://github.com/sonatype-nexus-community/auditjs/commit/56be7ce09724f4994e636c7ecad407f3059b420d))
+
 ## [4.0.1-alpha.31](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.30...v4.0.1-alpha.31) (2020-02-13)
 
 
