@@ -54,10 +54,10 @@ export class OssIndexServerConfig extends Config {
     }
     // It's likely an error would only ever occur if there was a permission based issue, so log it and move on
     catch (error) {
+      console.log(error);
       return false;
     }
   }
-
 
   public getConfigFromFile(
     saveLocation: string = this.getConfigLocation()

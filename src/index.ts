@@ -168,10 +168,9 @@ if (argv) {
 
       config.clearCache()
         .then((success) => {
-          (success) ? (console.log("Cache cleared"), process.exit(0)) : process.exit(1);
+          (success) ? (console.log("Cache cleared"), process.exit(0)) : console.log('There was an error clearing the cache, the cache location must only contain auditjs cache files.'), process.exit(0);
         });
-    }
-    else {
+      } else {
       console.error("Attempted to clear cache but no config file present, run `auditjs config` to set a cache location.");
     }
   } else if (argv._[0] == 'iq' || argv._[0] == 'ossi') {
