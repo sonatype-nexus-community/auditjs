@@ -144,10 +144,6 @@ let argv = yargs
   .argv;
 
 if (argv) {
-  if (argv._[0] == undefined) {
-    yargs.showHelp();
-    process.exit(0);
-  }
   if (argv._[0] == 'config') {
     let config = new AppConfig();
 
@@ -158,7 +154,8 @@ if (argv) {
       .catch((e) => {
         throw new Error(e);
       });
-  } else {
+  } 
+  else if (argv._[0] == 'iq' || argv._[0] == 'ossi') {
     let silence = (argv.json || argv.quiet || argv.xml) ? true : false;
     let artie = (argv.artie) ? true : false;
 
@@ -178,5 +175,8 @@ if (argv) {
     catch(error) {
       console.error(error.message);
     }
+  } else {
+    yargs.showHelp();
+    process.exit(0);
   }
 }
