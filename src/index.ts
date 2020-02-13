@@ -161,14 +161,19 @@ if (argv) {
       });
   } else if (argv.clear) {
     let config = new OssIndexServerConfig();
-    config.getConfigFromFile();
+    if (config.exists()) {
+      config.getConfigFromFile();
 
-    console.log('Cache location:', config.getCacheLocation());
+      console.log('Cache location:', config.getCacheLocation());
 
-    config.clearCache()
-      .then((success) => {
-        (success) ? (console.log("Cache cleared"), process.exit(0)) : console.log('There was an issue clearing the cache, does a Config exist? Did you make sure to set the location of the cache?'), process.exit(1);
-      });
+      config.clearCache()
+        .then((success) => {
+          (success) ? (console.log("Cache cleared"), process.exit(0)) : process.exit(1);
+        });
+    }
+    else {
+      console.error("Attempted to clear cache but no config file present, run `auditjs config` to set a cache location.");
+    }
   } else if (argv._[0] == 'iq' || argv._[0] == 'ossi') {
     let silence = (argv.json || argv.quiet || argv.xml) ? true : false;
     let artie = (argv.artie) ? true : false;
