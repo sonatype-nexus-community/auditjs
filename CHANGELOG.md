@@ -1,3 +1,10 @@
+## [4.0.1-alpha.30](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.29...v4.0.1-alpha.30) (2020-02-13)
+
+
+### Bug Fixes
+
+* Added section to README mentioning Nexus IQ Version 77+ requirement ([#158](https://github.com/sonatype-nexus-community/auditjs/issues/158)) ([a83f2fd](https://github.com/sonatype-nexus-community/auditjs/commit/a83f2fd639c16f8202d8745c19c67ee96ccc31a3))
+
 ## [4.0.1-alpha.29](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.28...v4.0.1-alpha.29) (2020-02-11)
 
 
