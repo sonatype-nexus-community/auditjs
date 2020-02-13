@@ -167,7 +167,7 @@ if (argv) {
 
     config.clearCache()
       .then((success) => {
-        (success) ? (console.log("Cache cleared"), process.exit(0)) : process.exit(1);
+        (success) ? (console.log("Cache cleared"), process.exit(0)) : console.log('There was an issue clearing the cache, does a Config exist? Did you make sure to set the location of the cache?'), process.exit(1);
       });
   } else if (argv._[0] == 'iq' || argv._[0] == 'ossi') {
     let silence = (argv.json || argv.quiet || argv.xml) ? true : false;
