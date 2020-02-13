@@ -1,3 +1,10 @@
+## [4.0.1-beta.25](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.24...v4.0.1-beta.25) (2020-02-13)
+
+
+### Bug Fixes
+
+* add logger to IQRequestService ([7b7a9fd](https://github.com/sonatype-nexus-community/auditjs/commit/7b7a9fd55d14401f199b4c446395574604cecfbe))
+
 ## [4.0.1-beta.24](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.23...v4.0.1-beta.24) (2020-02-11)
 
 
