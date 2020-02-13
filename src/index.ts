@@ -171,7 +171,7 @@ if (argv) {
           if (success) {
             console.log("Cache cleared");
           } else {
-            console.log('There was an error clearing the cache, the cache location must only contain auditjs cache files.');
+            console.log('There was an error clearing the cache, the cache location must only contain AuditJS cache files.');
           }
           process.exit(0);
         });
