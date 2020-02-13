@@ -18,6 +18,7 @@ import yargs from 'yargs';
 import { Argv } from 'yargs';
 import { Application } from './Application/Application';
 import { AppConfig } from './Config/AppConfig';
+import { OssIndexServerConfig } from './Config/OssIndexServerConfig';
 
 // TODO: Flesh out the remaining set of args that NEED to be moved over, look at them with a fine toothed comb and lots of skepticism
 const normalizeHostAddress = (address: string) => {
@@ -137,9 +138,13 @@ let argv = yargs
           type: 'string',
           description: 'Set path to whitelist file',
           demandOption: false
+        },
+        clear : {
+          description: 'Clears cache location if it has been set in config',
+          type: 'boolean',
+          demandOption: false
         }
-      },
-      )
+      })
     })
   .argv;
 
@@ -154,8 +159,27 @@ if (argv) {
       .catch((e) => {
         throw new Error(e);
       });
-  } 
-  else if (argv._[0] == 'iq' || argv._[0] == 'ossi') {
+  } else if (argv.clear) {
+    let config = new OssIndexServerConfig();
+    if (config.exists()) {
+      config.getConfigFromFile();
+
+      console.log('Cache location:', config.getCacheLocation());
+
+      config.clearCache()
+        .then((success) => {
+          if (success) {
+            console.log("Cache cleared");
+            process.exit(0);
+          } else {
+            console.log('There was an error clearing the cache, the cache location must only contain AuditJS cache files.');
+            process.exit(1);
+          }
+        });
+      } else {
+      console.error("Attempted to clear cache but no config file present, run `auditjs config` to set a cache location.");
+    }
+  } else if (argv._[0] == 'iq' || argv._[0] == 'ossi') {
     let silence = (argv.json || argv.quiet || argv.xml) ? true : false;
     let artie = (argv.artie) ? true : false;
 

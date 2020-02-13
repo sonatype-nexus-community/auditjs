@@ -18,6 +18,7 @@ import { readFileSync } from "fs";
 import { getAppLogger } from "../Application/Logger/Logger";
 import { Logger } from "winston";
 import { safeLoad } from "js-yaml";
+import storage from "node-persist";
 
 export class OssIndexServerConfig extends Config {
   constructor(
@@ -42,6 +43,18 @@ export class OssIndexServerConfig extends Config {
 
   public getCacheLocation(): string {
     return this.cacheLocation;
+  }
+
+  public async clearCache(): Promise<boolean> {
+    try {
+      await storage.init({ dir: this.cacheLocation });
+      await storage.clear();
+      return true;
+    } catch (error) {
+      // It's likely an error would only ever occur if there was a permission based issue, so log it and move on
+      console.log(error);
+      return false;
+    }
   }
 
   public getConfigFromFile(
