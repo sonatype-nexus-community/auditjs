@@ -168,7 +168,12 @@ if (argv) {
 
       config.clearCache()
         .then((success) => {
-          (success) ? (console.log("Cache cleared"), process.exit(0)) : console.log('There was an error clearing the cache, the cache location must only contain auditjs cache files.'), process.exit(0);
+          if (success) {
+            console.log("Cache cleared");
+          } else {
+            console.log('There was an error clearing the cache, the cache location must only contain auditjs cache files.');
+          }
+          process.exit(0);
         });
       } else {
       console.error("Attempted to clear cache but no config file present, run `auditjs config` to set a cache location.");
