@@ -129,7 +129,7 @@ export class OssIndexRequestService {
    * @returns a {@link Promise} of all Responses
   */
   public async callOSSIndexOrGetFromCache(data: Coordinates[], format: string = "npm"): Promise<any> {
-    await NodePersist.init({ dir: this.cacheLocation, ttl: TWELVE_HOURS});
+    await NodePersist.init({ dir: this.cacheLocation, ttl: TWELVE_HOURS });
     let responses = new Array();
     // console.debug(`Purls received, total purls before chunk: ${data.length}`);
     let results = await this.checkIfResultsAreInCache(data, format);
