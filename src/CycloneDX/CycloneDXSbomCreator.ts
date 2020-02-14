@@ -92,7 +92,7 @@ export class CycloneDXSbomCreator {
     if(pkg.extraneous) { return };
     if(!isRootPkg) {
       let pkgIdentifier = parsePackageJsonName(pkg.name);
-      let group: string = pkgIdentifier.scope as string;
+      let group: string = (pkgIdentifier.scope == null) ? '' : `@${pkgIdentifier.scope}`;
       let name: string = pkgIdentifier.fullName as string;
       let version: string = pkg.version as string;
       let purl: string = new PackageURL('npm', group, name, version, null, null).toString();
@@ -110,6 +110,10 @@ export class CycloneDXSbomCreator {
         purl: purl,
         externalReferences : this.addExternalReferences(pkg)
       };
+
+      if (component.group === '') {
+        delete component.group;
+      }
 
       if (this.options && this.options.includeLicenseData) {
         component.licenses = this.getLicenses(pkg);
