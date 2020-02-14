@@ -58,7 +58,6 @@
     "typescript": "^3.7.3"
   },
   "dependencies": {
-    "@cyclonedx/bom": "~1.0.4",
     "@types/figlet": "^1.2.0",
     "@types/js-yaml": "^3.12.1",
     "@types/node": "^12.12.17",
