@@ -8,15 +8,15 @@
     "esModuleInterop": true,
     "outDir": "./bin",
     "sourceMap": true,
-    "declaration": true
+    "declaration": true,
+    "resolveJsonModule": true,
+    "typeRoots": [
+      "./node_modules/@types",
+    ],
   },
-  "typeRoots": [
-    "./types",
-    "./node_modules/@types"
-  ],
   "include": [
-    "src/**/*.ts",
-    "types/**/*.d.ts"
+    "src/**/*.d.ts",
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules"

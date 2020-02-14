@@ -75,7 +75,8 @@ export class IqRequestService {
       let json = await response.json();
       return json.statusUrl as string;
     } else {
-      this.logger.debug('Response from third party API', {response: response});
+      let body = await response.text();
+      this.logger.error('Response from third party API', {response: body});
       throw new Error(`Unable to submit to Third Party API`);
     }
   }
