@@ -17,8 +17,8 @@ import { Muncher } from "./Muncher";
 import path from 'path';
 import fs from 'fs';
 import { Coordinates } from "../Types/Coordinates";
-import cyclonedx__bom from '@cyclonedx/bom';
 import readInstalled from 'read-installed'
+import { CycloneDXSbomCreator } from "../CycloneDX/CycloneDXSbomCreator";
 
 export class NpmList implements Muncher {
   private depsArray: Array<Coordinates> = new Array();
@@ -39,15 +39,25 @@ export class NpmList implements Muncher {
 
   // get cyclonedx formatted xml sbom that is submitted to the IQ Third Party API 
   public async getSbomFromCommand(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      // create bom from node-managed dependencies, cyclonedx uses read-installed on the backend
-      cyclonedx__bom.createbom("1.1", true, process.cwd(), { dev: this.devDependencies }, (err: any, out: any) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(out);
+    let sbomCreator = new CycloneDXSbomCreator(
+      process.cwd(), { 
+        devDependencies: this.devDependencies, 
+        includeLicenseData: false,
+        includeBomSerialNumber: true
       });
-    });
+
+    let result = await sbomCreator.createBom();
+
+    return result;
+    // return new Promise((resolve, reject) => {
+    //   // create bom from node-managed dependencies, cyclonedx uses read-installed on the backend
+    //   cyclonedx__bom.createbom("1.1", true, process.cwd(), { dev: this.devDependencies }, (err: any, out: any) => {
+    //     if (err) {
+    //       reject(err);
+    //     }
+    //     resolve(out);
+    //   });
+    // });
   }
 
   // turns object tree from read-installed into an array of coordinates represented node-managed deps
