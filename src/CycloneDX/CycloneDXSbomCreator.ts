@@ -213,7 +213,7 @@ export class CycloneDXSbomCreator {
   private getLicenses(pkg: any) {
     const spdxLicensesNonDeprecated = require('spdx-license-ids');
     const spdxLicensesDeprecated = require('spdx-license-ids/deprecated');
-    const spdxLicenses = spdxLicensesNonDeprecated.concat(spdxLicensesDeprecated);
+    const spdxLicenses = [...spdxLicensesNonDeprecated, ...spdxLicensesDeprecated];
     let license = pkg.license && (pkg.license.type || pkg.license);
     if (license) {
       if (!Array.isArray(license)) {
@@ -222,7 +222,7 @@ export class CycloneDXSbomCreator {
       return license.map((l: string) => {
         let licenseContent: LicenseContent = {};
 
-        if (spdxLicenses.some((v: any) => { return l === v; })) {
+        if (spdxLicenses.some((v: string) => { return l === v; })) {
           licenseContent.id = l;
         } else {
           licenseContent.name = l;
