@@ -1,3 +1,10 @@
+## [4.0.1-alpha.34](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.33...v4.0.1-alpha.34) (2020-02-14)
+
+
+### Bug Fixes
+
+* CycloneDX Inhouse Implementation ([#160](https://github.com/sonatype-nexus-community/auditjs/issues/160)) ([c128d2e](https://github.com/sonatype-nexus-community/auditjs/commit/c128d2e44ec80dc6fd97a63f499836da522cfb74))
+
 ## [4.0.1-alpha.33](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.32...v4.0.1-alpha.33) (2020-02-14)
 
 
