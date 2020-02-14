@@ -36,28 +36,18 @@ export class NpmList implements Muncher {
 
   // TODO: There is a 1 component discrepency in what gets identified by our installed deps implementation
   // and what gets identified by the iq server being passed the sbom, gotta figure out what that is and why...
-
-  // get cyclonedx formatted xml sbom that is submitted to the IQ Third Party API 
   public async getSbomFromCommand(): Promise<any> {
     let sbomCreator = new CycloneDXSbomCreator(
       process.cwd(), { 
         devDependencies: this.devDependencies, 
         includeLicenseData: false,
+        includeLicenseText: false,
         includeBomSerialNumber: true
       });
 
     let result = await sbomCreator.createBom();
 
     return result;
-    // return new Promise((resolve, reject) => {
-    //   // create bom from node-managed dependencies, cyclonedx uses read-installed on the backend
-    //   cyclonedx__bom.createbom("1.1", true, process.cwd(), { dev: this.devDependencies }, (err: any, out: any) => {
-    //     if (err) {
-    //       reject(err);
-    //     }
-    //     resolve(out);
-    //   });
-    // });
   }
 
   // turns object tree from read-installed into an array of coordinates represented node-managed deps

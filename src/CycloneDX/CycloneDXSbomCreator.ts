@@ -104,16 +104,19 @@ export class CycloneDXSbomCreator {
         version: version,
         description: description,
         hashes: [],
+        licenses: [],
         purl: purl,
         externalReferences : this.addExternalReferences(pkg)
       };
 
       if (this.options && this.options.includeLicenseData) {
         component.licenses = this.getLicenses(pkg);
+      } else {
+        delete component.licenses;
       }
 
       if (component.externalReferences === undefined || component.externalReferences.length === 0) {
-          delete component.externalReferences;
+        delete component.externalReferences;
       }
 
       this.processHashes(pkg, component);
@@ -206,7 +209,9 @@ export class CycloneDXSbomCreator {
    * object.
    */
   private getLicenses(pkg: any) {
-    const spdxLicenses = require('../../spdx-licenses.json');
+    const spdxLicensesNonDeprecated = require('spdx-license-ids');
+    const spdxLicensesDeprecated = require('spdx-license-ids/deprecated');
+    const spdxLicenses = spdxLicensesNonDeprecated.concat(spdxLicensesDeprecated);
     let license = pkg.license && (pkg.license.type || pkg.license);
     if (license) {
       if (!Array.isArray(license)) {
