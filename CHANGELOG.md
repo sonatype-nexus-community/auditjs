@@ -1,3 +1,10 @@
+## [4.0.1-beta.30](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.29...v4.0.1-beta.30) (2020-02-14)
+
+
+### Bug Fixes
+
+* Sorting vulnerabilities (high to low) and change colors ([#161](https://github.com/sonatype-nexus-community/auditjs/issues/161)) ([7954409](https://github.com/sonatype-nexus-community/auditjs/commit/79544094fd44de2c86365ac6c87108cde5123112))
+
 ## [4.0.1-beta.29](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.28...v4.0.1-beta.29) (2020-02-14)
 
 
