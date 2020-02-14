@@ -34,7 +34,7 @@ export class CycloneDXSbomCreator {
     readonly options?: Options,
     ) {}
 
-  public async createBom() {
+  public async createBom(pkgInfo: any) {
     let bom = builder.create('bom', { encoding: 'utf-8', separateArrayItems: true })
       .att('xmlns', this.SBOMSCHEMA);
 
@@ -45,7 +45,6 @@ export class CycloneDXSbomCreator {
     bom.att('version', 1);
 
     let componentsNode = bom.ele('components');
-    let pkgInfo = await this.getPackageInfoFromReadInstalled();
     let components = this.listComponents(pkgInfo);
 
     if (components.length > 0) {
@@ -61,10 +60,10 @@ export class CycloneDXSbomCreator {
     return bomString;
   }
 
-  private getPackageInfoFromReadInstalled() {
+  public getPackageInfoFromReadInstalled(path: string = this.path) {
     return new Promise((resolve, reject) => {
       readInstalled(
-        this.path, { 
+        path, { 
           dev: (this.options && this.options.devDependencies) ? this.options.devDependencies : false 
         }, 
         async (err: any, data: any) => {

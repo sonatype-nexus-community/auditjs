@@ -17,7 +17,6 @@ import { Muncher } from "./Muncher";
 import path from 'path';
 import fs from 'fs';
 import { Coordinates } from "../Types/Coordinates";
-import readInstalled from 'read-installed'
 import { CycloneDXSbomCreator } from "../CycloneDX/CycloneDXSbomCreator";
 
 export class NpmList implements Muncher {
@@ -45,31 +44,25 @@ export class NpmList implements Muncher {
         includeBomSerialNumber: true
       });
 
-    let result = await sbomCreator.createBom();
+    let pkgInfo = await sbomCreator.getPackageInfoFromReadInstalled();
+
+    let result = await sbomCreator.createBom(pkgInfo);
 
     return result;
   }
 
   // turns object tree from read-installed into an array of coordinates represented node-managed deps
   public async getInstalledDeps() {
-    let data = await this.getReadInstalledResults();
+    let sbomCreator = new CycloneDXSbomCreator(
+      process.cwd(), { 
+        devDependencies: this.devDependencies
+      });
+
+    let data = await sbomCreator.getPackageInfoFromReadInstalled();
 
     this.recurseObjectTree(data, this.depsArray, true);
 
     return this.depsArray;
-  }
-
-  private getReadInstalledResults() {
-    // Calls read-installed module, passes returned object tree to data, passes in current directory
-    return new Promise((resolve, reject) => {
-      readInstalled(process.cwd(), { dev: this.devDependencies }, async (err: any, data: any) => {
-        if (err) {
-          reject(err);
-        }
-  
-        resolve(data);
-      });
-    });
   }
 
   // recursive unit that traverses tree and terminates when object has no dependencies
