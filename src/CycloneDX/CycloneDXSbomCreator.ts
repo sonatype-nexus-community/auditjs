@@ -103,6 +103,7 @@ export class CycloneDXSbomCreator {
         name: name,
         version: version,
         description: description,
+        hashes: [],
         purl: purl,
         externalReferences : this.addExternalReferences(pkg)
       };
