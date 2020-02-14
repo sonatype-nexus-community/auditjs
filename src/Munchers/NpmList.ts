@@ -40,7 +40,6 @@ export class NpmList implements Muncher {
       process.cwd(), { 
         devDependencies: this.devDependencies, 
         includeLicenseData: false,
-        includeLicenseText: false,
         includeBomSerialNumber: true
       });
 

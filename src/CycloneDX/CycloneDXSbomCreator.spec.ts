@@ -16,6 +16,7 @@
 import { CycloneDXSbomCreator } from './CycloneDXSbomCreator';
 import expect from '../Tests/TestHelper';
 
+// Test object with circular dependency
 const object = {
   'name': 'testproject',
   'version': '1.0.0',
@@ -23,11 +24,23 @@ const object = {
   'dependencies': {
     'testdependency': {
       'name': 'testdependency',
-      'version': '1.0.1'
+      'version': '1.0.1',
+      'dependencies': {
+        'testdependency': {
+          'name': 'testdependency',
+          'version': '1.0.1',
+        }
+      }
     },
     'testdependency2': {
       'name': 'testdependency2',
-      'version': '1.0.2'
+      'version': '1.0.2',
+      'dependencies': {
+        'testdependency': {
+          'name': 'testdependency',
+          'version': '1.0.0',
+        }
+      }
     },
     'testdependency3': {
       'name': 'testdependency3',
@@ -36,7 +49,7 @@ const object = {
   }
 }
 
-const expectedResponse = `<?xml version="1.0" encoding="utf-8"?><bom xmlns="http://cyclonedx.org/schema/bom/1.1" version="1"><components><component type="library" bom-ref="pkg:npm/testdependency@1.0.1"><name>testdependency</name><version>1.0.1</version><description/><purl>pkg:npm/testdependency@1.0.1</purl></component><component type="library" bom-ref="pkg:npm/testdependency2@1.0.2"><name>testdependency2</name><version>1.0.2</version><description/><purl>pkg:npm/testdependency2@1.0.2</purl></component><component type="library" bom-ref="pkg:npm/testdependency3@1.0.2"><name>testdependency3</name><version>1.0.2</version><description/><purl>pkg:npm/testdependency3@1.0.2</purl></component></components></bom>`;
+const expectedResponse = `<?xml version="1.0" encoding="utf-8"?><bom xmlns="http://cyclonedx.org/schema/bom/1.1" version="1"><components><component type="library" bom-ref="pkg:npm/testdependency@1.0.1"><name>testdependency</name><version>1.0.1</version><description/><purl>pkg:npm/testdependency@1.0.1</purl></component><component type="library" bom-ref="pkg:npm/testdependency2@1.0.2"><name>testdependency2</name><version>1.0.2</version><description/><purl>pkg:npm/testdependency2@1.0.2</purl></component><component type="library" bom-ref="pkg:npm/testdependency@1.0.0"><name>testdependency</name><version>1.0.0</version><description/><purl>pkg:npm/testdependency@1.0.0</purl></component><component type="library" bom-ref="pkg:npm/testdependency3@1.0.2"><name>testdependency3</name><version>1.0.2</version><description/><purl>pkg:npm/testdependency3@1.0.2</purl></component></components></bom>`;
 
 describe("CycloneDXSbomCreator", async () => {
   it("should create an sbom given a minimal valid object", async () => {
