@@ -1,3 +1,6 @@
+/// <reference types="./typings/packageurl-js" />
+/// <reference types="./typings/parse-packagejson-name" />
+/// <reference types="./typings/read-installed" />
 /*
  * Copyright (c) 2020-present Erlend Oftedal, Steve Springett, Sonatype, Inc.
  *
