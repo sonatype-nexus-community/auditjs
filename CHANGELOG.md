@@ -1,3 +1,10 @@
+## [4.0.1-alpha.35](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.34...v4.0.1-alpha.35) (2020-02-14)
+
+
+### Bug Fixes
+
+* yarn project was not bringing back any dependencies ([#156](https://github.com/sonatype-nexus-community/auditjs/issues/156)) ([eb23ffb](https://github.com/sonatype-nexus-community/auditjs/commit/eb23ffbf14bdba5a6ba3d889ab4c7a5ddb9a20e8))
+
 ## [4.0.1-alpha.34](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.33...v4.0.1-alpha.34) (2020-02-14)
 
 
