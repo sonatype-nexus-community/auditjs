@@ -1,3 +1,10 @@
+## [4.0.1-beta.31](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.30...v4.0.1-beta.31) (2020-02-15)
+
+
+### Bug Fixes
+
+* Add in NOTICE file to be compliant with changes made to Apache licensed code ([e14400f](https://github.com/sonatype-nexus-community/auditjs/commit/e14400f8856052562f8a3c14f3ceabeb2041fb24))
+
 ## [4.0.1-beta.30](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.29...v4.0.1-beta.30) (2020-02-14)
 
 
