@@ -1,0 +1,12 @@
+AuditJS
+Copyright 2020 Sonatype.
+
+This product includes software developed by Erlend Oftedal and Steve Springett and 
+contains code derived from the @cyclonedx/bom (cyclonedx-node-module)
+package distributed on GitHub and npm. The software has been modified to:
+
+- Be written in TypeScript
+- Allow for the ability to exclude license data, or license text
+- Changes to how a purl is constructed
+
+The original code and repository can be found at: https://github.com/CycloneDX/cyclonedx-node-module
