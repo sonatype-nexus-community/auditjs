@@ -18,8 +18,8 @@ import { RequestHelpers } from './RequestHelpers';
 import os from 'os';
 const pack = require('../../package.json');
 
-describe("RequestHelpers", () => {
-  it("should return a valid user agent from getUserAgent ", () => {
+describe('RequestHelpers', () => {
+  it('should return a valid user agent from getUserAgent ', () => {
     const nodeVersion = process.versions;
     const environment = 'NodeJS';
     const environmentVersion = nodeVersion.node;

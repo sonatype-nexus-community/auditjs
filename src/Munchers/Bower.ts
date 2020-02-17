@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Muncher } from "./Muncher";
-import { Coordinates } from "../Types/Coordinates";
+import { Muncher } from './Muncher';
+import { Coordinates } from '../Types/Coordinates';
 import path from 'path';
 import fs from 'fs';
 
 export class Bower implements Muncher {
-
   constructor(readonly devDependencies: boolean = false) {}
 
   getSbomFromCommand(): Promise<any> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
   public isValid(): boolean {
-    const tempPath = path.join(process.cwd(), "bower.json");
+    const tempPath = path.join(process.cwd(), 'bower.json');
     return fs.existsSync(tempPath);
   }
 
@@ -42,13 +41,13 @@ export class Bower implements Muncher {
 
     Object.keys(json.dependencies).map((x: string) => {
       const version: string = json.dependencies[x];
-      depsArray.push(new Coordinates(x, version.replace("~", ""), ""));
+      depsArray.push(new Coordinates(x, version.replace('~', ''), ''));
     });
 
     if (this.devDependencies) {
       Object.keys(json.devDependencies).map((x: string) => {
         const version: string = json.devDependencies[x];
-        depsArray.push(new Coordinates(x, version.replace("~", ""), ""));
+        depsArray.push(new Coordinates(x, version.replace('~', ''), ''));
       });
     }
 

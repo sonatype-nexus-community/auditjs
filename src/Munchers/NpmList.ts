@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Muncher } from "./Muncher";
+import { Muncher } from './Muncher';
 import path from 'path';
 import fs from 'fs';
-import { Coordinates } from "../Types/Coordinates";
-import { CycloneDXSbomCreator } from "../CycloneDX/CycloneDXSbomCreator";
+import { Coordinates } from '../Types/Coordinates';
+import { CycloneDXSbomCreator } from '../CycloneDX/CycloneDXSbomCreator';
 
 export class NpmList implements Muncher {
   private depsArray: Array<Coordinates> = [];
@@ -29,19 +29,18 @@ export class NpmList implements Muncher {
   }
 
   public isValid(): boolean {
-    const nodeModulesPath = path.join(process.cwd(), "node_modules");
+    const nodeModulesPath = path.join(process.cwd(), 'node_modules');
     return fs.existsSync(nodeModulesPath);
   }
 
   // TODO: There is a 1 component discrepency in what gets identified by our installed deps implementation
   // and what gets identified by the iq server being passed the sbom, gotta figure out what that is and why...
   public async getSbomFromCommand(): Promise<string> {
-    const sbomCreator = new CycloneDXSbomCreator(
-      process.cwd(), { 
-        devDependencies: this.devDependencies, 
-        includeLicenseData: false,
-        includeBomSerialNumber: true
-      });
+    const sbomCreator = new CycloneDXSbomCreator(process.cwd(), {
+      devDependencies: this.devDependencies,
+      includeLicenseData: false,
+      includeBomSerialNumber: true,
+    });
 
     const pkgInfo = await sbomCreator.getPackageInfoFromReadInstalled();
 
@@ -52,10 +51,9 @@ export class NpmList implements Muncher {
 
   // turns object tree from read-installed into an array of coordinates represented node-managed deps
   public async getInstalledDeps(): Promise<Array<Coordinates>> {
-    const sbomCreator = new CycloneDXSbomCreator(
-      process.cwd(), { 
-        devDependencies: this.devDependencies
-      });
+    const sbomCreator = new CycloneDXSbomCreator(process.cwd(), {
+      devDependencies: this.devDependencies,
+    });
 
     const data = await sbomCreator.getPackageInfoFromReadInstalled();
 
@@ -72,22 +70,21 @@ export class NpmList implements Muncher {
     if (!isRootPkg) {
       if (this.maybePushNewCoordinate(objectTree, list)) {
         // NO OP
-      }
-      else {
+      } else {
         return;
       }
     }
     if (objectTree.dependencies) {
       Object.keys(objectTree.dependencies)
-        .map((x) => objectTree.dependencies[x])
-        .filter((x) => typeof(x) !== 'string')
-        .map((dep) => {
+        .map(x => objectTree.dependencies[x])
+        .filter(x => typeof x !== 'string')
+        .map(dep => {
           if (
-            this.toPurlObjTree(dep) == '' || 
-            list.find((x) => { 
-              return x.toPurl() == this.toPurlObjTree(dep) 
-              })
-            ) {
+            this.toPurlObjTree(dep) == '' ||
+            list.find(x => {
+              return x.toPurl() == this.toPurlObjTree(dep);
+            })
+          ) {
             return;
           }
           this.recurseObjectTree(dep, list, false);
@@ -99,23 +96,24 @@ export class NpmList implements Muncher {
   private maybePushNewCoordinate(pkg: any, list: Array<Coordinates>): boolean {
     if (pkg.name && pkg.name.includes('/')) {
       const name = pkg.name.split('/');
-      if (list.find((x) => { 
-        return (x.name == name[1] && x.version == pkg.version && x.group == name[0])
+      if (
+        list.find(x => {
+          return x.name == name[1] && x.version == pkg.version && x.group == name[0];
         })
-      ) { 
-        return false 
+      ) {
+        return false;
       }
       list.push(new Coordinates(name[1], pkg.version, name[0]));
       return true;
-    }
-    else if (pkg.name) {
-      if (list.find((x) => { 
-        return (x.name == pkg.name && x.version == pkg.version && x.group == '')
+    } else if (pkg.name) {
+      if (
+        list.find(x => {
+          return x.name == pkg.name && x.version == pkg.version && x.group == '';
         })
-      ) { 
-        return false 
+      ) {
+        return false;
       }
-      list.push(new Coordinates(pkg.name, pkg.version, ''))
+      list.push(new Coordinates(pkg.name, pkg.version, ''));
       return true;
     }
     return false;
@@ -125,8 +123,7 @@ export class NpmList implements Muncher {
     if (objectTree.name && objectTree.name.includes('/')) {
       const name = objectTree.name.split('/');
       return this.toPurl(name[1], objectTree.version, name[0]);
-    }
-    else if (objectTree.name) {
+    } else if (objectTree.name) {
       return this.toPurl(objectTree.name, objectTree.version);
     } else {
       return '';

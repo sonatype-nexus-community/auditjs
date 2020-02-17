@@ -29,7 +29,7 @@ export class OssIndexServerResult {
   }
 
   public toAuditLog(): string {
-    return `${this.coordinates.replace("%40", "@")} - ${this.vulnerabilityMessage()}`;
+    return `${this.coordinates.replace('%40', '@')} - ${this.vulnerabilityMessage()}`;
   }
 
   private vulnerabilityMessage(): string {

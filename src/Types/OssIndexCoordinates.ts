@@ -18,9 +18,9 @@ export class OssIndexCoordinates {
 
   public toConsumeableRequestObject() {
     return {
-      coordinates: this.coordinates.map((x) => {
-        return x
-      })
-    }
+      coordinates: this.coordinates.map(x => {
+        return x;
+      }),
+    };
   }
 }

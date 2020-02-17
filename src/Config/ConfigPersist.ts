@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 export class ConfigPersist {
-  constructor(readonly Username: string,
+  constructor(
+    readonly Username: string,
     readonly Token: string,
     readonly Server?: string,
-    readonly CacheLocation?: string,) {}
+    readonly CacheLocation?: string,
+  ) {}
 }

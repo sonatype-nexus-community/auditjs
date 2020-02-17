@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReportStatus } from "../Types/ReportStatus";
-import chalk = require("chalk");
-import { visuallySeperateText } from "../Visual/VisualHelper";
+import { ReportStatus } from '../Types/ReportStatus';
+import chalk = require('chalk');
+import { visuallySeperateText } from '../Visual/VisualHelper';
 
 export class AuditIQServer {
   public auditThirdPartyResults(results: ReportStatus): boolean {
@@ -24,10 +24,16 @@ export class AuditIQServer {
       return true;
     }
     if (results.policyAction === 'Failure') {
-      visuallySeperateText(true, [`Sonabot here, you have some build-breaking policy violations to clean up!`, chalk.keyword('orange').bold(`Report URL: ${results.reportHtmlUrl}`)]);
+      visuallySeperateText(true, [
+        `Sonabot here, you have some build-breaking policy violations to clean up!`,
+        chalk.keyword('orange').bold(`Report URL: ${results.reportHtmlUrl}`),
+      ]);
       return true;
     }
-    visuallySeperateText(false, [`Wonderbar! No build-breaking violations for this stage. You may still have non-breaking policy violations in the report.`, chalk.keyword('green').bold(`Report URL: ${results.reportHtmlUrl}`)]);
+    visuallySeperateText(false, [
+      `Wonderbar! No build-breaking violations for this stage. You may still have non-breaking policy violations in the report.`,
+      chalk.keyword('green').bold(`Report URL: ${results.reportHtmlUrl}`),
+    ]);
     return false;
   }
 }

@@ -17,9 +17,9 @@
 export const visuallySeperateText = (error: boolean, text: any[]) => {
   console.log();
   console.group();
-  text.forEach((val) => {
-    (error) ? console.error(val) : console.log(val);
+  text.forEach(val => {
+    error ? console.error(val) : console.log(val);
   });
   console.groupEnd();
   console.log();
-}
+};

@@ -35,15 +35,15 @@ const pj = require('../../package.json');
 
 export class Application {
   private results: Array<Coordinates> = [];
-  private sbom = "";
+  private sbom = '';
   private muncher: Muncher;
   private spinner: Spinner;
 
   constructor(
-    readonly devDependency: boolean = false, 
+    readonly devDependency: boolean = false,
     readonly silent: boolean = false,
-    readonly artie: boolean = false
-    ) {
+    readonly artie: boolean = false,
+  ) {
     createAppLogger();
     const npmList = new NpmList(devDependency);
     const bower = new Bower(devDependency);
@@ -54,14 +54,15 @@ export class Application {
     if (npmList.isValid()) {
       logMessage('Setting Muncher to npm list', DEBUG);
       this.muncher = npmList;
-    } 
-    else if (bower.isValid()) {
+    } else if (bower.isValid()) {
       logMessage('Setting Muncher to bower', DEBUG);
       this.muncher = bower;
-    }
-    else {
-      logMessage('Failed project directory validation.  Are you in a (built) node, yarn, or bower project directory?', 'error');
-      throw new Error("Could not instantiate muncher");
+    } else {
+      logMessage(
+        'Failed project directory validation.  Are you in a (built) node, yarn, or bower project directory?',
+        'error',
+      );
+      throw new Error('Could not instantiate muncher');
     }
   }
 
@@ -101,8 +102,7 @@ export class Application {
   private printHeader(): void {
     if (this.silent) {
       return;
-    }
-    else if (this.artie) {
+    } else if (this.artie) {
       this.doPrintHeader('ArtieJS', 'Ghost');
     } else {
       this.doPrintHeader();
@@ -110,8 +110,8 @@ export class Application {
   }
 
   private doPrintHeader(title = 'AuditJS', font: figlet.Fonts = '3D-ASCII'): void {
-    console.log(textSync(title, {font: font, horizontalLayout: 'fitted'}));
-    console.log(textSync('By Sonatype & Friends', {font: 'Pepper'}));
+    console.log(textSync(title, { font: font, horizontalLayout: 'fitted' }));
+    console.log(textSync('By Sonatype & Friends', { font: 'Pepper' }));
     visuallySeperateText(false, [`${title} version: ${pj.version}`]);
   }
 
@@ -120,8 +120,11 @@ export class Application {
       logMessage('Trying to get dependencies from Muncher', DEBUG);
       this.results = await this.muncher.getDepList();
       logMessage('Successfully got dependencies from Muncher', DEBUG);
-    } catch(e) {
-      logMessage(`An error was encountered while gathering your dependencies.`, ERROR, {title: e.message, stack: e.stack});
+    } catch (e) {
+      logMessage(`An error was encountered while gathering your dependencies.`, ERROR, {
+        title: e.message,
+        stack: e.stack,
+      });
       process.exit(1);
     }
   }
@@ -131,8 +134,11 @@ export class Application {
       logMessage('Trying to get sbom from cyclonedx/bom', DEBUG);
       this.sbom = await this.muncher.getSbomFromCommand();
       logMessage('Successfully got sbom from cyclonedx/bom', DEBUG);
-    } catch(e) {
-      logMessage(`An error was encountered while gathering your dependencies into an SBOM`, ERROR, {title: e.message, stack: e.stack});
+    } catch (e) {
+      logMessage(`An error was encountered while gathering your dependencies into an SBOM`, ERROR, {
+        title: e.message,
+        stack: e.stack,
+      });
       process.exit(1);
     }
   }
@@ -145,8 +151,8 @@ export class Application {
     logMessage('Submitting coordinates to Sonatype OSS Index', DEBUG);
     this.spinner.maybeCreateMessageForSpinner('Submitting coordinates to Sonatype OSS Index');
 
-    const format = (this.muncher instanceof Bower) ? "bower" : "npm";
-    logMessage('Format to query OSS Index picked', DEBUG, {format: format});
+    const format = this.muncher instanceof Bower ? 'bower' : 'npm';
+    logMessage('Format to query OSS Index picked', DEBUG, { format: format });
     try {
       logMessage('Attempting to query OSS Index or use Cache', DEBUG);
       const res = await requestService.callOSSIndexOrGetFromCache(this.results, format);
@@ -158,7 +164,9 @@ export class Application {
       let ossIndexResults: Array<OssIndexServerResult> = res.map((y: any) => {
         return new OssIndexServerResult(y);
       });
-      logMessage('Response morphed into Array<OssIndexServerResult>', DEBUG, { ossIndexServerResults: ossIndexResults });
+      logMessage('Response morphed into Array<OssIndexServerResult>', DEBUG, {
+        ossIndexServerResults: ossIndexResults,
+      });
       this.spinner.maybeSucceed();
 
       this.spinner.maybeCreateMessageForSpinner('Removing whitelisted vulnerabilities');
@@ -169,7 +177,11 @@ export class Application {
 
       this.spinner.maybeCreateMessageForSpinner('Auditing your results from Sonatype OSS Index');
       logMessage('Instantiating OSS Index Request Service, with quiet option', DEBUG, { quiet: args.quiet });
-      const auditOSSIndex = new AuditOSSIndex((args.quiet) ? true : false, (args.json) ? true : false, (args.xml) ? true : false);
+      const auditOSSIndex = new AuditOSSIndex(
+        args.quiet ? true : false,
+        args.json ? true : false,
+        args.xml ? true : false,
+      );
       this.spinner.maybeStop();
 
       logMessage('Attempting to audit results', DEBUG);
@@ -178,11 +190,11 @@ export class Application {
       logMessage('Results audited', DEBUG, { failureCode: failed });
       getAppLogger().end();
       getAppLogger().on('finish', () => {
-        (failed) ? process.exit(1) : process.exit(0);
+        failed ? process.exit(1) : process.exit(0);
       });
     } catch (e) {
       this.spinner.maybeStop();
-      logMessage('There was an error auditing with Sonatype OSS Index', ERROR, {title: e.message, stack: e.stack});
+      logMessage('There was an error auditing with Sonatype OSS Index', ERROR, { title: e.message, stack: e.stack });
       getAppLogger().end();
       getAppLogger().on('finish', () => {
         process.exit(1);
@@ -201,34 +213,37 @@ export class Application {
       this.spinner.maybeCreateMessageForSpinner('Submitting your dependencies');
       logMessage('Submitting SBOM to Sonatype IQ', DEBUG, this.sbom);
       const resultUrl = await requestService.submitToThirdPartyAPI(this.sbom);
-      
+
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Checking for results (this could take a minute)');
       logMessage('Polling IQ for report results', DEBUG, resultUrl);
 
-      requestService.asyncPollForResults(`${resultUrl}`, (e) => {
-        this.spinner.maybeFail();
-        logMessage('There was an issue auditing your application!', ERROR, {title: e.message});
-        process.exit(1);
-      }, 
-      (x) => {
-        this.spinner.maybeSucceed();
-        this.spinner.maybeCreateMessageForSpinner('Auditing your results');
-        const results: ReportStatus = Object.assign(new ReportStatus(), x);
-        logMessage('Sonatype IQ results obtained!', DEBUG, results);
+      requestService.asyncPollForResults(
+        `${resultUrl}`,
+        e => {
+          this.spinner.maybeFail();
+          logMessage('There was an issue auditing your application!', ERROR, { title: e.message });
+          process.exit(1);
+        },
+        x => {
+          this.spinner.maybeSucceed();
+          this.spinner.maybeCreateMessageForSpinner('Auditing your results');
+          const results: ReportStatus = Object.assign(new ReportStatus(), x);
+          logMessage('Sonatype IQ results obtained!', DEBUG, results);
 
-        const auditResults = new AuditIQServer();
+          const auditResults = new AuditIQServer();
 
-        this.spinner.maybeStop();
-        logMessage('Auditing results', DEBUG, results);
-        const failure = auditResults.auditThirdPartyResults(results);
-        logMessage('Audit finished', DEBUG, { failure: failure });
+          this.spinner.maybeStop();
+          logMessage('Auditing results', DEBUG, results);
+          const failure = auditResults.auditThirdPartyResults(results);
+          logMessage('Audit finished', DEBUG, { failure: failure });
 
-        (failure) ? process.exit(1) : process.exit(0);
-      });
+          failure ? process.exit(1) : process.exit(0);
+        },
+      );
     } catch (e) {
       this.spinner.maybeFail();
-      logMessage('There was an issue auditing your application!', ERROR, {title: e.message, stack: e.stack});
+      logMessage('There was an issue auditing your application!', ERROR, { title: e.message, stack: e.stack });
       process.exit(1);
     }
   }
@@ -252,15 +267,17 @@ export class Application {
     const config = new IqServerConfig();
     //config.getConfigFromFile();
     if (!config.exists() && !(args.user && args.password && args.server))
-      throw new Error('No config file is defined and you are missing one of the -h (host), -u (user), or -p (password) parameters.');
+      throw new Error(
+        'No config file is defined and you are missing one of the -h (host), -u (user), or -p (password) parameters.',
+      );
 
     return new IqRequestService(
-      (args.user !== undefined) ? args.user as string : config.getUsername(),
-      (args.password !== undefined) ? args.password as string : config.getToken(), 
-      (args.server !== undefined) ? args.server as string : config.getHost(),
+      args.user !== undefined ? (args.user as string) : config.getUsername(),
+      args.password !== undefined ? (args.password as string) : config.getToken(),
+      args.server !== undefined ? (args.server as string) : config.getHost(),
       args.application as string,
       args.stage as string,
-      args.timeout as number
+      args.timeout as number,
     );
   }
 }

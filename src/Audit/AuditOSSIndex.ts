@@ -13,18 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { OssIndexServerResult, Vulnerability } from "../Types/OssIndexServerResult";
+import { OssIndexServerResult, Vulnerability } from '../Types/OssIndexServerResult';
 import chalk from 'chalk';
 import * as builder from 'xmlbuilder';
 
 export class AuditOSSIndex {
+  constructor(readonly quiet: boolean = false, readonly json: boolean = false, readonly xml: boolean = false) {}
 
-  constructor(
-    readonly quiet: boolean = false, 
-    readonly json: boolean = false,
-    readonly xml: boolean = false) 
-  {}
-  
   public auditResults(results: Array<OssIndexServerResult>): boolean {
     if (this.json) {
       return this.printJson(results);
@@ -35,7 +30,7 @@ export class AuditOSSIndex {
 
     const total = results.length;
     results = results.sort((a, b) => {
-      return (a.coordinates < b.coordinates ? -1 : 1);
+      return a.coordinates < b.coordinates ? -1 : 1;
     });
 
     console.log();
@@ -46,7 +41,7 @@ export class AuditOSSIndex {
     console.log();
 
     this.printLine('-'.repeat(process.stdout.columns));
-    
+
     let isVulnerable = false;
 
     results.forEach((x: OssIndexServerResult, i: number) => {
@@ -78,25 +73,25 @@ export class AuditOSSIndex {
     testsuite.att('timestamp', new Date().toISOString());
     testsuite.att('failures', this.getNumberOfVulnerablePackagesFromResults(results));
 
-    for(let i = 0; i < results.length; i++) {
-      const testcase = testsuite.ele("testcase", {"classname": results[i].coordinates, "name": results[i].coordinates});
+    for (let i = 0; i < results.length; i++) {
+      const testcase = testsuite.ele('testcase', { classname: results[i].coordinates, name: results[i].coordinates });
       const vulns = results[i].vulnerabilities;
 
       if (vulns) {
         if (vulns.length > 0) {
-          const failure = testcase.ele("failure");
-          let failureText = "";
+          const failure = testcase.ele('failure');
+          let failureText = '';
           for (let j = 0; j < vulns.length; j++) {
-            failureText += this.getVulnerabilityForXmlBlock(vulns[j]) + "\n";
+            failureText += this.getVulnerabilityForXmlBlock(vulns[j]) + '\n';
           }
           failure.text(failureText);
-          failure.att("type", "Vulnerability detected");
+          failure.att('type', 'Vulnerability detected');
         }
       }
     }
 
     const xml = testsuite.end({ pretty: true });
-    
+
     console.log(xml);
 
     if (this.getNumberOfVulnerablePackagesFromResults(results) > 0) {
@@ -106,11 +101,13 @@ export class AuditOSSIndex {
   }
 
   private getNumberOfVulnerablePackagesFromResults(results: Array<OssIndexServerResult>): number {
-    return results.filter((x) => { return (x.vulnerabilities && x.vulnerabilities?.length > 0) }).length;
+    return results.filter(x => {
+      return x.vulnerabilities && x.vulnerabilities?.length > 0;
+    }).length;
   }
 
   private getVulnerabilityForXmlBlock(vuln: Vulnerability): string {
-    let vulnBlock = "";
+    let vulnBlock = '';
     vulnBlock += `Vulnerability Title: ${vuln.title}\n`;
     vulnBlock += `ID: ${vuln.id}\n`;
     vulnBlock += `Description: ${vuln.description}\n`;
@@ -125,37 +122,46 @@ export class AuditOSSIndex {
   private getColorFromMaxScore(maxScore: number, defaultColor = 'chartreuse'): string {
     if (maxScore > 8) {
       defaultColor = 'red';
-    }
-    else if (maxScore > 6) {
+    } else if (maxScore > 6) {
       defaultColor = 'orange';
-    }
-    else if (maxScore > 4) {
+    } else if (maxScore > 4) {
       defaultColor = 'yellow';
     }
     return defaultColor;
   }
 
   private printVulnerability(i: number, total: number, result: OssIndexServerResult): void {
-    const maxScore: number = Math.max(...result.vulnerabilities!.map((x: Vulnerability) => { return +x.cvssScore; }));
+    const maxScore: number = Math.max(
+      ...result.vulnerabilities!.map((x: Vulnerability) => {
+        return +x.cvssScore;
+      }),
+    );
     const printVuln = (x: Array<Vulnerability>) => {
       x.forEach((y: Vulnerability) => {
         const color: string = this.getColorFromMaxScore(+y.cvssScore);
         console.group();
-        console.log(chalk.keyword(color)(`Vulnerability Title: `), (`${y.title}`));
-        console.log(chalk.keyword(color)(`ID: `), (`${y.id}`));
-        console.log(chalk.keyword(color)(`Description: `), (`${y.description}`));
-        console.log(chalk.keyword(color)(`CVSS Score: `), (`${y.cvssScore}`));
-        console.log(chalk.keyword(color)(`CVSS Vector: `), (`${y.cvssVector}`));
-        console.log(chalk.keyword(color)(`CVE: `), (`${y.cve}`));
-        console.log(chalk.keyword(color)(`Reference: `), (`${y.reference}`));
+        console.log(chalk.keyword(color)(`Vulnerability Title: `), `${y.title}`);
+        console.log(chalk.keyword(color)(`ID: `), `${y.id}`);
+        console.log(chalk.keyword(color)(`Description: `), `${y.description}`);
+        console.log(chalk.keyword(color)(`CVSS Score: `), `${y.cvssScore}`);
+        console.log(chalk.keyword(color)(`CVSS Vector: `), `${y.cvssVector}`);
+        console.log(chalk.keyword(color)(`CVE: `), `${y.cve}`);
+        console.log(chalk.keyword(color)(`Reference: `), `${y.reference}`);
         console.log();
         console.groupEnd();
       });
-    }
+    };
 
-    console.log(chalk.keyword(this.getColorFromMaxScore(maxScore)).bold(`[${i + 1}/${total}] - ${result.toAuditLog()}`));
+    console.log(
+      chalk.keyword(this.getColorFromMaxScore(maxScore)).bold(`[${i + 1}/${total}] - ${result.toAuditLog()}`),
+    );
     console.log();
-    result.vulnerabilities && printVuln(result.vulnerabilities.sort((x, y) => { return +y.cvssScore - +x.cvssScore; }));
+    result.vulnerabilities &&
+      printVuln(
+        result.vulnerabilities.sort((x, y) => {
+          return +y.cvssScore - +x.cvssScore;
+        }),
+      );
   }
 
   private printLine(line: any): void {
