@@ -33,7 +33,7 @@ export class AuditOSSIndex {
       return this.printJUnitXML(results);
     }
 
-    let total = results.length;
+    const total = results.length;
     results = results.sort((a, b) => {
       return (a.coordinates < b.coordinates ? -1 : 1);
     });
@@ -47,7 +47,7 @@ export class AuditOSSIndex {
 
     this.printLine('-'.repeat(process.stdout.columns));
     
-    let isVulnerable: boolean = false;
+    let isVulnerable = false;
 
     results.forEach((x: OssIndexServerResult, i: number) => {
       if (x.vulnerabilities && x.vulnerabilities.length > 0) {
@@ -73,20 +73,20 @@ export class AuditOSSIndex {
   }
 
   private printJUnitXML(results: Array<OssIndexServerResult>): boolean {
-    let testsuite = builder.create('testsuite');
+    const testsuite = builder.create('testsuite');
     testsuite.att('tests', results.length);
     testsuite.att('timestamp', new Date().toISOString());
     testsuite.att('failures', this.getNumberOfVulnerablePackagesFromResults(results));
 
-    for(let i: number = 0; i < results.length; i++) {
-      let testcase = testsuite.ele("testcase", {"classname": results[i].coordinates, "name": results[i].coordinates});
-      let vulns = results[i].vulnerabilities;
+    for(let i = 0; i < results.length; i++) {
+      const testcase = testsuite.ele("testcase", {"classname": results[i].coordinates, "name": results[i].coordinates});
+      const vulns = results[i].vulnerabilities;
 
       if (vulns) {
         if (vulns.length > 0) {
-          let failure = testcase.ele("failure");
+          const failure = testcase.ele("failure");
           let failureText = "";
-          for (let j: number = 0; j < vulns.length; j++) {
+          for (let j = 0; j < vulns.length; j++) {
             failureText += this.getVulnerabilityForXmlBlock(vulns[j]) + "\n";
           }
           failure.text(failureText);
@@ -95,7 +95,7 @@ export class AuditOSSIndex {
       }
     }
 
-    let xml = testsuite.end({ pretty: true });
+    const xml = testsuite.end({ pretty: true });
     
     console.log(xml);
 
@@ -122,7 +122,7 @@ export class AuditOSSIndex {
     return vulnBlock;
   }
 
-  private getColorFromMaxScore(maxScore: number, defaultColor: string = 'chartreuse'): string {
+  private getColorFromMaxScore(maxScore: number, defaultColor = 'chartreuse'): string {
     if (maxScore > 8) {
       defaultColor = 'red';
     }
@@ -135,11 +135,11 @@ export class AuditOSSIndex {
     return defaultColor;
   }
 
-  private printVulnerability(i: number, total: number, result: OssIndexServerResult) {
-    let maxScore: number = Math.max(...result.vulnerabilities!.map((x: Vulnerability) => { return +x.cvssScore; }));
-    let printVuln = (x: Array<Vulnerability>) => {
+  private printVulnerability(i: number, total: number, result: OssIndexServerResult): void {
+    const maxScore: number = Math.max(...result.vulnerabilities!.map((x: Vulnerability) => { return +x.cvssScore; }));
+    const printVuln = (x: Array<Vulnerability>) => {
       x.forEach((y: Vulnerability) => {
-        let color: string = this.getColorFromMaxScore(+y.cvssScore);
+        const color: string = this.getColorFromMaxScore(+y.cvssScore);
         console.group();
         console.log(chalk.keyword(color)(`Vulnerability Title: `), (`${y.title}`));
         console.log(chalk.keyword(color)(`ID: `), (`${y.id}`));
@@ -158,7 +158,7 @@ export class AuditOSSIndex {
     result.vulnerabilities && printVuln(result.vulnerabilities.sort((x, y) => { return +y.cvssScore - +x.cvssScore; }));
   }
 
-  private printLine(line: any) {
+  private printLine(line: any): void {
     if (!this.quiet) {
       console.log(line);
     }

@@ -20,28 +20,28 @@ import { ReportStatus } from '../Types/ReportStatus';
 describe("AuditIQServer", () => {
   it("should provide a true value if IQ Server Results have policy violations", () => {
     const auditIqServer = new AuditIQServer();
-    let results = new ReportStatus();
+    const results = new ReportStatus();
     results.policyAction = 'Failure'
     results.reportHtmlUrl = "";
-    let result = auditIqServer.auditThirdPartyResults(results);
+    const result = auditIqServer.auditThirdPartyResults(results);
     expect(result).to.equal(true);
   });
 
   it("should provide a true value if IQ Server Results have an isError value", () => {
     const auditIqServer = new AuditIQServer();
-    let results = new ReportStatus();
+    const results = new ReportStatus();
     results.isError = true
     results.reportHtmlUrl = "";
-    let result = auditIqServer.auditThirdPartyResults(results);
+    const result = auditIqServer.auditThirdPartyResults(results);
     expect(result).to.equal(true);
   });
 
   it("should provide a false value if IQ Server Results have no policy violations", () => {
     const auditIqServer = new AuditIQServer();
-    let results = new ReportStatus();
+    const results = new ReportStatus();
     results.policyAction = 'None'
     results.reportHtmlUrl = "";
-    let result = auditIqServer.auditThirdPartyResults(results);
+    const result = auditIqServer.auditThirdPartyResults(results);
     expect(result).to.equal(false);
   });
 });

@@ -71,7 +71,7 @@ export class OssIndexRequestService {
   }
 
   private chunkData(data: Coordinates[]): Array<Array<Coordinates>> {
-    let chunks = new Array();
+    const chunks = [];
     while (data.length > 0) {
       chunks.push(data.splice(0, MAX_COORDINATES));
     }
@@ -104,14 +104,14 @@ export class OssIndexRequestService {
 
   private async checkIfResultsAreInCache(
     data: Coordinates[],
-    format: string = "npm"
+    format = "npm"
   ): Promise<PurlContainer> {
-    let inCache = new Array<OssIndexServerResult>();
-    let notInCache = new Array<Coordinates>();
+    const inCache = new Array<OssIndexServerResult>();
+    const notInCache = new Array<Coordinates>();
 
     for (let i = 0; i < data.length; i++) {
-      let coord = data[i];
-      let dataInCache = await NodePersist.getItem(coord.toPurl(format));
+      const coord = data[i];
+      const dataInCache = await NodePersist.getItem(coord.toPurl(format));
       if (dataInCache) {
         inCache.push(dataInCache);
       } else {
@@ -119,7 +119,6 @@ export class OssIndexRequestService {
       }
     }
 
-    // console.debug(`Number of coordinates found in cache: ${inCache.length}`);
     return new PurlContainer(inCache, notInCache);
   }
 
@@ -128,16 +127,16 @@ export class OssIndexRequestService {
    * @param data - {@link Coordinates} Array
    * @returns a {@link Promise} of all Responses
   */
-  public async callOSSIndexOrGetFromCache(data: Coordinates[], format: string = "npm"): Promise<any> {
+  public async callOSSIndexOrGetFromCache(data: Coordinates[], format = "npm"): Promise<any> {
     await NodePersist.init({ dir: this.cacheLocation, ttl: TWELVE_HOURS });
-    let responses = new Array();
+    const responses = new Array();
     // console.debug(`Purls received, total purls before chunk: ${data.length}`);
-    let results = await this.checkIfResultsAreInCache(data, format);
-    let chunkedPurls = this.chunkData(results.notInCache);
+    const results = await this.checkIfResultsAreInCache(data, format);
+    const chunkedPurls = this.chunkData(results.notInCache);
 
-    for (let chunk of chunkedPurls) {
+    for (const chunk of chunkedPurls) {
       try {
-        let res = this.getResultsFromOSSIndex(
+        const res = this.getResultsFromOSSIndex(
           new OssIndexCoordinates(chunk.map(x => x.toPurl(format)))
         );
         responses.push(res);

@@ -53,9 +53,9 @@ const expectedResponse = `<?xml version="1.0" encoding="utf-8"?><bom xmlns="http
 
 describe("CycloneDXSbomCreator", async () => {
   it("should create an sbom string given a minimal valid object", async () => {
-    let sbomCreator = new CycloneDXSbomCreator(process.cwd());
+    const sbomCreator = new CycloneDXSbomCreator(process.cwd());
 
-    let string = await sbomCreator.createBom(object);
+    const string = await sbomCreator.createBom(object);
 
     expect(string).to.eq(expectedResponse);
   });

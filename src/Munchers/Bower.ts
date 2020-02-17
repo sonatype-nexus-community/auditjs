@@ -27,7 +27,7 @@ export class Bower implements Muncher {
   }
 
   public isValid(): boolean {
-    let tempPath = path.join(process.cwd(), "bower.json");
+    const tempPath = path.join(process.cwd(), "bower.json");
     return fs.existsSync(tempPath);
   }
 
@@ -36,18 +36,18 @@ export class Bower implements Muncher {
   }
 
   public async getInstalledDeps(): Promise<Coordinates[]> {
-    let depsArray: Array<Coordinates> = new Array();
-    let file = fs.readFileSync(path.join(process.cwd(), 'bower.json'));
-    let json = JSON.parse(file.toString());
+    const depsArray: Array<Coordinates> = [];
+    const file = fs.readFileSync(path.join(process.cwd(), 'bower.json'));
+    const json = JSON.parse(file.toString());
 
-    Object.keys(json.dependencies).map((x: any) => {
-      let version: string = json.dependencies[x];
+    Object.keys(json.dependencies).map((x: string) => {
+      const version: string = json.dependencies[x];
       depsArray.push(new Coordinates(x, version.replace("~", ""), ""));
     });
 
     if (this.devDependencies) {
-      Object.keys(json.devDependencies).map((x: any) => {
-        let version: string = json.devDependencies[x];
+      Object.keys(json.devDependencies).map((x: string) => {
+        const version: string = json.devDependencies[x];
         depsArray.push(new Coordinates(x, version.replace("~", ""), ""));
       });
     }

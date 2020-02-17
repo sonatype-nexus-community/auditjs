@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IqServerResult } from "../Types/IqServerResult";
 import { ReportStatus } from "../Types/ReportStatus";
 import chalk = require("chalk");
 import { visuallySeperateText } from "../Visual/VisualHelper";
@@ -29,26 +28,6 @@ export class AuditIQServer {
       return true;
     }
     visuallySeperateText(false, [`Wonderbar! No build-breaking violations for this stage. You may still have non-breaking policy violations in the report.`, chalk.keyword('green').bold(`Report URL: ${results.reportHtmlUrl}`)]);
-    return false;
-  }
-
-  public auditResults(results: Array<IqServerResult>): boolean {
-    let total = results.length;
-    results = results.sort((a, b) => {
-      return (a.component.packageUrl < b.component.packageUrl ? -1 : 1);
-    });
-
-    visuallySeperateText(false, ['Sonabot here, beep boop beep boop, here are your Nexus IQ Server results:\n', `Total dependencies audited: ${total}`])
-
-    console.log('-'.repeat(process.stdout.columns));
-    
-    results.forEach((x: IqServerResult, i: number) => {
-      console.log(`[${i + 1}/${total}] - ${x.toAuditLog()}`);
-    });
-
-    console.log('-'.repeat(process.stdout.columns));
-
-    // TODO: Temporary failure on purpose
     return false;
   }
 }

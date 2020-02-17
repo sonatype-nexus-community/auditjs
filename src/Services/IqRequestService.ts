@@ -22,8 +22,8 @@ import { Logger } from 'winston';
 const APPLICATION_INTERNAL_ID_ENDPOINT = '/api/v2/applications?publicId=';
 
 export class IqRequestService {
-  private internalId: string = "";
-  private isInitialized: boolean = false;
+  private internalId = "";
+  private isInitialized = false;
   private logger: Logger;
 
   constructor(
@@ -42,14 +42,14 @@ export class IqRequestService {
     this.isInitialized = true;
   };
 
-  private timeoutAttempts: number = 0;
+  private timeoutAttempts = 0;
 
   private async getApplicationInternalId(): Promise<string> {
     const response = await fetch(
       `${this.host}${APPLICATION_INTERNAL_ID_ENDPOINT}${this.application}`,
       { method: 'get', headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()]});
     if (response.ok) {
-      let res = await response.json();
+      const res = await response.json();
       try {
         return res.applications[0].id;
       } catch(e) {
@@ -72,10 +72,10 @@ export class IqRequestService {
       { method: 'post', headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ["Content-Type", "application/xml"]], body: data}
     );
     if (response.ok) {
-      let json = await response.json();
+      const json = await response.json();
       return json.statusUrl as string;
     } else {
-      let body = await response.text();
+      const body = await response.text();
       this.logger.error('Response from third party API', {response: body});
       throw new Error(`Unable to submit to Third Party API`);
     }
@@ -104,7 +104,7 @@ export class IqRequestService {
         }
         setTimeout(() => this.asyncPollForResults(url, errorHandler, pollingFinished), 1000);
       } else {
-        let json = await response.json();
+        const json = await response.json();
         pollingFinished(json);
       }
     }

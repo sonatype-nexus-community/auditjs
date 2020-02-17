@@ -1,6 +1,7 @@
 /// <reference types="./typings/packageurl-js" />
 /// <reference types="./typings/parse-packagejson-name" />
 /// <reference types="./typings/read-installed" />
+/// <reference types="./typings/spdx-license-ids" />
 /*
  * Copyright (c) 2020-present Erlend Oftedal, Steve Springett, Sonatype, Inc.
  *
@@ -28,6 +29,8 @@ import { LicenseContent } from "./Types/LicenseContent";
 import { Component, GenericDescription } from "./Types/Component";
 import { ExternalReference } from "./Types/ExternalReference";
 import { Hash } from "./Types/Hash";
+import spdxLicensesNonDeprecated = require('spdx-license-ids');
+import spdxLicensesDeprecated = require('spdx-license-ids/deprecated');
 
 export class CycloneDXSbomCreator {
   readonly licenseFilenames: Array<string> = [ 
@@ -56,8 +59,8 @@ export class CycloneDXSbomCreator {
     readonly options?: Options,
     ) {}
 
-  public async createBom(pkgInfo: any) {
-    let bom = builder.create('bom', { encoding: 'utf-8', separateArrayItems: true })
+  public async createBom(pkgInfo: any): Promise<string> {
+    const bom = builder.create('bom', { encoding: 'utf-8', separateArrayItems: true })
       .att('xmlns', this.SBOMSCHEMA);
 
     if (this.options && this.options.includeBomSerialNumber) {
@@ -66,14 +69,14 @@ export class CycloneDXSbomCreator {
 
     bom.att('version', 1);
 
-    let componentsNode = bom.ele('components');
-    let components = this.listComponents(pkgInfo);
+    const componentsNode = bom.ele('components');
+    const components = this.listComponents(pkgInfo);
 
     if (components.length > 0) {
       componentsNode.ele(components);
     }
 
-    let bomString = bom.end({
+    const bomString = bom.end({
       width: 0,
       allowEmpty: false,
       spaceBeforeSlash: ''
@@ -82,7 +85,7 @@ export class CycloneDXSbomCreator {
     return bomString;
   }
 
-  public getPackageInfoFromReadInstalled(path: string = this.path) {
+  public getPackageInfoFromReadInstalled(path: string = this.path): Promise<any> {
     return new Promise((resolve, reject) => {
       readInstalled(
         path, { 
@@ -99,25 +102,25 @@ export class CycloneDXSbomCreator {
   }
 
   private listComponents(pkg: any) {
-    let list: any = {};
-    const isRootPkg: boolean = true;
+    const list: any = {};
+    const isRootPkg = true;
     this.addComponent(pkg, list, isRootPkg);
     return Object.keys(list).map(k => ({ component: list[k] }));
   }
 
-  private addComponent(pkg: any, list: any, isRootPkg: boolean = false) {
+  private addComponent(pkg: any, list: any, isRootPkg = false) {
     //read-installed with default options marks devDependencies as extraneous
     //if a package is marked as extraneous, do not include it as a component
     if(pkg.extraneous) { return };
     if(!isRootPkg) {
-      let pkgIdentifier = parsePackageJsonName(pkg.name);
-      let group: string = (pkgIdentifier.scope == null) ? '' : `@${pkgIdentifier.scope}`;
-      let name: string = pkgIdentifier.fullName as string;
-      let version: string = pkg.version as string;
-      let purl: string = new PackageURL('npm', group, name, version, null, null).toString();
-      let description: GenericDescription = { '#cdata': pkg.description };
+      const pkgIdentifier = parsePackageJsonName(pkg.name);
+      const group: string = (pkgIdentifier.scope == null) ? '' : `@${pkgIdentifier.scope}`;
+      const name: string = pkgIdentifier.fullName as string;
+      const version: string = pkg.version as string;
+      const purl: string = new PackageURL('npm', group, name, version, null, null).toString();
+      const description: GenericDescription = { '#cdata': pkg.description };
 
-      let component: Component = {
+      const component: Component = {
         '@type': this.determinePackageType(pkg),
         '@bom-ref': purl,
         group: group,
@@ -161,9 +164,9 @@ export class CycloneDXSbomCreator {
    * If the author has described the module as a 'framework', the take their
    * word for it, otherwise, identify the module as a 'library'.
    */
-  private determinePackageType(pkg: any) {
+  private determinePackageType(pkg: any): string {
     if (pkg.hasOwnProperty('keywords')) {
-      for (let keyword of pkg.keywords) {
+      for (const keyword of pkg.keywords) {
         if (keyword.toLowerCase() === 'framework') {
           return 'framework';
         }
@@ -181,7 +184,7 @@ export class CycloneDXSbomCreator {
     if (pkg._shasum) {
       component.hashes.push({hash: { '@alg':'SHA-1', '#text': pkg._shasum} });
     } else if (pkg._integrity) {
-      let integrity = ssri.parse(pkg._integrity);
+      const integrity = ssri.parse(pkg._integrity);
       // Components may have multiple hashes with various lengths. Check each one
       // that is supported by the CycloneDX specification.
       if (integrity.hasOwnProperty('sha512')) {
@@ -206,7 +209,7 @@ export class CycloneDXSbomCreator {
    * Adds a hash to component.
    */
   private addComponentHash(alg: string, digest: string): Hash {
-    let hash = Buffer.from(digest, 'base64').toString('hex');
+    const hash = Buffer.from(digest, 'base64').toString('hex');
     return {hash: {'@alg': alg, '#text': hash}};
   }
 
@@ -214,7 +217,7 @@ export class CycloneDXSbomCreator {
    * Adds external references supported by the package format.
    */
   private addExternalReferences(pkg: any): Array<ExternalReference> {
-    let externalReferences = [];
+    const externalReferences = [];
     if (pkg.homepage) {
       externalReferences.push({'reference': {'@type': 'website', url: pkg.homepage}});
     }
@@ -234,8 +237,6 @@ export class CycloneDXSbomCreator {
    * object.
    */
   private getLicenses(pkg: any) {
-    const spdxLicensesNonDeprecated = require('spdx-license-ids');
-    const spdxLicensesDeprecated = require('spdx-license-ids/deprecated');
     const spdxLicenses = [...spdxLicensesNonDeprecated, ...spdxLicensesDeprecated];
     let license = pkg.license && (pkg.license.type || pkg.license);
     if (license) {
@@ -243,7 +244,7 @@ export class CycloneDXSbomCreator {
         license = [license];
       }
       return license.map((l: string) => {
-        let licenseContent: LicenseContent = {};
+        const licenseContent: LicenseContent = {};
 
         if (spdxLicenses.some((v: string) => { return l === v; })) {
           licenseContent.id = l;
@@ -285,9 +286,9 @@ export class CycloneDXSbomCreator {
   * content-type attribute, if not default. Returns the license text object.
   */
   private readLicenseText(licenseFilepath: string, licenseContentType: string): GenericDescription | undefined {
-    let licenseText = fs.readFileSync(licenseFilepath, 'utf8');
+    const licenseText = fs.readFileSync(licenseFilepath, 'utf8');
     if (licenseText) {
-      let licenseContentText: GenericDescription = { '#cdata' : licenseText };
+      const licenseContentText: GenericDescription = { '#cdata' : licenseText };
       if (licenseContentType !== 'text/plain') {
         licenseContentText['@content-type'] = licenseContentType;
       }

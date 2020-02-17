@@ -20,8 +20,8 @@ import { IqRequestService } from "./IqRequestService";
 
 describe("IQRequestService", () => {
   it("should have it's third party API request rejected when the IQ Server is down", async () => {
-    let internalId = "123456"
-    let stage = "build"
+    const internalId = "123456"
+    const stage = "build"
     const scope = nock("http://testlocation:8070")
       .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
       .replyWithError("you messed up!");
@@ -38,9 +38,9 @@ describe("IQRequestService", () => {
   });
 
   it("should have it's third party API request accepted when the IQ Server is up", async () => {
-    let internalId = "4bb67dcfc86344e3a483832f8c496419"
-    let stage = "build"
-    let response = {
+    const internalId = "4bb67dcfc86344e3a483832f8c496419"
+    const stage = "build"
+    const response = {
       statusCode: 202,
       body: {
         "statusUrl": "api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb"
@@ -62,7 +62,7 @@ describe("IQRequestService", () => {
   });
 
   it("should have return a proper result when polling IQ Server and the request is eventually valid", async () => {
-    let response = {
+    const response = {
       statusCode: 200,
       body: {
         "policyAction": "None",
@@ -71,7 +71,7 @@ describe("IQRequestService", () => {
       }
     }
 
-    let stage = "build"
+    const stage = "build"
     const scope = nock("http://testlocation:8070")
       .get(`/api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb`)
       .reply(response.statusCode, response.body);

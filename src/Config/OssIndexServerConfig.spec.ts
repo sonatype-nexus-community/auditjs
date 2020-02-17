@@ -25,11 +25,11 @@ describe("OssIndexServerConfig", async () => {
     sinon.stub(os, 'homedir').returns('/nonsense');
     mock({ '/nonsense': {}});
 
-    let config = new OssIndexServerConfig();
-    let configPersist = new ConfigPersist("username", "password")
+    const config = new OssIndexServerConfig();
+    const configPersist = new ConfigPersist("username", "password")
     expect(config.saveFile(configPersist)).to.equal(true);
 
-    let conf = config.getConfigFromFile('/nonsense/.ossindex/.oss-index-config');
+    const conf = config.getConfigFromFile('/nonsense/.ossindex/.oss-index-config');
 
     expect(conf.getUsername()).to.equal('username');
     expect(conf.getToken()).to.equal('password');

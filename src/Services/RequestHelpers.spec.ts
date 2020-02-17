@@ -16,17 +16,16 @@
 import expect from '../Tests/TestHelper';
 import { RequestHelpers } from './RequestHelpers';
 import os from 'os';
-
-const pack = require('../../package.json');
+import pack = require('../../package.json');
 
 describe("RequestHelpers", () => {
   it("should return a valid user agent from getUserAgent ", () => {
-    let nodeVersion = process.versions;
-    let environment = 'NodeJS';
-    let environmentVersion = nodeVersion.node;
-    let system = `${os.type()} ${os.release()}`;
-    let res = RequestHelpers.getUserAgent();
-    let expected = ['User-Agent', `AuditJS/${pack.version} (${environment} ${environmentVersion}; ${system})`];
+    const nodeVersion = process.versions;
+    const environment = 'NodeJS';
+    const environmentVersion = nodeVersion.node;
+    const system = `${os.type()} ${os.release()}`;
+    const res = RequestHelpers.getUserAgent();
+    const expected = ['User-Agent', `AuditJS/${pack.version} (${environment} ${environmentVersion}; ${system})`];
 
     expect(res).to.include.members(expected);
   });
