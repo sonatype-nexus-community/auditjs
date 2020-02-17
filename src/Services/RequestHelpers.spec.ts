@@ -16,7 +16,7 @@
 import expect from '../Tests/TestHelper';
 import { RequestHelpers } from './RequestHelpers';
 import os from 'os';
-import pack = require('../../package.json');
+const pack = require('../../package.json');
 
 describe("RequestHelpers", () => {
   it("should return a valid user agent from getUserAgent ", () => {

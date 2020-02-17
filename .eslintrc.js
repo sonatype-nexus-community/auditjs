@@ -11,5 +11,6 @@ module.exports =  {
     "@typescript-eslint/no-use-before-define": "off",
     "prefer-spread": "off",
     "@typescript-eslint/no-array-constructor": "off",
+    "@typescript-eslint/no-var-requires": "off",
   },
 };

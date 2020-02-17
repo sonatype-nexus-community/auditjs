@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import os from 'os';
-import pack = require('../../package.json');
+const pack = require('../../package.json');
 
 export class RequestHelpers {
   public static getUserAgent(): string[] {
