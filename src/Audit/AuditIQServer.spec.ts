@@ -17,7 +17,20 @@ import expect from '../Tests/TestHelper';
 import { AuditIQServer } from './AuditIQServer';
 import { ReportStatus } from '../Types/ReportStatus';
 
+const oldLog = console.log;
+const oldError = console.error;
+
 describe('AuditIQServer', () => {
+  before(() => {
+    console.log = () => {};
+    console.error = () => {};
+  });
+
+  after(() => {
+    console.log = oldLog;
+    console.error = oldError;
+  });
+
   it('should provide a true value if IQ Server Results have policy violations', () => {
     const auditIqServer = new AuditIQServer();
     const results = new ReportStatus();
