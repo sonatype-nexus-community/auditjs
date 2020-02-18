@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IqServerResult } from "../Types/IqServerResult";
-import { ReportStatus } from "../Types/ReportStatus";
-import chalk = require("chalk");
-import { visuallySeperateText } from "../Visual/VisualHelper";
+import { ReportStatus } from '../Types/ReportStatus';
+import chalk = require('chalk');
+import { visuallySeperateText } from '../Visual/VisualHelper';
 
 export class AuditIQServer {
   public auditThirdPartyResults(results: ReportStatus): boolean {
@@ -25,30 +24,16 @@ export class AuditIQServer {
       return true;
     }
     if (results.policyAction === 'Failure') {
-      visuallySeperateText(true, [`Sonabot here, you have some build-breaking policy violations to clean up!`, chalk.keyword('orange').bold(`Report URL: ${results.reportHtmlUrl}`)]);
+      visuallySeperateText(true, [
+        `Sonabot here, you have some build-breaking policy violations to clean up!`,
+        chalk.keyword('orange').bold(`Report URL: ${results.reportHtmlUrl}`),
+      ]);
       return true;
     }
-    visuallySeperateText(false, [`Wonderbar! No build-breaking violations for this stage. You may still have non-breaking policy violations in the report.`, chalk.keyword('green').bold(`Report URL: ${results.reportHtmlUrl}`)]);
-    return false;
-  }
-
-  public auditResults(results: Array<IqServerResult>): boolean {
-    let total = results.length;
-    results = results.sort((a, b) => {
-      return (a.component.packageUrl < b.component.packageUrl ? -1 : 1);
-    });
-
-    visuallySeperateText(false, ['Sonabot here, beep boop beep boop, here are your Nexus IQ Server results:\n', `Total dependencies audited: ${total}`])
-
-    console.log('-'.repeat(process.stdout.columns));
-    
-    results.forEach((x: IqServerResult, i: number) => {
-      console.log(`[${i + 1}/${total}] - ${x.toAuditLog()}`);
-    });
-
-    console.log('-'.repeat(process.stdout.columns));
-
-    // TODO: Temporary failure on purpose
+    visuallySeperateText(false, [
+      `Wonderbar! No build-breaking violations for this stage. You may still have non-breaking policy violations in the report.`,
+      chalk.keyword('green').bold(`Report URL: ${results.reportHtmlUrl}`),
+    ]);
     return false;
   }
 }

@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 import os from 'os';
-
 const pack = require('../../package.json');
 
 export class RequestHelpers {
   public static getUserAgent(): string[] {
-    let nodeVersion = process.versions;
-    let environment = 'NodeJS';
-    let environmentVersion = nodeVersion.node;
-    let system = `${os.type()} ${os.release()}`;
+    const nodeVersion = process.versions;
+    const environment = 'NodeJS';
+    const environmentVersion = nodeVersion.node;
+    const system = `${os.type()} ${os.release()}`;
 
     return ['User-Agent', `AuditJS/${pack.version} (${environment} ${environmentVersion}; ${system})`];
   }

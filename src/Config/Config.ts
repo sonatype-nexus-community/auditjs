@@ -13,34 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import path from "path";
-import { homedir } from "os";
-import { mkdirSync, existsSync } from "fs";
-import { Logger } from "winston";
-import { writeFileSync } from "fs";
-import { safeDump } from "js-yaml";
+import path from 'path';
+import { homedir } from 'os';
+import { mkdirSync, existsSync } from 'fs';
+import { Logger } from 'winston';
+import { writeFileSync } from 'fs';
+import { safeDump } from 'js-yaml';
 
-import { ConfigPersist } from "./ConfigPersist";
+import { ConfigPersist } from './ConfigPersist';
 
 export abstract class Config {
-  private directoryName = ".ossindex";
-  private fileName = ".oss-index-config";
+  private directoryName = '.ossindex';
+  private fileName = '.oss-index-config';
   private configLocation: string;
-  constructor(
-    protected type: string,
-    protected username: string,
-    protected token: string,
-    readonly logger: Logger
-  ) {
-    if (this.type == "iq") {
-      this.directoryName = ".iqserver";
-      this.fileName = ".iq-server-config";
+  constructor(protected type: string, protected username: string, protected token: string, readonly logger: Logger) {
+    if (this.type == 'iq') {
+      this.directoryName = '.iqserver';
+      this.fileName = '.iq-server-config';
     }
-    this.configLocation = path.join(
-      homedir(),
-      this.directoryName,
-      this.fileName
-    );
+    this.configLocation = path.join(homedir(), this.directoryName, this.fileName);
   }
 
   protected getConfigLocation(): string {
@@ -56,10 +47,7 @@ export abstract class Config {
   }
 
   public saveFile(objectToSave: ConfigPersist): boolean {
-    writeFileSync(
-      this.getConfigLocation(),
-      safeDump(objectToSave, { skipInvalid: true })
-    );
+    writeFileSync(this.getConfigLocation(), safeDump(objectToSave, { skipInvalid: true }));
     this.getConfigFromFile();
     return true;
   }

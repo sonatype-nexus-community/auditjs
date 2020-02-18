@@ -13,43 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { OssIndexRequestService } from "./OssIndexRequestService";
+import { OssIndexRequestService } from './OssIndexRequestService';
 import expect from '../Tests/TestHelper';
-import { Coordinates } from "../Types/Coordinates";
-import nock from "nock";
+import { Coordinates } from '../Types/Coordinates';
+import nock from 'nock';
 import rimraf from 'rimraf';
 
 // This will only work on Linux/OS X, find a better Windows friendly path
-const CACHE_LOCATION = "/tmp/.ossindex";
+const CACHE_LOCATION = '/tmp/.ossindex';
 
-const OSS_INDEX_BASE_URL = "http://ossindex.sonatype.org/";
+const OSS_INDEX_BASE_URL = 'http://ossindex.sonatype.org/';
 
-describe("OssIndexRequestService", () => {
-  it("should have its request rejected when the OSS Index server is down", async () => {
+describe('OssIndexRequestService', () => {
+  it('should have its request rejected when the OSS Index server is down', async () => {
     rimraf.sync(CACHE_LOCATION);
-    const scope = nock(OSS_INDEX_BASE_URL)
-      .post("/api/v3/component-report")
-      .replyWithError("you messed up!");
+    nock(OSS_INDEX_BASE_URL)
+      .post('/api/v3/component-report')
+      .replyWithError('you messed up!');
     const requestService = new OssIndexRequestService(undefined, undefined, OSS_INDEX_BASE_URL, CACHE_LOCATION);
-    const coords = [new Coordinates("commander", "2.12.2", "@types")];
-    return expect(requestService.callOSSIndexOrGetFromCache(coords)).to.eventually.be
-      .rejected;
+    const coords = [new Coordinates('commander', '2.12.2', '@types')];
+    return expect(requestService.callOSSIndexOrGetFromCache(coords)).to.eventually.be.rejected;
   });
 
-  it("should return a valid response when given a valid component request", async () => {
+  it('should return a valid response when given a valid component request', async () => {
     rimraf.sync(CACHE_LOCATION);
     const expectedOutput = [
       {
-        coordinates: "pkg:npm/%40types/commander@2.12.2",
-        reference: "https://ossindex.sonatype.org/blahblahblah",
-        vulnerabilities: []
-      }
+        coordinates: 'pkg:npm/%40types/commander@2.12.2',
+        reference: 'https://ossindex.sonatype.org/blahblahblah',
+        vulnerabilities: [],
+      },
     ];
-    const scope = nock(OSS_INDEX_BASE_URL)
-      .post("/api/v3/component-report")
+    nock(OSS_INDEX_BASE_URL)
+      .post('/api/v3/component-report')
       .reply(200, expectedOutput);
     const requestService = new OssIndexRequestService(undefined, undefined, OSS_INDEX_BASE_URL, CACHE_LOCATION);
-    const coords = [new Coordinates("commander", "2.12.2", "@types")];
+    const coords = [new Coordinates('commander', '2.12.2', '@types')];
     return expect(requestService.callOSSIndexOrGetFromCache(coords)).to.eventually.deep.equal(expectedOutput);
   });
 });

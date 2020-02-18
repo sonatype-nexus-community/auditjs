@@ -17,31 +17,44 @@ import expect from '../Tests/TestHelper';
 import { AuditIQServer } from './AuditIQServer';
 import { ReportStatus } from '../Types/ReportStatus';
 
-describe("AuditIQServer", () => {
-  it("should provide a true value if IQ Server Results have policy violations", () => {
+const oldLog = console.log;
+const oldError = console.error;
+
+describe('AuditIQServer', () => {
+  before(() => {
+    console.log = () => ({});
+    console.error = () => ({});
+  });
+
+  after(() => {
+    console.log = oldLog;
+    console.error = oldError;
+  });
+
+  it('should provide a true value if IQ Server Results have policy violations', () => {
     const auditIqServer = new AuditIQServer();
-    let results = new ReportStatus();
-    results.policyAction = 'Failure'
-    results.reportHtmlUrl = "";
-    let result = auditIqServer.auditThirdPartyResults(results);
+    const results = new ReportStatus();
+    results.policyAction = 'Failure';
+    results.reportHtmlUrl = '';
+    const result = auditIqServer.auditThirdPartyResults(results);
     expect(result).to.equal(true);
   });
 
-  it("should provide a true value if IQ Server Results have an isError value", () => {
+  it('should provide a true value if IQ Server Results have an isError value', () => {
     const auditIqServer = new AuditIQServer();
-    let results = new ReportStatus();
-    results.isError = true
-    results.reportHtmlUrl = "";
-    let result = auditIqServer.auditThirdPartyResults(results);
+    const results = new ReportStatus();
+    results.isError = true;
+    results.reportHtmlUrl = '';
+    const result = auditIqServer.auditThirdPartyResults(results);
     expect(result).to.equal(true);
   });
 
-  it("should provide a false value if IQ Server Results have no policy violations", () => {
+  it('should provide a false value if IQ Server Results have no policy violations', () => {
     const auditIqServer = new AuditIQServer();
-    let results = new ReportStatus();
-    results.policyAction = 'None'
-    results.reportHtmlUrl = "";
-    let result = auditIqServer.auditThirdPartyResults(results);
+    const results = new ReportStatus();
+    results.policyAction = 'None';
+    results.reportHtmlUrl = '';
+    const result = auditIqServer.auditThirdPartyResults(results);
     expect(result).to.equal(false);
   });
 });

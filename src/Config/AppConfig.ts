@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import readline from "readline";
-import { OssIndexServerConfig } from "./OssIndexServerConfig";
-import { IqServerConfig } from "./IqServerConfig";
-import { ConfigPersist } from "./ConfigPersist";
-import { join } from "path";
-import { homedir } from "os";
+import readline from 'readline';
+import { OssIndexServerConfig } from './OssIndexServerConfig';
+import { IqServerConfig } from './IqServerConfig';
+import { ConfigPersist } from './ConfigPersist';
+import { join } from 'path';
+import { homedir } from 'os';
 
 export class AppConfig {
   private rl: readline.Interface;
@@ -26,70 +26,55 @@ export class AppConfig {
   constructor() {
     this.rl = readline.createInterface({
       input: process.stdin,
-      output: process.stdout
+      output: process.stdout,
     });
   }
 
   public async getConfigFromCommandLine(): Promise<boolean> {
-    let username = "";
-    let token = "";
-    let type = "";
+    let username = '';
+    let token = '';
+    let type = '';
 
     type = await this.setVariable(
-      "Do you want to set config for Nexus IQ Server or OSS Index? Hit enter for OSS Index, iq for Nexus IQ Server? "
+      'Do you want to set config for Nexus IQ Server or OSS Index? Hit enter for OSS Index, iq for Nexus IQ Server? ',
     );
 
-    if (type == "iq") {
-      username = "admin";
-      token = "admin123";
+    if (type == 'iq') {
+      username = 'admin';
+      token = 'admin123';
 
-      let host = "http://localhost:8070";
+      let host = 'http://localhost:8070';
 
-      username = await this.setVariable(
-        `What is your username (default: ${username})? `,
-        username
-      );
+      username = await this.setVariable(`What is your username (default: ${username})? `, username);
 
       token = await this.setVariable(
         `What is your password/token (pretty please do not save your password to the filesystem, USE A TOKEN) (default: ${token})? `,
-        token
+        token,
       );
 
-      host = await this.setVariable(
-        `What is your IQ Server address (default: ${host})? `,
-        host
-      );
+      host = await this.setVariable(`What is your IQ Server address (default: ${host})? `, host);
 
       this.rl.close();
 
-      const iqConfig = new ConfigPersist(
-        username,
-        token,
-        host.endsWith("/") ? host.slice(0, host.length - 1) : host
-      );
+      const iqConfig = new ConfigPersist(username, token, host.endsWith('/') ? host.slice(0, host.length - 1) : host);
 
       const config = new IqServerConfig();
 
       return config.saveFile(iqConfig);
     } else {
-      let cacheLocation = join(homedir(), ".ossindex", "auditjs");
-      username = await this.setVariable("What is your username? ");
+      let cacheLocation = join(homedir(), '.ossindex', 'auditjs');
+      username = await this.setVariable('What is your username? ');
 
-      token = await this.setVariable("What is your token? ");
+      token = await this.setVariable('What is your token? ');
 
       cacheLocation = await this.setVariable(
         `Where would you like your OSS Index cache saved to (default: ${cacheLocation})? `,
-        cacheLocation
+        cacheLocation,
       );
 
       this.rl.close();
 
-      const ossIndexConfig = new ConfigPersist(
-        username,
-        token,
-        undefined,
-        cacheLocation
-      );
+      const ossIndexConfig = new ConfigPersist(username, token, undefined, cacheLocation);
 
       const config = new OssIndexServerConfig();
 
@@ -97,9 +82,9 @@ export class AppConfig {
     }
   }
 
-  private setVariable(message: string, defaultValue = ""): Promise<string> {
-    return new Promise(resolve => {
-      this.rl.question(message, answer => {
+  private setVariable(message: string, defaultValue = ''): Promise<string> {
+    return new Promise((resolve) => {
+      this.rl.question(message, (answer) => {
         resolve(answer || defaultValue);
       });
     });

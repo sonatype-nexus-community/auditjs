@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Muncher } from "./Muncher";
-import { Coordinates } from "../Types/Coordinates";
+import { Muncher } from './Muncher';
+import { Coordinates } from '../Types/Coordinates';
 
 export class NpmShrinkwrap implements Muncher {
   getInstalledDeps(): Promise<any> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   getSbomFromCommand(): Promise<any> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   public getDepList(): Promise<Array<Coordinates>> {
-    throw new Error("Method not implemented.");
-  }  
-  
+    throw new Error('Method not implemented.');
+  }
+
   public isValid(): boolean {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 }

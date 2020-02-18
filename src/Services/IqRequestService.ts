@@ -22,93 +22,111 @@ import { Logger } from 'winston';
 const APPLICATION_INTERNAL_ID_ENDPOINT = '/api/v2/applications?publicId=';
 
 export class IqRequestService {
-  private internalId: string = "";
-  private isInitialized: boolean = false;
+  private internalId = '';
+  private isInitialized = false;
   private logger: Logger;
 
   constructor(
-    readonly user: string, 
-    readonly password: string, 
+    readonly user: string,
+    readonly password: string,
     readonly host: string,
     readonly application: string,
     readonly stage: string,
-    readonly timeout: number
+    readonly timeout: number,
   ) {
     this.logger = getAppLogger();
   }
 
-  private async init() {
+  private async init(): Promise<void> {
     this.internalId = await this.getApplicationInternalId();
     this.isInitialized = true;
-  };
+  }
 
-  private timeoutAttempts: number = 0;
+  private timeoutAttempts = 0;
 
   private async getApplicationInternalId(): Promise<string> {
-    const response = await fetch(
-      `${this.host}${APPLICATION_INTERNAL_ID_ENDPOINT}${this.application}`,
-      { method: 'get', headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()]});
+    const response = await fetch(`${this.host}${APPLICATION_INTERNAL_ID_ENDPOINT}${this.application}`, {
+      method: 'get',
+      headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
+    });
     if (response.ok) {
-      let res = await response.json();
+      const res = await response.json();
       try {
         return res.applications[0].id;
-      } catch(e) {
-        throw new Error(`No valid ID on response from Nexus IQ, potentially check the public application ID you are using`);
+      } catch (e) {
+        throw new Error(
+          `No valid ID on response from Nexus IQ, potentially check the public application ID you are using`,
+        );
       }
     } else {
-      throw new Error('Unable to connect to IQ Server with http status ' + response.status
-       + '. Check your credentials and network connectivity by hitting Nexus IQ at ' + this.host + ' in your browser.');
+      throw new Error(
+        'Unable to connect to IQ Server with http status ' +
+          response.status +
+          '. Check your credentials and network connectivity by hitting Nexus IQ at ' +
+          this.host +
+          ' in your browser.',
+      );
     }
   }
 
-  public async submitToThirdPartyAPI(data: any) {
-    if(!this.isInitialized) {
+  public async submitToThirdPartyAPI(data: any): Promise<string> {
+    if (!this.isInitialized) {
       await this.init();
     }
-    this.logger.debug('Internal ID', {internalId: this.internalId});
-    
+    this.logger.debug('Internal ID', { internalId: this.internalId });
+
     const response = await fetch(
       `${this.host}/api/v2/scan/applications/${this.internalId}/sources/auditjs?stageId=${this.stage}`,
-      { method: 'post', headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ["Content-Type", "application/xml"]], body: data}
+      {
+        method: 'post',
+        headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ['Content-Type', 'application/xml']],
+        body: data,
+      },
     );
     if (response.ok) {
-      let json = await response.json();
+      const json = await response.json();
       return json.statusUrl as string;
     } else {
-      let body = await response.text();
-      this.logger.error('Response from third party API', {response: body});
+      const body = await response.text();
+      this.logger.error('Response from third party API', { response: body });
       throw new Error(`Unable to submit to Third Party API`);
     }
   }
 
-  public async asyncPollForResults(url: string, errorHandler: (error: any) => any, pollingFinished: (body: any) => any) {
+  public async asyncPollForResults(
+    url: string,
+    errorHandler: (error: any) => any,
+    pollingFinished: (body: any) => any,
+  ): Promise<void> {
     logMessage(url, DEBUG);
     let mergeUrl: URL;
     try {
       mergeUrl = this.getURLOrMerge(url);
 
       // https://www.youtube.com/watch?v=Pubd-spHN-0
-      const response = await fetch(
-        mergeUrl.href, { 
-          method: 'get', 
-          headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()]
-        });
-  
+      const response = await fetch(mergeUrl.href, {
+        method: 'get',
+        headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
+      });
+
       const body = response.ok;
       // TODO: right now I think we cover 500s and 400s the same and we'd continue polling as a result. We should likely switch
       // to checking explicitly for a 404 and if we get a 500/401 or other throw an error
       if (!body) {
         this.timeoutAttempts += 1;
         if (this.timeoutAttempts > this.timeout) {
-          errorHandler({message: "Polling attempts exceeded, please either provide a higher limit via the command line using the timeout flag, or re-examine your project and logs to see if another error happened"})
+          errorHandler({
+            message:
+              'Polling attempts exceeded, please either provide a higher limit via the command line using the timeout flag, or re-examine your project and logs to see if another error happened',
+          });
         }
         setTimeout(() => this.asyncPollForResults(url, errorHandler, pollingFinished), 1000);
       } else {
-        let json = await response.json();
+        const json = await response.json();
         pollingFinished(json);
       }
-    } catch(e) {
-      errorHandler({ message: e.message });
+    } catch (e) {
+      errorHandler({ title: e.message });
     }
   }
 
@@ -118,13 +136,13 @@ export class IqRequestService {
     } catch (e) {
       logMessage(e.title, DEBUG, { message: e.message });
       if (this.host.endsWith('/')) {
-        return new URL(this.host.concat(url)); 
+        return new URL(this.host.concat(url));
       }
-      return new URL(this.host.concat('/' + url)); 
+      return new URL(this.host.concat('/' + url));
     }
   }
 
   private getBasicAuth(): string[] {
-    return ['Authorization', 'Basic ' + Buffer.from(this.user + ":" + this.password).toString('base64')];
+    return ['Authorization', 'Basic ' + Buffer.from(this.user + ':' + this.password).toString('base64')];
   }
 }

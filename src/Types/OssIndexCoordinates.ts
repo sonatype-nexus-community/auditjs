@@ -15,12 +15,4 @@
  */
 export class OssIndexCoordinates {
   constructor(readonly coordinates: string[]) {}
-
-  public toConsumeableRequestObject() {
-    return {
-      coordinates: this.coordinates.map((x) => {
-        return x
-      })
-    }
-  }
 }

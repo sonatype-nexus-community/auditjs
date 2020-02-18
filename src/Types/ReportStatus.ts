@@ -17,5 +17,5 @@ export class ReportStatus {
   policyAction?: string;
   reportHtmlUrl?: string;
   errorMessage?: string;
-  isError: boolean = false;
+  isError = false;
 }

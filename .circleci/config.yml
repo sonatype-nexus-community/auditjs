@@ -1,7 +1,7 @@
 version: 2.1
 jobs:
   build:
-    working_directory: ~/auditjs 
+    working_directory: ~/auditjs
     docker:
       - image: circleci/node:12.14.0
     steps:
@@ -19,6 +19,9 @@ jobs:
           paths:
             - ./node_modules
       - run:
+          name: Lint auditjs
+          command: npm run lint
+      - run:
           name: build
           command: npm run build
       - run:
@@ -29,11 +32,11 @@ jobs:
           command: npm run start -- ossi
   release:
     working_directory: ~/auditjs
-    docker: 
-      - image: circleci/node:12.14.0 
+    docker:
+      - image: circleci/node:12.14.0
     steps:
       - checkout
-      - run: 
+      - run:
           name: Allow global installs of npm packages
           command: sudo chown -R circleci:circleci /usr/local/lib && sudo chown -R circleci:circleci /usr/local/bin
       - run:
@@ -42,10 +45,10 @@ jobs:
       - run:
           name: Build auditjs
           command: npm run build
-      - run: 
-          name: Install publishing packages 
+      - run:
+          name: Install publishing packages
           command: npm install -g semantic-release@beta @semantic-release/changelog @semantic-release/git@beta @semantic-release/npm@beta
-      - run: 
+      - run:
           name: Attempt publish
           command: npx semantic-release
 

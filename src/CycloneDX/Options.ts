@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 export interface Options {
-  devDependencies?: boolean,
-  includeBomSerialNumber?: boolean,
-  includeLicenseData?: boolean,
-  includeLicenseText?: boolean,
+  devDependencies?: boolean;
+  includeBomSerialNumber?: boolean;
+  includeLicenseData?: boolean;
+  includeLicenseText?: boolean;
 }

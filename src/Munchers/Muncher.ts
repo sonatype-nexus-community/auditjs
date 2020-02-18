@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Coordinates } from "../Types/Coordinates";
+import { Coordinates } from '../Types/Coordinates';
 
 export interface Muncher {
-  getDepList(): Promise<Array<Coordinates>>
-  getSbomFromCommand(): Promise<any>
-  getInstalledDeps(): Promise<any>
-  isValid(): boolean
+  getDepList(): Promise<Array<Coordinates>>;
+  getSbomFromCommand(): Promise<any>;
+  getInstalledDeps(): Promise<any>;
+  isValid(): boolean;
 }
