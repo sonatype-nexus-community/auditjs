@@ -4,7 +4,10 @@
   ],
 	"plugins": [
 		["@semantic-release/commit-analyzer", {
-      "preset": "angular"
+      "preset": "angular",
+      "releaseRules": [
+        { "type": "major-release", "release": "major" }
+      ]
     }],
     ["@semantic-release/npm", { 
       "tarballDir": "dist"
