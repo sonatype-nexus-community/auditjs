@@ -1,3 +1,10 @@
+## [4.0.1-alpha.38](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.37...v4.0.1-alpha.38) (2020-02-18)
+
+
+### Bug Fixes
+
+* implement ESLint warnings, tune, put in prettier ([#162](https://github.com/sonatype-nexus-community/auditjs/issues/162)) ([2791c7a](https://github.com/sonatype-nexus-community/auditjs/commit/2791c7af83d68076d9c07c489d43c8d951962515))
+
 ## [4.0.1-alpha.37](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-alpha.36...v4.0.1-alpha.37) (2020-02-15)
 
 
