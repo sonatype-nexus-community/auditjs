@@ -56,7 +56,6 @@ export class OssIndexRequestService {
   }
 
   private getResultsFromOSSIndex(data: OssIndexCoordinates): Promise<object> {
-    console.log(data);
     const response = fetch(`${this.baseURL}${COMPONENT_REPORT_ENDPOINT}`, {
       method: 'post',
       body: JSON.stringify(data),
