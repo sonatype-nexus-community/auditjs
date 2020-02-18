@@ -1,5 +1,7 @@
 **IMPORTANT NOTE**: Welcome to AuditJS 4.0.0, lots has changed since 3.0.0, mainly around usage. Make sure to read the new docs.
 
+If you have an issue migrating from AuditJS 3.x to AuditJS 4.x, please [file a GitHub issue here](https://github.com/sonatype-nexus-community/auditjs/issues).
+
 # AuditJS
 
 [![CircleCI](https://circleci.com/gh/sonatype-nexus-community/auditjs.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/auditjs)
