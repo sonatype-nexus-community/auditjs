@@ -1,3 +1,10 @@
+## [4.0.1-beta.33](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.32...v4.0.1-beta.33) (2020-02-18)
+
+
+### Bug Fixes
+
+* esLint for the friggin win ([7da5b84](https://github.com/sonatype-nexus-community/auditjs/commit/7da5b849f0fb8800f67743d97461a1aca7006f72))
+
 ## [4.0.1-beta.32](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.31...v4.0.1-beta.32) (2020-02-18)
 
 
