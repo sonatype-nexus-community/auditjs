@@ -22,8 +22,8 @@ const oldError = console.error;
 
 describe('AuditIQServer', () => {
   before(() => {
-    console.log = () => {};
-    console.error = () => {};
+    console.log = () => ({});
+    console.error = () => ({});
   });
 
   after(() => {

@@ -136,7 +136,7 @@ export class AuditOSSIndex {
         return +x.cvssScore;
       }),
     );
-    const printVuln = (x: Array<Vulnerability>) => {
+    const printVuln = (x: Array<Vulnerability>): void => {
       x.forEach((y: Vulnerability) => {
         const color: string = this.getColorFromMaxScore(+y.cvssScore);
         console.group();

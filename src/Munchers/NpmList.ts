@@ -63,7 +63,7 @@ export class NpmList implements Muncher {
   }
 
   // recursive unit that traverses tree and terminates when object has no dependencies
-  private recurseObjectTree(objectTree: any, list: Array<Coordinates>, isRootPkg = false) {
+  private recurseObjectTree(objectTree: any, list: Array<Coordinates>, isRootPkg = false): any {
     if (objectTree.extraneous && !this.devDependencies) {
       return;
     }

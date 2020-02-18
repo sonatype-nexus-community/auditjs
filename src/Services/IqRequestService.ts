@@ -97,7 +97,7 @@ export class IqRequestService {
     url: string,
     errorHandler: (error: any) => any,
     pollingFinished: (body: any) => any,
-  ) {
+  ): Promise<void> {
     logMessage(url, DEBUG);
     let mergeUrl: URL;
     try {

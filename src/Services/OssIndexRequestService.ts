@@ -89,7 +89,7 @@ export class OssIndexRequestService {
     return combinedChunks.concat(dataInCache);
   }
 
-  private async insertResponsesIntoCache(response: Array<OssIndexServerResult>) {
+  private async insertResponsesIntoCache(response: Array<OssIndexServerResult>): Promise<Array<OssIndexServerResult>> {
     // console.debug(`Preparing to cache ${response.length} coordinate responses`);
 
     for (let i = 0; i < response.length; i++) {

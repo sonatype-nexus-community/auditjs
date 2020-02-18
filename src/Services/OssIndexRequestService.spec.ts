@@ -27,7 +27,7 @@ const OSS_INDEX_BASE_URL = 'http://ossindex.sonatype.org/';
 describe('OssIndexRequestService', () => {
   it('should have its request rejected when the OSS Index server is down', async () => {
     rimraf.sync(CACHE_LOCATION);
-    const scope = nock(OSS_INDEX_BASE_URL)
+    nock(OSS_INDEX_BASE_URL)
       .post('/api/v3/component-report')
       .replyWithError('you messed up!');
     const requestService = new OssIndexRequestService(undefined, undefined, OSS_INDEX_BASE_URL, CACHE_LOCATION);
@@ -44,7 +44,7 @@ describe('OssIndexRequestService', () => {
         vulnerabilities: [],
       },
     ];
-    const scope = nock(OSS_INDEX_BASE_URL)
+    nock(OSS_INDEX_BASE_URL)
       .post('/api/v3/component-report')
       .reply(200, expectedOutput);
     const requestService = new OssIndexRequestService(undefined, undefined, OSS_INDEX_BASE_URL, CACHE_LOCATION);

@@ -27,11 +27,11 @@ describe('IQRequestService', () => {
   it("should have it's third party API request rejected when the IQ Server is down", async () => {
     const internalId = '123456';
     const stage = 'build';
-    const scope = nock('http://testlocation:8070')
+    nock('http://testlocation:8070')
       .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
       .replyWithError('you messed up!');
 
-    const scope2 = nock('http://testlocation:8070')
+    nock('http://testlocation:8070')
       .get(`/api/v2/applications?publicId=testapp`)
       .reply(applicationInternalIdResponse.statusCode, applicationInternalIdResponse.body);
 
@@ -51,11 +51,11 @@ describe('IQRequestService', () => {
       },
     };
 
-    const scope = nock('http://testlocation:8070')
+    nock('http://testlocation:8070')
       .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
       .reply(response.statusCode, response.body);
 
-    const scope2 = nock('http://testlocation:8070')
+    nock('http://testlocation:8070')
       .get(`/api/v2/applications?publicId=testapp`)
       .reply(applicationInternalIdResponse.statusCode, applicationInternalIdResponse.body);
 
@@ -78,7 +78,7 @@ describe('IQRequestService', () => {
     };
 
     const stage = 'build';
-    const scope = nock('http://testlocation:8070')
+    nock('http://testlocation:8070')
       .get(`/api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb`)
       .reply(response.statusCode, response.body);
 

@@ -129,7 +129,7 @@ export class Application {
     }
   }
 
-  private async populateCoordinatesForIQ() {
+  private async populateCoordinatesForIQ(): Promise<void> {
     try {
       logMessage('Trying to get sbom from cyclonedx/bom', DEBUG);
       this.sbom = await this.muncher.getSbomFromCommand();
@@ -143,7 +143,7 @@ export class Application {
     }
   }
 
-  private async auditWithOSSIndex(args: any) {
+  private async auditWithOSSIndex(args: any): Promise<void> {
     logMessage('Instantiating OSS Index Request Service', DEBUG);
     const requestService = this.getOssIndexRequestService(args);
     this.spinner.maybeSucceed();

@@ -99,14 +99,14 @@ export class CycloneDXSbomCreator {
     });
   }
 
-  private listComponents(pkg: any) {
+  private listComponents(pkg: any): Array<any> {
     const list: any = {};
     const isRootPkg = true;
     this.addComponent(pkg, list, isRootPkg);
     return Object.keys(list).map((k) => ({ component: list[k] }));
   }
 
-  private addComponent(pkg: any, list: any, isRootPkg = false) {
+  private addComponent(pkg: any, list: any, isRootPkg = false): void {
     //read-installed with default options marks devDependencies as extraneous
     //if a package is marked as extraneous, do not include it as a component
     if (pkg.extraneous) {
@@ -179,7 +179,7 @@ export class CycloneDXSbomCreator {
    * Uses the SHA1 shasum (if present) otherwise utilizes Subresource Integrity
    * of the package with support for multiple hashing algorithms.
    */
-  private processHashes(pkg: any, component: Component) {
+  private processHashes(pkg: any, component: Component): void {
     component.hashes = new Array<Hash>();
     if (pkg._shasum) {
       component.hashes.push({ hash: { '@alg': 'SHA-1', '#text': pkg._shasum } });
@@ -236,7 +236,7 @@ export class CycloneDXSbomCreator {
    * of the license object, otherwise, set the 'name' of the license
    * object.
    */
-  private getLicenses(pkg: any) {
+  private getLicenses(pkg: any): any {
     const spdxLicenses = [...spdxLicensesNonDeprecated, ...spdxLicensesDeprecated];
     let license = pkg.license && (pkg.license.type || pkg.license);
     if (license) {
