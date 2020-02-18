@@ -1,27 +1,29 @@
-**IMPORTANT NOTE**: Welcome to AuditJS 4.0.0-beta, lots has changed since 3.0.0, mainly around usage. Make sure to read the new docs.
+**IMPORTANT NOTE**: Welcome to AuditJS 4.0.0, lots has changed since 3.0.0, mainly around usage. Make sure to read the new docs.
 
 # AuditJS
 
-[![CircleCI](https://circleci.com/gh/sonatype-nexus-community/auditjs.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/auditjs) 
+[![CircleCI](https://circleci.com/gh/sonatype-nexus-community/auditjs.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/auditjs)
 
 Audits JavaScript projects using the [OSS Index v3 REST API](https://ossindex.sonatype.org/rest)
 to identify known vulnerabilities and outdated package versions.
 
 Supports any project with package managers that install npm dependencies into a node_modules folder including:
+
 - npm
 - Angular
 - yarn
 - bower
 
-<img src="https://github.com/sonatype-nexus-community/auditjs/blob/beta/assets/images/auditjsnew.png?raw=true" width="640">
+<img src="https://github.com/sonatype-nexus-community/auditjs/blob/master/assets/images/auditjsnew.png?raw=true" width="640">
 
 ## Requirement
-For users wanting to use Nexus IQ Server as their data source for scanning, Version 77 or above must be installed. This is when the [Third-Party Scan REST API](https://help.sonatype.com/iqserver/automating/rest-apis/third-party-scan-rest-api---v2) was incorporated into Nexus IQ Server. 
+
+For users wanting to use Nexus IQ Server as their data source for scanning, Version 77 or above must be installed. This is when the [Third-Party Scan REST API](https://help.sonatype.com/iqserver/automating/rest-apis/third-party-scan-rest-api---v2) was incorporated into Nexus IQ Server.
 
 ## Installation
 
 ```
-npm install -g auditjs@beta
+npm install -g auditjs
 ```
 
 ## Usage
@@ -33,6 +35,7 @@ indicate a problem (HTTP code 429) then you may need to make an account at
 OSS Index and supply the username and "token". See below for more details.
 
 ### Generic Usage
+
 ```terminal
 auditjs [command]
 
@@ -47,6 +50,7 @@ Options:
 ```
 
 ### OSS Index Usage
+
 ```terminal
 auditjs ossi [options]
 
@@ -66,6 +70,7 @@ Options:
 ```
 
 ### Nexus IQ Server Usage
+
 ```
 auditjs iq [options]
 
@@ -118,6 +123,7 @@ The format in these files is similar to:
 ### Usage in CI
 
 #### Jenkins
+
 TBD
 
 #### CircleCI
@@ -160,7 +166,7 @@ An example snippet from a `package.json`:
 
 Now that we've added a `scan` script, you can run `npm run scan` and your project will invoke `auditjs` and scan your dependencies. This can be handy for local work, or for if you want to run `auditjs` in CI/CD without installing it globally.
 
-Note: these reference implementations are applicable to running an IQ scan as well.  The caveat is that the config for the IQ url and auth needs to either be in the home directory of the user running the job, or stored as (preferably secret) environmental variables.
+Note: these reference implementations are applicable to running an IQ scan as well. The caveat is that the config for the IQ url and auth needs to either be in the home directory of the user running the job, or stored as (preferably secret) environmental variables.
 
 ## Config file
 
@@ -193,7 +199,7 @@ file as described above, as using them on the command line is less secure.
 
 Whitelisting of vulnerabilities can be done! To accomplish this thus far we have implemented the ability to have a file named `auditjs.json` checked in to your repo ideally, so that it would be at the root where you run `auditjs`. Alternatively you can run `auditjs` with a whitelist file at a different location, with an example such as:
 
-```terminal 
+```terminal
 $ auditjs ossi --whitelist /Users/cooldeveloperperson/code/sonatype-nexus-community/auditjs/auditjs.json
 ```
 
@@ -201,9 +207,7 @@ The file should look like:
 
 ```json
 {
-  "ignore": [
-    { "id": "78a61524-80c5-4371-b6d1-6b32af349043", "reason": "Insert reason here" }
-  ]
+  "ignore": [{ "id": "78a61524-80c5-4371-b6d1-6b32af349043", "reason": "Insert reason here" }]
 }
 ```
 
@@ -216,11 +220,13 @@ Any `id` that is whitelisted will be squelched from the results, and not cause a
 `auditjs` can output directly as `json` or as `xml` specifically formatted for JUnit test cases.
 
 JSON:
+
 ```
 auditjs ossi --json > file.json
 ```
 
 XML:
+
 ```
 auditjs ossi --xml > file.xml
 ```
@@ -233,7 +239,8 @@ As this program depends on the OSS Index database, network access is
 required. Connection problems with OSS Index will result in an exception.
 
 ## Credit
-------
+
+---
 
 Thank you to everybody who has contributed to this project, both with
 [code contributions](https://github.com/OSSIndex/auditjs/pulls?q=is%3Apr+is%3Aclosed)
