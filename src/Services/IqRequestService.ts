@@ -37,7 +37,7 @@ export class IqRequestService {
     this.logger = getAppLogger();
   }
 
-  private async init() {
+  private async init(): Promise<void> {
     this.internalId = await this.getApplicationInternalId();
     this.isInitialized = true;
   }
@@ -69,7 +69,7 @@ export class IqRequestService {
     }
   }
 
-  public async submitToThirdPartyAPI(data: any) {
+  public async submitToThirdPartyAPI(data: any): Promise<string> {
     if (!this.isInitialized) {
       await this.init();
     }

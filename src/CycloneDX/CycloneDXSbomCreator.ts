@@ -103,7 +103,7 @@ export class CycloneDXSbomCreator {
     const list: any = {};
     const isRootPkg = true;
     this.addComponent(pkg, list, isRootPkg);
-    return Object.keys(list).map(k => ({ component: list[k] }));
+    return Object.keys(list).map((k) => ({ component: list[k] }));
   }
 
   private addComponent(pkg: any, list: any, isRootPkg = false) {
@@ -154,9 +154,9 @@ export class CycloneDXSbomCreator {
     }
     if (pkg.dependencies) {
       Object.keys(pkg.dependencies)
-        .map(x => pkg.dependencies[x])
-        .filter(x => typeof x !== 'string') //remove cycles
-        .map(x => this.addComponent(x, list));
+        .map((x) => pkg.dependencies[x])
+        .filter((x) => typeof x !== 'string') //remove cycles
+        .map((x) => this.addComponent(x, list));
     }
   }
 

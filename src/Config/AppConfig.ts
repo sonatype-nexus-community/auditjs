@@ -83,8 +83,8 @@ export class AppConfig {
   }
 
   private setVariable(message: string, defaultValue = ''): Promise<string> {
-    return new Promise(resolve => {
-      this.rl.question(message, answer => {
+    return new Promise((resolve) => {
+      this.rl.question(message, (answer) => {
         resolve(answer || defaultValue);
       });
     });

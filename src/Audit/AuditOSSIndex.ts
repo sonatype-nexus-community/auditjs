@@ -101,7 +101,7 @@ export class AuditOSSIndex {
   }
 
   private getNumberOfVulnerablePackagesFromResults(results: Array<OssIndexServerResult>): number {
-    return results.filter(x => {
+    return results.filter((x) => {
       return x.vulnerabilities && x.vulnerabilities?.length > 0;
     }).length;
   }

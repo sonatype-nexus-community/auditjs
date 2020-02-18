@@ -220,12 +220,12 @@ export class Application {
 
       requestService.asyncPollForResults(
         `${resultUrl}`,
-        e => {
+        (e) => {
           this.spinner.maybeFail();
           logMessage('There was an issue auditing your application!', ERROR, { title: e.message });
           process.exit(1);
         },
-        x => {
+        (x) => {
           this.spinner.maybeSucceed();
           this.spinner.maybeCreateMessageForSpinner('Auditing your results');
           const results: ReportStatus = Object.assign(new ReportStatus(), x);

@@ -81,10 +81,10 @@ describe('IQRequestService', () => {
 
     requestService.asyncPollForResults(
       'api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb',
-      x => {
+      (x) => {
         return false;
       },
-      x => {
+      (x) => {
         return expect(x.reportHtmlUrl).to.equal('http://localhost:8070/ui/links/application/test-app/report/95c4c14e');
       },
     );

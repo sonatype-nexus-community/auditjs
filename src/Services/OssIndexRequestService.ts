@@ -62,8 +62,8 @@ export class OssIndexRequestService {
       headers: this.getHeaders(),
     })
       .then(this.checkStatus)
-      .then(res => res.json())
-      .catch(err => {
+      .then((res) => res.json())
+      .catch((err) => {
         throw new Error(`There was an error making the request: ${err}`);
       });
     return response;
@@ -130,7 +130,7 @@ export class OssIndexRequestService {
 
     for (const chunk of chunkedPurls) {
       try {
-        const res = this.getResultsFromOSSIndex(new OssIndexCoordinates(chunk.map(x => x.toPurl(format))));
+        const res = this.getResultsFromOSSIndex(new OssIndexCoordinates(chunk.map((x) => x.toPurl(format))));
         responses.push(res);
       } catch (e) {
         throw new Error(e);
@@ -138,10 +138,10 @@ export class OssIndexRequestService {
     }
 
     return Promise.all(responses)
-      .then(resolvedResponses => this.combineResponseChunks(resolvedResponses))
-      .then(combinedResponses => this.insertResponsesIntoCache(combinedResponses))
-      .then(combinedResponses => this.combineCacheAndResponses(combinedResponses, results.inCache))
-      .catch(err => {
+      .then((resolvedResponses) => this.combineResponseChunks(resolvedResponses))
+      .then((combinedResponses) => this.insertResponsesIntoCache(combinedResponses))
+      .then((combinedResponses) => this.combineCacheAndResponses(combinedResponses, results.inCache))
+      .catch((err) => {
         throw err;
       });
   }

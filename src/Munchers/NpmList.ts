@@ -76,12 +76,12 @@ export class NpmList implements Muncher {
     }
     if (objectTree.dependencies) {
       Object.keys(objectTree.dependencies)
-        .map(x => objectTree.dependencies[x])
-        .filter(x => typeof x !== 'string')
-        .map(dep => {
+        .map((x) => objectTree.dependencies[x])
+        .filter((x) => typeof x !== 'string')
+        .map((dep) => {
           if (
             this.toPurlObjTree(dep) == '' ||
-            list.find(x => {
+            list.find((x) => {
               return x.toPurl() == this.toPurlObjTree(dep);
             })
           ) {
@@ -97,7 +97,7 @@ export class NpmList implements Muncher {
     if (pkg.name && pkg.name.includes('/')) {
       const name = pkg.name.split('/');
       if (
-        list.find(x => {
+        list.find((x) => {
           return x.name == name[1] && x.version == pkg.version && x.group == name[0];
         })
       ) {
@@ -107,7 +107,7 @@ export class NpmList implements Muncher {
       return true;
     } else if (pkg.name) {
       if (
-        list.find(x => {
+        list.find((x) => {
           return x.name == pkg.name && x.version == pkg.version && x.group == '';
         })
       ) {
