@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "module":"commonjs",
+    "target": "es6",
+    "lib": ["es6", "dom"],
+    "types": ["node"],
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "./bin",
+    "sourceMap": true,
+    "declaration": true,
+    "resolveJsonModule": true,
+    "typeRoots": [
+      "./node_modules/@types",
+    ],
+  },
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

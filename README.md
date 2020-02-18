@@ -1,179 +1,184 @@
-**New major release, which uses OSS Index API v3.x!!**
+**IMPORTANT NOTE**: Welcome to AuditJS 4.0.0, lots has changed since 3.0.0, mainly around usage. Make sure to read the new docs.
 
-**IMPORTANT NOTE**: Vulnerability IDs have changed, so unfortunately your whitelist files
-will have to be updated. They are now UUIDs. This is a one time change; there are no
-plans to ever change the IDs again in the future. Sorry for the inconvenience.
+# AuditJS
 
-- [AuditJS](#auditjs)
-  * [Installation](#installation)
-  * [Usage](#usage)
-  * [Config file](#config-file)
-  * [OSS Index Credentials](#oss-index-credentials)
-  * [Whitelisting](#whitelisting)
-    + [Whitelist in configuration](#whitelist-in-configuration)
-    + [Whitelist File](#whitelist-file)
-      - [Simplified Whitelist Format](#simplified-whitelist-format)
-      - [Verbose Whitelist Format](#verbose-whitelist-format)
-  * [Limitations](#limitations)
-  * [Credit](#credit)
+[![CircleCI](https://circleci.com/gh/sonatype-nexus-community/auditjs.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/auditjs)
 
-AuditJS
-=======
-
-Audits an NPM project using the [OSS Index v3 REST API](https://ossindex.sonatype.org/rest)
+Audits JavaScript projects using the [OSS Index v3 REST API](https://ossindex.sonatype.org/rest)
 to identify known vulnerabilities and outdated package versions.
 
-![Screenshot](screenshots/screenshot.png)
+Supports any project with package managers that install npm dependencies into a node_modules folder including:
 
-Installation
-------------
+- npm
+- Angular
+- yarn
+- bower
+
+<img src="https://github.com/sonatype-nexus-community/auditjs/blob/master/assets/images/auditjsnew.png?raw=true" width="640">
+
+## Requirement
+
+For users wanting to use Nexus IQ Server as their data source for scanning, Version 77 or above must be installed. This is when the [Third-Party Scan REST API](https://help.sonatype.com/iqserver/automating/rest-apis/third-party-scan-rest-api---v2) was incorporated into Nexus IQ Server.
+
+## Installation
 
 ```
-npm install auditjs -g
+npm install -g auditjs
 ```
 
-Usage
------
+## Usage
+
+`auditjs` supports node LTS versions of 8.x forward at the moment. Usage outside of these node versions will error.
 
 Note that the OSS Index v3 API is rate limited. If you are seeing errors that
 indicate a problem (HTTP code 429) then you may need to make an account at
 OSS Index and supply the username and "token". See below for more details.
 
+### Generic Usage
+
 ```terminal
-  Usage [Linux]:   auditjs [options]
-  Usage [Windows]: auditjs-win
+auditjs [command]
 
-  Options:
+Commands:
+  auditjs iq [options]    Audit this application using Nexus IQ Server
+  auditjs config          Set config for OSS Index or Nexus IQ Server
+  auditjs ossi [options]  Audit this application using Sonatype OSS Index
 
-  -V, --version                output the version number
-  -b --bower                   This flag is necessary to correctly audit bower
-           packages. Use together with -p bower.json, since
-           scanning bower_components is not supported
-  -n --noNode                  Ignore node executable when scanning node_modules.
-  -p --package <file>          Specific package.json or bower.json file to audit
-  -d --dependencyTypes <list>  One or more of devDependencies, dependencies, peerDependencies, bundledDependencies, or optionalDependencies
-  --prod --production          Analyze production dependencies only
-  -q --quiet                   Supress console logging
-  -r --report                  Create JUnit reports in reports/ directory
-  -v --verbose                 Print all vulnerabilities
-  -w --whitelist <file>        Whitelist of vulnerabilities that should not break the build,
-           e.g. XSS vulnerabilities for an app with no possbile input for XSS.
-           See Example test_data/audit_package_whitelist.json.
-  -l --level <level>           Logging level. Possible options: error,warn,info,verbose,debug
-  --suppressExitError          Supress exit code when vulnerability found
-  --cacheDir <path>            Cache parent directory [default: <homedir>/.auditjs]
-  --username <username>        Username for registered users
-  --token <token>              Password for registered users
-  --scheme <scheme>            [testing] http/https
-  --host <host>                [testing] data host
-  --port <port>                [testing] data port
-  -h, --help                   output usage information
-
+Options:
+  --version  Show version number                                       [boolean]
+  --help     Show help                                                 [boolean]
 ```
 
-Audit installed packages and their dependencies to identify known
-vulnerabilities.
+### OSS Index Usage
 
-**IMPORTANT WINDOWS USAGE NOTE ... IMPORTANT WINDOWS USAGE NOTE ... IMPORTANT WINDOWS USAGE NOTE**
+```terminal
+auditjs ossi [options]
 
-> **On windows execute using `auditjs-win`.** This is required for now due to some
-> Linux-specific code which mitigates some odd Debian/Ubuntu specific edge cases.
+Audit this application using Sonatype OSS Index
 
-**IMPORTANT WINDOWS USAGE NOTE ... IMPORTANT WINDOWS USAGE NOTE ... IMPORTANT WINDOWS USAGE NOTE**
+Options:
+  --version        Show version number                                 [boolean]
+  --help           Show help                                           [boolean]
+  --user, -u       Specify OSS Index username                           [string]
+  --password, -p   Specify OSS Index password or token                  [string]
+  --quiet, -q      Only print out vulnerable dependencies              [boolean]
+  --verbose, -V    Set console logging level to verbose                [boolean]
+  --json, -j       Set output to JSON                                  [boolean]
+  --xml, -x        Set output to JUnit XML format                      [boolean]
+  --whitelist, -w  Set path to whitelist file                           [string]
+  --clear          Clears cache location if it has been set in config  [boolean]
+```
+
+### Nexus IQ Server Usage
+
+```
+auditjs iq [options]
+
+Audit this application using Nexus IQ Server
+
+Options:
+  --version          Show version number                               [boolean]
+  --help             Show help                                         [boolean]
+  --application, -a  Specify IQ application public ID        [string] [required]
+  --stage, -s        Specify IQ app stage
+  [choices: "develop", "build", "stage-release", "release"] [default: "develop"]
+  --server, -h       Specify IQ server url/port
+                                     [string] [default: "http://localhost:8070"]
+  --timeout, -t      Specify an optional timeout in seconds for IQ Server
+                     Polling                             [number] [default: 300]
+  --user, -u         Specify username for request    [string] [default: "admin"]
+  --password, -p     Specify password for request [string] [default: "admin123"]
+  --artie, -x        Artie                                             [boolean]
+  --dev, -d          Exclude Development Dependencies                  [boolean]
+```
+
+### Usage Information
 
 Execute from inside a node project (above the node_modules directory) to audit
 the dependencies. This will audit not only the direct dependencies of the project,
 but all **transitive** dependencies. To identify transitive dependencies they must
 all be installed for the project under audit.
 
-If a package.json file is specified as an argument, only the dependencies in
-the package file will be audited (no transitive dependencies).
-
 If a vulnerability is found to be affecting an installed library the package
 header will be highlighted in red and information about the pertinent
 vulnerability will be printed to the screen.
 
-![Screenshot](screenshots/cve.png)
+Running in verbose mode will give you lots of silly debug data. By default however we write all silly debug data to:
 
-Running in verbose mode prints more descriptive output, and some extra information
-such as ALL vulnerabilities for a package, whether they are identified as
-impacting the installed version or not.
+`YOUR_HOME_DIR/.ossindex/.audit-js.combined.log`
 
-Config file
------------
+All errors are written to:
 
-Support is now provided for configuration files. This reduces the need for
-command line options, and is particularly important when using authentication
-as it allows you to supply credentials without having them visible on the
-command line.
+`YOUR_HOME_DIR/.ossindex/.audit-js.error.log`
 
-Audit.js uses [node-config](https://github.com/lorenwest/node-config/wiki) to
-provide support for configuration files, though the original command line options
-still work. Configuration files are loaded from the
-[config directory](https://github.com/lorenwest/node-config/wiki/Configuration-Files)
-which by default is the application installation directory in a sub-directory
-called config, but can be controlled using the `NODE_CONFIG_DIR` environment variable.
-
-The default configuration file in the config directory should be called
-`default.json`, and might have contents like the following. You do not need
-to specify all configuration options, and subset is reasonable.
+The format in these files is similar to:
 
 ```
-{
-  "auth": {
-    "user": "username@example.com",
-    "token": "ef40752eeb642ba1c3df1893d270c6f9fb7ab9e1"
-  },
-  "cache": {
-    "path": "./ossi-cache"
-  },
-  "dependencyTypes": [
-    "devDependencies",
-    "dependencies",
-    "peerDependencies",
-    "bundledDependencies",
-    "optionalDependencies"
-  ],
-  "server": {
-    "scheme": "https",
-    "host": "ossindex.sonatype.org",
-    "port": 443
-  },
-  "packages": {
-    "type": "npm",
-    "file": "./package.json",
-    "withNode": false
-  },
-  "logging": {
-    "level": "info",
-    "verbose": false,
-    "quiet": false
-  },
-  "whitelist": {
-    "file": "./whitelist.json",
-    "ignore": [
-      "a81a18b3-26bf-43d8-b823-826ef69bf8e8"
-    ]
-  }
-}
+{ level: 'debug',
+  message: 'Results audited',
+  label: 'AuditJS',
+  timestamp: '2019-12-22T20:09:33.447Z' }
 ```
 
-If you want to make different configurations for different situations, create
-set the NODE_ENV environment variable and change the configuration file name
-to use the same name as the selected environment.
+### Usage in CI
 
-eg.
+#### Jenkins
+
+TBD
+
+#### CircleCI
+
+We've provided an example repo with a working CircleCI config on a "fake" but real project, you can see how it is all setup by clicking [this link](https://github.com/sonatype-nexus-community/example-auditjs-repo#usage-in-circleci).
+
+#### TravisCI
+
+We've provided an example repo with a working TravisCI config on a "fake" but real project, you can see how it is all setup by clicking [this link](https://github.com/sonatype-nexus-community/example-auditjs-repo#usage-in-travisci).
+
+#### GitHub Actions
+
+We've provided an example repo with a working GitHub Action on a "fake" but real project, you can see how it is all setup by clicking [this link](https://github.com/sonatype-nexus-community/example-auditjs-repo#usage-with-github-actions).
+
+### Usage As A NPM Script
+
+`auditjs` can be added as a devDependency to your project, and then an npm script can be added so you can leverage it in your npm scripts.
+
+You would install `auditjs` like so:
+
 ```
-export NODE_ENV=production
-# File name: config/production.json
+$ npm i auditjs -D
 ```
 
-OSS Index Credentials
----------------------
+An example snippet from a `package.json`:
+
+```
+  },
+  "scripts": {
+    "test": "mocha -r ts-node/register src/**/*.spec.ts",
+    "build": "tsc -p tsconfig.json",
+    "build-dev": "tsc -p tsconfig.development.json",
+    "start": "node ./bin/index.js",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run test",
+    "scan": "auditjs ossi"
+  },
+  "keywords": [
+```
+
+Now that we've added a `scan` script, you can run `npm run scan` and your project will invoke `auditjs` and scan your dependencies. This can be handy for local work, or for if you want to run `auditjs` in CI/CD without installing it globally.
+
+Note: these reference implementations are applicable to running an IQ scan as well. The caveat is that the config for the IQ url and auth needs to either be in the home directory of the user running the job, or stored as (preferably secret) environmental variables.
+
+## Config file
+
+Config is now set via the command line, you can do so by running `auditjs config`. You will be prompted if you'd like to set Nexus IQ Server config or Sonatype OSS Index config. Reasonable defaults are provided for Sonatype Nexus IQ Server that will work for an out of the box install. It is STRONGLY suggested that you do not save your password in config (although it will work), but rather use a token from OSS Index or Nexus IQ Server.
+
+Config passed in via the command line will be respected over filesystem based config so that you can override specific calls to either Sonatype OSS Index or Nexus IQ Server. Please see usage of either command to see how to set this command line config.
+
+## OSS Index Credentials
 
 The OSS Index API is rate limited to prevent abuse. Guests (non-authorized users)
 are restricted to 16 requests of 120 packages each, which replenish at a rate
-of one request per minute. This means if you have 600 dependencies then 5 requests
+of one request per minute. This means if you have 600 dependencies, then 5 requests
 will be used. No problem! If you have many projects which are run close to each
 other you could run into the limit.
 
@@ -190,139 +195,79 @@ You can specify your credentials on either the command line or the configuration
 file. It is almost certainly better to put the credentials in a configuration
 file as described above, as using them on the command line is less secure.
 
-Whitelisting
-------------
-It may be that a particular vulnerability does not impact your code, and upgrading the
-dependency is not feasible, wise, or indeed possible in your case. In that situation it
-is possible to whitelist a vulnerability to hide it from the output and report.
+## Whitelisting
 
-Successful whitelisting will remove vulnerability mentions in the standard output and
-report text, but will be mentioned elsewhere in the standard output like so:
+Whitelisting of vulnerabilities can be done! To accomplish this thus far we have implemented the ability to have a file named `auditjs.json` checked in to your repo ideally, so that it would be at the root where you run `auditjs`. Alternatively you can run `auditjs` with a whitelist file at a different location, with an example such as:
 
-```
-Filtering the following vulnerabilities
-==================================================
-Root path disclosure vulnerability affected versions: expressjs <3.19.1 || >=4.0.0 <4.11.1
-Fixed root path disclosure vulnerability in express.static, res.sendfile, and res.sendFile
-==================================================
+```terminal
+$ auditjs ossi --whitelist /Users/cooldeveloperperson/code/sonatype-nexus-community/auditjs/auditjs.json
 ```
 
-The whitelist can either be specified in the configuration, or as a separate whitelist file.
-The whitelist file has two format alternatives.
+The file should look like:
 
-### Whitelist in configuration
-
-Vulnerabilities can be blocked (whitelisted) by specifying them directly in the configuration
-file as follows:
-
-
-```
+```json
 {
-  ...
-  "whitelist": {
-    "file": "./whitelist.json",
-    "ignore": [
-      "a81a18b3-26bf-43d8-b823-826ef69bf8e8",
-      "49da4413-af2b-4e55-acc0-9c752e30dde4"
-    ]
-  }
-  ...
+  "ignore": [{ "id": "78a61524-80c5-4371-b6d1-6b32af349043", "reason": "Insert reason here" }]
 }
 ```
 
-### Whitelist File
+The only field that actually matters is `id` and that is the ID you recieve from OSS Index for a vulnerability. You can add fields such as `reason` so that you later can understand why you whitelisted a vulnerability.
 
-The whitelist is a JSON document which is passed on the command line using the `-w <file>`
-option. The whitelist document itself can take one of two forms: simplified and verbose.
+Any `id` that is whitelisted will be squelched from the results, and not cause a failure.
 
-#### Simplified Whitelist Format
+## Alternative output formats
 
-The simplified whitelist is a list of vulnerability IDs. The ID for a vulnerability can
-be seen by generating the report (`-r`) and viewing the embedded JSON describing a
-particular vulnerability. For example:
+`auditjs` can output directly as `json` or as `xml` specifically formatted for JUnit test cases.
 
-```
-...
-  {
-    "id": "a81a18b3-26bf-43d8-b823-826ef69bf8e8",
-    "title": "Denial of Service",
-    "description": "Kris Reeves and Trevor Norris pinpointed a bug in V8 in the way it decodes UTF strings. This impacts Node at the Buffer to UTF8 String conversion and can cause a process to crash. The security concern comes from the fact that a lot of data from outside of an application is delivered to Node via this mechanism which means that users can potentially deliver specially crafted input data that can cause an application to crash when it goes through this path.",
-    "cvssScore": 0,
-    "reference": "https://ossindex.sonatype.org/vuln/a81a18b3-26bf-43d8-b823-826ef69bf8e8"
-  },
-...
-```
-
-The vulnerability id is right at the top. A whitelist will look like this:
+JSON:
 
 ```
-[
-"a81a18b3-26bf-43d8-b823-826ef69bf8e8",
-"49da4413-af2b-4e55-acc0-9c752e30dde4"
-]
+auditjs ossi --json > file.json
 ```
 
-#### Verbose Whitelist Format
-
-The verbose whitelist is useful because it acts as documentation on the details of the
-vulnerabilities that have been filtered, with the associated title, description, version
-range, and package.
-
-Here is the simplest example:
+XML:
 
 ```
-{
-  "packageName": [
-  {
-    "id": "a81a18b3-26bf-43d8-b823-826ef69bf8e8"
-  },
-  {
-    "id": "49da4413-af2b-4e55-acc0-9c752e30dde4"
-  }
-  ]
-}
-...
+auditjs ossi --xml > file.xml
 ```
 
-The document is a JSON object, where the field names are the names of packages which contain
-the vulnerabilities, and the value is a list of the vulnerabilities affecting the package that
-should be filtered. The minimal data required is the ID for the vulnerability. Dependency paths
-may be the full path of the dependency or any matching regular expression.
+We chose to allow output directly to the stdout, so that the user can decide what they want to do with it. If you'd like it to be written to a file by `auditjs` itself, pop in to [this issue](https://github.com/sonatype-nexus-community/auditjs/issues/115) and let us know your thoughts!
 
-And now something a bit more useful.
-
-```
-{
-  "node": [
-  {
-    "id": "a81a18b3-26bf-43d8-b823-826ef69bf8e8",
-    "title": "Denial of Service",
-    "description": "Kris Reeves and Trevor Norris pinpointed a bug in V8 in the way it decodes UTF strings. This impacts Node at the Buffer to UTF8 String conversion and can cause a process to crash. The security concern comes from the fact that a lot of data from outside of an application is delivered to Node via this mechanism which means that users can potentially deliver specially crafted input data that can cause an application to crash when it goes through this path."
-  },
-    ...
-  ]
-}
-...
-```
-
-Here we reproduced the title and description. You can include any
-of the fields that you feel are most useful in documenting the vulnerability, and
-even your own descriptive fields.
-
-Limitations
------------
+## Limitations
 
 As this program depends on the OSS Index database, network access is
 required. Connection problems with OSS Index will result in an exception.
 
-The NVD does not always indicate all (or any) of the affected versions
-it is best to read the vulnerability text itself to determine whether
-any particular version is known to be vulnerable.
+## Credit
 
-Credit
-------
+---
 
 Thank you to everybody who has contributed to this project, both with
 [code contributions](https://github.com/OSSIndex/auditjs/pulls?q=is%3Apr+is%3Aclosed)
 and also suggestions, testing help, and notifying us of new and/or missing
 vulnerabilities.
+
+## Contributing
+
+We care a lot about making the world a safer place, and that's why we continue to work on this and other plugins for Sonatype OSS Index. If you as well want to speed up the pace of software development by working on this project, jump on in! Before you start work, create a new issue, or comment on an existing issue, to let others know you are!
+
+## The Fine Print
+
+It is worth noting that this is **NOT SUPPORTED** by Sonatype, and is a contribution of ours
+to the open source community (read: you!)
+
+Remember:
+
+- Use this contribution at the risk tolerance that you have
+- Do NOT file Sonatype support tickets related to `auditjs`
+- DO file issues here on GitHub, so that the community can pitch in
+
+Phew, that was easier than I thought. Last but not least of all:
+
+Have fun creating and using this extension and the [Sonatype OSS Index](https://ossindex.sonatype.org/), we are glad to have you here!
+
+## Getting help
+
+Looking to contribute to our code but need some help? There's a few ways to get information:
+
+- Chat with us on [Gitter](https://gitter.im/sonatype/nexus-developers)

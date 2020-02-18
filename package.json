@@ -1,43 +1,96 @@
 {
   "name": "auditjs",
-  "version": "3.2.4",
+  "version": "4.0.0",
   "description": "Audit dependencies to identify known vulnerabilities and maintenance problems",
-  "main": "audit-package.js",
+  "main": "./bin/index.js",
   "bin": {
-    "auditjs": "./audit.js",
-    "auditjs-win": "./auditjs.js"
+    "auditjs": "./bin/index.js"
   },
+  "files": [
+    "bin/**/*"
+  ],
   "preferGlobal": true,
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "scripts": {
-    "pretest": "node audit.js -r -n -p test_data/package.json -w test_data/audit_package_whitelist.json || true &&  node audit.js -r -b -p test_data/bower.json || true",
-    "test": "diff reports/bower.xml test_data/expected_reports/bower.xml && diff reports/package.xml test_data/expected_reports/package.xml",
-    "update-tests": "npm run pretest && cp reports/*.xml test_data/expected_reports/"
+    "test": "mocha -r ts-node/register src/**/*.spec.ts",
+    "build": "tsc -p tsconfig.json",
+    "build-dev": "tsc -p tsconfig.development.json",
+    "lint": "eslint src/**/*.ts",
+    "start": "node ./bin/index.js",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run test"
   },
   "keywords": [
     "Audit",
+    "Scan",
     "Vulnerability",
     "CPE",
-    "CVE"
+    "CVE",
+    "CWE",
+    "OSSIndex",
+    "Artie",
+    "Nexus",
+    "Sonatype"
   ],
-  "author": "OSS Index",
-  "license": "BSD-3-Clause",
+  "author": "Sonatype Community",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/OSSIndex/auditjs.git"
+    "url": "https://github.com/sonatype-nexus-community/auditjs.git"
+  },
+  "devDependencies": {
+    "@types/chai": "4.2.0",
+    "@types/chai-as-promised": "7.1.1",
+    "@types/mocha": "5.2.7",
+    "@types/mock-fs": "^4.10.0",
+    "@types/rimraf": "^2.0.3",
+    "@types/sinon": "^7.5.1",
+    "@types/ssri": "^6.0.1",
+    "@typescript-eslint/eslint-plugin": "^2.20.0",
+    "@typescript-eslint/parser": "^2.20.0",
+    "chai": "4.2.0",
+    "chai-as-promised": "7.1.1",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "mocha": "6.2.2",
+    "mock-fs": "^4.10.4",
+    "nock": "11.7.0",
+    "prettier": "^1.19.1",
+    "rimraf": "^3.0.0",
+    "sinon": "^8.0.2",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.3"
   },
   "dependencies": {
+    "@types/figlet": "^1.2.0",
+    "@types/js-yaml": "^3.12.1",
+    "@types/node": "^12.12.17",
+    "@types/node-fetch": "^2.5.4",
+    "@types/node-persist": "^3.0.0",
+    "@types/uuid": "^3.4.7",
+    "@types/yargs": "^13.0.3",
+    "@types/yarnpkg__lockfile": "^1.1.3",
     "@yarnpkg/lockfile": "^1.1.0",
+    "chalk": "^3.0.0",
     "colors": "^1.3.1",
-    "commander": "^2.17.1",
-    "config": "1.30.0",
-    "html-entities": "^1.2.0",
-    "jsontoxml": "^1.0.0",
-    "mkdirp": "^0.5.1",
-    "npm": "^6.10.3",
-    "npm-conf": "1.1.3",
-    "request": "^2.87.0",
-    "semver": "^5.5.0",
-    "winston": "^2.4.3",
-    "xmldom": "^0.1.27"
+    "figlet": "^1.2.4",
+    "js-yaml": "3.13.1",
+    "node-fetch": "^2.6.0",
+    "node-persist": "^3.0.5",
+    "ora": "^4.0.3",
+    "packageurl-js": "^0.0.1",
+    "parse-packagejson-name": "^1.0.1",
+    "prettify-xml": "^1.2.0",
+    "read-installed": "~4.0.3",
+    "spdx-license-ids": "^3.0.5",
+    "ssri": "^6.0.0",
+    "uuid": "^3.3.2",
+    "winston": "^3.2.1",
+    "xmlbuilder": "^13.0.2",
+    "xmldom": "^0.2.1",
+    "yargs": "^15.0.2"
   }
 }
