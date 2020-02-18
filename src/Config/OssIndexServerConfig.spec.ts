@@ -20,16 +20,16 @@ import sinon from 'sinon';
 import os from 'os';
 import { ConfigPersist } from './ConfigPersist';
 
-describe("OssIndexServerConfig", async () => {
-  it("should return true when it is able to save a config file", async () => {
+describe('OssIndexServerConfig', async () => {
+  it('should return true when it is able to save a config file', async () => {
     sinon.stub(os, 'homedir').returns('/nonsense');
-    mock({ '/nonsense': {}});
+    mock({ '/nonsense': {} });
 
-    let config = new OssIndexServerConfig();
-    let configPersist = new ConfigPersist("username", "password")
+    const config = new OssIndexServerConfig();
+    const configPersist = new ConfigPersist('username', 'password');
     expect(config.saveFile(configPersist)).to.equal(true);
 
-    let conf = config.getConfigFromFile('/nonsense/.ossindex/.oss-index-config');
+    const conf = config.getConfigFromFile('/nonsense/.ossindex/.oss-index-config');
 
     expect(conf.getUsername()).to.equal('username');
     expect(conf.getToken()).to.equal('password');

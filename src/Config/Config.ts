@@ -16,29 +16,24 @@
 import path from 'path';
 import { homedir } from 'os';
 import { mkdirSync, existsSync } from 'fs';
-import { Logger, config } from 'winston';
-import { writeFileSync } from "fs";
+import { Logger } from 'winston';
+import { writeFileSync } from 'fs';
 import { safeDump } from 'js-yaml';
 
 import { ConfigPersist } from './ConfigPersist';
 
 export abstract class Config {
-  private directoryName: string = ".ossindex";
-  private fileName: string = ".oss-index-config";
+  private directoryName = '.ossindex';
+  private fileName = '.oss-index-config';
   private configLocation: string;
-  constructor(
-    protected type: string,
-    protected username: string, 
-    protected token: string,
-    readonly logger: Logger
-  ) {
-      if (this.type == 'iq') {
-        this.directoryName = ".iqserver";
-        this.fileName = ".iq-server-config";
-      }
-      this.configLocation = path.join(homedir(), this.directoryName, this.fileName);
+  constructor(protected type: string, protected username: string, protected token: string, readonly logger: Logger) {
+    if (this.type == 'iq') {
+      this.directoryName = '.iqserver';
+      this.fileName = '.iq-server-config';
     }
-  
+    this.configLocation = path.join(homedir(), this.directoryName, this.fileName);
+  }
+
   protected getConfigLocation(): string {
     this.tryCreateDirectory();
     return this.configLocation;
@@ -51,13 +46,8 @@ export abstract class Config {
     return;
   }
 
-  public saveFile(
-    objectToSave: ConfigPersist,
-  ): boolean {
-    writeFileSync(
-      this.getConfigLocation(), 
-      safeDump(objectToSave, { skipInvalid: true })
-    );
+  public saveFile(objectToSave: ConfigPersist): boolean {
+    writeFileSync(this.getConfigLocation(), safeDump(objectToSave, { skipInvalid: true }));
     this.getConfigFromFile();
     return true;
   }

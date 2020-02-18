@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Muncher } from "./Muncher";
-import { Coordinates } from "../Types/Coordinates";
+import { Muncher } from './Muncher';
+import { Coordinates } from '../Types/Coordinates';
 import path from 'path';
 import fs from 'fs';
 
 export class Bower implements Muncher {
-
   constructor(readonly devDependencies: boolean = false) {}
 
   getSbomFromCommand(): Promise<any> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
   public isValid(): boolean {
-    let tempPath = path.join(process.cwd(), "bower.json");
+    const tempPath = path.join(process.cwd(), 'bower.json');
     return fs.existsSync(tempPath);
   }
 
@@ -36,19 +35,19 @@ export class Bower implements Muncher {
   }
 
   public async getInstalledDeps(): Promise<Coordinates[]> {
-    let depsArray: Array<Coordinates> = new Array();
-    let file = fs.readFileSync(path.join(process.cwd(), 'bower.json'));
-    let json = JSON.parse(file.toString());
+    const depsArray: Array<Coordinates> = [];
+    const file = fs.readFileSync(path.join(process.cwd(), 'bower.json'));
+    const json = JSON.parse(file.toString());
 
-    Object.keys(json.dependencies).map((x: any) => {
-      let version: string = json.dependencies[x];
-      depsArray.push(new Coordinates(x, version.replace("~", ""), ""));
+    Object.keys(json.dependencies).map((x: string) => {
+      const version: string = json.dependencies[x];
+      depsArray.push(new Coordinates(x, version.replace('~', ''), ''));
     });
 
     if (this.devDependencies) {
-      Object.keys(json.devDependencies).map((x: any) => {
-        let version: string = json.devDependencies[x];
-        depsArray.push(new Coordinates(x, version.replace("~", ""), ""));
+      Object.keys(json.devDependencies).map((x: string) => {
+        const version: string = json.devDependencies[x];
+        depsArray.push(new Coordinates(x, version.replace('~', ''), ''));
       });
     }
 

@@ -51,7 +51,7 @@ class Component {
 
 class ComponentIdentifier {
   readonly format: string;
-  readonly coordinates: Array<Object>;
+  readonly coordinates: Record<string, any>;
 
   constructor(componentIdentifier: any) {
     this.format = componentIdentifier.format;

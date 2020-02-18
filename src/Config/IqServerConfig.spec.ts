@@ -20,16 +20,16 @@ import sinon from 'sinon';
 import os from 'os';
 import { ConfigPersist } from './ConfigPersist';
 
-describe("IqServerConfig", async () => {
-  it("should return true when it is able to save a config file", async () => {
+describe('IqServerConfig', async () => {
+  it('should return true when it is able to save a config file', async () => {
     sinon.stub(os, 'homedir').returns('/nonsense');
-    mock({ '/nonsense': {}});
+    mock({ '/nonsense': {} });
 
-    let config = new IqServerConfig();
-    let configPersist = new ConfigPersist("username", "password", "http://localhost:8070")
+    const config = new IqServerConfig();
+    const configPersist = new ConfigPersist('username', 'password', 'http://localhost:8070');
     expect(config.saveFile(configPersist)).to.equal(true);
 
-    let conf = config.getConfigFromFile('/nonsense/.iqserver/.iq-server-config');
+    const conf = config.getConfigFromFile('/nonsense/.iqserver/.iq-server-config');
 
     expect(conf.getUsername()).to.equal('username');
     expect(conf.getToken()).to.equal('password');

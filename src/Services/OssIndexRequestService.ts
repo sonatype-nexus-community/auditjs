@@ -13,34 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { OssIndexCoordinates } from "../Types/OssIndexCoordinates";
-import { Coordinates } from "../Types/Coordinates";
-import fetch from "node-fetch";
-import { Response } from "node-fetch";
+import { OssIndexCoordinates } from '../Types/OssIndexCoordinates';
+import { Coordinates } from '../Types/Coordinates';
+import fetch from 'node-fetch';
+import { Response } from 'node-fetch';
 import NodePersist from 'node-persist';
-import path from "path";
-import { OssIndexServerResult } from "../Types/OssIndexServerResult";
+import path from 'path';
+import { OssIndexServerResult } from '../Types/OssIndexServerResult';
 import { homedir } from 'os';
-import { RequestHelpers } from "./RequestHelpers";
+import { RequestHelpers } from './RequestHelpers';
 
-const OSS_INDEX_BASE_URL = "https://ossindex.sonatype.org/";
+const OSS_INDEX_BASE_URL = 'https://ossindex.sonatype.org/';
 
-const COMPONENT_REPORT_ENDPOINT = "api/v3/component-report";
+const COMPONENT_REPORT_ENDPOINT = 'api/v3/component-report';
 
 const MAX_COORDINATES = 128;
 
-const PATH = path.join(homedir(), ".ossindex", "auditjs");
+const PATH = path.join(homedir(), '.ossindex', 'auditjs');
 
-const TWELVE_HOURS = (12 * 60 * 60 * 1000);
+const TWELVE_HOURS = 12 * 60 * 60 * 1000;
 
 export class OssIndexRequestService {
-  
   constructor(
-    readonly user?: string, 
-    readonly password?: string, 
-    private baseURL: string = OSS_INDEX_BASE_URL, 
-    private cacheLocation: string = PATH)
-  {}
+    readonly user?: string,
+    readonly password?: string,
+    private baseURL: string = OSS_INDEX_BASE_URL,
+    private cacheLocation: string = PATH,
+  ) {}
 
   private checkStatus(res: Response): Response {
     if (res.ok) {
@@ -51,27 +50,27 @@ export class OssIndexRequestService {
 
   private getHeaders(): string[][] {
     if (this.user && this.password) {
-      return [["Content-Type", "application/json"], this.getBasicAuth(), RequestHelpers.getUserAgent()];
+      return [['Content-Type', 'application/json'], this.getBasicAuth(), RequestHelpers.getUserAgent()];
     }
-    return [["Content-Type", "application/json"], RequestHelpers.getUserAgent()];
+    return [['Content-Type', 'application/json'], RequestHelpers.getUserAgent()];
   }
 
   private getResultsFromOSSIndex(data: OssIndexCoordinates): Promise<object> {
     const response = fetch(`${this.baseURL}${COMPONENT_REPORT_ENDPOINT}`, {
-      method: "post",
-      body: JSON.stringify(data.toConsumeableRequestObject()),
-      headers: this.getHeaders()
+      method: 'post',
+      body: JSON.stringify(data),
+      headers: this.getHeaders(),
     })
       .then(this.checkStatus)
-      .then(res => res.json())
-      .catch(err => {
+      .then((res) => res.json())
+      .catch((err) => {
         throw new Error(`There was an error making the request: ${err}`);
       });
     return response;
   }
 
   private chunkData(data: Coordinates[]): Array<Array<Coordinates>> {
-    let chunks = new Array();
+    const chunks = [];
     while (data.length > 0) {
       chunks.push(data.splice(0, MAX_COORDINATES));
     }
@@ -84,14 +83,12 @@ export class OssIndexRequestService {
 
   private combineCacheAndResponses(
     combinedChunks: Array<OssIndexServerResult>,
-    dataInCache: Array<OssIndexServerResult>
+    dataInCache: Array<OssIndexServerResult>,
   ): Array<OssIndexServerResult> {
     return combinedChunks.concat(dataInCache);
   }
 
-  private async insertResponsesIntoCache(
-    response: Array<OssIndexServerResult>
-  ) {
+  private async insertResponsesIntoCache(response: Array<OssIndexServerResult>): Promise<Array<OssIndexServerResult>> {
     // console.debug(`Preparing to cache ${response.length} coordinate responses`);
 
     for (let i = 0; i < response.length; i++) {
@@ -102,16 +99,13 @@ export class OssIndexRequestService {
     return response;
   }
 
-  private async checkIfResultsAreInCache(
-    data: Coordinates[],
-    format: string = "npm"
-  ): Promise<PurlContainer> {
-    let inCache = new Array<OssIndexServerResult>();
-    let notInCache = new Array<Coordinates>();
+  private async checkIfResultsAreInCache(data: Coordinates[], format = 'npm'): Promise<PurlContainer> {
+    const inCache = new Array<OssIndexServerResult>();
+    const notInCache = new Array<Coordinates>();
 
     for (let i = 0; i < data.length; i++) {
-      let coord = data[i];
-      let dataInCache = await NodePersist.getItem(coord.toPurl(format));
+      const coord = data[i];
+      const dataInCache = await NodePersist.getItem(coord.toPurl(format));
       if (dataInCache) {
         inCache.push(dataInCache);
       } else {
@@ -119,7 +113,6 @@ export class OssIndexRequestService {
       }
     }
 
-    // console.debug(`Number of coordinates found in cache: ${inCache.length}`);
     return new PurlContainer(inCache, notInCache);
   }
 
@@ -127,43 +120,37 @@ export class OssIndexRequestService {
    * Posts to OSS Index {@link COMPONENT_REPORT_ENDPOINT}, returns Promise of json object of response
    * @param data - {@link Coordinates} Array
    * @returns a {@link Promise} of all Responses
-  */
-  public async callOSSIndexOrGetFromCache(data: Coordinates[], format: string = "npm"): Promise<any> {
+   */
+  public async callOSSIndexOrGetFromCache(data: Coordinates[], format = 'npm'): Promise<any> {
     await NodePersist.init({ dir: this.cacheLocation, ttl: TWELVE_HOURS });
-    let responses = new Array();
+    const responses = new Array();
     // console.debug(`Purls received, total purls before chunk: ${data.length}`);
-    let results = await this.checkIfResultsAreInCache(data, format);
-    let chunkedPurls = this.chunkData(results.notInCache);
+    const results = await this.checkIfResultsAreInCache(data, format);
+    const chunkedPurls = this.chunkData(results.notInCache);
 
-    for (let chunk of chunkedPurls) {
+    for (const chunk of chunkedPurls) {
       try {
-        let res = this.getResultsFromOSSIndex(
-          new OssIndexCoordinates(chunk.map(x => x.toPurl(format)))
-        );
+        const res = this.getResultsFromOSSIndex(new OssIndexCoordinates(chunk.map((x) => x.toPurl(format))));
         responses.push(res);
-      }
-      catch (e) {
+      } catch (e) {
         throw new Error(e);
       }
     }
 
     return Promise.all(responses)
-      .then(resolvedResponses => this.combineResponseChunks(resolvedResponses))
-      .then(combinedResponses => this.insertResponsesIntoCache(combinedResponses))
-      .then(combinedResponses => this.combineCacheAndResponses(combinedResponses, results.inCache))
-      .catch(err => {
+      .then((resolvedResponses) => this.combineResponseChunks(resolvedResponses))
+      .then((combinedResponses) => this.insertResponsesIntoCache(combinedResponses))
+      .then((combinedResponses) => this.combineCacheAndResponses(combinedResponses, results.inCache))
+      .catch((err) => {
         throw err;
       });
   }
 
   private getBasicAuth(): string[] {
-    return ['Authorization', 'Basic ' + Buffer.from(this.user + ":" + this.password).toString('base64')];
+    return ['Authorization', 'Basic ' + Buffer.from(this.user + ':' + this.password).toString('base64')];
   }
 }
 
 class PurlContainer {
-  constructor(
-    readonly inCache: OssIndexServerResult[],
-    readonly notInCache: Coordinates[]
-  ) {}
+  constructor(readonly inCache: OssIndexServerResult[], readonly notInCache: Coordinates[]) {}
 }
