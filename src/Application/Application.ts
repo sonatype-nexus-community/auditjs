@@ -202,7 +202,7 @@ export class Application {
     }
   }
 
-  private async auditWithIQ(args: any) {
+  private async auditWithIQ(args: any): Promise<void> {
     try {
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Authenticating with Sonatype IQ');
