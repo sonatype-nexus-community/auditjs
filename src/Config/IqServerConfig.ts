@@ -17,18 +17,18 @@ import { Config } from "./Config";
 import { readFileSync } from "fs";
 import { Logger } from "winston";
 import { getAppLogger } from "../Application/Logger/Logger";
-import { safeLoad } from 'js-yaml';
+import { safeLoad } from "js-yaml";
 
 export class IqServerConfig extends Config {
   constructor(
     // TODO: Decide if we want to put default values here or leave them blank.. regardless empty strings are not easy to handle
-    protected username: string = '', 
-    protected token: string = '', 
-    private host: string = '', 
-    readonly logger: Logger = getAppLogger())
-  {
-    super('iq', username, token, logger);
-    if(this.exists()) {
+    protected username: string = "",
+    protected token: string = "",
+    private host: string = "",
+    readonly logger: Logger = getAppLogger()
+  ) {
+    super("iq", username, token, logger);
+    if (this.exists()) {
       this.getConfigFromFile();
     }
   }
@@ -44,12 +44,11 @@ export class IqServerConfig extends Config {
   public getHost(): string {
     return this.host;
   }
-  
+
   public getConfigFromFile(
     saveLocation: string = this.getConfigLocation()
   ): IqServerConfig {
-
-    const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
+    const doc = safeLoad(readFileSync(saveLocation, "utf8"));
     super.username = doc.Username;
     super.token = doc.Token;
     this.host = doc.Server;

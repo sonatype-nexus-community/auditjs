@@ -23,8 +23,8 @@ import { safeDump } from "js-yaml";
 import { ConfigPersist } from "./ConfigPersist";
 
 export abstract class Config {
-  private directoryName: string = ".ossindex";
-  private fileName: string = ".oss-index-config";
+  private directoryName = ".ossindex";
+  private fileName = ".oss-index-config";
   private configLocation: string;
   constructor(
     protected type: string,

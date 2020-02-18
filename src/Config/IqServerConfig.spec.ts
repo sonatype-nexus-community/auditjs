@@ -25,15 +25,15 @@ describe("IqServerConfig", async () => {
     sinon.stub(os, "homedir").returns("/nonsense");
     mock({ "/nonsense": {} });
 
-    let config = new IqServerConfig();
-    let configPersist = new ConfigPersist(
+    const config = new IqServerConfig();
+    const configPersist = new ConfigPersist(
       "username",
       "password",
       "http://localhost:8070"
     );
     expect(config.saveFile(configPersist)).to.equal(true);
 
-    let conf = config.getConfigFromFile(
+    const conf = config.getConfigFromFile(
       "/nonsense/.iqserver/.iq-server-config"
     );
 

@@ -30,10 +30,10 @@ export class AppConfig {
     });
   }
 
-  public async getConfigFromCommandLine() {
-    let username: string = "";
-    let token: string = "";
-    let type: string = "";
+  public async getConfigFromCommandLine(): Promise<boolean> {
+    let username = "";
+    let token = "";
+    let type = "";
 
     type = await this.setVariable(
       "Do you want to set config for Nexus IQ Server or OSS Index? Hit enter for OSS Index, iq for Nexus IQ Server? "
@@ -43,7 +43,7 @@ export class AppConfig {
       username = "admin";
       token = "admin123";
 
-      let host: string = "http://localhost:8070";
+      let host = "http://localhost:8070";
 
       username = await this.setVariable(
         `What is your username (default: ${username})? `,
@@ -62,13 +62,13 @@ export class AppConfig {
 
       this.rl.close();
 
-      let iqConfig = new ConfigPersist(
+      const iqConfig = new ConfigPersist(
         username,
         token,
         host.endsWith("/") ? host.slice(0, host.length - 1) : host
       );
 
-      let config = new IqServerConfig();
+      const config = new IqServerConfig();
 
       return config.saveFile(iqConfig);
     } else {
@@ -77,25 +77,27 @@ export class AppConfig {
 
       token = await this.setVariable("What is your token? ");
 
+      cacheLocation = await this.setVariable(
+        `Where would you like your OSS Index cache saved to (default: ${cacheLocation})? `,
+        cacheLocation
+      );
+
       this.rl.close();
 
-      let ossIndexConfig = new ConfigPersist(
+      const ossIndexConfig = new ConfigPersist(
         username,
         token,
         undefined,
         cacheLocation
       );
 
-      let config = new OssIndexServerConfig();
+      const config = new OssIndexServerConfig();
 
       return config.saveFile(ossIndexConfig);
     }
   }
 
-  private setVariable(
-    message: string,
-    defaultValue: string = ""
-  ): Promise<string> {
+  private setVariable(message: string, defaultValue = ""): Promise<string> {
     return new Promise(resolve => {
       this.rl.question(message, answer => {
         resolve(answer || defaultValue);
