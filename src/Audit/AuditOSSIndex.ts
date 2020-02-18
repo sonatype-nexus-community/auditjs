@@ -131,8 +131,11 @@ export class AuditOSSIndex {
   }
 
   private printVulnerability(i: number, total: number, result: OssIndexServerResult): void {
+    if (!result.vulnerabilities) {
+      return;
+    }
     const maxScore: number = Math.max(
-      ...result.vulnerabilities!.map((x: Vulnerability) => {
+      ...result.vulnerabilities.map((x: Vulnerability) => {
         return +x.cvssScore;
       }),
     );
