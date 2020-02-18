@@ -1,3 +1,10 @@
+## [4.0.1-beta.32](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.31...v4.0.1-beta.32) (2020-02-18)
+
+
+### Bug Fixes
+
+* Cherry pick config things, more or less, mas o menos ([45abf5a](https://github.com/sonatype-nexus-community/auditjs/commit/45abf5ad05d3e86237d33d44289028dbf3060422))
+
 ## [4.0.1-beta.31](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1-beta.30...v4.0.1-beta.31) (2020-02-15)
 
 
