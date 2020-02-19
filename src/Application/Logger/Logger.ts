@@ -33,6 +33,7 @@ export const logger = pino(
   {
     name: 'auditjs',
     level: DEBUG,
+    enabled: process.env.NODE_ENV == 'test' ? false : true,
     timestamp: pino.stdTimeFunctions.isoTime,
   },
   pino.extreme(`${logPath}/.auditjs.combined.log`),
@@ -42,6 +43,7 @@ export const loggerError = pino(
   {
     name: 'auditjs',
     level: DEBUG,
+    enabled: process.env.NODE_ENV == 'test' ? false : true,
     timestamp: pino.stdTimeFunctions.isoTime,
   },
   pino.extreme(`${logPath}/.auditjs.combined.log`),
