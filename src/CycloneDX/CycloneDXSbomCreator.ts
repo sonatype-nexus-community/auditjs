@@ -1,4 +1,3 @@
-/// <reference types="./typings/packageurl-js" />
 /// <reference types="./typings/parse-packagejson-name" />
 /// <reference types="./typings/read-installed" />
 /// <reference types="./typings/spdx-license-ids" />
@@ -21,7 +20,6 @@ import { Options } from './Options';
 import uuidv4 from 'uuid/v4';
 import builder from 'xmlbuilder';
 import readInstalled from 'read-installed';
-import PackageURL from 'packageurl-js';
 import parsePackageJsonName from 'parse-packagejson-name';
 import * as ssri from 'ssri';
 import * as fs from 'fs';
@@ -31,6 +29,7 @@ import { ExternalReference } from './Types/ExternalReference';
 import { Hash } from './Types/Hash';
 import spdxLicensesNonDeprecated = require('spdx-license-ids');
 import spdxLicensesDeprecated = require('spdx-license-ids/deprecated');
+import { toPurl } from './Helpers/Helpers';
 
 export class CycloneDXSbomCreator {
   readonly licenseFilenames: Array<string> = [
@@ -117,7 +116,7 @@ export class CycloneDXSbomCreator {
       const group: string = pkgIdentifier.scope == null ? '' : `@${pkgIdentifier.scope}`;
       const name: string = pkgIdentifier.fullName as string;
       const version: string = pkg.version as string;
-      const purl: string = new PackageURL('npm', group, name, version, null, null).toString();
+      const purl: string = toPurl(name, version, group);
       const description: GenericDescription = { '#cdata': pkg.description };
 
       const component: Component = {

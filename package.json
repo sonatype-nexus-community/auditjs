@@ -81,7 +81,6 @@
     "node-fetch": "^2.6.0",
     "node-persist": "^3.0.5",
     "ora": "^4.0.3",
-    "packageurl-js": "^0.0.1",
     "parse-packagejson-name": "^1.0.1",
     "prettify-xml": "^1.2.0",
     "read-installed": "~4.0.3",
