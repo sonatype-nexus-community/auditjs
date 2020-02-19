@@ -300,7 +300,7 @@ export class CycloneDXSbomCreator {
     return undefined;
   }
 
-  private parsePackageJsonName(name: string) {
+  private parsePackageJsonName(name: string): Result {
     const result: Result = {
       scope: undefined,
       fullName: '',
