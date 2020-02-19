@@ -16,7 +16,7 @@
 
 export const toPurl = (name: string, version: string, group = ''): string => {
   if (group != '') {
-    return `pkg:npm/${group}/${name}@${version}`;
+    return `pkg:npm/${encodeURIComponent(group)}/${name}@${version}`;
   }
   return `pkg:npm/${name}@${version}`;
 };

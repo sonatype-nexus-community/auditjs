@@ -82,7 +82,6 @@
     "node-persist": "^3.0.5",
     "ora": "^4.0.3",
     "parse-packagejson-name": "^1.0.1",
-    "prettify-xml": "^1.2.0",
     "read-installed": "~4.0.3",
     "spdx-license-ids": "^3.0.5",
     "ssri": "^6.0.0",
