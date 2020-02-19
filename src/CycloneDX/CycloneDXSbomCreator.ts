@@ -1,4 +1,3 @@
-/// <reference types="./typings/parse-packagejson-name" />
 /// <reference types="./typings/read-installed" />
 /// <reference types="./typings/spdx-license-ids" />
 /*
@@ -20,7 +19,6 @@ import { Options } from './Options';
 import uuidv4 from 'uuid/v4';
 import builder from 'xmlbuilder';
 import readInstalled from 'read-installed';
-import parsePackageJsonName from 'parse-packagejson-name';
 import * as ssri from 'ssri';
 import * as fs from 'fs';
 import { LicenseContent } from './Types/LicenseContent';
@@ -112,8 +110,8 @@ export class CycloneDXSbomCreator {
       return;
     }
     if (!isRootPkg) {
-      const pkgIdentifier = parsePackageJsonName(pkg.name);
-      const group: string = pkgIdentifier.scope == null ? '' : `@${pkgIdentifier.scope}`;
+      const pkgIdentifier = this.parsePackageJsonName(pkg.name);
+      const group: string = pkgIdentifier.scope == undefined ? '' : `@${pkgIdentifier.scope}`;
       const name: string = pkgIdentifier.fullName as string;
       const version: string = pkg.version as string;
       const purl: string = toPurl(name, version, group);
@@ -301,4 +299,31 @@ export class CycloneDXSbomCreator {
     }
     return undefined;
   }
+
+  private parsePackageJsonName(name: string) {
+    const result: Result = {
+      scope: undefined,
+      fullName: '',
+      projectName: '',
+      moduleName: '',
+    };
+
+    const regexp = new RegExp(/^(?:@([^/]+)\/)?(([^\.]+)(?:\.(.*))?)$/);
+
+    const matches = name.match(regexp);
+    if (matches) {
+      result.scope = matches[1] || undefined;
+      result.fullName = matches[2] || matches[0];
+      result.projectName = matches[3] === matches[2] ? undefined : matches[3];
+      result.moduleName = matches[4] || matches[2] || undefined;
+    }
+    return result;
+  }
+}
+
+interface Result {
+  scope?: string;
+  fullName: string;
+  projectName?: string;
+  moduleName?: string;
 }
