@@ -25,7 +25,6 @@ export const ERROR = 'error';
 export const logger = pino(
   {
     name: 'auditjs',
-    enabled: process.env.NODE_ENV == 'test' ? false : true,
     level: DEBUG,
     timestamp: pino.stdTimeFunctions.isoTime,
   },
@@ -35,7 +34,6 @@ export const logger = pino(
 export const loggerError = pino(
   {
     name: 'auditjs',
-    enabled: process.env.NODE_ENV == 'test' ? false : true,
     level: DEBUG,
     timestamp: pino.stdTimeFunctions.isoTime,
   },
@@ -43,6 +41,10 @@ export const loggerError = pino(
 );
 
 export const logMessage = (message: string, level: string, ...meta: any) => {
+  if (process.env.NODE_ENV == 'test') {
+    return;
+  }
+
   if (level == DEBUG) {
     logger.debug(message, ...meta);
   } else if (level == ERROR) {
@@ -51,6 +53,10 @@ export const logMessage = (message: string, level: string, ...meta: any) => {
 };
 
 const handler = pino.final(logger, (err, finalLogger, evt) => {
+  if (process.env.NODE_ENV == 'test') {
+    return;
+  }
+
   logger.flush();
   loggerError.flush();
   finalLogger.debug(`${evt} caught`);
