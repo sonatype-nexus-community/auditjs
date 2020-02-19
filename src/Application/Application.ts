@@ -25,7 +25,7 @@ import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
 import { ReportStatus } from '../Types/ReportStatus';
 import { Bower } from '../Munchers/Bower';
-import { DEBUG, ERROR, logMessage } from './Logger/Logger';
+import { DEBUG, ERROR, logMessage, createAppLogger } from './Logger/Logger';
 import { Spinner } from './Spinner/Spinner';
 import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
@@ -49,6 +49,7 @@ export class Application {
 
     this.printHeader();
     this.spinner = new Spinner(silent);
+    createAppLogger();
 
     if (npmList.isValid()) {
       logMessage('Setting Muncher to npm list', DEBUG);

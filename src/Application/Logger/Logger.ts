@@ -15,12 +15,19 @@
  */
 import pino from 'pino';
 import { homedir } from 'os';
+import { existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
 
-const home = homedir();
-const logPath = `${home}/.ossindex`;
+const logPath = join(homedir(), '.ossindex');
 
 export const DEBUG = 'debug';
 export const ERROR = 'error';
+
+export const createAppLogger = () => {
+  if (!existsSync(logPath)) {
+    mkdirSync(logPath);
+  }
+};
 
 export const logger = pino(
   {
