@@ -25,12 +25,13 @@ import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
 import { ReportStatus } from '../Types/ReportStatus';
 import { Bower } from '../Munchers/Bower';
-import { setConsoleTransportLevel, logMessage, createAppLogger, DEBUG, ERROR, getAppLogger } from './Logger/Logger';
+import { DEBUG, ERROR, logger, logMessage } from './Logger/Logger';
 import { Spinner } from './Spinner/Spinner';
 import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 import { visuallySeperateText } from '../Visual/VisualHelper';
+import { Logger } from 'pino';
 const pj = require('../../package.json');
 
 export class Application {
@@ -44,7 +45,6 @@ export class Application {
     readonly silent: boolean = false,
     readonly artie: boolean = false,
   ) {
-    createAppLogger();
     const npmList = new NpmList(devDependency);
     const bower = new Bower(devDependency);
 
@@ -68,7 +68,7 @@ export class Application {
 
   public async startApplication(args: any): Promise<void> {
     if (args.verbose) {
-      setConsoleTransportLevel(DEBUG);
+      // setConsoleTransportLevel(DEBUG);
     }
     // args has sensitive info in it, such as username/password, etc... do not log them in total
     if (args._[0] == 'iq') {

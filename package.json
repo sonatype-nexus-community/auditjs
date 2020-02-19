@@ -88,7 +88,6 @@
     "spdx-license-ids": "^3.0.5",
     "ssri": "^6.0.0",
     "uuid": "^3.3.2",
-    "winston": "^3.2.1",
     "xmlbuilder": "^13.0.2",
     "xmldom": "^0.2.1",
     "yargs": "^15.0.2"

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-present Sonatype, Inc.
+ * Copyright (c) 2020-present Sonatype, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,59 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import path from 'path';
+import pino from 'pino';
+import childProcess from 'child_process';
+import stream from 'stream';
 import { homedir } from 'os';
 
-import winston, { format } from 'winston';
+// Environment variables
+const home = homedir();
+const cwd = process.cwd();
+const { env } = process;
+const logPath = `${home}/.ossindex`;
 
 export const DEBUG = 'debug';
 export const ERROR = 'error';
 
-const transports = {
-  console: new winston.transports.Console(
-    {
-      level: ERROR
-    }
-  ),
-  file: new winston.transports.File(
-    {
-      filename: path.join(homedir(), '.ossindex', '.audit-js.error.log'),
-      options: { flags: 'w' }, 
-      level: ERROR
-    }
-  ),
-  combinedFile: new winston.transports.File(
-    {
-      filename: path.join(homedir(), '.ossindex', '.audit-js.combined.log'),
-      options: { flags: 'w' },
-      level: DEBUG
-    }
-  )
-};
+const logThrough = new stream.PassThrough();
 
-export const createAppLogger = (logLevel: string = DEBUG, name: string = "auditjs") => {
-  winston.loggers.add(name, {
-    level: logLevel,
-    format: 
-      format.combine(format.label({label: 'AuditJS'}),
-      format.timestamp(),
-      format.prettyPrint()),
-    transports: [
-      transports.file,
-      transports.combinedFile,
-      transports.console
-    ]
-  });
-}
+export const logger = pino(
+  {
+    name: 'auditjs',
+    level: DEBUG,
+  },
+  logThrough,
+);
 
-export const setConsoleTransportLevel = (logLevel: string) => {
-  transports.console.level = logLevel;
-}
+const child = childProcess.spawn(
+  process.execPath,
+  [require.resolve('pino-tee'), DEBUG, `${logPath}/.auditjs.debug.log`, ERROR, `${logPath}/.auditjs.error.log`],
+  { cwd, env },
+);
 
-export const getAppLogger = (loggerName: string = "auditjs") => {
-  return winston.loggers.get(loggerName);
-}
+logThrough.pipe(child.stdin);
 
 export const logMessage = (message: string, level: string, ...meta: any) => {
-  getAppLogger().log(level, message, meta);
-}
+  if (level == DEBUG) {
+    logger.debug(message, ...meta);
+  } else if (level == ERROR) {
+    logger.error(message, ...meta);
+  }
+};
