@@ -15,8 +15,6 @@
  */
 import { Config } from './Config';
 import { readFileSync } from 'fs';
-import { Logger } from 'winston';
-import { getAppLogger } from '../Application/Logger/Logger';
 import { safeLoad } from 'js-yaml';
 
 export class IqServerConfig extends Config {
@@ -25,9 +23,8 @@ export class IqServerConfig extends Config {
     protected username: string = '',
     protected token: string = '',
     private host: string = '',
-    readonly logger: Logger = getAppLogger(),
   ) {
-    super('iq', username, token, logger);
+    super('iq', username, token);
     if (this.exists()) {
       this.getConfigFromFile();
     }

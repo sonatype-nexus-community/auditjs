@@ -16,7 +16,6 @@
 import path from 'path';
 import { homedir } from 'os';
 import { mkdirSync, existsSync } from 'fs';
-import { Logger } from 'winston';
 import { writeFileSync } from 'fs';
 import { safeDump } from 'js-yaml';
 
@@ -26,7 +25,7 @@ export abstract class Config {
   private directoryName = '.ossindex';
   private fileName = '.oss-index-config';
   private configLocation: string;
-  constructor(protected type: string, protected username: string, protected token: string, readonly logger: Logger) {
+  constructor(protected type: string, protected username: string, protected token: string) {
     if (this.type == 'iq') {
       this.directoryName = '.iqserver';
       this.fileName = '.iq-server-config';

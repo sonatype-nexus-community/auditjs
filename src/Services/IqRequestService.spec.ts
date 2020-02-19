@@ -17,13 +17,8 @@ import expect, { applicationInternalIdResponse } from '../Tests/TestHelper';
 import { Coordinates } from '../Types/Coordinates';
 import nock from 'nock';
 import { IqRequestService } from './IqRequestService';
-import { getAppLogger } from '../Application/Logger/Logger';
 
 describe('IQRequestService', () => {
-  before(() => {
-    getAppLogger().silent = true;
-  });
-
   it("should have it's third party API request rejected when the IQ Server is down", async () => {
     const internalId = '123456';
     const stage = 'build';

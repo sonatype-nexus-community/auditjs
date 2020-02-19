@@ -15,16 +15,14 @@
  */
 import fetch from 'node-fetch';
 import { RequestHelpers } from './RequestHelpers';
-import { logMessage, DEBUG, getAppLogger } from '../Application/Logger/Logger';
+import { logMessage, DEBUG } from '../Application/Logger/Logger';
 import { URL } from 'url';
-import { Logger } from 'winston';
 
 const APPLICATION_INTERNAL_ID_ENDPOINT = '/api/v2/applications?publicId=';
 
 export class IqRequestService {
   private internalId = '';
   private isInitialized = false;
-  private logger: Logger;
 
   constructor(
     readonly user: string,
@@ -33,9 +31,7 @@ export class IqRequestService {
     readonly application: string,
     readonly stage: string,
     readonly timeout: number,
-  ) {
-    this.logger = getAppLogger();
-  }
+  ) {}
 
   private async init(): Promise<void> {
     this.internalId = await this.getApplicationInternalId();
@@ -73,7 +69,7 @@ export class IqRequestService {
     if (!this.isInitialized) {
       await this.init();
     }
-    this.logger.debug('Internal ID', { internalId: this.internalId });
+    logMessage('Internal ID', DEBUG, { internalId: this.internalId });
 
     const response = await fetch(
       `${this.host}/api/v2/scan/applications/${this.internalId}/sources/auditjs?stageId=${this.stage}`,
@@ -88,7 +84,7 @@ export class IqRequestService {
       return json.statusUrl as string;
     } else {
       const body = await response.text();
-      this.logger.error('Response from third party API', { response: body });
+      logMessage('Response from third party API', DEBUG, { response: body });
       throw new Error(`Unable to submit to Third Party API`);
     }
   }

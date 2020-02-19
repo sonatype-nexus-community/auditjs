@@ -25,13 +25,12 @@ import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
 import { ReportStatus } from '../Types/ReportStatus';
 import { Bower } from '../Munchers/Bower';
-import { DEBUG, ERROR, logger, logMessage } from './Logger/Logger';
+import { DEBUG, ERROR, logMessage } from './Logger/Logger';
 import { Spinner } from './Spinner/Spinner';
 import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 import { visuallySeperateText } from '../Visual/VisualHelper';
-import { Logger } from 'pino';
 const pj = require('../../package.json');
 
 export class Application {
@@ -67,10 +66,6 @@ export class Application {
   }
 
   public async startApplication(args: any): Promise<void> {
-    if (args.verbose) {
-      // setConsoleTransportLevel(DEBUG);
-    }
-    // args has sensitive info in it, such as username/password, etc... do not log them in total
     if (args._[0] == 'iq') {
       logMessage('Attempting to start application', DEBUG);
       logMessage('Getting coordinates for Sonatype IQ', DEBUG);
@@ -188,17 +183,11 @@ export class Application {
       const failed = auditOSSIndex.auditResults(ossIndexResults);
 
       logMessage('Results audited', DEBUG, { failureCode: failed });
-      getAppLogger().end();
-      getAppLogger().on('finish', () => {
-        failed ? process.exit(1) : process.exit(0);
-      });
+      failed ? process.exit(1) : process.exit(0);
     } catch (e) {
       this.spinner.maybeStop();
       logMessage('There was an error auditing with Sonatype OSS Index', ERROR, { title: e.message, stack: e.stack });
-      getAppLogger().end();
-      getAppLogger().on('finish', () => {
-        process.exit(1);
-      });
+      process.exit(1);
     }
   }
 

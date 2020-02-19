@@ -14,41 +14,70 @@
  * limitations under the License.
  */
 import pino from 'pino';
-import childProcess from 'child_process';
-import stream from 'stream';
 import { homedir } from 'os';
 
-// Environment variables
 const home = homedir();
-const cwd = process.cwd();
-const { env } = process;
 const logPath = `${home}/.ossindex`;
 
 export const DEBUG = 'debug';
 export const ERROR = 'error';
 
-const logThrough = new stream.PassThrough();
+export const loggerError = pino(
+  {
+    name: 'auditjs',
+    level: ERROR,
+    timestamp: pino.stdTimeFunctions.isoTime,
+  },
+  pino.extreme(`${logPath}/.auditjs.error.log`),
+);
 
 export const logger = pino(
   {
     name: 'auditjs',
     level: DEBUG,
+    timestamp: pino.stdTimeFunctions.isoTime,
   },
-  logThrough,
+  pino.extreme(`${logPath}/.auditjs.debug.log`),
 );
-
-const child = childProcess.spawn(
-  process.execPath,
-  [require.resolve('pino-tee'), DEBUG, `${logPath}/.auditjs.debug.log`, ERROR, `${logPath}/.auditjs.error.log`],
-  { cwd, env },
-);
-
-logThrough.pipe(child.stdin);
 
 export const logMessage = (message: string, level: string, ...meta: any) => {
   if (level == DEBUG) {
     logger.debug(message, ...meta);
   } else if (level == ERROR) {
-    logger.error(message, ...meta);
+    loggerError.error(message, ...meta);
   }
 };
+
+const handler = pino.final(logger, (err, finalLogger, evt) => {
+  logger.flush();
+  loggerError.flush();
+  finalLogger.debug(`${evt} caught`);
+  if (err) {
+    finalLogger.error(err, 'Error caused exit');
+  }
+  process.exit(err ? 1 : 0);
+});
+
+process.on('exit', () => {
+  handler(null, 'exit');
+});
+
+process.on('beforeExit', () => {
+  handler(null, 'beforeExit');
+});
+
+process.on('uncaughtException', (err) => {
+  handler(err, 'uncaughtException');
+});
+
+process.on('SIGINT', () => {
+  handler(null, 'SIGINT');
+});
+
+process.on('SIGQUIT', () => {
+  handler(null, 'SIGQUIT');
+});
+
+process.on('SIGTERM', () => {
+  handler(null, 'SIGTERM');
+});
