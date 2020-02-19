@@ -22,22 +22,24 @@ const logPath = `${home}/.ossindex`;
 export const DEBUG = 'debug';
 export const ERROR = 'error';
 
-export const loggerError = pino(
-  {
-    name: 'auditjs',
-    level: ERROR,
-    timestamp: pino.stdTimeFunctions.isoTime,
-  },
-  pino.extreme(`${logPath}/.auditjs.error.log`),
-);
-
 export const logger = pino(
   {
     name: 'auditjs',
+    enabled: process.env.NODE_ENV == 'test' ? false : true,
     level: DEBUG,
     timestamp: pino.stdTimeFunctions.isoTime,
   },
-  pino.extreme(`${logPath}/.auditjs.debug.log`),
+  pino.extreme(`${logPath}/.auditjs.combined.log`),
+);
+
+export const loggerError = pino(
+  {
+    name: 'auditjs',
+    enabled: process.env.NODE_ENV == 'test' ? false : true,
+    level: DEBUG,
+    timestamp: pino.stdTimeFunctions.isoTime,
+  },
+  pino.extreme(`${logPath}/.auditjs.combined.log`),
 );
 
 export const logMessage = (message: string, level: string, ...meta: any) => {
