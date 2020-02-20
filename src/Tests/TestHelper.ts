@@ -17,7 +17,6 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import 'mocha';
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
-import { createAppLogger } from '../Application/Logger/Logger';
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;

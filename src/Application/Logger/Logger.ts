@@ -20,6 +20,8 @@ import { join } from 'path';
 
 const logPath = join(homedir(), '.ossindex');
 
+const logPathFile = process.env.NODE_ENV == 'test' ? undefined : join(logPath, '.auditjs.combined.log');
+
 export const DEBUG = 'debug';
 export const ERROR = 'error';
 
@@ -29,24 +31,24 @@ export const createAppLogger = () => {
   }
 };
 
-export const logger = pino(
+const logger = pino(
   {
     name: 'auditjs',
     level: DEBUG,
     enabled: process.env.NODE_ENV == 'test' ? false : true,
     timestamp: pino.stdTimeFunctions.isoTime,
   },
-  pino.extreme(`${logPath}/.auditjs.combined.log`),
+  pino.extreme(logPathFile),
 );
 
-export const loggerError = pino(
+const loggerError = pino(
   {
     name: 'auditjs',
-    level: DEBUG,
+    level: ERROR,
     enabled: process.env.NODE_ENV == 'test' ? false : true,
     timestamp: pino.stdTimeFunctions.isoTime,
   },
-  pino.extreme(`${logPath}/.auditjs.combined.log`),
+  pino.extreme(logPathFile),
 );
 
 export const logMessage = (message: string, level: string, ...meta: any) => {
