@@ -25,7 +25,7 @@ import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
 import { ReportStatus } from '../Types/ReportStatus';
 import { Bower } from '../Munchers/Bower';
-import { DEBUG, ERROR, logMessage, createAppLogger } from './Logger/Logger';
+import { DEBUG, ERROR, logMessage, createAppLogger, shutDownLoggerAndExit } from './Logger/Logger';
 import { Spinner } from './Spinner/Spinner';
 import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
@@ -91,7 +91,7 @@ export class Application {
       this.spinner.maybeCreateMessageForSpinner('Auditing your application with Sonatype OSS Index');
       await this.auditWithOSSIndex(args);
     } else {
-      process.exit(0);
+      shutDownLoggerAndExit(0);
     }
   }
 
@@ -121,7 +121,7 @@ export class Application {
         title: e.message,
         stack: e.stack,
       });
-      process.exit(1);
+      shutDownLoggerAndExit(1);
     }
   }
 
@@ -135,7 +135,7 @@ export class Application {
         title: e.message,
         stack: e.stack,
       });
-      process.exit(1);
+      shutDownLoggerAndExit(1);
     }
   }
 
@@ -184,11 +184,11 @@ export class Application {
       const failed = auditOSSIndex.auditResults(ossIndexResults);
 
       logMessage('Results audited', DEBUG, { failureCode: failed });
-      failed ? process.exit(1) : process.exit(0);
+      failed ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);
     } catch (e) {
       this.spinner.maybeStop();
       logMessage('There was an error auditing with Sonatype OSS Index', ERROR, { title: e.message, stack: e.stack });
-      process.exit(1);
+      shutDownLoggerAndExit(1);
     }
   }
 
@@ -213,7 +213,7 @@ export class Application {
         (e) => {
           this.spinner.maybeFail();
           logMessage('There was an issue auditing your application!', ERROR, { title: e.message });
-          process.exit(1);
+          shutDownLoggerAndExit(1);
         },
         (x) => {
           this.spinner.maybeSucceed();
@@ -228,13 +228,13 @@ export class Application {
           const failure = auditResults.auditThirdPartyResults(results);
           logMessage('Audit finished', DEBUG, { failure: failure });
 
-          failure ? process.exit(1) : process.exit(0);
+          failure ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);
         },
       );
     } catch (e) {
       this.spinner.maybeFail();
       logMessage('There was an issue auditing your application!', ERROR, { title: e.message, stack: e.stack });
-      process.exit(1);
+      shutDownLoggerAndExit(1);
     }
   }
 

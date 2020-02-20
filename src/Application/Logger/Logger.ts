@@ -13,17 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import pino from 'pino';
+import { configure, getLogger, shutdown } from 'log4js';
 import { homedir } from 'os';
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
-const logPath = join(homedir(), '.ossindex');
-
-const logPathFile = process.env.CI ? undefined : join(logPath, '.auditjs.combined.log');
-
 export const DEBUG = 'debug';
 export const ERROR = 'error';
+
+const logPath = join(homedir(), '.ossindex');
+
+const logPathFile = join(logPath, '.auditjs.combined.log');
+configure({
+  appenders: { auditjs: { type: 'file', filename: logPathFile } },
+  categories: { default: { appenders: ['auditjs'], level: 'error' } },
+});
+
+const logger = getLogger('auditjs');
+logger.level = DEBUG;
 
 export const createAppLogger = () => {
   if (!existsSync(logPath)) {
@@ -31,72 +38,20 @@ export const createAppLogger = () => {
   }
 };
 
-const logger = pino(
-  {
-    name: 'auditjs',
-    level: DEBUG,
-    enabled: process.env.CI ? false : true,
-    timestamp: pino.stdTimeFunctions.isoTime,
-  },
-  pino.extreme(logPathFile),
-);
-
-const loggerError = pino(
-  {
-    name: 'auditjs',
-    level: ERROR,
-    enabled: process.env.CI ? false : true,
-    timestamp: pino.stdTimeFunctions.isoTime,
-  },
-  pino.extreme(logPathFile),
-);
-
 export const logMessage = (message: string, level: string, ...meta: any) => {
-  if (process.env.CI) {
-    return;
-  }
-
   if (level == DEBUG) {
     logger.debug(message, ...meta);
   } else if (level == ERROR) {
-    loggerError.error(message, ...meta);
+    logger.error(message, ...meta);
   }
 };
 
-const handler = pino.final(logger, (err, finalLogger, evt) => {
-  if (process.env.CI) {
-    return;
-  }
-
-  logger.flush();
-  loggerError.flush();
-  finalLogger.debug(`${evt} caught`);
-  if (err) {
-    finalLogger.error(err, 'Error caused exit');
-  }
-  process.exit(err ? 1 : 0);
-});
-
-process.on('exit', () => {
-  handler(null, 'exit');
-});
-
-process.on('beforeExit', () => {
-  handler(null, 'beforeExit');
-});
-
-process.on('uncaughtException', (err) => {
-  handler(err, 'uncaughtException');
-});
-
-process.on('SIGINT', () => {
-  handler(null, 'SIGINT');
-});
-
-process.on('SIGQUIT', () => {
-  handler(null, 'SIGQUIT');
-});
-
-process.on('SIGTERM', () => {
-  handler(null, 'SIGTERM');
-});
+export const shutDownLoggerAndExit = (code: number) => {
+  shutdown((err) => {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
+    process.exit(code);
+  });
+};

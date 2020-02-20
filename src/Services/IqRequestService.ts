@@ -34,8 +34,12 @@ export class IqRequestService {
   ) {}
 
   private async init(): Promise<void> {
-    this.internalId = await this.getApplicationInternalId();
-    this.isInitialized = true;
+    try {
+      this.internalId = await this.getApplicationInternalId();
+      this.isInitialized = true;
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 
   private timeoutAttempts = 0;
