@@ -20,7 +20,9 @@ import { join } from 'path';
 
 const logPath = join(homedir(), '.ossindex');
 
-const logPathFile = process.env.NODE_ENV == 'test' ? undefined : join(logPath, '.auditjs.combined.log');
+const logPathFile = process.env.CI ? undefined : join(logPath, '.auditjs.combined.log');
+
+console.log(logPathFile);
 
 export const DEBUG = 'debug';
 export const ERROR = 'error';
@@ -35,7 +37,7 @@ const logger = pino(
   {
     name: 'auditjs',
     level: DEBUG,
-    enabled: process.env.NODE_ENV == 'test' ? false : true,
+    enabled: process.env.CI ? false : true,
     timestamp: pino.stdTimeFunctions.isoTime,
   },
   pino.extreme(logPathFile),
@@ -45,14 +47,14 @@ const loggerError = pino(
   {
     name: 'auditjs',
     level: ERROR,
-    enabled: process.env.NODE_ENV == 'test' ? false : true,
+    enabled: process.env.CI ? false : true,
     timestamp: pino.stdTimeFunctions.isoTime,
   },
   pino.extreme(logPathFile),
 );
 
 export const logMessage = (message: string, level: string, ...meta: any) => {
-  if (process.env.NODE_ENV == 'test') {
+  if (process.env.CI) {
     return;
   }
 
@@ -64,7 +66,7 @@ export const logMessage = (message: string, level: string, ...meta: any) => {
 };
 
 const handler = pino.final(logger, (err, finalLogger, evt) => {
-  if (process.env.NODE_ENV == 'test') {
+  if (process.env.CI) {
     return;
   }
 

@@ -14,7 +14,7 @@
     "node": ">=8.0.0"
   },
   "scripts": {
-    "test": "NODE_ENV=test mocha -r ts-node/register src/**/*.spec.ts",
+    "test": "mocha -r ts-node/register src/**/*.spec.ts",
     "build": "tsc -p tsconfig.json",
     "build-dev": "tsc -p tsconfig.development.json",
     "lint": "eslint src/**/*.ts",
