@@ -22,8 +22,6 @@ const logPath = join(homedir(), '.ossindex');
 
 const logPathFile = process.env.CI ? undefined : join(logPath, '.auditjs.combined.log');
 
-console.log(logPathFile);
-
 export const DEBUG = 'debug';
 export const ERROR = 'error';
 
