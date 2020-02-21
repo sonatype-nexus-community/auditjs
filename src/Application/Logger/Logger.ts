@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-present Sonatype, Inc.
+ * Copyright (c) 2020-present Sonatype, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,59 +13,67 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import path from 'path';
+import { configure, getLogger, shutdown, addLayout } from 'log4js';
 import { homedir } from 'os';
-
-import winston, { format } from 'winston';
+import { existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
 
 export const DEBUG = 'debug';
 export const ERROR = 'error';
 
-const transports = {
-  console: new winston.transports.Console(
-    {
-      level: ERROR
-    }
-  ),
-  file: new winston.transports.File(
-    {
-      filename: path.join(homedir(), '.ossindex', '.audit-js.error.log'),
-      options: { flags: 'w' }, 
-      level: ERROR
-    }
-  ),
-  combinedFile: new winston.transports.File(
-    {
-      filename: path.join(homedir(), '.ossindex', '.audit-js.combined.log'),
-      options: { flags: 'w' },
-      level: DEBUG
-    }
-  )
+const logPath = join(homedir(), '.ossindex');
+
+const logPathFile = join(logPath, '.auditjs.combined.log');
+
+addLayout('json', function(config) {
+  return function(logEvent) {
+    return JSON.stringify(logEvent) + config.separator;
+  };
+});
+
+configure({
+  appenders: {
+    auditjs: {
+      type: 'file',
+      maxLogSize: 2 * 1024 * 1024,
+      layout: {
+        type: 'json',
+        separator: ',',
+      },
+      filename: logPathFile,
+    },
+  },
+  categories: {
+    default: {
+      appenders: ['auditjs'],
+      level: 'error',
+    },
+  },
+});
+
+const logger = getLogger('auditjs');
+logger.level = DEBUG;
+
+export const createAppLogger = () => {
+  if (!existsSync(logPath)) {
+    mkdirSync(logPath);
+  }
 };
 
-export const createAppLogger = (logLevel: string = DEBUG, name: string = "auditjs") => {
-  winston.loggers.add(name, {
-    level: logLevel,
-    format: 
-      format.combine(format.label({label: 'AuditJS'}),
-      format.timestamp(),
-      format.prettyPrint()),
-    transports: [
-      transports.file,
-      transports.combinedFile,
-      transports.console
-    ]
-  });
-}
-
-export const setConsoleTransportLevel = (logLevel: string) => {
-  transports.console.level = logLevel;
-}
-
-export const getAppLogger = (loggerName: string = "auditjs") => {
-  return winston.loggers.get(loggerName);
-}
-
 export const logMessage = (message: string, level: string, ...meta: any) => {
-  getAppLogger().log(level, message, meta);
-}
+  if (level == DEBUG) {
+    logger.debug(message, ...meta);
+  } else if (level == ERROR) {
+    logger.error(message, ...meta);
+  }
+};
+
+export const shutDownLoggerAndExit = (code: number) => {
+  shutdown((err) => {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
+    process.exit(code);
+  });
+};

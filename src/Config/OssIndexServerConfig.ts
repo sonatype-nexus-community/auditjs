@@ -15,19 +15,12 @@
  */
 import { Config } from './Config';
 import { readFileSync } from 'fs';
-import { getAppLogger } from '../Application/Logger/Logger';
-import { Logger } from 'winston';
 import { safeLoad } from 'js-yaml';
 import storage from 'node-persist';
 
 export class OssIndexServerConfig extends Config {
-  constructor(
-    protected username: string = '',
-    protected token: string = '',
-    protected cacheLocation: string = '',
-    readonly logger: Logger = getAppLogger(),
-  ) {
-    super('ossi', username, token, logger);
+  constructor(protected username: string = '', protected token: string = '', protected cacheLocation: string = '') {
+    super('ossi', username, token);
     if (this.exists()) {
       this.getConfigFromFile();
     }

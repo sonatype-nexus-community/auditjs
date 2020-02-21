@@ -66,7 +66,6 @@ Options:
   --user, -u       Specify OSS Index username                           [string]
   --password, -p   Specify OSS Index password or token                  [string]
   --quiet, -q      Only print out vulnerable dependencies              [boolean]
-  --verbose, -V    Set console logging level to verbose                [boolean]
   --json, -j       Set output to JSON                                  [boolean]
   --xml, -x        Set output to JUnit XML format                      [boolean]
   --whitelist, -w  Set path to whitelist file                           [string]
@@ -107,15 +106,9 @@ If a vulnerability is found to be affecting an installed library the package
 header will be highlighted in red and information about the pertinent
 vulnerability will be printed to the screen.
 
-Running in verbose mode will give you lots of silly debug data. By default however we write all silly debug data to:
+By default we write all silly debug and error data to:
 
-`YOUR_HOME_DIR/.ossindex/.audit-js.combined.log`
-
-All errors are written to:
-
-`YOUR_HOME_DIR/.ossindex/.audit-js.error.log`
-
-The format in these files is similar to:
+`YOUR_HOME_DIR/.ossindex/.auditjs.combined.log`
 
 ```
 { level: 'debug',
