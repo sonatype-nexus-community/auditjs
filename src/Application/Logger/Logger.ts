@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { configure, getLogger, shutdown } from 'log4js';
+import { configure, getLogger, shutdown, addLayout } from 'log4js';
 import { homedir } from 'os';
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
@@ -24,9 +24,31 @@ export const ERROR = 'error';
 const logPath = join(homedir(), '.ossindex');
 
 const logPathFile = join(logPath, '.auditjs.combined.log');
+
+addLayout('json', function(config) {
+  return function(logEvent) {
+    return JSON.stringify(logEvent) + config.separator;
+  };
+});
+
 configure({
-  appenders: { auditjs: { type: 'file', filename: logPathFile } },
-  categories: { default: { appenders: ['auditjs'], level: 'error' } },
+  appenders: {
+    auditjs: {
+      type: 'file',
+      maxLogSize: 2 * 1024 * 1024,
+      layout: {
+        type: 'json',
+        separator: ',',
+      },
+      filename: logPathFile,
+    },
+  },
+  categories: {
+    default: {
+      appenders: ['auditjs'],
+      level: 'error',
+    },
+  },
 });
 
 const logger = getLogger('auditjs');
