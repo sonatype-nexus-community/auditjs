@@ -183,7 +183,10 @@ if (argv) {
         app = new Application(false, silence, artie);
       }
       app.startApplication(argv);
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+      process.exit(1);
+    }
   } else {
     yargs.showHelp();
     process.exit(0);
