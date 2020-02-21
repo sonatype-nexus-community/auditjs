@@ -25,6 +25,9 @@ const object = {
     testdependency: {
       name: 'testdependency',
       version: '1.0.1',
+      bugs: {
+        url: 'git+ssh://git@github.com/slackhq/csp-html-webpack-plugin.git',
+      },
       dependencies: {
         testdependency: {
           name: 'testdependency',
@@ -35,6 +38,9 @@ const object = {
     testdependency2: {
       name: 'testdependency2',
       version: '1.0.2',
+      repository: {
+        url: 'git@slack-github.com:anuj/csp-html-webpack-plugin.git',
+      },
       dependencies: {
         testdependency: {
           name: 'testdependency',
@@ -49,7 +55,7 @@ const object = {
   },
 };
 
-const expectedResponse = `<?xml version="1.0" encoding="utf-8"?><bom xmlns="http://cyclonedx.org/schema/bom/1.1" version="1"><components><component type="library" bom-ref="pkg:npm/testdependency@1.0.1"><name>testdependency</name><version>1.0.1</version><description/><purl>pkg:npm/testdependency@1.0.1</purl></component><component type="library" bom-ref="pkg:npm/testdependency2@1.0.2"><name>testdependency2</name><version>1.0.2</version><description/><purl>pkg:npm/testdependency2@1.0.2</purl></component><component type="library" bom-ref="pkg:npm/testdependency@1.0.0"><name>testdependency</name><version>1.0.0</version><description/><purl>pkg:npm/testdependency@1.0.0</purl></component><component type="library" bom-ref="pkg:npm/%40scope/testdependency3@1.0.2"><group>@scope</group><name>testdependency3</name><version>1.0.2</version><description/><purl>pkg:npm/%40scope/testdependency3@1.0.2</purl></component></components></bom>`;
+const expectedResponse = `<?xml version="1.0" encoding="utf-8"?><bom xmlns="http://cyclonedx.org/schema/bom/1.1" version="1"><components><component type="library" bom-ref="pkg:npm/testdependency@1.0.1"><name>testdependency</name><version>1.0.1</version><description/><purl>pkg:npm/testdependency@1.0.1</purl><externalReferences><reference type="issue-tracker"><url>git+ssh://git@github.com/slackhq/csp-html-webpack-plugin.git</url></reference></externalReferences></component><component type="library" bom-ref="pkg:npm/testdependency2@1.0.2"><name>testdependency2</name><version>1.0.2</version><description/><purl>pkg:npm/testdependency2@1.0.2</purl></component><component type="library" bom-ref="pkg:npm/testdependency@1.0.0"><name>testdependency</name><version>1.0.0</version><description/><purl>pkg:npm/testdependency@1.0.0</purl></component><component type="library" bom-ref="pkg:npm/%40scope/testdependency3@1.0.2"><group>@scope</group><name>testdependency3</name><version>1.0.2</version><description/><purl>pkg:npm/%40scope/testdependency3@1.0.2</purl></component></components></bom>`;
 
 describe('CycloneDXSbomCreator', async () => {
   it('should create an sbom string given a minimal valid object', async () => {
