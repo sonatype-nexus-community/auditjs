@@ -28,6 +28,7 @@ import { Hash } from './Types/Hash';
 import spdxLicensesNonDeprecated = require('spdx-license-ids');
 import spdxLicensesDeprecated = require('spdx-license-ids/deprecated');
 import { toPurl } from './Helpers/Helpers';
+import { logMessage, DEBUG } from '../Application/Logger/Logger';
 
 export class CycloneDXSbomCreator {
   readonly licenseFilenames: Array<string> = [
@@ -214,17 +215,26 @@ export class CycloneDXSbomCreator {
    * Adds external references supported by the package format.
    */
   private addExternalReferences(pkg: any): Array<ExternalReference> {
-    const externalReferences = [];
+    const externalReferences: Array<ExternalReference> = [];
     if (pkg.homepage) {
-      externalReferences.push({ reference: { '@type': 'website', url: pkg.homepage } });
+      this.pushURLToExternalReferences('website', pkg.repository.url, externalReferences);
     }
     if (pkg.bugs && pkg.bugs.url) {
-      externalReferences.push({ reference: { '@type': 'issue-tracker', url: pkg.bugs.url } });
+      this.pushURLToExternalReferences('issue-tracker', pkg.bugs.url, externalReferences);
     }
     if (pkg.repository && pkg.repository.url) {
-      externalReferences.push({ reference: { '@type': 'vcs', url: pkg.repository.url } });
+      this.pushURLToExternalReferences('vcs', pkg.repository.url, externalReferences);
     }
     return externalReferences;
+  }
+
+  private pushURLToExternalReferences(typeOfURL: string, url: string, externalReferences: Array<ExternalReference>) {
+    try {
+      const uri = new URL(url);
+      externalReferences.push({ reference: { '@type': typeOfURL, url: uri.toString() } });
+    } catch (e) {
+      logMessage('Encountered an invalid URL', DEBUG, { title: e.message, stack: e.stack });
+    }
   }
 
   /**
