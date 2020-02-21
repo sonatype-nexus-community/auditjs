@@ -36,7 +36,7 @@ export class AuditOSSIndex {
     console.log();
     console.group();
     this.printLine('Sonabot here, beep boop beep boop, here are your Sonatype OSS Index results:');
-    this.printLine(`Total dependencies audited: ${total}`);
+    this.suggestIncludeDevDeps(total);
     console.groupEnd();
     console.log();
 
@@ -170,6 +170,15 @@ export class AuditOSSIndex {
   private printLine(line: any): void {
     if (!this.quiet) {
       console.log(line);
+    }
+  }
+
+  private suggestIncludeDevDeps(total: number) {
+    this.printLine(`Total dependencies audited: ${total}`);
+    if (total == 0) {
+      this.printLine(
+        `We noticed you had 0 dependencies, we exclude devDependencies by default, try running with --dev if you want to include those as well`,
+      );
     }
   }
 }
