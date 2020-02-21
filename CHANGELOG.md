@@ -1,3 +1,10 @@
+## [4.0.4](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.3...v4.0.4) (2020-02-21)
+
+
+### Bug Fixes
+
+* Suggest to run with dev flag if 0 dependencies are found ([#171](https://github.com/sonatype-nexus-community/auditjs/issues/171)) ([39b7d73](https://github.com/sonatype-nexus-community/auditjs/commit/39b7d733c077b2b8f0a5e5bcd2992476f0335e44))
+
 ## [4.0.3](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.2...v4.0.3) (2020-02-21)
 
 
