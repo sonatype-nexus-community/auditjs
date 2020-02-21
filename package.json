@@ -15,7 +15,7 @@
   },
   "scripts": {
     "test": "mocha -r ts-node/register src/**/*.spec.ts",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && api-extractor run --local --verbose",
     "build-dev": "tsc -p tsconfig.development.json",
     "lint": "eslint src/**/*.ts",
     "start": "node ./bin/index.js",
@@ -41,6 +41,7 @@
     "url": "https://github.com/sonatype-nexus-community/auditjs.git"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.7.8",
     "@types/chai": "4.2.0",
     "@types/chai-as-promised": "7.1.1",
     "@types/figlet": "^1.2.0",

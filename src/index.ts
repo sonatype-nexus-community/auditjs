@@ -189,3 +189,11 @@ if (argv) {
     process.exit(0);
   }
 }
+
+export * from './Audit';
+export * from './CycloneDX';
+export * from './Munchers';
+export * from './Services';
+export * from './Types';
+export * from './Visual';
+export * from './Whitelist';
