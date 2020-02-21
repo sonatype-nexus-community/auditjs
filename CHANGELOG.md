@@ -1,3 +1,10 @@
+## [4.0.3](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.2...v4.0.3) (2020-02-21)
+
+
+### Bug Fixes
+
+* Make sure CycloneDXSbomCreator handles URIs if it runs into a bad one ([#170](https://github.com/sonatype-nexus-community/auditjs/issues/170)) ([d6d24ba](https://github.com/sonatype-nexus-community/auditjs/commit/d6d24ba03ee4e77380bfbf4b277d6041d217e7d4))
+
 ## [4.0.2](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.1...v4.0.2) (2020-02-19)
 
 
