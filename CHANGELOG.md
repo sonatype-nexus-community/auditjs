@@ -1,3 +1,10 @@
+## [4.0.5](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.4...v4.0.5) (2020-02-21)
+
+
+### Bug Fixes
+
+* Moving from Winston to Log4JS ([#166](https://github.com/sonatype-nexus-community/auditjs/issues/166)) ([b22a9e0](https://github.com/sonatype-nexus-community/auditjs/commit/b22a9e05751f6b87f26c961ba0e793f783735b8a))
+
 ## [4.0.4](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.3...v4.0.4) (2020-02-21)
 
 
