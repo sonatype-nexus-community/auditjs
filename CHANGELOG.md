@@ -1,3 +1,10 @@
+## [4.0.6](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.5...v4.0.6) (2020-02-24)
+
+
+### Bug Fixes
+
+* Added Istanbul (not Constantinople) as a code coverage checker ([#173](https://github.com/sonatype-nexus-community/auditjs/issues/173)) ([c7d3536](https://github.com/sonatype-nexus-community/auditjs/commit/c7d353690afcdf6b539f02f837e1671226ecdaf0))
+
 ## [4.0.5](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.4...v4.0.5) (2020-02-21)
 
 
