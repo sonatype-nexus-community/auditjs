@@ -42,11 +42,12 @@ configure({
       },
       filename: logPathFile,
     },
-    errorout: { type: 'stdout' },
+    out: { type: 'stdout' },
+    errors: { type: 'logLevelFilter', appender: 'out', level: 'error', maxLevel: 'error' },
   },
   categories: {
     default: {
-      appenders: ['errorout', 'auditjs'],
+      appenders: ['errors', 'auditjs'],
       level: 'error',
     },
   },
