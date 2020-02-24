@@ -8,3 +8,4 @@ auditjs.json
 .nyc_output/
 reports/
 lcov.info
+test-results.xml

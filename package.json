@@ -20,6 +20,7 @@
     "coverage": "nyc mocha -r ts-node/register src/**/*.spec.ts",
     "generate-coverage-report": "nyc report --reporter=text-lcov > lcov.info",
     "test-ci": "MOCHA_FILE=./reports/test-results.xml mocha -r ts-node/register src/**/*.spec.ts --reporter mocha-junit-reporter",
+    "test-console": "mocha -r ts-node/register src/**/*.spec.ts --reporter mocha-junit-reporter --reporter-options toConsole",
     "lint": "eslint src/**/*.ts",
     "start": "node ./bin/index.js",
     "prepare": "npm run build",
