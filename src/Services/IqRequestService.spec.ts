@@ -35,7 +35,7 @@ describe('IQRequestService', () => {
   });
 
   it('should respond with an error if the response for an ID is bad', async () => {
-    let stage = 'build';
+    const stage = 'build';
 
     nock('http://testlocation:8070')
       .get(`/api/v2/applications?publicId=testapp`)
@@ -74,9 +74,9 @@ describe('IQRequestService', () => {
   });
 
   it("should have it's third party API request rejected when IQ Server is up but API gives bad response", async () => {
-    let internalId = '4bb67dcfc86344e3a483832f8c496419';
-    let stage = 'build';
-    let response = {
+    const internalId = '4bb67dcfc86344e3a483832f8c496419';
+    const stage = 'build';
+    const response = {
       statusCode: 202,
       body: {
         statusUrl: 'api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb',
@@ -116,7 +116,7 @@ describe('IQRequestService', () => {
 
     requestService.asyncPollForResults(
       'api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb',
-      (x) => {
+      () => {
         return false;
       },
       (x) => {
