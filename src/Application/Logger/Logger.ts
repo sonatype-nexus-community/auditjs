@@ -42,10 +42,12 @@ configure({
       },
       filename: logPathFile,
     },
+    out: { type: 'stdout' },
+    errors: { type: 'logLevelFilter', appender: 'out', level: 'error', maxLevel: 'error' },
   },
   categories: {
     default: {
-      appenders: ['auditjs'],
+      appenders: ['errors', 'auditjs'],
       level: 'error',
     },
   },
@@ -64,7 +66,11 @@ export const logMessage = (message: string, level: string, ...meta: any) => {
   if (level == DEBUG) {
     logger.debug(message, ...meta);
   } else if (level == ERROR) {
-    logger.error(message, ...meta);
+    if (meta[0].stack) {
+      logger.error(message, meta[0].stack);
+    } else {
+      logger.error(message, ...meta);
+    }
   }
 };
 

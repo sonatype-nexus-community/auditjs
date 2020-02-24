@@ -24,16 +24,29 @@ describe('IQRequestService', () => {
     const stage = 'build';
     nock('http://testlocation:8070')
       .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
-      .replyWithError('you messed up!');
-
-    nock('http://testlocation:8070')
+      .replyWithError('you messed up!')
       .get(`/api/v2/applications?publicId=testapp`)
-      .reply(applicationInternalIdResponse.statusCode, applicationInternalIdResponse.body);
+      .reply(404, applicationInternalIdResponse.body);
 
     const requestService = new IqRequestService('admin', 'admin123', 'http://testlocation:8070', 'testapp', stage, 300);
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
     return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.be.rejected;
+  });
+
+  it('should respond with an error if the response for an ID is bad', async () => {
+    const stage = 'build';
+
+    nock('http://testlocation:8070')
+      .get(`/api/v2/applications?publicId=testapp`)
+      .reply(applicationInternalIdResponse.statusCode, { thereisnoid: 'none' });
+
+    const requestService = new IqRequestService('admin', 'admin123', 'http://testlocation:8070', 'testapp', stage, 300);
+    const coords = [new Coordinates('commander', '2.12.2', '@types')];
+
+    return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.be.rejectedWith(
+      'No valid ID on response from Nexus IQ, potentially check the public application ID you are using',
+    );
   });
 
   it("should have it's third party API request accepted when the IQ Server is up", async () => {
@@ -48,9 +61,7 @@ describe('IQRequestService', () => {
 
     nock('http://testlocation:8070')
       .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
-      .reply(response.statusCode, response.body);
-
-    nock('http://testlocation:8070')
+      .reply(response.statusCode, response.body)
       .get(`/api/v2/applications?publicId=testapp`)
       .reply(applicationInternalIdResponse.statusCode, applicationInternalIdResponse.body);
 
@@ -59,6 +70,30 @@ describe('IQRequestService', () => {
 
     return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.equal(
       'api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb',
+    );
+  });
+
+  it("should have it's third party API request rejected when IQ Server is up but API gives bad response", async () => {
+    const internalId = '4bb67dcfc86344e3a483832f8c496419';
+    const stage = 'build';
+    const response = {
+      statusCode: 202,
+      body: {
+        statusUrl: 'api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb',
+      },
+    };
+
+    nock('http://testlocation:8070')
+      .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
+      .reply(404, response.body)
+      .get(`/api/v2/applications?publicId=testapp`)
+      .reply(applicationInternalIdResponse.statusCode, applicationInternalIdResponse.body);
+
+    const requestService = new IqRequestService('admin', 'admin123', 'http://testlocation:8070', 'testapp', stage, 300);
+    const coords = [new Coordinates('commander', '2.12.2', '@types')];
+
+    return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.be.rejectedWith(
+      'Unable to submit to Third Party API',
     );
   });
 
@@ -81,7 +116,7 @@ describe('IQRequestService', () => {
 
     requestService.asyncPollForResults(
       'api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb',
-      (x) => {
+      () => {
         return false;
       },
       (x) => {
