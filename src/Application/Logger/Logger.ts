@@ -66,7 +66,11 @@ export const logMessage = (message: string, level: string, ...meta: any) => {
   if (level == DEBUG) {
     logger.debug(message, ...meta);
   } else if (level == ERROR) {
-    logger.error(message, ...meta);
+    if (meta[0].stack) {
+      logger.error(message, meta[0].stack);
+    } else {
+      logger.error(message, ...meta);
+    }
   }
 };
 

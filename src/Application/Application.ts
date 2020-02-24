@@ -212,7 +212,7 @@ export class Application {
         `${resultUrl}`,
         (e) => {
           this.spinner.maybeFail();
-          logMessage('There was an issue auditing your application!', ERROR, { title: e.message });
+          logMessage('There was an issue auditing your application!', ERROR, { title: e.message, stack: e.stack });
           shutDownLoggerAndExit(1);
         },
         (x) => {
