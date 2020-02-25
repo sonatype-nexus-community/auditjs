@@ -267,4 +267,4 @@ Have fun creating and using this extension and the [Sonatype OSS Index](https://
 
 Looking to contribute to our code but need some help? There's a few ways to get information:
 
-- Chat with us on [Gitter](https://gitter.im/sonatype/nexus-developers)
+- Chat with us on [The AuditJS Gitter](https://gitter.im/sonatype-nexus-community/auditjs)
