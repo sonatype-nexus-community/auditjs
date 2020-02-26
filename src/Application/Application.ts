@@ -43,6 +43,7 @@ export class Application {
     readonly devDependency: boolean = false,
     readonly silent: boolean = false,
     readonly artie: boolean = false,
+    readonly allen: boolean = false,
   ) {
     const npmList = new NpmList(devDependency);
     const bower = new Bower(devDependency);
@@ -100,6 +101,8 @@ export class Application {
       return;
     } else if (this.artie) {
       this.doPrintHeader('ArtieJS', 'Ghost');
+    } else if (this.allen) {
+      this.doPrintHeader('AllenJS', 'Ghost');
     } else {
       this.doPrintHeader();
     }

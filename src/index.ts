@@ -77,6 +77,12 @@ let argv = yargs
         description: 'Artie',
         demandOption: false,
       },
+      allen: {
+        alias: 'w',
+        type: 'boolean',
+        description: 'Allen',
+        demandOption: false,
+      },
       dev: {
         alias: 'd',
         type: 'boolean',
@@ -170,6 +176,7 @@ if (argv) {
   } else if (argv._[0] == 'iq' || argv._[0] == 'ossi') {
     let silence = argv.json || argv.quiet || argv.xml ? true : false;
     let artie = argv.artie ? true : false;
+    let allen = argv.allen ? true : false;
 
     if (argv.server) {
       argv.server = normalizeHostAddress(argv.server as string);
@@ -178,9 +185,9 @@ if (argv) {
     let app: Application;
     try {
       if (argv.dev) {
-        app = new Application(argv.dev as boolean, silence, artie);
+        app = new Application(argv.dev as boolean, silence, artie, allen);
       } else {
-        app = new Application(false, silence, artie);
+        app = new Application(false, silence, artie, allen);
       }
       app.startApplication(argv);
     } catch (error) {
