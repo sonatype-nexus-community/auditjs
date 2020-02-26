@@ -83,6 +83,13 @@ let argv = yargs
         description: 'Exclude Development Dependencies',
         demandOption: false,
       },
+      loglocation: {
+        alias: 'l',
+        type: 'string',
+        normalize: true,
+        description: 'Location to store log files',
+        demandOption: false,
+      },
     });
   })
   .command('config', 'Set config for OSS Index or Nexus IQ Server')
@@ -127,6 +134,13 @@ let argv = yargs
       clear: {
         description: 'Clears cache location if it has been set in config',
         type: 'boolean',
+        demandOption: false,
+      },
+      loglocation: {
+        alias: 'l',
+        type: 'string',
+        normalize: true,
+        description: 'Location to store log files',
         demandOption: false,
       },
     });

@@ -19,10 +19,12 @@ Supports any project with package managers that install npm dependencies into a 
 <img src="https://github.com/sonatype-nexus-community/auditjs/blob/master/assets/images/auditjsnew.png?raw=true" width="640">
 
 ## Requirements
-For users wanting to use Nexus IQ Server as their data source for scanning:
-1)  Version 77 or above must be installed. This is when the [Third-Party Scan REST API](https://help.sonatype.com/iqserver/automating/rest-apis/third-party-scan-rest-api---v2) was incorporated into Nexus IQ Server.
 
-2) The User performing the scan must have the permission "Can Evaluate Applications", this can be found in the Role Editor > *User* > Permissions > IQ
+For users wanting to use Nexus IQ Server as their data source for scanning:
+
+1.  Version 77 or above must be installed. This is when the [Third-Party Scan REST API](https://help.sonatype.com/iqserver/automating/rest-apis/third-party-scan-rest-api---v2) was incorporated into Nexus IQ Server.
+
+2.  The User performing the scan must have the permission "Can Evaluate Applications", this can be found in the Role Editor > _User_ > Permissions > IQ
 
 ## Installation
 
@@ -234,6 +236,13 @@ We chose to allow output directly to the stdout, so that the user can decide wha
 
 As this program depends on the OSS Index database, network access is
 required. Connection problems with OSS Index will result in an exception.
+
+## Development
+
+We offer two Istanbul scripts for people looking to contribute:
+
+1. `npm run coverage` will run all tests then display the results of a code coverage analysis in your terminal and save a copy in the `<project-root>/.nyc_output` folder
+2. `npm run generate-coverage-report` will generate a `lcov.info` in the `<project-root>`
 
 ## Credit
 
