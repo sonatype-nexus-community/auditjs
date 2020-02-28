@@ -99,6 +99,24 @@ Options:
 
 #### AuditJS usage with IQ Server, and what to expect
 
+##### TL;DR
+
+AuditJS should catch most if not the exact same amount of issues as the Sonatype Nexus IQ CLI Scanner. It however can't catch a few cases. If you want total visibility, please use the Sonatype Nexus IQ CLI Scanner. You can use both in tandem, too.
+
+##### The full scoop
+
+AuditJS functions by traversing your `node_modules` folder in your project, so it will pick up the dependencies that are physically installed. This will capture your declared as well as transititive dependencies. Once it has done this, it takes the list and converts it into something that we use to communicate with Sonatype Nexus IQ Server. The crux of this approach is that we do "coordinate" or "name based matching", which we've found to be reliable in the JavaScript ecosystem, but it will not catch corner cases such as if you've:
+
+- Drug a vulnerable copy of jQuery into your project and left it in a folder (npm does not know about this)
+- Copied and pasted code from a project into one of your files
+
+The Nexus IQ CLI Scanner is equipped to locate and identify cases such as what I've just described. As such if you are using AuditJS, you would not be made aware of these cases, potentially until your code is audited by the IQ CLI Scanner later on.
+
+It is our suggestion that when you are using this tooling to:
+
+- Use AuditJS in your dev environments, etc... and use it to scan as early and as often as possible. This will alert you and other developers to using bad dependencies right off the bat.
+- Use the Sonatype Nexus IQ CLI Scanner in CI/CD for a more thorough scan, and have development and your Application Security experts evaluate this scan for any "gotchas"
+
 ### Usage Information
 
 Execute from inside a node project (above the node_modules directory) to audit
