@@ -19,10 +19,12 @@ Supports any project with package managers that install npm dependencies into a 
 <img src="https://github.com/sonatype-nexus-community/auditjs/blob/master/assets/images/auditjsnew.png?raw=true" width="640">
 
 ## Requirements
-For users wanting to use Nexus IQ Server as their data source for scanning:
-1)  Version 77 or above must be installed. This is when the [Third-Party Scan REST API](https://help.sonatype.com/iqserver/automating/rest-apis/third-party-scan-rest-api---v2) was incorporated into Nexus IQ Server.
 
-2) The User performing the scan must have the permission "Can Evaluate Applications", this can be found in the Role Editor > *User* > Permissions > IQ
+For users wanting to use Nexus IQ Server as their data source for scanning:
+
+1.  Version 77 or above must be installed. This is when the [Third-Party Scan REST API](https://help.sonatype.com/iqserver/automating/rest-apis/third-party-scan-rest-api---v2) was incorporated into Nexus IQ Server.
+
+2.  The User performing the scan must have the permission "Can Evaluate Applications", this can be found in the Role Editor > _User_ > Permissions > IQ
 
 ## Installation
 
@@ -94,6 +96,8 @@ Options:
   --artie, -x        Artie                                             [boolean]
   --dev, -d          Exclude Development Dependencies                  [boolean]
 ```
+
+#### AuditJS usage with IQ Server, and what to expect
 
 ### Usage Information
 
