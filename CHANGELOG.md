@@ -1,3 +1,11 @@
+## [4.0.8](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.7...v4.0.8) (2020-02-28)
+
+
+### Bug Fixes
+
+* add some info on AuditJS and IQ CLI Scanner, and differences ([ca3c119](https://github.com/sonatype-nexus-community/auditjs/commit/ca3c119d62712fce5155bc83cb7ee9b757e9e064))
+* add verbiage to identify some potential differences with using AuditJS vs using the Sonatype Nexus IQ CLI Scanner ([1d5a2d7](https://github.com/sonatype-nexus-community/auditjs/commit/1d5a2d762f9fcdd017103d48b26a94035132880c))
+
 ## [4.0.7](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.6...v4.0.7) (2020-02-26)
 
 
