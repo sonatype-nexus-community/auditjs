@@ -1,3 +1,10 @@
+## [4.0.7](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.6...v4.0.7) (2020-02-26)
+
+
+### Bug Fixes
+
+* memorialize Allen, through AllenJS ([592fb93](https://github.com/sonatype-nexus-community/auditjs/commit/592fb93e88b4d4837388ea10bea60223c956cca6))
+
 ## [4.0.6](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.5...v4.0.6) (2020-02-24)
 
 
