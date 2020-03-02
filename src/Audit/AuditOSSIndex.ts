@@ -15,17 +15,32 @@
  */
 import { OssIndexServerResult, Vulnerability } from '../Types/OssIndexServerResult';
 import chalk from 'chalk';
-import * as builder from 'xmlbuilder';
+import { Formatter, getNumberOfVulnerablePackagesFromResults } from './Formatters/Formatter';
+import { JsonFormatter } from './Formatters/JsonFormatter';
+import { TextFormatter } from './Formatters/TextFormatter';
+import { XmlFormatter } from './Formatters/XmlFormatter';
 
 export class AuditOSSIndex {
-  constructor(readonly quiet: boolean = false, readonly json: boolean = false, readonly xml: boolean = false) {}
+  private formatter: Formatter;
+
+  constructor(readonly quiet: boolean = false, readonly json: boolean = false, readonly xml: boolean = false) {
+    if (json) {
+      this.formatter = new JsonFormatter();
+    } else if (xml) {
+      this.formatter = new XmlFormatter();
+    } else {
+      this.formatter = new TextFormatter();
+    }
+  }
 
   public auditResults(results: Array<OssIndexServerResult>): boolean {
     if (this.json) {
-      return this.printJson(results);
+      this.formatter.printAuditResults(results);
+      return getNumberOfVulnerablePackagesFromResults(results) > 0;
     }
     if (this.xml) {
-      return this.printJUnitXML(results);
+      this.formatter.printAuditResults(results);
+      return getNumberOfVulnerablePackagesFromResults(results) > 0;
     }
 
     const total = results.length;
@@ -56,67 +71,6 @@ export class AuditOSSIndex {
     this.printLine('-'.repeat(process.stdout.columns));
 
     return isVulnerable;
-  }
-
-  private printJson(results: Array<OssIndexServerResult>): boolean {
-    console.log(JSON.stringify(results, null, 2));
-
-    if (this.getNumberOfVulnerablePackagesFromResults(results) > 0) {
-      return true;
-    }
-    return false;
-  }
-
-  private printJUnitXML(results: Array<OssIndexServerResult>): boolean {
-    const testsuite = builder.create('testsuite');
-    testsuite.att('tests', results.length);
-    testsuite.att('timestamp', new Date().toISOString());
-    testsuite.att('failures', this.getNumberOfVulnerablePackagesFromResults(results));
-
-    for (let i = 0; i < results.length; i++) {
-      const testcase = testsuite.ele('testcase', { classname: results[i].coordinates, name: results[i].coordinates });
-      const vulns = results[i].vulnerabilities;
-
-      if (vulns) {
-        if (vulns.length > 0) {
-          const failure = testcase.ele('failure');
-          let failureText = '';
-          for (let j = 0; j < vulns.length; j++) {
-            failureText += this.getVulnerabilityForXmlBlock(vulns[j]) + '\n';
-          }
-          failure.text(failureText);
-          failure.att('type', 'Vulnerability detected');
-        }
-      }
-    }
-
-    const xml = testsuite.end({ pretty: true });
-
-    console.log(xml);
-
-    if (this.getNumberOfVulnerablePackagesFromResults(results) > 0) {
-      return true;
-    }
-    return false;
-  }
-
-  private getNumberOfVulnerablePackagesFromResults(results: Array<OssIndexServerResult>): number {
-    return results.filter((x) => {
-      return x.vulnerabilities && x.vulnerabilities?.length > 0;
-    }).length;
-  }
-
-  private getVulnerabilityForXmlBlock(vuln: Vulnerability): string {
-    let vulnBlock = '';
-    vulnBlock += `Vulnerability Title: ${vuln.title}\n`;
-    vulnBlock += `ID: ${vuln.id}\n`;
-    vulnBlock += `Description: ${vuln.description}\n`;
-    vulnBlock += `CVSS Score: ${vuln.cvssScore}\n`;
-    vulnBlock += `CVSS Vector: ${vuln.cvssVector}\n`;
-    vulnBlock += `CVE: ${vuln.cve}\n`;
-    vulnBlock += `Reference: ${vuln.reference}\n`;
-
-    return vulnBlock;
   }
 
   private getColorFromMaxScore(maxScore: number, defaultColor = 'chartreuse'): string {
