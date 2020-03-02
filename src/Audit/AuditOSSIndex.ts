@@ -41,8 +41,6 @@ export class AuditOSSIndex {
 
     this.formatter.printAuditResults(results);
 
-    let isVulnerable = getNumberOfVulnerablePackagesFromResults(results) > 0;
-
-    return isVulnerable;
+    return getNumberOfVulnerablePackagesFromResults(results) > 0;
   }
 }
