@@ -35,7 +35,11 @@
     "OSSIndex",
     "Artie",
     "Nexus",
-    "Sonatype"
+    "Sonatype",
+    "SCA",
+    "SBOM",
+    "Security",
+    "Advisories"
   ],
   "author": "Sonatype Community",
   "license": "Apache-2.0",

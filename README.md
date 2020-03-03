@@ -28,9 +28,21 @@ For users wanting to use Nexus IQ Server as their data source for scanning:
 
 ## Installation
 
+You can use `auditjs` a number of ways:
+
+via npx (least permanent install)
+
+```
+npx auditjs@latest ossi
+```
+
+via global install (most permanent install)
+
 ```
 npm install -g auditjs
 ```
+
+We suggest you use it via `npx`, as global installs are generally frowned upon in the nodejs world.
 
 ## Usage
 
