@@ -1,3 +1,10 @@
+## [4.0.9](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.8...v4.0.9) (2020-03-03)
+
+
+### Bug Fixes
+
+* move to formatters ([#180](https://github.com/sonatype-nexus-community/auditjs/issues/180)) ([fa59842](https://github.com/sonatype-nexus-community/auditjs/commit/fa59842d8f57f2371900ca5cc00e21add0dcff81))
+
 ## [4.0.8](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.7...v4.0.8) (2020-02-28)
 
 
