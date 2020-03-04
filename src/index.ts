@@ -86,7 +86,7 @@ let argv = yargs
       dev: {
         alias: 'd',
         type: 'boolean',
-        description: 'Exclude Development Dependencies',
+        description: 'Include Development Dependencies',
         demandOption: false,
       },
     });

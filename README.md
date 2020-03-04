@@ -106,7 +106,7 @@ Options:
   --user, -u         Specify username for request    [string] [default: "admin"]
   --password, -p     Specify password for request [string] [default: "admin123"]
   --artie, -x        Artie                                             [boolean]
-  --dev, -d          Exclude Development Dependencies                  [boolean]
+  --dev, -d          Include Development Dependencies                  [boolean]
 ```
 
 #### AuditJS usage with IQ Server, and what to expect
