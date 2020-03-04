@@ -1,3 +1,10 @@
+## [4.0.10](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.9...v4.0.10) (2020-03-04)
+
+
+### Bug Fixes
+
+* -d flag *in*cludes dev dependencies, not *ex*cludes ([#181](https://github.com/sonatype-nexus-community/auditjs/issues/181)) ([188b9be](https://github.com/sonatype-nexus-community/auditjs/commit/188b9be1a7755dcc147a3b9ce3a61ecf80805143))
+
 ## [4.0.9](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.8...v4.0.9) (2020-03-03)
 
 
