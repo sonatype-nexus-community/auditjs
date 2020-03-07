@@ -135,6 +135,11 @@ let argv = yargs
         type: 'boolean',
         demandOption: false,
       },
+      bower: {
+        description: 'Force the application to explicitly scan for Bower',
+        type: 'boolean',
+        demandOption: false,
+      },
     });
   }).argv;
 
@@ -177,6 +182,7 @@ if (argv) {
     let silence = argv.json || argv.quiet || argv.xml ? true : false;
     let artie = argv.artie ? true : false;
     let allen = argv.allen ? true : false;
+    let bower = argv.bower ? true : false;
 
     if (argv.server) {
       argv.server = normalizeHostAddress(argv.server as string);
@@ -185,9 +191,9 @@ if (argv) {
     let app: Application;
     try {
       if (argv.dev) {
-        app = new Application(argv.dev as boolean, silence, artie, allen);
+        app = new Application(argv.dev as boolean, silence, artie, allen, bower);
       } else {
-        app = new Application(false, silence, artie, allen);
+        app = new Application(false, silence, artie, allen, bower);
       }
       app.startApplication(argv);
     } catch (error) {
