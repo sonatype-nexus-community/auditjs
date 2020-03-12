@@ -1,3 +1,10 @@
+## [4.0.12](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.11...v4.0.12) (2020-03-12)
+
+
+### Bug Fixes
+
+* pkg.homepage, not pkg.repository.url ([213e52d](https://github.com/sonatype-nexus-community/auditjs/commit/213e52da1eac425f319693a074819d76308ce5a7))
+
 ## [4.0.11](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.10...v4.0.11) (2020-03-12)
 
 
