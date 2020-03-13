@@ -217,7 +217,7 @@ export class CycloneDXSbomCreator {
   private addExternalReferences(pkg: any): Array<ExternalReference> {
     const externalReferences: Array<ExternalReference> = [];
     if (pkg.homepage) {
-      this.pushURLToExternalReferences('website', pkg.repository.url, externalReferences);
+      this.pushURLToExternalReferences('website', pkg.homepage, externalReferences);
     }
     if (pkg.bugs && pkg.bugs.url) {
       this.pushURLToExternalReferences('issue-tracker', pkg.bugs.url, externalReferences);

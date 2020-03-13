@@ -1,3 +1,17 @@
+## [4.0.12](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.11...v4.0.12) (2020-03-12)
+
+
+### Bug Fixes
+
+* pkg.homepage, not pkg.repository.url ([213e52d](https://github.com/sonatype-nexus-community/auditjs/commit/213e52da1eac425f319693a074819d76308ce5a7))
+
+## [4.0.11](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.10...v4.0.11) (2020-03-12)
+
+
+### Bug Fixes
+
+* (bug) Fixed NPE in logger if meta is not passed in ([#183](https://github.com/sonatype-nexus-community/auditjs/issues/183)) ([c113741](https://github.com/sonatype-nexus-community/auditjs/commit/c113741de9dbbcb87a8a509a24a047bb85c34e51))
+
 ## [4.0.10](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.9...v4.0.10) (2020-03-04)
 
 
