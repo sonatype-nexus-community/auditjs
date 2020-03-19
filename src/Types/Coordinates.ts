@@ -19,6 +19,7 @@ export class Coordinates {
     readonly version: string,
     readonly group?: string,
     public requestedBy: Set<string> = new Set(),
+    public pathOnDisk: string = '',
   ) {}
 
   public toPurl(ecosystem = 'npm'): string {
