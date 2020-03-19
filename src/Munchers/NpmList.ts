@@ -21,22 +21,29 @@ import { CycloneDXSbomCreator } from '../CycloneDX/CycloneDXSbomCreator';
 
 export class NpmList implements Muncher {
   private depsArray: Array<Coordinates> = [];
+  private _directory: string;
 
-  constructor(readonly devDependencies: boolean = false, readonly directory: string = process.cwd()) { }
+  constructor(readonly devDependencies: boolean = false, readonly directory: string = process.cwd()) {
+    //setting directory so it doesn't end in node_modules so CycloneDX is happy
+    this._directory = this.directory.endsWith('node_modules')
+      ? this.directory.substr(0, this.directory.indexOf('node_modules'))
+      : this.directory;
+  }
 
   public async getDepList(): Promise<any> {
     return await this.getInstalledDeps();
   }
 
   public isValid(): boolean {
-    const nodeModulesPath = path.join(this.directory, 'node_modules');
+    const nodeModulesPath = path.join(this._directory, 'node_modules');
+
     return fs.existsSync(nodeModulesPath);
   }
 
   // TODO: There is a 1 component discrepency in what gets identified by our installed deps implementation
   // and what gets identified by the iq server being passed the sbom, gotta figure out what that is and why...
   public async getSbomFromCommand(): Promise<string> {
-    const sbomCreator = new CycloneDXSbomCreator(this.directory, {
+    const sbomCreator = new CycloneDXSbomCreator(this._directory, {
       devDependencies: this.devDependencies,
       includeLicenseData: false,
       includeBomSerialNumber: true,
@@ -51,7 +58,7 @@ export class NpmList implements Muncher {
 
   // turns object tree from read-installed into an array of coordinates represented node-managed deps
   public async getInstalledDeps(): Promise<Array<Coordinates>> {
-    const sbomCreator = new CycloneDXSbomCreator(this.directory, {
+    const sbomCreator = new CycloneDXSbomCreator(this._directory, {
       devDependencies: this.devDependencies,
     });
 
