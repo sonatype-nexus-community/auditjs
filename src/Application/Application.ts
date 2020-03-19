@@ -184,7 +184,7 @@ export class Application {
       this.spinner.maybeStop();
 
       logMessage('Attempting to audit results', DEBUG);
-      const failed = auditOSSIndex.auditResults(ossIndexResults);
+      const failed = auditOSSIndex.auditResults(ossIndexResults, this.results);
 
       logMessage('Results audited', DEBUG, { failureCode: failed });
       failed ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);

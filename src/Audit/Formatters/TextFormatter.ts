@@ -40,6 +40,10 @@ export class TextFormatter implements Formatter {
         this.printVulnerability(i, total, x);
       } else {
         this.printLine(chalk.keyword('green')(`[${i + 1}/${total}] - ${x.toAuditLog()}`));
+        console.group();
+        this.printLine(chalk.keyword('green')(`Path: ${x.realPath}`));
+        this.printLine(chalk.keyword('green')(`Required By: ${x.requiredBy}`));
+        console.groupEnd();
       }
     });
 
@@ -85,6 +89,8 @@ export class TextFormatter implements Formatter {
     console.log(
       chalk.keyword(this.getColorFromMaxScore(maxScore)).bold(`[${i + 1}/${total}] - ${result.toAuditLog()}`),
     );
+    console.log(chalk.keyword(this.getColorFromMaxScore(maxScore)).bold(`Path: ${result.realPath}`));
+    console.log(chalk.keyword(this.getColorFromMaxScore(maxScore)).bold(`Required By: ${result.requiredBy}`));
     console.log();
     result.vulnerabilities &&
       printVuln(
