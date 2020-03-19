@@ -19,7 +19,7 @@ import path from 'path';
 import fs from 'fs';
 
 export class Bower implements Muncher {
-  constructor(readonly devDependencies: boolean = false, readonly directory: string = process.cwd()) { }
+  constructor(readonly devDependencies: boolean = false, readonly directory: string = process.cwd()) {}
 
   getSbomFromCommand(): Promise<any> {
     throw new Error('Method not implemented.');
