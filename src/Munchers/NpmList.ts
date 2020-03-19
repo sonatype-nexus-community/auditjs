@@ -108,7 +108,7 @@ export class NpmList implements Muncher {
 
         return false;
       }
-      let set = new Set<string>();
+      const set = new Set<string>();
       pkg._requiredBy.forEach((item: string) => {
         set.add(item);
       });
@@ -129,7 +129,7 @@ export class NpmList implements Muncher {
 
         return false;
       }
-      let set = new Set<string>();
+      const set = new Set<string>();
       pkg._requiredBy.forEach((item: string) => {
         set.add(item);
       });

@@ -40,7 +40,7 @@ export class AuditOSSIndex {
       });
     }
     for (let i = 0; i < supplemental.length; i++) {
-      let index = results.findIndex((res) => res.coordinates == supplemental[i].toPurl());
+      const index = results.findIndex((res) => res.coordinates == supplemental[i].toPurl());
       results[index].requiredBy = Array.from(supplemental[i].requestedBy).join(', ');
       results[index].realPath = supplemental[i].pathOnDisk;
     }
