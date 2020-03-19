@@ -89,6 +89,12 @@ let argv = yargs
         description: 'Include Development Dependencies',
         demandOption: false,
       },
+      directory: {
+        alias: 'D',
+        type: 'string',
+        description: 'Scan another directory (default is process.cwd())',
+        demandOption: false,
+      },
     });
   })
   .command('config', 'Set config for OSS Index or Nexus IQ Server')
@@ -135,6 +141,12 @@ let argv = yargs
         type: 'boolean',
         demandOption: false,
       },
+      directory: {
+        alias: 'D',
+        type: 'string',
+        description: 'Scan another directory (default is process.cwd())',
+        demandOption: false,
+      },
     });
   }).argv;
 
@@ -177,6 +189,11 @@ if (argv) {
     let silence = argv.json || argv.quiet || argv.xml ? true : false;
     let artie = argv.artie ? true : false;
     let allen = argv.allen ? true : false;
+    let directory = argv.directory ? argv.directory : process.cwd();
+
+    if (directory && directory !== process.cwd()) {
+      console.log('Running on directory', directory);
+    }
 
     if (argv.server) {
       argv.server = normalizeHostAddress(argv.server as string);
@@ -185,9 +202,9 @@ if (argv) {
     let app: Application;
     try {
       if (argv.dev) {
-        app = new Application(argv.dev as boolean, silence, artie, allen);
+        app = new Application(argv.dev as boolean, silence, directory as string, artie, allen);
       } else {
-        app = new Application(false, silence, artie, allen);
+        app = new Application(false, silence, directory as string, artie, allen);
       }
       app.startApplication(argv);
     } catch (error) {

@@ -42,11 +42,12 @@ export class Application {
   constructor(
     readonly devDependency: boolean = false,
     readonly silent: boolean = false,
+    readonly directory: string,
     readonly artie: boolean = false,
     readonly allen: boolean = false,
   ) {
-    const npmList = new NpmList(devDependency);
-    const bower = new Bower(devDependency);
+    const npmList = new NpmList(devDependency, directory);
+    const bower = new Bower(devDependency, directory);
 
     this.printHeader();
     this.spinner = new Spinner(silent);
@@ -59,10 +60,14 @@ export class Application {
       logMessage('Setting Muncher to bower', DEBUG);
       this.muncher = bower;
     } else {
-      logMessage(
-        'Failed project directory validation.  Are you in a (built) node, yarn, or bower project directory?',
-        'error',
-      );
+      if (directory) {
+        logMessage('Failed project directory validation. Is ' + directory + ' a valid project directory?', 'error');
+      } else {
+        logMessage(
+          'Failed project directory validation.  Are you in a (built) node, yarn, or bower project directory?',
+          'error',
+        );
+      }
       throw new Error('Could not instantiate muncher');
     }
   }
