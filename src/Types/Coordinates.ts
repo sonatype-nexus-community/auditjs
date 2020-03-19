@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 export class Coordinates {
-  constructor(readonly name: string, readonly version: string, readonly group?: string) {}
+  constructor(
+    readonly name: string,
+    readonly version: string,
+    readonly group?: string,
+    public requestedBy: Set<string> = new Set(),
+  ) {}
 
   public toPurl(ecosystem = 'npm'): string {
     if (this.group) {

@@ -101,9 +101,18 @@ export class NpmList implements Muncher {
           return x.name == name[1] && x.version == pkg.version && x.group == name[0];
         })
       ) {
+        const foundIndex = list.findIndex((x) => x.name == name[1] && x.version == pkg.version && x.group == name[0]);
+        pkg._requiredBy.forEach((item: string) => {
+          list[foundIndex].requestedBy.add(item);
+        });
+
         return false;
       }
-      list.push(new Coordinates(name[1], pkg.version, name[0]));
+      let set = new Set<string>();
+      pkg._requiredBy.forEach((item: string) => {
+        set.add(item);
+      });
+      list.push(new Coordinates(name[1], pkg.version, name[0], set));
       return true;
     } else if (pkg.name) {
       if (
@@ -111,9 +120,18 @@ export class NpmList implements Muncher {
           return x.name == pkg.name && x.version == pkg.version && x.group == '';
         })
       ) {
+        const foundIndex = list.findIndex((x) => x.name == pkg.name && x.version == pkg.version && x.group == '');
+        pkg._requiredBy.forEach((item: string) => {
+          list[foundIndex].requestedBy.add(item);
+        });
+
         return false;
       }
-      list.push(new Coordinates(pkg.name, pkg.version, ''));
+      let set = new Set<string>();
+      pkg._requiredBy.forEach((item: string) => {
+        set.add(item);
+      });
+      list.push(new Coordinates(pkg.name, pkg.version, '', set));
       return true;
     }
     return false;
