@@ -1,3 +1,10 @@
+## [4.0.13](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.12...v4.0.13) (2020-03-24)
+
+
+### Bug Fixes
+
+* Allow someone to force a Bower scan, if they so wish ([#182](https://github.com/sonatype-nexus-community/auditjs/issues/182)) ([840e81c](https://github.com/sonatype-nexus-community/auditjs/commit/840e81c9e39b60a03ecce54134a51b5cd5eba7df))
+
 ## [4.0.12](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.11...v4.0.12) (2020-03-12)
 
 
