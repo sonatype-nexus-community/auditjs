@@ -35,7 +35,7 @@ describe('NpmList SanityCheck', async () => {
 });
 
 describe('NpmList.maybePushNewCoordinate', async () => {
-  it('handle path with leading / found in coordinate list', async () => {
+  it('handle package name with / found in coordinate list', async () => {
     const npmList = new NpmList();
 
     const data = {
@@ -63,7 +63,7 @@ describe('NpmList.maybePushNewCoordinate', async () => {
     expect(actualCoordinates.length).to.eq(1);
   });
 
-  it('handle path with leading / Not found in coordinate list', async () => {
+  it('handle package name with / Not found in coordinate list', async () => {
     const npmList = new NpmList();
 
     const data = {
@@ -114,7 +114,7 @@ describe('NpmList.maybePushNewCoordinate', async () => {
     expect(actualCoordinates.length).to.eq(1);
   });
 
-  it('normal package name / Not found in coordinate list', async () => {
+  it('normal package name Not found in coordinate list', async () => {
     const npmList = new NpmList();
 
     const data = {
