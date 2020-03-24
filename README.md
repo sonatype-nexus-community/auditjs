@@ -84,6 +84,7 @@ Options:
   --xml, -x        Set output to JUnit XML format                      [boolean]
   --whitelist, -w  Set path to whitelist file                           [string]
   --clear          Clears cache location if it has been set in config  [boolean]
+  --bower          Force the application to explicitly scan for Bower  [boolean]
 ```
 
 ### Nexus IQ Server Usage

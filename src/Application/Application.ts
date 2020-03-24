@@ -44,6 +44,7 @@ export class Application {
     readonly silent: boolean = false,
     readonly artie: boolean = false,
     readonly allen: boolean = false,
+    readonly scanBower: boolean = false,
   ) {
     const npmList = new NpmList(devDependency);
     const bower = new Bower(devDependency);
@@ -52,7 +53,7 @@ export class Application {
     this.spinner = new Spinner(silent);
     createAppLogger();
 
-    if (npmList.isValid()) {
+    if (npmList.isValid() && !this.scanBower) {
       logMessage('Setting Muncher to npm list', DEBUG);
       this.muncher = npmList;
     } else if (bower.isValid()) {
