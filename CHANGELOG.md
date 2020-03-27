@@ -1,3 +1,10 @@
+## [4.0.14](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.13...v4.0.14) (2020-03-27)
+
+
+### Bug Fixes
+
+* Bump yargs due to https://github.com/yargs/yargs-parser/pull/258 ([#190](https://github.com/sonatype-nexus-community/auditjs/issues/190)) ([69598e5](https://github.com/sonatype-nexus-community/auditjs/commit/69598e584834b9ae52b43320d9c7da25ac067765))
+
 ## [4.0.13](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.12...v4.0.13) (2020-03-24)
 
 
