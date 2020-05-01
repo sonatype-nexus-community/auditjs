@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { textSync } from 'figlet';
+import {textSync} from 'figlet';
 
-import { IqRequestService } from '../Services/IqRequestService';
-import { NpmList } from '../Munchers/NpmList';
-import { Coordinates } from '../Types/Coordinates';
-import { Muncher } from '../Munchers/Muncher';
-import { OssIndexRequestService } from '../Services/OssIndexRequestService';
-import { AuditIQServer } from '../Audit/AuditIQServer';
-import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
-import { OssIndexServerResult } from '../Types/OssIndexServerResult';
-import { ReportStatus } from '../Types/ReportStatus';
-import { Bower } from '../Munchers/Bower';
-import { DEBUG, ERROR, logMessage, createAppLogger, shutDownLoggerAndExit } from './Logger/Logger';
-import { Spinner } from './Spinner/Spinner';
-import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
-import { IqServerConfig } from '../Config/IqServerConfig';
-import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
-import { visuallySeperateText } from '../Visual/VisualHelper';
+import {IqRequestService} from '../Services/IqRequestService';
+import {NpmList} from '../Munchers/NpmList';
+import {Coordinates} from '../Types/Coordinates';
+import {Muncher} from '../Munchers/Muncher';
+import {OssIndexRequestService} from '../Services/OssIndexRequestService';
+import {AuditIQServer} from '../Audit/AuditIQServer';
+import {AuditOSSIndex} from '../Audit/AuditOSSIndex';
+import {OssIndexServerResult} from '../Types/OssIndexServerResult';
+import {ReportStatus} from '../Types/ReportStatus';
+import {Bower} from '../Munchers/Bower';
+import {DEBUG, ERROR, logMessage, createAppLogger, shutDownLoggerAndExit} from './Logger/Logger';
+import {Spinner} from './Spinner/Spinner';
+import {filterVulnerabilities} from '../Whitelist/VulnerabilityExcluder';
+import {IqServerConfig} from '../Config/IqServerConfig';
+import {OssIndexServerConfig} from '../Config/OssIndexServerConfig';
+import {visuallySeperateText} from '../Visual/VisualHelper';
 const pj = require('../../package.json');
 
 export class Application {
@@ -92,6 +92,9 @@ export class Application {
       logMessage('Auditing your application with Sonatype OSS Index', DEBUG);
       this.spinner.maybeCreateMessageForSpinner('Auditing your application with Sonatype OSS Index');
       await this.auditWithOSSIndex(args);
+    } else if (args._[0] == 'sbom') {
+      await this.populateCoordinatesForIQ();
+      console.log(this.sbom)
     } else {
       shutDownLoggerAndExit(0);
     }
@@ -110,8 +113,8 @@ export class Application {
   }
 
   private doPrintHeader(title = 'AuditJS', font: figlet.Fonts = '3D-ASCII'): void {
-    console.log(textSync(title, { font: font, horizontalLayout: 'fitted' }));
-    console.log(textSync('By Sonatype & Friends', { font: 'Pepper' }));
+    console.log(textSync(title, {font: font, horizontalLayout: 'fitted'}));
+    console.log(textSync('By Sonatype & Friends', {font: 'Pepper'}));
     visuallySeperateText(false, [`${title} version: ${pj.version}`]);
   }
 
@@ -152,7 +155,7 @@ export class Application {
     this.spinner.maybeCreateMessageForSpinner('Submitting coordinates to Sonatype OSS Index');
 
     const format = this.muncher instanceof Bower ? 'bower' : 'npm';
-    logMessage('Format to query OSS Index picked', DEBUG, { format: format });
+    logMessage('Format to query OSS Index picked', DEBUG, {format: format});
     try {
       logMessage('Attempting to query OSS Index or use Cache', DEBUG);
       const res = await requestService.callOSSIndexOrGetFromCache(this.results, format);
@@ -170,13 +173,13 @@ export class Application {
       this.spinner.maybeSucceed();
 
       this.spinner.maybeCreateMessageForSpinner('Removing whitelisted vulnerabilities');
-      logMessage('Response being ran against whitelist', DEBUG, { ossIndexServerResults: ossIndexResults });
+      logMessage('Response being ran against whitelist', DEBUG, {ossIndexServerResults: ossIndexResults});
       ossIndexResults = await filterVulnerabilities(ossIndexResults);
-      logMessage('Response has been whitelisted', DEBUG, { ossIndexServerResults: ossIndexResults });
+      logMessage('Response has been whitelisted', DEBUG, {ossIndexServerResults: ossIndexResults});
       this.spinner.maybeSucceed();
 
       this.spinner.maybeCreateMessageForSpinner('Auditing your results from Sonatype OSS Index');
-      logMessage('Instantiating OSS Index Request Service, with quiet option', DEBUG, { quiet: args.quiet });
+      logMessage('Instantiating OSS Index Request Service, with quiet option', DEBUG, {quiet: args.quiet});
       const auditOSSIndex = new AuditOSSIndex(
         args.quiet ? true : false,
         args.json ? true : false,
@@ -187,11 +190,11 @@ export class Application {
       logMessage('Attempting to audit results', DEBUG);
       const failed = auditOSSIndex.auditResults(ossIndexResults);
 
-      logMessage('Results audited', DEBUG, { failureCode: failed });
+      logMessage('Results audited', DEBUG, {failureCode: failed});
       failed ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);
     } catch (e) {
       this.spinner.maybeStop();
-      logMessage('There was an error auditing with Sonatype OSS Index', ERROR, { title: e.message, stack: e.stack });
+      logMessage('There was an error auditing with Sonatype OSS Index', ERROR, {title: e.message, stack: e.stack});
       shutDownLoggerAndExit(1);
     }
   }
@@ -216,7 +219,7 @@ export class Application {
         `${resultUrl}`,
         (e) => {
           this.spinner.maybeFail();
-          logMessage('There was an issue auditing your application!', ERROR, { title: e.message, stack: e.stack });
+          logMessage('There was an issue auditing your application!', ERROR, {title: e.message, stack: e.stack});
           shutDownLoggerAndExit(1);
         },
         (x) => {
@@ -230,14 +233,14 @@ export class Application {
           this.spinner.maybeStop();
           logMessage('Auditing results', DEBUG, results);
           const failure = auditResults.auditThirdPartyResults(results);
-          logMessage('Audit finished', DEBUG, { failure: failure });
+          logMessage('Audit finished', DEBUG, {failure: failure});
 
           failure ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);
         },
       );
     } catch (e) {
       this.spinner.maybeFail();
-      logMessage('There was an issue auditing your application!', ERROR, { title: e.message, stack: e.stack });
+      logMessage('There was an issue auditing your application!', ERROR, {title: e.message, stack: e.stack});
       shutDownLoggerAndExit(1);
     }
   }

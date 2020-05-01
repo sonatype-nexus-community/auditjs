@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 import yargs from 'yargs';
-import { Argv } from 'yargs';
-import { Application } from './Application/Application';
-import { AppConfig } from './Config/AppConfig';
-import { OssIndexServerConfig } from './Config/OssIndexServerConfig';
+import {Argv} from 'yargs';
+import {Application} from './Application/Application';
+import {AppConfig} from './Config/AppConfig';
+import {OssIndexServerConfig} from './Config/OssIndexServerConfig';
 
 // TODO: Flesh out the remaining set of args that NEED to be moved over, look at them with a fine toothed comb and lots of skepticism
 const normalizeHostAddress = (address: string) => {
@@ -140,7 +140,8 @@ let argv = yargs
         type: 'boolean',
         demandOption: false,
       },
-    });
+    })
+      .command('sbom', 'Output the purl only CycloneDx sbom to std_out');
   }).argv;
 
 if (argv) {
@@ -178,8 +179,9 @@ if (argv) {
         'Attempted to clear cache but no config file present, run `auditjs config` to set a cache location.',
       );
     }
-  } else if (argv._[0] == 'iq' || argv._[0] == 'ossi') {
-    let silence = argv.json || argv.quiet || argv.xml ? true : false;
+  } else if (argv._[0] == 'iq' || argv._[0] == 'ossi' || argv._[0] == 'sbom') {
+    // silence all output if quiet or if sending file to std_out
+    let silence = argv.json || argv.quiet || argv.xml || argv._[0] == 'sbom' ? true : false;
     let artie = argv.artie ? true : false;
     let allen = argv.allen ? true : false;
     let bower = argv.bower ? true : false;
