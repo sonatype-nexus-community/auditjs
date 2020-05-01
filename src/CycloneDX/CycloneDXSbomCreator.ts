@@ -228,7 +228,11 @@ export class CycloneDXSbomCreator {
     return externalReferences;
   }
 
-  private pushURLToExternalReferences(typeOfURL: string, url: string, externalReferences: Array<ExternalReference>) {
+  private pushURLToExternalReferences(
+    typeOfURL: string,
+    url: string,
+    externalReferences: Array<ExternalReference>,
+  ): void {
     try {
       const uri = new URL(url);
       externalReferences.push({ reference: { '@type': typeOfURL, url: uri.toString() } });
