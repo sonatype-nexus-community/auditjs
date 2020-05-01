@@ -91,6 +91,7 @@
     "node-fetch": "^2.6.0",
     "node-persist": "^3.0.5",
     "ora": "^4.0.3",
+    "package-lock.json": "^1.0.0",
     "read-installed": "~4.0.3",
     "spdx-license-ids": "^3.0.5",
     "ssri": "^6.0.0",
