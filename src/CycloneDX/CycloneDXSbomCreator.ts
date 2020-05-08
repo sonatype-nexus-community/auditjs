@@ -52,7 +52,7 @@ export class CycloneDXSbomCreator {
 
   readonly SBOMSCHEMA: string = 'http://cyclonedx.org/schema/bom/1.1';
 
-  constructor(readonly path: string, readonly options?: Options) { }
+  constructor(readonly path: string, readonly options?: Options) {}
 
   public async createBom(pkgInfo: any): Promise<string> {
     const bom = builder.create('bom', { encoding: 'utf-8', separateArrayItems: true }).att('xmlns', this.SBOMSCHEMA);
@@ -116,9 +116,9 @@ export class CycloneDXSbomCreator {
       const name: string = pkgIdentifier.fullName as string;
       const version: string = pkg.version as string;
       const purl: string = toPurl(name, version, group);
-      let component: Component = {} as any;
-      component["@bom-ref"] = purl;
-      component["@type"] = this.determinePackageType(pkg);
+      const component: Component = {} as any;
+      component['@bom-ref'] = purl;
+      component['@type'] = this.determinePackageType(pkg);
       component.purl = purl;
       component.group = group;
       component.name = name;
