@@ -105,6 +105,7 @@ export class CycloneDXSbomCreator {
   }
 
   private addComponent(pkg: any, list: any, isRootPkg = false): void {
+    const spartan = this.options?.spartan ? this.options.spartan : false;
     //read-installed with default options marks devDependencies as extraneous
     //if a package is marked as extraneous, do not include it as a component
     if (pkg.extraneous) {
@@ -116,29 +117,26 @@ export class CycloneDXSbomCreator {
       const name: string = pkgIdentifier.fullName as string;
       const version: string = pkg.version as string;
       const purl: string = toPurl(name, version, group);
-      const component: Component = {} as any;
-      component['@bom-ref'] = purl;
-      component['@type'] = this.determinePackageType(pkg);
-      component.purl = purl;
-      component.group = group;
-      component.name = name;
-      component.version = version;
+      const component: Component = {
+        '@type': this.determinePackageType(pkg),
+        '@bom-ref': purl,
+        group: group,
+        name: name,
+        version: version,
+        purl: purl,
+      };
 
       if (component.group === '') {
         delete component.group;
       }
 
-      if (!this.options?.spartan) {
+      if (!spartan) {
         const description: GenericDescription = { '#cdata': pkg.description };
 
         component.description = description;
         component.hashes = [];
         component.licenses = [];
         component.externalReferences = this.addExternalReferences(pkg);
-
-        if (component.group === '') {
-          delete component.group;
-        }
 
         if (this.options && this.options.includeLicenseData) {
           component.licenses = this.getLicenses(pkg);
@@ -155,13 +153,12 @@ export class CycloneDXSbomCreator {
 
       if (list[component.purl]) return; //remove cycles
       list[component.purl] = component;
-
-      if (pkg.dependencies) {
-        Object.keys(pkg.dependencies)
-          .map((x) => pkg.dependencies[x])
-          .filter((x) => typeof x !== 'string') //remove cycles
-          .map((x) => this.addComponent(x, list));
-      }
+    }
+    if (pkg.dependencies) {
+      Object.keys(pkg.dependencies)
+        .map((x) => pkg.dependencies[x])
+        .filter((x) => typeof x !== 'string') //remove cycles
+        .map((x) => this.addComponent(x, list));
     }
   }
 
