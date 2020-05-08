@@ -52,7 +52,7 @@ export class CycloneDXSbomCreator {
 
   readonly SBOMSCHEMA: string = 'http://cyclonedx.org/schema/bom/1.1';
 
-  constructor(readonly path: string, readonly options?: Options) {}
+  constructor(readonly path: string, readonly options?: Options) { }
 
   public async createBom(pkgInfo: any): Promise<string> {
     const bom = builder.create('bom', { encoding: 'utf-8', separateArrayItems: true }).att('xmlns', this.SBOMSCHEMA);
@@ -116,45 +116,52 @@ export class CycloneDXSbomCreator {
       const name: string = pkgIdentifier.fullName as string;
       const version: string = pkg.version as string;
       const purl: string = toPurl(name, version, group);
-      const description: GenericDescription = { '#cdata': pkg.description };
-
-      const component: Component = {
-        '@type': this.determinePackageType(pkg),
-        '@bom-ref': purl,
-        group: group,
-        name: name,
-        version: version,
-        description: description,
-        hashes: [],
-        licenses: [],
-        purl: purl,
-        externalReferences: this.addExternalReferences(pkg),
-      };
+      let component: Component = {} as any;
+      component["@bom-ref"] = purl;
+      component["@type"] = this.determinePackageType(pkg);
+      component.purl = purl;
+      component.group = group;
+      component.name = name;
+      component.version = version;
 
       if (component.group === '') {
         delete component.group;
       }
 
-      if (this.options && this.options.includeLicenseData) {
-        component.licenses = this.getLicenses(pkg);
-      } else {
-        delete component.licenses;
-      }
+      if (!this.options?.spartan) {
+        const description: GenericDescription = { '#cdata': pkg.description };
 
-      if (component.externalReferences === undefined || component.externalReferences.length === 0) {
-        delete component.externalReferences;
-      }
+        component.description = description;
+        component.hashes = [];
+        component.licenses = [];
+        component.externalReferences = this.addExternalReferences(pkg);
 
-      this.processHashes(pkg, component);
+        if (component.group === '') {
+          delete component.group;
+        }
+
+        if (this.options && this.options.includeLicenseData) {
+          component.licenses = this.getLicenses(pkg);
+        } else {
+          delete component.licenses;
+        }
+
+        if (component.externalReferences === undefined || component.externalReferences.length === 0) {
+          delete component.externalReferences;
+        }
+
+        this.processHashes(pkg, component);
+      }
 
       if (list[component.purl]) return; //remove cycles
       list[component.purl] = component;
-    }
-    if (pkg.dependencies) {
-      Object.keys(pkg.dependencies)
-        .map((x) => pkg.dependencies[x])
-        .filter((x) => typeof x !== 'string') //remove cycles
-        .map((x) => this.addComponent(x, list));
+
+      if (pkg.dependencies) {
+        Object.keys(pkg.dependencies)
+          .map((x) => pkg.dependencies[x])
+          .filter((x) => typeof x !== 'string') //remove cycles
+          .map((x) => this.addComponent(x, list));
+      }
     }
   }
 
