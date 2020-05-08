@@ -1,3 +1,10 @@
+## [4.0.15](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.14...v4.0.15) (2020-05-08)
+
+
+### Bug Fixes
+
+* Pipe cyclonedx sbom to std_out ([#194](https://github.com/sonatype-nexus-community/auditjs/issues/194)) ([9bf2ae0](https://github.com/sonatype-nexus-community/auditjs/commit/9bf2ae0df50290698d5a84d4b43ebc6ae198a1cb)), closes [#195](https://github.com/sonatype-nexus-community/auditjs/issues/195)
+
 ## [4.0.14](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.13...v4.0.14) (2020-03-27)
 
 
