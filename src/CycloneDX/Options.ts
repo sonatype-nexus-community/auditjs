@@ -18,4 +18,5 @@ export interface Options {
   includeBomSerialNumber?: boolean;
   includeLicenseData?: boolean;
   includeLicenseText?: boolean;
+  spartan?: boolean;
 }

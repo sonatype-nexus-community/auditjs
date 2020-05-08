@@ -92,6 +92,9 @@ export class Application {
       logMessage('Auditing your application with Sonatype OSS Index', DEBUG);
       this.spinner.maybeCreateMessageForSpinner('Auditing your application with Sonatype OSS Index');
       await this.auditWithOSSIndex(args);
+    } else if (args._[0] == 'sbom') {
+      await this.populateCoordinatesForIQ();
+      console.log(this.sbom);
     } else {
       shutDownLoggerAndExit(0);
     }

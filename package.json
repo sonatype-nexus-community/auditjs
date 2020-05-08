@@ -23,7 +23,8 @@
     "lint": "eslint src/**/*.ts",
     "start": "node ./bin/index.js",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run test"
+    "prepublishOnly": "npm run test",
+    "iq-scan": "npx auditjs@latest iq -a auditjs"
   },
   "keywords": [
     "Audit",

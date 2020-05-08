@@ -105,6 +105,7 @@ export class CycloneDXSbomCreator {
   }
 
   private addComponent(pkg: any, list: any, isRootPkg = false): void {
+    const spartan = this.options?.spartan ? this.options.spartan : false;
     //read-installed with default options marks devDependencies as extraneous
     //if a package is marked as extraneous, do not include it as a component
     if (pkg.extraneous) {
@@ -116,36 +117,39 @@ export class CycloneDXSbomCreator {
       const name: string = pkgIdentifier.fullName as string;
       const version: string = pkg.version as string;
       const purl: string = toPurl(name, version, group);
-      const description: GenericDescription = { '#cdata': pkg.description };
-
       const component: Component = {
         '@type': this.determinePackageType(pkg),
         '@bom-ref': purl,
         group: group,
         name: name,
         version: version,
-        description: description,
-        hashes: [],
-        licenses: [],
         purl: purl,
-        externalReferences: this.addExternalReferences(pkg),
       };
 
       if (component.group === '') {
         delete component.group;
       }
 
-      if (this.options && this.options.includeLicenseData) {
-        component.licenses = this.getLicenses(pkg);
-      } else {
-        delete component.licenses;
-      }
+      if (!spartan) {
+        const description: GenericDescription = { '#cdata': pkg.description };
 
-      if (component.externalReferences === undefined || component.externalReferences.length === 0) {
-        delete component.externalReferences;
-      }
+        component.description = description;
+        component.hashes = [];
+        component.licenses = [];
+        component.externalReferences = this.addExternalReferences(pkg);
 
-      this.processHashes(pkg, component);
+        if (this.options && this.options.includeLicenseData) {
+          component.licenses = this.getLicenses(pkg);
+        } else {
+          delete component.licenses;
+        }
+
+        if (component.externalReferences === undefined || component.externalReferences.length === 0) {
+          delete component.externalReferences;
+        }
+
+        this.processHashes(pkg, component);
+      }
 
       if (list[component.purl]) return; //remove cycles
       list[component.purl] = component;
@@ -228,7 +232,11 @@ export class CycloneDXSbomCreator {
     return externalReferences;
   }
 
-  private pushURLToExternalReferences(typeOfURL: string, url: string, externalReferences: Array<ExternalReference>) {
+  private pushURLToExternalReferences(
+    typeOfURL: string,
+    url: string,
+    externalReferences: Array<ExternalReference>,
+  ): void {
     try {
       const uri = new URL(url);
       externalReferences.push({ reference: { '@type': typeOfURL, url: uri.toString() } });

@@ -33,13 +33,12 @@ export class NpmList implements Muncher {
     return fs.existsSync(nodeModulesPath);
   }
 
-  // TODO: There is a 1 component discrepency in what gets identified by our installed deps implementation
-  // and what gets identified by the iq server being passed the sbom, gotta figure out what that is and why...
   public async getSbomFromCommand(): Promise<string> {
     const sbomCreator = new CycloneDXSbomCreator(process.cwd(), {
       devDependencies: this.devDependencies,
       includeLicenseData: false,
       includeBomSerialNumber: true,
+      spartan: true,
     });
 
     const pkgInfo = await sbomCreator.getPackageInfoFromReadInstalled();
@@ -53,6 +52,8 @@ export class NpmList implements Muncher {
   public async getInstalledDeps(): Promise<Array<Coordinates>> {
     const sbomCreator = new CycloneDXSbomCreator(process.cwd(), {
       devDependencies: this.devDependencies,
+      includeLicenseData: false,
+      includeBomSerialNumber: true,
     });
 
     const data = await sbomCreator.getPackageInfoFromReadInstalled();
