@@ -38,6 +38,7 @@ export class NpmList implements Muncher {
       devDependencies: this.devDependencies,
       includeLicenseData: false,
       includeBomSerialNumber: true,
+      spartan: true,
     });
 
     const pkgInfo = await sbomCreator.getPackageInfoFromReadInstalled();
