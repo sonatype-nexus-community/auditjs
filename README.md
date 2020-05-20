@@ -285,18 +285,13 @@ We care a lot about making the world a safer place, and that's why we continue t
 
 ## The Fine Print
 
-It is worth noting that this is **NOT SUPPORTED** by Sonatype, and is a contribution of ours
-to the open source community (read: you!)
-
 Remember:
 
-- Use this contribution at the risk tolerance that you have
-- Do NOT file Sonatype support tickets related to `auditjs`
-- DO file issues here on GitHub, so that the community can pitch in
+* If you are a Sonatype customer, you may file Sonatype support tickets related to `AuditJS` support in regard to this project
+  * We suggest you file issues here on GitHub as well, so that the community can pitch in
+* If you are not a Sonatype customer, Do NOT file Sonatype support tickets related to nancy support in regard to this project, file an issue here on GitHub
 
-Phew, that was easier than I thought. Last but not least of all:
-
-Have fun creating and using this extension and the [Sonatype OSS Index](https://ossindex.sonatype.org/), we are glad to have you here!
+Have fun creating and using `AuditJS` and the [Sonatype OSS Index](https://ossindex.sonatype.org/), we are glad to have you here!
 
 ## Getting help
 
