@@ -48,6 +48,7 @@ export class IqRequestService {
     const response = await fetch(`${this.host}${APPLICATION_INTERNAL_ID_ENDPOINT}${this.application}`, {
       method: 'get',
       headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
+      agent: RequestHelpers.getHttpAgent(),
     });
     if (response.ok) {
       const res = await response.json();
@@ -81,6 +82,7 @@ export class IqRequestService {
         method: 'post',
         headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ['Content-Type', 'application/xml']],
         body: data,
+        agent: RequestHelpers.getHttpAgent(),
       },
     );
     if (response.ok) {
@@ -107,6 +109,7 @@ export class IqRequestService {
       const response = await fetch(mergeUrl.href, {
         method: 'get',
         headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
+        agent: RequestHelpers.getHttpAgent(),
       });
 
       const body = response.ok;

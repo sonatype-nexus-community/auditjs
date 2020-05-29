@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 import os from 'os';
+import { Agent } from 'http';
+const HttpsProxyAgent = require('https-proxy-agent');
 const pack = require('../../package.json');
 
 export class RequestHelpers {
@@ -24,5 +26,13 @@ export class RequestHelpers {
     const system = `${os.type()} ${os.release()}`;
 
     return ['User-Agent', `AuditJS/${pack.version} (${environment} ${environmentVersion}; ${system})`];
+  }
+
+  public static getHttpAgent(): Agent | undefined {
+    const proxyUrl = process.env.http_proxy || process.env.https_proxy;
+    if (proxyUrl !== undefined && proxyUrl !== 'no-proxy') {
+      return new HttpsProxyAgent(proxyUrl);
+    }
+    return undefined;
   }
 }
