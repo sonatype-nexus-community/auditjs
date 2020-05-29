@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import expect, { ossIndexObject, ossIndexObjectNoVulnerabilities } from '../Tests/TestHelper';
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
 import { AuditOSSIndex } from './AuditOSSIndex';

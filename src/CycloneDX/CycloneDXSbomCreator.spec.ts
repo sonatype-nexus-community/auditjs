@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import { CycloneDXSbomCreator } from './CycloneDXSbomCreator';
 import expect from '../Tests/TestHelper';
 

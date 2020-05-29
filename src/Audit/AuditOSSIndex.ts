@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
 import { Formatter, getNumberOfVulnerablePackagesFromResults } from './Formatters/Formatter';
 import { JsonFormatter } from './Formatters/JsonFormatter';

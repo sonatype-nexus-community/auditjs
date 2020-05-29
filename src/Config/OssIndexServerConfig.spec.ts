@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import expect from '../Tests/TestHelper';
 import { OssIndexServerConfig } from './OssIndexServerConfig';
 import mock from 'mock-fs';

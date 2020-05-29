@@ -1,5 +1,3 @@
-/// <reference types="./typings/read-installed" />
-/// <reference types="./typings/spdx-license-ids" />
 /*
  * Copyright (c) 2020-present Erlend Oftedal, Steve Springett, Sonatype, Inc.
  *
@@ -15,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/// <reference types="./typings/read-installed" />
+/// <reference types="./typings/spdx-license-ids" />
+
 import { Options } from './Options';
 import uuidv4 from 'uuid/v4';
 import builder from 'xmlbuilder';
