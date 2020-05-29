@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Copyright (c) 2019-present Sonatype, Inc.
+ * Copyright (c) 2019-Present Sonatype, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,7 +177,7 @@ if (argv) {
       });
     } else {
       console.error(
-        'Attempted to clear cache but no config file present, run `auditjs config` to set a cache location.',
+        'Attempted to clear cache but no config file Present, run `auditjs config` to set a cache location.',
       );
     }
   } else if (argv._[0] == 'iq' || argv._[0] == 'ossi' || argv._[0] == 'sbom') {
