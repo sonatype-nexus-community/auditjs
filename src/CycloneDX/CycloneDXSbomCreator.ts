@@ -1,7 +1,5 @@
-/// <reference types="./typings/read-installed" />
-/// <reference types="./typings/spdx-license-ids" />
 /*
- * Copyright (c) 2020-present Erlend Oftedal, Steve Springett, Sonatype, Inc.
+ * Copyright (c) 2020-Present Erlend Oftedal, Steve Springett, Sonatype, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/// <reference types="./typings/read-installed" />
+/// <reference types="./typings/spdx-license-ids" />
+
 import { Options } from './Options';
 import uuidv4 from 'uuid/v4';
 import builder from 'xmlbuilder';
@@ -178,7 +180,7 @@ export class CycloneDXSbomCreator {
   }
 
   /**
-   * Uses the SHA1 shasum (if present) otherwise utilizes Subresource Integrity
+   * Uses the SHA1 shasum (if Present) otherwise utilizes Subresource Integrity
    * of the package with support for multiple hashing algorithms.
    */
   private processHashes(pkg: any, component: Component): void {

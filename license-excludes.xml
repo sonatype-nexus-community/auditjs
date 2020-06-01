@@ -1,0 +1,21 @@
+<excludes>
+  <exclude>src/.circleci/circleci-readme.md</exclude>
+  <exclude>src/.github/**</exclude>
+  <exclude>src/.vscode/**</exclude>
+  <exclude>src/bin/**</exclude>
+  <exclude>src/node_modules/**</exclude>
+  <exclude>src/.eslintrc.js</exclude>
+  <exclude>src/.npmignore</exclude>
+  <exclude>src/.nycrc</exclude>
+  <exclude>src/.prettierrc.js</exclude>
+  <exclude>src/.releaserc</exclude>
+  <exclude>src/CHANGELOG.md</exclude>
+  <exclude>src/CONTRIBUTORS.md</exclude>
+  <exclude>src/NOTICE</exclude>
+  <exclude>src/tsconfig.development.json</exclude>
+  <exclude>src/tsconfig.json</exclude>
+  <exclude>src/package.json</exclude>
+  <exclude>src/package-lock.json</exclude>
+  <exclude>src/**/index.d.ts</exclude>
+  <exclude>src/src/CycloneDX/**/*.ts</exclude>
+</excludes>
