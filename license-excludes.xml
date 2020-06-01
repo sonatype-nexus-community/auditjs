@@ -17,10 +17,5 @@
   <exclude>src/package.json</exclude>
   <exclude>src/package-lock.json</exclude>
   <exclude>src/**/index.d.ts</exclude>
-  <exclude>src/CycloneDX/Types/Component.ts</exclude>
-  <exclude>src/CycloneDX/Types/ExternalReference.ts</exclude>
-  <exclude>src/CycloneDX/Types/Hash.ts</exclude>
-  <exclude>src/CycloneDX/Types/LicenseContent.ts</exclude>
-  <exclude>src/CycloneDX/CycloneDXSbomCreator.ts</exclude>
-  <exclude>src/CycloneDX/Options.ts</exclude>
+  <exclude>src/CycloneDX/**/*.ts</exclude>
 </excludes>
