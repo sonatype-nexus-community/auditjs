@@ -1,3 +1,10 @@
+## [4.0.17](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.16...v4.0.17) (2020-06-02)
+
+
+### Bug Fixes
+
+* Add support of proxy environment variable ([#191](https://github.com/sonatype-nexus-community/auditjs/issues/191)) ([#199](https://github.com/sonatype-nexus-community/auditjs/issues/199)) ([276974d](https://github.com/sonatype-nexus-community/auditjs/commit/276974da21a5bc4fa2996d03586154dabb7052be))
+
 ## [4.0.16](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.15...v4.0.16) (2020-05-20)
 
 
