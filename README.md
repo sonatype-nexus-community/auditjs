@@ -192,6 +192,10 @@ We've provided an example repo with a working TravisCI config on a "fake" but re
 
 We've provided an example repo with a working GitHub Action on a "fake" but real project, you can see how it is all setup by clicking [this link](https://github.com/sonatype-nexus-community/example-auditjs-repo#usage-with-github-actions).
 
+#### Proxy integration
+
+The tool reads the `http_proxy` or `https_proxy` environment variables to perform network request through a Proxy.
+
 ### Usage As A NPM Script
 
 `auditjs` can be added as a devDependency to your project, and then an npm script can be added so you can leverage it in your npm scripts.
@@ -309,9 +313,9 @@ We care a lot about making the world a safer place, and that's why we continue t
 
 Remember:
 
-* If you are a Sonatype customer, you may file Sonatype support tickets related to `AuditJS` support in regard to this project
-  * We suggest you file issues here on GitHub as well, so that the community can pitch in
-* If you are not a Sonatype customer, Do NOT file Sonatype support tickets related to nancy support in regard to this project, file an issue here on GitHub
+- If you are a Sonatype customer, you may file Sonatype support tickets related to `AuditJS` support in regard to this project
+  - We suggest you file issues here on GitHub as well, so that the community can pitch in
+- If you are not a Sonatype customer, Do NOT file Sonatype support tickets related to nancy support in regard to this project, file an issue here on GitHub
 
 Have fun creating and using `AuditJS` and the [Sonatype OSS Index](https://ossindex.sonatype.org/), we are glad to have you here!
 

@@ -17,6 +17,7 @@
 import expect from '../Tests/TestHelper';
 import { RequestHelpers } from './RequestHelpers';
 import os from 'os';
+
 const pack = require('../../package.json');
 
 describe('RequestHelpers', () => {
@@ -29,5 +30,28 @@ describe('RequestHelpers', () => {
     const expected = ['User-Agent', `AuditJS/${pack.version} (${environment} ${environmentVersion}; ${system})`];
 
     expect(res).to.include.members(expected);
+  });
+
+  it('should return an httpAgent when env variable is set', () => {
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    process.env.http_proxy = 'http://test.local:8080';
+    const res = RequestHelpers.getHttpAgent();
+    expect(res).not.to.be.undefined;
+    if (res) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      expect(res.proxy.host).to.equal('test.local');
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      expect(res.proxy.port).to.equal(8080);
+    }
+  });
+
+  it('should return undefined when no env variable is set', () => {
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    process.env.http_proxy = 'no-proxy';
+
+    const res = RequestHelpers.getHttpAgent();
+    expect(res).to.be.undefined;
   });
 });

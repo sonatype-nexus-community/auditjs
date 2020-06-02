@@ -61,6 +61,7 @@ export class OssIndexRequestService {
       method: 'post',
       body: JSON.stringify(data),
       headers: this.getHeaders(),
+      agent: RequestHelpers.getHttpAgent(),
     })
       .then(this.checkStatus)
       .then((res) => res.json())
