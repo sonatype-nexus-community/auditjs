@@ -15,7 +15,7 @@
  */
 import os from 'os';
 import { Agent } from 'http';
-const HttpsProxyAgent = require('https-proxy-agent');
+import { HttpsProxyAgent } from 'https-proxy-agent';
 const pack = require('../../package.json');
 
 export class RequestHelpers {
