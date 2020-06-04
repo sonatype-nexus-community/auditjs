@@ -91,7 +91,7 @@
     "js-yaml": "3.13.1",
     "log4js": "^6.1.2",
     "node-fetch": "^2.6.0",
-    "node-persist": "^3.0.5",
+    "node-persist": "^3.1.0",
     "ora": "^4.0.3",
     "read-installed": "~4.0.3",
     "spdx-license-ids": "^3.0.5",
