@@ -1,3 +1,10 @@
+## [4.0.18](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.17...v4.0.18) (2020-06-04)
+
+
+### Bug Fixes
+
+* Bump node-persist version ([#201](https://github.com/sonatype-nexus-community/auditjs/issues/201)) ([144e370](https://github.com/sonatype-nexus-community/auditjs/commit/144e37080c5674865d28e2f9d4116e6f3de08a3e))
+
 ## [4.0.17](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.16...v4.0.17) (2020-06-02)
 
 
