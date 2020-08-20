@@ -19,39 +19,40 @@ import path from 'path';
 
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
 
-const whitelistFilePathPwd = path.join(process.cwd(), 'auditjs.json');
+const licenseExcludeFilePathPwd = path.join(process.cwd(), 'auditjs.json');
 
-export const filterVulnerabilities = async (
+export const filterLicenses = async (
   results: Array<OssIndexServerResult>,
-  whitelistFilePath: string = whitelistFilePathPwd,
+  licenseExcludeFilePath: string = licenseExcludeFilePathPwd,
 ): Promise<Array<OssIndexServerResult>> => {
   let json: Buffer;
   try {
-    json = readFileSync(whitelistFilePath, { flag: 'r+' });
+    json = readFileSync(licenseExcludeFilePath, { flag: 'r+' });
   } catch (e) {
     return results;
   }
 
   try {
-    const whitelist = JSON.parse(json.toString());
+    const licenseList = JSON.parse(json.toString());
 
-    const whiteListSet = new Set(whitelist.ignore.map((exclusion: any) => exclusion.id));
+    const licenseBannedSet = new Set(licenseList.acceptedLicenses.map((license: any) => license));
 
     const newResults = results.map((result) => {
-      if (result.vulnerabilities && result.vulnerabilities.length) {
-        const vulns = result.vulnerabilities.filter((vuln) => !whiteListSet.has(vuln.id));
+      if (result.license) {
+        result.license.banned = !licenseBannedSet.has(result.license.id || result.license.name);
 
         return new OssIndexServerResult({
-          ...result,
-          vulnerabilities: vulns
+          ...result
         }, result.license);
       }
+
       return result;
     });
+
     return newResults;
   } catch (e) {
     throw new Error(
-      `There was an issue excluding vulnerabilities likely based on your whitelist, please check ${whitelistFilePath}, to ensure it is valid JSON, and review stack trace for more information, stack trace: ${e.stack}`,
+      `There was an issue checking licenses likely based on your license exclusion list, please check ${licenseExcludeFilePath}, to ensure it is valid JSON, and review stack trace for more information, stack trace: ${e.stack}`,
     );
   }
 };

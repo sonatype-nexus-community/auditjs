@@ -141,6 +141,12 @@ let argv = yargs
         type: 'boolean',
         demandOption: false,
       },
+      approvedLicenses: {
+        description: 'Set path to approved licenses file',
+        type: 'string',
+        alias: 'l',
+        demandOption: false,
+      },
     })
       .command('sbom', 'Output the purl only CycloneDx sbom to std_out');
   }).argv;

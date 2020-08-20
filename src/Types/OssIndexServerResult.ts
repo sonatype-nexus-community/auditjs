@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
+import { License } from "./License";
+
 export class OssIndexServerResult {
   readonly coordinates: string;
   readonly description?: string;
   readonly reference: string;
   readonly vulnerabilities?: Array<Vulnerability>;
+  readonly license: License;
 
-  constructor(result: any) {
+  constructor(result: any, license: any) {
     this.coordinates = result.coordinates;
     this.description = result.description;
     this.reference = result.reference;
     this.vulnerabilities = result.vulnerabilities.map((x: any) => {
       return new Vulnerability(x);
     });
+    this.license = license;
   }
 
   public toAuditLog(): string {
-    return `${this.coordinates.replace('%40', '@')} - ${this.vulnerabilityMessage()}`;
+    return `${this.coordinates.replace('%40', '@')} - ${this.vulnerabilityMessage()}\nLicense: ${this.license.name}`;
   }
 
   private vulnerabilityMessage(): string {

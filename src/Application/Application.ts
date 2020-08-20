@@ -32,6 +32,7 @@ import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 import { visuallySeperateText } from '../Visual/VisualHelper';
+import { filterLicenses } from '../License/LicenseExcluder';
 const pj = require('../../package.json');
 
 export class Application {
@@ -166,17 +167,28 @@ export class Application {
       this.spinner.maybeCreateMessageForSpinner('Reticulating splines');
       logMessage('Turning response into Array<OssIndexServerResult>', DEBUG);
       let ossIndexResults: Array<OssIndexServerResult> = res.map((y: any) => {
-        return new OssIndexServerResult(y);
+        const coord = this.results.find(e => e.toPurl() == y.coordinates);
+        return new OssIndexServerResult(y, coord?.license);
       });
       logMessage('Response morphed into Array<OssIndexServerResult>', DEBUG, {
         ossIndexServerResults: ossIndexResults,
       });
       this.spinner.maybeSucceed();
 
+      ossIndexResults = res.map((y: any) => {
+
+      });
+
       this.spinner.maybeCreateMessageForSpinner('Removing whitelisted vulnerabilities');
       logMessage('Response being ran against whitelist', DEBUG, { ossIndexServerResults: ossIndexResults });
       ossIndexResults = await filterVulnerabilities(ossIndexResults);
       logMessage('Response has been whitelisted', DEBUG, { ossIndexServerResults: ossIndexResults });
+      this.spinner.maybeSucceed();
+
+      this.spinner.maybeCreateMessageForSpinner('Marking banned licenses');
+      logMessage('Response being ran against accepted license accepted list', DEBUG, { ossIndexServerResults: ossIndexResults });
+      ossIndexResults = await filterLicenses(ossIndexResults);
+      logMessage('Response has been checked against accepted licenses', DEBUG, { ossIndexServerResults: ossIndexResults });
       this.spinner.maybeSucceed();
 
       this.spinner.maybeCreateMessageForSpinner('Auditing your results from Sonatype OSS Index');
