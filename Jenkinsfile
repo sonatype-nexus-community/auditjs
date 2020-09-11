@@ -35,11 +35,13 @@ dockerizedBuildPipeline(
       }
     })
   },
-  testResults: [ 'reports/test-results.xml' ],
+  testResults: [ '**/reports/test-*.xml' ],
   onSuccess: {
     githubStatusUpdate('success')
   },
   onFailure: {
     githubStatusUpdate('failure')
+    notifyChat(currentBuild: currentBuild, env: env, room: 'community-oss-fun')
+    sendEmailNotification(currentBuild, env, [], 'community-group@sonatype.com')
   }
 )
