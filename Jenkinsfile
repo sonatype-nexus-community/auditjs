@@ -35,7 +35,7 @@ dockerizedBuildPipeline(
       }
     })
   },
-  testResults: [ '**/reports/test-*.xml' ],
+  testResults: [ 'reports/test-results.xml' ],
   onSuccess: {
     githubStatusUpdate('success')
   },
