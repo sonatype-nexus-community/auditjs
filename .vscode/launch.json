@@ -15,7 +15,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch with Nexus IQ Server",
-      "args": ["iq", "-a", "auditjs"],
+      "args": ["iq", "-a", "testapp", "-g", "bin"],
       "program": "${workspaceFolder}/src/index.ts",
       "preLaunchTask": "tsc: build - tsconfig.json",
       "console": "integratedTerminal",
