@@ -19,6 +19,7 @@ import path from 'path';
 import fs from 'fs';
 import { Coordinates } from '../Types/Coordinates';
 import { CycloneDXSbomCreator } from '../CycloneDX/CycloneDXSbomCreator';
+import { License } from '../Types/License';
 
 export class NpmList implements Muncher {
   private depsArray: Array<Coordinates> = [];
@@ -96,6 +97,9 @@ export class NpmList implements Muncher {
   }
 
   private maybePushNewCoordinate(pkg: any, list: Array<Coordinates>): boolean {
+    const l = pkg.license && (pkg.license.type || pkg.license);
+    const license = new License(l, l, false);
+
     if (pkg.name && pkg.name.includes('/')) {
       const name = pkg.name.split('/');
       if (
@@ -105,7 +109,7 @@ export class NpmList implements Muncher {
       ) {
         return false;
       }
-      list.push(new Coordinates(name[1], pkg.version, name[0]));
+      list.push(new Coordinates(name[1], pkg.version, name[0], license));
       return true;
     } else if (pkg.name) {
       if (
@@ -115,7 +119,7 @@ export class NpmList implements Muncher {
       ) {
         return false;
       }
-      list.push(new Coordinates(pkg.name, pkg.version, ''));
+      list.push(new Coordinates(pkg.name, pkg.version, '', license));
       return true;
     }
     return false;

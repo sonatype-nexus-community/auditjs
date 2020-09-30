@@ -45,13 +45,13 @@ export const ossIndexObject: OssIndexServerResult = new OssIndexServerResult({
       cve: '9.8',
     },
   ],
-});
+}, null);
 
 export const ossIndexObjectNoVulnerabilities: OssIndexServerResult = new OssIndexServerResult({
   coordinates: 'Test',
   reference: 'reference',
   vulnerabilities: [],
-});
+}, null);
 
 export const applicationInternalIdResponse = {
   statusCode: 200,
