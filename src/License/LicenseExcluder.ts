@@ -34,22 +34,25 @@ export const filterLicenses = async (
 
   try {
     const licenseList = JSON.parse(json.toString());
+    if (licenseList.acceptedLicenses) {
+      const licenseBannedSet = new Set(licenseList.acceptedLicenses.map((license: any) => license));
 
-    const licenseBannedSet = new Set(licenseList.acceptedLicenses.map((license: any) => license));
+      const newResults = results.map((result) => {
+        if (result.license) {
+          result.license.banned = !licenseBannedSet.has(result.license.id || result.license.name);
+  
+          return new OssIndexServerResult({
+            ...result
+          }, result.license);
+        }
+  
+        return result;
+      });
 
-    const newResults = results.map((result) => {
-      if (result.license) {
-        result.license.banned = !licenseBannedSet.has(result.license.id || result.license.name);
-
-        return new OssIndexServerResult({
-          ...result
-        }, result.license);
-      }
-
-      return result;
-    });
-
-    return newResults;
+      return newResults;
+    } else {
+      return results;
+    }
   } catch (e) {
     throw new Error(
       `There was an issue checking licenses likely based on your license exclusion list, please check ${licenseExcludeFilePath}, to ensure it is valid JSON, and review stack trace for more information, stack trace: ${e.stack}`,

@@ -175,9 +175,9 @@ export class Application {
       });
       this.spinner.maybeSucceed();
 
-      ossIndexResults = res.map((y: any) => {
+      // ossIndexResults = res.map((y: any) => {
 
-      });
+      // });
 
       this.spinner.maybeCreateMessageForSpinner('Removing whitelisted vulnerabilities');
       logMessage('Response being ran against whitelist', DEBUG, { ossIndexServerResults: ossIndexResults });

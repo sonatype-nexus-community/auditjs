@@ -17,6 +17,7 @@
 import { Formatter } from './Formatter';
 import { OssIndexServerResult, Vulnerability } from '../../Types/OssIndexServerResult';
 import chalk = require('chalk');
+import { License } from '../../Types/License';
 
 export class TextFormatter implements Formatter {
   constructor(readonly quiet: boolean = false) {}
@@ -39,7 +40,12 @@ export class TextFormatter implements Formatter {
     list.forEach((x: OssIndexServerResult, i: number) => {
       if (x.vulnerabilities && x.vulnerabilities.length > 0) {
         this.printVulnerability(i, total, x);
-      } else {
+      } 
+      else if (x.license.banned) {
+        this.printLine(chalk.keyword('yellow')(`[${i + 1}/${total}] - ${x.toAuditLog()}`));
+        this.printLicense(x.license);
+      }
+      else {
         this.printLine(chalk.keyword('green')(`[${i + 1}/${total}] - ${x.toAuditLog()}`));
       }
     });
@@ -99,6 +105,11 @@ export class TextFormatter implements Formatter {
     if (!this.quiet) {
       console.log(line);
     }
+  }
+
+  private printLicense(license: License): void {
+    console.log(chalk.keyword("yellow")(`The license: ${license.id} for this project is not in your approved licenses list.`));
+    console.log(chalk.keyword("yellow")(`Continue to ${encodeURI(`https://ossindex.sonatype.com/license/${license.id}`)} to learn more about this license.`));
   }
 
   private suggestIncludeDevDeps(total: number) {
