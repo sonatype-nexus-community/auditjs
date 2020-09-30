@@ -17,27 +17,27 @@ import expect from '../Tests/TestHelper';
 import { Lister } from './Lister';
 import mock from 'mock-fs';
 
-describe("Lister", () => {
-  it("should return a set of paths to js files and no directories given a base path", async () => {
-    mock({'/nonsensical': {
-      'auditjs.js': '{}',
-      'directory': {
-        'anotherpath.js': '{}',
-        'fakething.notjs': '{}',
-        'anotherdirectory': {}
-        }
-      } 
+describe('Lister', () => {
+  it('should return a set of paths to js files and no directories given a base path', async () => {
+    mock({
+      '/nonsensical': {
+        'auditjs.js': '{}',
+        directory: {
+          'anotherpath.js': '{}',
+          'fakething.notjs': '{}',
+          anotherdirectory: {},
+        },
+      },
     });
 
-    let expected = new Set();
+    const expected = new Set();
 
     expected.add('auditjs.js');
     expected.add('directory/anotherpath.js');
 
-    let result = Lister.getListOfFilesInBasePath('/nonsensical');
+    const result = Lister.getListOfFilesInBasePath('/nonsensical');
 
-    expect(result)
-      .to.deep.eq(expected);
+    expect(result).to.deep.eq(expected);
 
     mock.restore();
   });

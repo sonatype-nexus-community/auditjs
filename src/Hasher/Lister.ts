@@ -17,7 +17,7 @@ import glob from 'glob';
 
 export abstract class Lister {
   public static getListOfFilesInBasePath(path: string): Set<string> {
-    let files = glob.sync(`**/*.js`, {nodir: true, cwd: path});
+    const files = glob.sync(`**/*.js`, { nodir: true, cwd: path });
 
     return new Set(files);
   }

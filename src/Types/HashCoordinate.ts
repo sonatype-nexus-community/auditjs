@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 export class HashCoordinate {
-    constructor(readonly hash: string, readonly path: string) {}
+  constructor(readonly hash: string, readonly path: string) {}
 }

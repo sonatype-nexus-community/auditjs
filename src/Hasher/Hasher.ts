@@ -23,8 +23,8 @@ export class Hasher {
 
   public getHashFromPath(path: string): Promise<HashCoordinate> {
     return new Promise((resolve, reject) => {
-      let fd = fs.createReadStream(path);
-      let hash = crypto.createHash(this.algorithm);
+      const fd = fs.createReadStream(path);
+      const hash = crypto.createHash(this.algorithm);
       hash.setEncoding('hex');
 
       fd.on('end', () => {

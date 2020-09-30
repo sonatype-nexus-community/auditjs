@@ -23,29 +23,28 @@ const json2 = `{"anotherThing": "anotherValue"}`;
 
 const json3 = `{"yetAnotherThing": "yetAnotherValue"}`;
 
-describe("Hasher", () => {
-  it("should return a sha1 hash for a provided path", async () => {
-    mock({'/nonsensical': {
-      'auditjs.js': json,
-      'directory': {
-        'anotherpath.js': json2,
-        'fakething.js': json3,
-        'anotherdirectory': {}
-        }
-      } 
+describe('Hasher', () => {
+  it('should return a sha1 hash for a provided path', async () => {
+    mock({
+      '/nonsensical': {
+        'auditjs.js': json,
+        directory: {
+          'anotherpath.js': json2,
+          'fakething.js': json3,
+          anotherdirectory: {},
+        },
+      },
     });
 
-    let expected = '54bbc009e6ba2ee4e892a0347279819bd30e5e29';
+    const expected = '54bbc009e6ba2ee4e892a0347279819bd30e5e29';
 
-    let hasher = new Hasher('sha1');
+    const hasher = new Hasher('sha1');
 
-    let result = await hasher.getHashFromPath('/nonsensical/auditjs.js');
+    const result = await hasher.getHashFromPath('/nonsensical/auditjs.js');
 
-    expect(result.hash)
-      .to.eq(expected);
+    expect(result.hash).to.eq(expected);
 
-    expect(result.path)
-      .to.eq('/nonsensical/auditjs.js');
+    expect(result.path).to.eq('/nonsensical/auditjs.js');
 
     mock.restore();
   });

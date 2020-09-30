@@ -19,20 +19,20 @@ import { HashCoordinate } from '../Types/HashCoordinate';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-let hashes = new Array<HashCoordinate>();
+const hashes = new Array<HashCoordinate>();
 
-hashes.push(new HashCoordinate("hash", "path"));
-hashes.push(new HashCoordinate("hash1", "path1"));
-hashes.push(new HashCoordinate("hash2", "path2"));
-hashes.push(new HashCoordinate("hash3", "path3"));
+hashes.push(new HashCoordinate('hash', 'path'));
+hashes.push(new HashCoordinate('hash1', 'path1'));
+hashes.push(new HashCoordinate('hash2', 'path2'));
+hashes.push(new HashCoordinate('hash3', 'path3'));
 
-describe("Merger", () => {
-  it("should take an array of HashCoordinates and merge them together with the existing XML SBOM", async () => {
-    let sbom = readFileSync(join(__dirname, 'validsbom.xml'), 'utf8').toString();
+describe('Merger', () => {
+  it('should take an array of HashCoordinates and merge them together with the existing XML SBOM', async () => {
+    const sbom = readFileSync(join(__dirname, 'validsbom.xml'), 'utf8').toString();
 
-    let merger = new Merger();
+    const merger = new Merger();
 
-    let results = await merger.mergeHashesIntoSbom(hashes, sbom);
+    const results = await merger.mergeHashesIntoSbom(hashes, sbom);
 
     expect(results).to.include(`<name>path</name>`);
     expect(results).to.include(`<hashes><hash alg="SHA-1">hash</hash></hashes>`);
@@ -40,12 +40,12 @@ describe("Merger", () => {
     expect(results).to.include(`<hashes><hash alg="SHA-1">hash3</hash></hashes>`);
   });
 
-  it("should not merge an array of HashCoordinates with an invalid XML SBOM", () => {
-    let sbom = "this is garbage data";
-    
-    let merger = new Merger();
+  it('should not merge an array of HashCoordinates with an invalid XML SBOM', () => {
+    const sbom = 'this is garbage data';
 
-    let results = merger.mergeHashesIntoSbom(hashes, sbom);
+    const merger = new Merger();
+
+    const results = merger.mergeHashesIntoSbom(hashes, sbom);
 
     expect(results).to.eventually.be.rejected;
   });

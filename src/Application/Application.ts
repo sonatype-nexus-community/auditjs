@@ -137,32 +137,33 @@ export class Application {
     }
   }
 
-  private getHashesFromPath(paths: Set<string>, basePath: string = '') {
-    let promises: any[] = [];
-    let hasher = new Hasher('sha1');
+  private getHashesFromPath(paths: Set<string>, basePath = '') {
+    const promises: any[] = [];
+    const hasher = new Hasher('sha1');
 
     paths.forEach((path) => {
       promises.push(hasher.getHashFromPath(join(process.cwd(), basePath, path)));
-    })
+    });
 
     return Promise.all(promises);
   }
 
-  private async populateCoordinatesForIQ(deepPath: string = ''): Promise<void> {
+  private async populateCoordinatesForIQ(deepPath = ''): Promise<void> {
     try {
       if (deepPath != '') {
         logMessage('Trying to get sbom from cyclonedx/bom and list of hashes from deepPath', DEBUG);
-        let files = Lister.getListOfFilesInBasePath(join(deepPath));
-        logMessage('Got list of files to get hashes from', DEBUG, {files: files});
+        const files = Lister.getListOfFilesInBasePath(join(deepPath));
+        logMessage('Got list of files to get hashes from', DEBUG, { files: files });
         logMessage('Attempting to generate sbom and get hashes', DEBUG);
-        await Promise.all([this.getHashesFromPath(files, deepPath), this.muncher.getSbomFromCommand()])
-        .then(async (values) => {
-          logMessage('Got sbom and hashes, attempting to merge them', DEBUG);
-          let merger = new Merger();
-          this.sbom = await merger.mergeHashesIntoSbom(values[0], values[1]);
-          logMessage('Sbom merged', DEBUG, {sbom: this.sbom});
-          logMessage('Merge of sbom and hashes successful, our work is done here', DEBUG);
-        });
+        await Promise.all([this.getHashesFromPath(files, deepPath), this.muncher.getSbomFromCommand()]).then(
+          async (values) => {
+            logMessage('Got sbom and hashes, attempting to merge them', DEBUG);
+            const merger = new Merger();
+            this.sbom = await merger.mergeHashesIntoSbom(values[0], values[1]);
+            logMessage('Sbom merged', DEBUG, { sbom: this.sbom });
+            logMessage('Merge of sbom and hashes successful, our work is done here', DEBUG);
+          },
+        );
       } else {
         logMessage('Trying to get sbom from cyclonedx/bom', DEBUG);
         this.sbom = await this.muncher.getSbomFromCommand();

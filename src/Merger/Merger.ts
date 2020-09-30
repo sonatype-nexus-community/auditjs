@@ -17,27 +17,26 @@ import elementtree from 'elementtree';
 import { HashCoordinate } from '../Types/HashCoordinate';
 
 export class Merger {
-
   constructor(readonly algorithm: string = 'SHA-1') {}
 
   public async mergeHashesIntoSbom(hashes: HashCoordinate[], xml: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      let tree = elementtree.parse(xml);
-      let components = tree.find('./components');
+      const tree = elementtree.parse(xml);
+      const components = tree.find('./components');
       if (!components) {
         reject();
       }
       hashes.map((val) => {
         if (components) {
-          let component = elementtree.SubElement(components, 'component', {'type': 'library'});
-          let name = elementtree.SubElement(component, 'name');
+          const component = elementtree.SubElement(components, 'component', { type: 'library' });
+          const name = elementtree.SubElement(component, 'name');
           name.text = val.path;
-          let version = elementtree.SubElement(component, 'version');
-          version.text = "0";
-          let hashes = elementtree.SubElement(component, 'hashes');
-          let hash = elementtree.SubElement(hashes, 'hash', {'alg': this.algorithm});
+          const version = elementtree.SubElement(component, 'version');
+          version.text = '0';
+          const hashes = elementtree.SubElement(component, 'hashes');
+          const hash = elementtree.SubElement(hashes, 'hash', { alg: this.algorithm });
           hash.text = val.hash;
-        } 
+        }
       });
       resolve(tree.write());
     });
