@@ -46,13 +46,9 @@ export const ossIndexObject: OssIndexServerResult = new OssIndexServerResult(
         cvssVector: '',
         cve: '9.8',
       },
-    ]
+    ],
   },
-  new License(
-    "test",
-    "test",
-    false
-  ),
+  new License('test', 'test', false),
 );
 
 export const ossIndexObjectNoVulnerabilities: OssIndexServerResult = new OssIndexServerResult(
@@ -61,11 +57,7 @@ export const ossIndexObjectNoVulnerabilities: OssIndexServerResult = new OssInde
     reference: 'reference',
     vulnerabilities: [],
   },
-  new License(
-    "test",
-    "test",
-    false
-  ),
+  new License('test', 'test', false),
 );
 
 export const applicationInternalIdResponse = {
