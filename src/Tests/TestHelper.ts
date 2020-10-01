@@ -17,6 +17,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import 'mocha';
+import { License } from '../Types/License';
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
 
 chai.use(chaiAsPromised);
@@ -45,9 +46,13 @@ export const ossIndexObject: OssIndexServerResult = new OssIndexServerResult(
         cvssVector: '',
         cve: '9.8',
       },
-    ],
+    ]
   },
-  null,
+  new License(
+    "test",
+    "test",
+    false
+  ),
 );
 
 export const ossIndexObjectNoVulnerabilities: OssIndexServerResult = new OssIndexServerResult(
@@ -56,7 +61,11 @@ export const ossIndexObjectNoVulnerabilities: OssIndexServerResult = new OssInde
     reference: 'reference',
     vulnerabilities: [],
   },
-  null,
+  new License(
+    "test",
+    "test",
+    false
+  ),
 );
 
 export const applicationInternalIdResponse = {
