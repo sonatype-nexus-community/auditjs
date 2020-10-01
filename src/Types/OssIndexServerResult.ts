@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { License } from "./License";
+import { License } from './License';
 
 export class OssIndexServerResult {
   readonly coordinates: string;

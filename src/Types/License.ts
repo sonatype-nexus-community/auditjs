@@ -15,6 +15,5 @@
  */
 
 export class License {
-    constructor(readonly name: string, readonly id: string, public banned: boolean) {}
+  constructor(readonly name: string, readonly id: string, public banned: boolean) {}
 }
-  

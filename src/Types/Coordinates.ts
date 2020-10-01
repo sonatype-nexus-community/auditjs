@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { License } from "./License";
+import { License } from './License';
 
 export class Coordinates {
   constructor(readonly name: string, readonly version: string, readonly group?: string, readonly license?: License) {}

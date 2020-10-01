@@ -40,12 +40,15 @@ export const filterLicenses = async (
       const newResults = results.map((result) => {
         if (result.license) {
           result.license.banned = !licenseBannedSet.has(result.license.id || result.license.name);
-  
-          return new OssIndexServerResult({
-            ...result
-          }, result.license);
+
+          return new OssIndexServerResult(
+            {
+              ...result,
+            },
+            result.license,
+          );
         }
-  
+
         return result;
       });
 

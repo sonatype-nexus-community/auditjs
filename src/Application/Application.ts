@@ -167,7 +167,7 @@ export class Application {
       this.spinner.maybeCreateMessageForSpinner('Reticulating splines');
       logMessage('Turning response into Array<OssIndexServerResult>', DEBUG);
       let ossIndexResults: Array<OssIndexServerResult> = res.map((y: any) => {
-        const coord = this.results.find(e => e.toPurl() == y.coordinates);
+        const coord = this.results.find((e) => e.toPurl() == y.coordinates);
         return new OssIndexServerResult(y, coord?.license);
       });
       logMessage('Response morphed into Array<OssIndexServerResult>', DEBUG, {
@@ -186,9 +186,13 @@ export class Application {
       this.spinner.maybeSucceed();
 
       this.spinner.maybeCreateMessageForSpinner('Marking banned licenses');
-      logMessage('Response being ran against accepted license accepted list', DEBUG, { ossIndexServerResults: ossIndexResults });
+      logMessage('Response being ran against accepted license accepted list', DEBUG, {
+        ossIndexServerResults: ossIndexResults,
+      });
       ossIndexResults = await filterLicenses(ossIndexResults);
-      logMessage('Response has been checked against accepted licenses', DEBUG, { ossIndexServerResults: ossIndexResults });
+      logMessage('Response has been checked against accepted licenses', DEBUG, {
+        ossIndexServerResults: ossIndexResults,
+      });
       this.spinner.maybeSucceed();
 
       this.spinner.maybeCreateMessageForSpinner('Auditing your results from Sonatype OSS Index');

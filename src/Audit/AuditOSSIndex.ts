@@ -15,7 +15,11 @@
  */
 
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
-import { Formatter, getIfBannedLicenseEncountered, getNumberOfVulnerablePackagesFromResults } from './Formatters/Formatter';
+import {
+  Formatter,
+  getIfBannedLicenseEncountered,
+  getNumberOfVulnerablePackagesFromResults,
+} from './Formatters/Formatter';
 import { JsonFormatter } from './Formatters/JsonFormatter';
 import { TextFormatter } from './Formatters/TextFormatter';
 import { XmlFormatter } from './Formatters/XmlFormatter';

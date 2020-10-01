@@ -22,36 +22,42 @@ import { OssIndexServerResult } from '../Types/OssIndexServerResult';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-export const ossIndexObject: OssIndexServerResult = new OssIndexServerResult({
-  coordinates: 'Test',
-  reference: 'reference',
-  vulnerabilities: [
-    {
-      id: 'test_id',
-      title: 'title',
-      cvssScore: '9.8',
-      reference: 'reference',
-      description: '',
-      cvssVector: '',
-      cve: '9.8',
-    },
-    {
-      id: 'test_id2',
-      title: 'title',
-      cvssScore: '9.8',
-      reference: 'reference',
-      description: '',
-      cvssVector: '',
-      cve: '9.8',
-    },
-  ],
-}, null);
+export const ossIndexObject: OssIndexServerResult = new OssIndexServerResult(
+  {
+    coordinates: 'Test',
+    reference: 'reference',
+    vulnerabilities: [
+      {
+        id: 'test_id',
+        title: 'title',
+        cvssScore: '9.8',
+        reference: 'reference',
+        description: '',
+        cvssVector: '',
+        cve: '9.8',
+      },
+      {
+        id: 'test_id2',
+        title: 'title',
+        cvssScore: '9.8',
+        reference: 'reference',
+        description: '',
+        cvssVector: '',
+        cve: '9.8',
+      },
+    ],
+  },
+  null,
+);
 
-export const ossIndexObjectNoVulnerabilities: OssIndexServerResult = new OssIndexServerResult({
-  coordinates: 'Test',
-  reference: 'reference',
-  vulnerabilities: [],
-}, null);
+export const ossIndexObjectNoVulnerabilities: OssIndexServerResult = new OssIndexServerResult(
+  {
+    coordinates: 'Test',
+    reference: 'reference',
+    vulnerabilities: [],
+  },
+  null,
+);
 
 export const applicationInternalIdResponse = {
   statusCode: 200,
