@@ -38,10 +38,14 @@ export class TextFormatter implements Formatter {
     this.printLine('-'.repeat(process.stdout.columns));
 
     list.forEach((x: OssIndexServerResult, i: number) => {
-      if (x.vulnerabilities && x.vulnerabilities.length > 0) {
+      if (x.vulnerabilities && x.vulnerabilities.length > 0 && !x.license.banned) {
         this.printVulnerability(i, total, x);
       } 
-      else if (x.license.banned) {
+      else if (x.vulnerabilities && x.vulnerabilities.length > 0 && x.license.banned) {
+        this.printVulnerability(i, total, x);
+        this.printLicense(x.license);
+      } 
+      else if (x.vulnerabilities && x.vulnerabilities.length == 0 && x.license.banned) {
         this.printLine(chalk.keyword('yellow')(`[${i + 1}/${total}] - ${x.toAuditLog()}`));
         this.printLicense(x.license);
       }
@@ -108,8 +112,10 @@ export class TextFormatter implements Formatter {
   }
 
   private printLicense(license: License): void {
-    console.log(chalk.keyword("yellow")(`The license: ${license.id} for this project is not in your approved licenses list.`));
-    console.log(chalk.keyword("yellow")(`Continue to ${encodeURI(`https://ossindex.sonatype.com/license/${license.id}`)} to learn more about this license.`));
+    console.group();
+    console.log(chalk.keyword("yellow")(`The license ${license.id} for this project is not in your approved licenses list.`));
+    console.log(chalk.keyword("yellow")(`Continue to ${encodeURI(`https://ossindex.sonatype.com/license/${license.id}?utm_medium=int&utm_source=auditjs`)} to learn more about this license.`));
+    console.groupEnd();
   }
 
   private suggestIncludeDevDeps(total: number) {

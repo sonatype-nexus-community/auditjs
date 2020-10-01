@@ -26,10 +26,12 @@
 
 **IMPORTANT NOTE**: Welcome to AuditJS 4.0.0, lots has changed since 3.0.0, mainly around usage. Make sure to read the new docs.
 
+**ANOTHER IMPORTANT NOTE**: Welcome to AuditJS 4.1.0, we now allow you to audit declared licenses using the tool. See this section for more info!
+
 If you have an issue migrating from AuditJS 3.x to AuditJS 4.x, please [file a GitHub issue here](https://github.com/sonatype-nexus-community/auditjs/issues).
 
 Audits JavaScript projects using the [OSS Index v3 REST API](https://ossindex.sonatype.org/rest)
-to identify known vulnerabilities and outdated package versions.
+to identify known vulnerabilities, and audit declared licenses.
 
 Supports any project with package managers that install npm dependencies into a node_modules folder including:
 
@@ -253,9 +255,51 @@ You can specify your credentials on either the command line or the configuration
 file. It is almost certainly better to put the credentials in a configuration
 file as described above, as using them on the command line is less secure.
 
-## Whitelisting
+## Approving licenses
 
-Whitelisting of vulnerabilities can be done! To accomplish this thus far we have implemented the ability to have a file named `auditjs.json` checked in to your repo ideally, so that it would be at the root where you run `auditjs`. Alternatively you can run `auditjs` with a whitelist file at a different location, with an example such as:
+As of AuditJS 4.1.0, we have added the ability to audit the declared license for your project. We aren't lawyers, and this feature is meant solely as a way to speed you up.
+
+In your `auditjs.json` file, one can now do something like:
+
+```json
+{
+  "ignore": [{ "id": "78a61524-80c5-4371-b6d1-6b32af349043", "reason": "Insert reason here" }],
+  "approvedLicenses": ["MIT", "ISC", "Apache-2.0"]
+}
+```
+
+When running, if the `approvedLicenses` key exists in your json file, AuditJS will begin to look at all declared licenses (what the author has claimed the license is, more or less) that exist in your dependencies, and mark the ones that are outside of that list as `banned`. This will cause the tool to throw an error code if it finds licenses that aren't in your list, and provide you an opportunity to fail builds in CI/CD etc... if need be.
+
+Output on the command line will be similar to the following (assuming you find vulnerabilities, and a non approved license):
+
+```
+[372/377] - pkg:npm/yargs-parser@13.1.1 - 2 vulnerabilities found!
+
+  Vulnerability Title:  [CVE-2020-7608] yargs-parser could be tricked into adding or modifying properties of Object.prot...
+  ID:  b7740d41-fc85-4d22-8af5-5a3159e114ea
+  Description:  yargs-parser could be tricked into adding or modifying properties of Object.prototype using a "__proto__" payload.
+  CVSS Score:  7.5
+  CVSS Vector:  CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+  CVE:  CVE-2020-7608
+  Reference:  https://ossindex.sonatype.org/vuln/b7740d41-fc85-4d22-8af5-5a3159e114ea?component-type=npm&component-name=yargs-parser&utm_source=auditjs&utm_medium=integration&utm_content=4.0.18
+  
+  Vulnerability Title:  CWE-400: Uncontrolled Resource Consumption ('Resource Exhaustion')
+  ID:  7ccaaed0-205b-4382-a963-8a30a0b151b1
+  Description:  The software does not properly restrict the size or amount of resources that are requested or influenced by an actor, which can be used to consume more resources than intended.
+  CVSS Score:  7.5
+  CVSS Vector:  CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+  CVE:  undefined
+  Reference:  https://ossindex.sonatype.org/vuln/7ccaaed0-205b-4382-a963-8a30a0b151b1?component-type=npm&component-name=yargs-parser&utm_source=auditjs&utm_medium=integration&utm_content=4.0.18
+  
+  The license ISC for this project is not in your approved licenses list.
+  Continue to https://ossindex.sonatype.com/license/ISC?utm_medium=int&utm_source=auditjs to learn more about this license.
+```
+
+The link to OSS Index can be followed for more information about the license, and in the future, further functionality to help you understand license risk!
+
+## Approving vulnerabilities
+
+Approving the use of a library with vulnerabilities can be done! To accomplish this thus far we have implemented the ability to have a file named `auditjs.json` checked in to your repo ideally, so that it would be at the root where you run `auditjs`. Alternatively you can run `auditjs` with an approved file at a different location, with an example such as:
 
 ```terminal
 $ auditjs ossi --whitelist /Users/cooldeveloperperson/code/sonatype-nexus-community/auditjs/auditjs.json
@@ -269,9 +313,9 @@ The file should look like:
 }
 ```
 
-The only field that actually matters is `id` and that is the ID you recieve from OSS Index for a vulnerability. You can add fields such as `reason` so that you later can understand why you whitelisted a vulnerability.
+The only field that actually matters is `id` and that is the ID you recieve from OSS Index for a vulnerability. You can add fields such as `reason` so that you later can understand why you approved a vulnerability.
 
-Any `id` that is whitelisted will be squelched from the results, and not cause a failure.
+Any `id` that is approved will be squelched from the results, and not cause a failure.
 
 ## Alternative output formats
 
