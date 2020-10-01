@@ -25,3 +25,9 @@ export const getNumberOfVulnerablePackagesFromResults = (results: Array<OssIndex
     return x.vulnerabilities && x.vulnerabilities?.length > 0;
   }).length;
 };
+
+export const getIfBannedLicenseEncountered = (results: Array<OssIndexServerResult>): boolean => {
+  return results.filter((x) => {
+    return x.license && x.license?.banned;
+  }).length > 0;
+};

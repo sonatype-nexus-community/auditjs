@@ -34,16 +34,24 @@ export class OssIndexServerResult {
   }
 
   public toAuditLog(): string {
-    return `${this.coordinates.replace('%40', '@')} - ${this.vulnerabilityMessage()}`;
+    return `${this.coordinates.replace('%40', '@')} - ${this.vulnerabilityMessage()} ${this.licenseMessage()}`;
   }
 
   private vulnerabilityMessage(): string {
     if (this.vulnerabilities && this.vulnerabilities?.length > 1) {
-      return `${this.vulnerabilities.length} vulnerabilities found!`;
+      return `${this.vulnerabilities.length} vulnerabilities`;
     } else if (this.vulnerabilities && this.vulnerabilities?.length === 1) {
-      return `${this.vulnerabilities.length} vulnerability found!`;
+      return `${this.vulnerabilities.length} vulnerability`;
     } else {
-      return `No vulnerabilities found!`;
+      return `No vulnerabilities`;
+    }
+  }
+
+  private licenseMessage(): string {
+    if (this.license && this.license?.banned) {
+      return `and a license issue found!`;
+    } else {
+      return `and no license issues found!`;
     }
   }
 }

@@ -26,7 +26,7 @@
 
 **IMPORTANT NOTE**: Welcome to AuditJS 4.0.0, lots has changed since 3.0.0, mainly around usage. Make sure to read the new docs.
 
-**ANOTHER IMPORTANT NOTE**: Welcome to AuditJS 4.1.0, we now allow you to audit declared licenses using the tool. See this section for more info!
+**ANOTHER IMPORTANT NOTE**: Welcome to AuditJS 4.1.0, we now allow you to audit declared licenses using the tool. See [this section for more info](https://github.com/sonatype-nexus-community/auditjs#approving-licenses)!
 
 If you have an issue migrating from AuditJS 3.x to AuditJS 4.x, please [file a GitHub issue here](https://github.com/sonatype-nexus-community/auditjs/issues).
 
@@ -264,7 +264,7 @@ In your `auditjs.json` file, one can now do something like:
 ```json
 {
   "ignore": [{ "id": "78a61524-80c5-4371-b6d1-6b32af349043", "reason": "Insert reason here" }],
-  "approvedLicenses": ["MIT", "ISC", "Apache-2.0"]
+  "acceptedLicenses": ["MIT", "ISC", "Apache-2.0", "(LGPL-2.0 or MIT)", "CC0-1.0", "BSD-3-Clause", "CC-BY-3.0", "BSD-2-Clause"]
 }
 ```
 
@@ -273,7 +273,7 @@ When running, if the `approvedLicenses` key exists in your json file, AuditJS wi
 Output on the command line will be similar to the following (assuming you find vulnerabilities, and a non approved license):
 
 ```
-[372/377] - pkg:npm/yargs-parser@13.1.1 - 2 vulnerabilities found!
+[372/377] - pkg:npm/yargs-parser@13.1.1 - 2 vulnerabilities and a license issue found!
 
   Vulnerability Title:  [CVE-2020-7608] yargs-parser could be tricked into adding or modifying properties of Object.prot...
   ID:  b7740d41-fc85-4d22-8af5-5a3159e114ea

@@ -15,7 +15,7 @@
  */
 
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
-import { Formatter, getNumberOfVulnerablePackagesFromResults } from './Formatters/Formatter';
+import { Formatter, getIfBannedLicenseEncountered, getNumberOfVulnerablePackagesFromResults } from './Formatters/Formatter';
 import { JsonFormatter } from './Formatters/JsonFormatter';
 import { TextFormatter } from './Formatters/TextFormatter';
 import { XmlFormatter } from './Formatters/XmlFormatter';
@@ -42,6 +42,6 @@ export class AuditOSSIndex {
 
     this.formatter.printAuditResults(results);
 
-    return getNumberOfVulnerablePackagesFromResults(results) > 0;
+    return getNumberOfVulnerablePackagesFromResults(results) > 0 || getIfBannedLicenseEncountered(results);
   }
 }
