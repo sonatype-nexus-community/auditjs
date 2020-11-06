@@ -32,6 +32,7 @@ export class IqRequestService {
     readonly application: string,
     readonly stage: string,
     readonly timeout: number,
+    readonly insecure: boolean,
   ) {}
 
   private async init(): Promise<void> {
@@ -49,7 +50,7 @@ export class IqRequestService {
     const response = await fetch(`${this.host}${APPLICATION_INTERNAL_ID_ENDPOINT}${this.application}`, {
       method: 'get',
       headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
-      agent: RequestHelpers.getHttpAgent(),
+      agent: RequestHelpers.getAgent(this.insecure),
     });
     if (response.ok) {
       const res = await response.json();
@@ -83,7 +84,7 @@ export class IqRequestService {
         method: 'post',
         headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ['Content-Type', 'application/xml']],
         body: data,
-        agent: RequestHelpers.getHttpAgent(),
+        agent: RequestHelpers.getAgent(this.insecure),
       },
     );
     if (response.ok) {
@@ -110,7 +111,7 @@ export class IqRequestService {
       const response = await fetch(mergeUrl.href, {
         method: 'get',
         headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
-        agent: RequestHelpers.getHttpAgent(),
+        agent: RequestHelpers.getAgent(this.insecure),
       });
 
       const body = response.ok;

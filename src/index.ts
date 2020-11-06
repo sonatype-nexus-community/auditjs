@@ -90,6 +90,11 @@ let argv = yargs
         description: 'Include Development Dependencies',
         demandOption: false,
       },
+      insecure: {
+        type: 'boolean',
+        description: 'Allow insecure connections',
+        demandOption: false,
+      },
     });
   })
   .command('config', 'Set config for OSS Index or Nexus IQ Server')
