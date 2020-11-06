@@ -1,3 +1,10 @@
+## [4.0.19](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.18...v4.0.19) (2020-11-06)
+
+
+### Bug Fixes
+
+* YARGS TO THE FUTURE ([#214](https://github.com/sonatype-nexus-community/auditjs/issues/214)) ([254ea3d](https://github.com/sonatype-nexus-community/auditjs/commit/254ea3dcbe5e4bc0a345b3846ba6fb6ae28cd961))
+
 ## [4.0.18](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.17...v4.0.18) (2020-06-04)
 
 
