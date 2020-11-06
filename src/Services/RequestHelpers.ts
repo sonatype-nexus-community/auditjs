@@ -30,10 +30,10 @@ export class RequestHelpers {
     return ['User-Agent', `AuditJS/${pack.version} (${environment} ${environmentVersion}; ${system})`];
   }
 
-  public static getAgent(insecure: boolean = false): Agent | undefined {
+  public static getAgent(insecure = false): Agent | undefined {
     if (insecure) {
       return new HttpsAgent({
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
       });
     }
 
