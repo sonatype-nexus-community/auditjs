@@ -71,19 +71,19 @@ export class TextFormatter implements Formatter {
       x.forEach((y: Vulnerability) => {
         const color: string = this.getColorFromMaxScore(+y.cvssScore);
         console.group();
-        if (typeof y.title === 'undefined') 
+        if (typeof y.title !== 'undefined') 
           console.log(chalk.keyword(color)(`Vulnerability Title: `), `${y.title}`);
-        if (typeof y.id === 'undefined')
+        if (typeof y.id !== 'undefined')
           console.log(chalk.keyword(color)(`ID: `), `${y.id}`);
-        if (typeof y.description === 'undefined')
+        if (typeof y.description !== 'undefined')
           console.log(chalk.keyword(color)(`Description: `), `${y.description}`);
-        if (typeof y.cvssScore === 'undefined')
+        if (typeof y.cvssScore !== 'undefined')
           console.log(chalk.keyword(color)(`CVSS Score: `), `${y.cvssScore}`);
-        if (typeof y.cvssVector === 'undefined')
+        if (typeof y.cvssVector !== 'undefined')
           console.log(chalk.keyword(color)(`CVSS Vector: `), `${y.cvssVector}`);
-        if (typeof y.cve === 'undefined')
+        if (typeof y.cve !== 'undefined')
           console.log(chalk.keyword(color)(`CVE: `), `${y.cve}`);
-        if (typeof y.reference === 'undefined')
+        if (typeof y.reference !== 'undefined')
           console.log(chalk.keyword(color)(`Reference: `), `${y.reference}`);
         console.log();
         console.groupEnd();
