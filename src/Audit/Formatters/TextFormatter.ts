@@ -71,13 +71,13 @@ export class TextFormatter implements Formatter {
       x.forEach((y: Vulnerability) => {
         const color: string = this.getColorFromMaxScore(+y.cvssScore);
         console.group();
-        console.log(chalk.keyword(color)(`Vulnerability Title: `), `${y.title}`);
-        console.log(chalk.keyword(color)(`ID: `), `${y.id}`);
-        console.log(chalk.keyword(color)(`Description: `), `${y.description}`);
-        console.log(chalk.keyword(color)(`CVSS Score: `), `${y.cvssScore}`);
-        console.log(chalk.keyword(color)(`CVSS Vector: `), `${y.cvssVector}`);
-        console.log(chalk.keyword(color)(`CVE: `), `${y.cve}`);
-        console.log(chalk.keyword(color)(`Reference: `), `${y.reference}`);
+        this.printVulnField(color, `Vulnerability Title: `, y.title);
+        this.printVulnField(color, `ID: `, y.id);
+        this.printVulnField(color, `Description: `, y.description);
+        this.printVulnField(color, `CVSS Score: `, y.cvssScore);
+        this.printVulnField(color, `CVSS Vector: `, y.cvssVector);
+        this.printVulnField(color, `CVE: `, y.cve);
+        this.printVulnField(color, `Reference: `, y.reference);
         console.log();
         console.groupEnd();
       });
@@ -98,6 +98,12 @@ export class TextFormatter implements Formatter {
   private printLine(line: any): void {
     if (!this.quiet) {
       console.log(line);
+    }
+  }
+
+  private printVulnField(color: string, title: string, field: string) {
+    if (typeof field !== 'undefined') {
+      console.log(chalk.keyword(color)(title), field);
     }
   }
 
