@@ -1,3 +1,10 @@
+## [4.0.20](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.19...v4.0.20) (2020-11-17)
+
+
+### Bug Fixes
+
+* Vulnerability field ([#216](https://github.com/sonatype-nexus-community/auditjs/issues/216)) ([0b91917](https://github.com/sonatype-nexus-community/auditjs/commit/0b91917f0a8ae3dce3c18695b074ea3852219387))
+
 ## [4.0.19](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.18...v4.0.19) (2020-11-06)
 
 
