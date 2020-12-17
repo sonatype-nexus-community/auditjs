@@ -1,3 +1,10 @@
+## [4.0.21](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.20...v4.0.21) (2020-12-17)
+
+
+### Bug Fixes
+
+* Adds insecure flag, implements ([#213](https://github.com/sonatype-nexus-community/auditjs/issues/213)) ([88e7d87](https://github.com/sonatype-nexus-community/auditjs/commit/88e7d873754c96755ee50229115bcee1ecbead2d))
+
 ## [4.0.20](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.19...v4.0.20) (2020-11-17)
 
 
