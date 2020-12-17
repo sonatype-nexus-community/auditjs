@@ -276,6 +276,7 @@ export class Application {
       args.application as string,
       args.stage as string,
       args.timeout as number,
+      args.insecure as boolean,
     );
   }
 }

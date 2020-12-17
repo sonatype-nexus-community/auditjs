@@ -29,7 +29,15 @@ describe('IQRequestService', () => {
       .get(`/api/v2/applications?publicId=testapp`)
       .reply(404, applicationInternalIdResponse.body);
 
-    const requestService = new IqRequestService('admin', 'admin123', 'http://testlocation:8070', 'testapp', stage, 300);
+    const requestService = new IqRequestService(
+      'admin',
+      'admin123',
+      'http://testlocation:8070',
+      'testapp',
+      stage,
+      300,
+      false,
+    );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
     return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.be.rejected;
@@ -42,7 +50,15 @@ describe('IQRequestService', () => {
       .get(`/api/v2/applications?publicId=testapp`)
       .reply(applicationInternalIdResponse.statusCode, { thereisnoid: 'none' });
 
-    const requestService = new IqRequestService('admin', 'admin123', 'http://testlocation:8070', 'testapp', stage, 300);
+    const requestService = new IqRequestService(
+      'admin',
+      'admin123',
+      'http://testlocation:8070',
+      'testapp',
+      stage,
+      300,
+      false,
+    );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
     return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.be.rejectedWith(
@@ -66,7 +82,15 @@ describe('IQRequestService', () => {
       .get(`/api/v2/applications?publicId=testapp`)
       .reply(applicationInternalIdResponse.statusCode, applicationInternalIdResponse.body);
 
-    const requestService = new IqRequestService('admin', 'admin123', 'http://testlocation:8070', 'testapp', stage, 300);
+    const requestService = new IqRequestService(
+      'admin',
+      'admin123',
+      'http://testlocation:8070',
+      'testapp',
+      stage,
+      300,
+      false,
+    );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
     return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.equal(
@@ -90,7 +114,15 @@ describe('IQRequestService', () => {
       .get(`/api/v2/applications?publicId=testapp`)
       .reply(applicationInternalIdResponse.statusCode, applicationInternalIdResponse.body);
 
-    const requestService = new IqRequestService('admin', 'admin123', 'http://testlocation:8070', 'testapp', stage, 300);
+    const requestService = new IqRequestService(
+      'admin',
+      'admin123',
+      'http://testlocation:8070',
+      'testapp',
+      stage,
+      300,
+      false,
+    );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
     return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.be.rejectedWith(
@@ -113,7 +145,15 @@ describe('IQRequestService', () => {
       .get(`/api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb`)
       .reply(response.statusCode, response.body);
 
-    const requestService = new IqRequestService('admin', 'admin123', 'http://testlocation:8070', 'testapp', stage, 300);
+    const requestService = new IqRequestService(
+      'admin',
+      'admin123',
+      'http://testlocation:8070',
+      'testapp',
+      stage,
+      300,
+      false,
+    );
 
     requestService.asyncPollForResults(
       'api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb',

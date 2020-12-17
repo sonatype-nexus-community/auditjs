@@ -16,6 +16,7 @@
 
 import os from 'os';
 import { Agent } from 'http';
+import { Agent as HttpsAgent } from 'https';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 const pack = require('../../package.json');
 
@@ -27,6 +28,16 @@ export class RequestHelpers {
     const system = `${os.type()} ${os.release()}`;
 
     return ['User-Agent', `AuditJS/${pack.version} (${environment} ${environmentVersion}; ${system})`];
+  }
+
+  public static getAgent(insecure = false): Agent | undefined {
+    if (insecure) {
+      return new HttpsAgent({
+        rejectUnauthorized: false,
+      });
+    }
+
+    return this.getHttpAgent();
   }
 
   public static getHttpAgent(): Agent | undefined {
