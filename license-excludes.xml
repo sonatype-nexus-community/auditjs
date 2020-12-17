@@ -18,4 +18,5 @@
   <exclude>src/package-lock.json</exclude>
   <exclude>src/**/index.d.ts</exclude>
   <exclude>src/src/CycloneDX/**/*.ts</exclude>
+  <exclude>src/SECURITY.md</exclude>
 </excludes>
