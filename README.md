@@ -309,6 +309,17 @@ vulnerabilities.
 
 We care a lot about making the world a safer place, and that's why we continue to work on this and other plugins for Sonatype OSS Index. If you as well want to speed up the pace of software development by working on this project, jump on in! Before you start work, create a new issue, or comment on an existing issue, to let others know you are!
 
+## Releasing
+
+We use [semantic-release](https://github.com/semantic-release/semantic-release) to generate releases
+from commits to the `main` branch.
+
+For example, to perform a "patch" release, add a commit to `main` with a comment like:
+
+```
+fix: Adds insecure flag, implements (#213)
+```
+
 ## The Fine Print
 
 Remember:
