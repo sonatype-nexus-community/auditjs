@@ -1,3 +1,10 @@
+## [4.0.22](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.21...v4.0.22) (2020-12-18)
+
+
+### Bug Fixes
+
+* document release process, test release credentials ([3e5b2ba](https://github.com/sonatype-nexus-community/auditjs/commit/3e5b2ba5ad3df3518ba46ccc7820740e2dd18c51))
+
 ## [4.0.21](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.20...v4.0.21) (2020-12-17)
 
 
