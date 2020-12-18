@@ -67,7 +67,7 @@ describe('RequestHelpers', () => {
 
   // TODO: This may indicate a problem. In the case of insecure, the proxy setting is ignored
   // see: https://github.com/sonatype-nexus-community/auditjs/pull/213#discussion_r545617666
-/*
+  /*
   it('getAgent() should return an insecure proxy httpAgent when env variable is set', () => {
     // eslint-disable-next-line @typescript-eslint/camelcase
     process.env.http_proxy = 'http://test.local:8080';
@@ -85,7 +85,7 @@ describe('RequestHelpers', () => {
       expect(res.proxy.port).to.equal(8080);
     }
   });
-*/
+  */
 
   it('should return an httpAgent when env variable is set', () => {
     // eslint-disable-next-line @typescript-eslint/camelcase
