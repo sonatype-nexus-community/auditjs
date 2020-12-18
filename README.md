@@ -312,9 +312,9 @@ We care a lot about making the world a safer place, and that's why we continue t
 ## Releasing
 
 We use [semantic-release](https://github.com/semantic-release/semantic-release) to generate releases
-from commits to the `main` branch.
+from commits to the `master` branch.
 
-For example, to perform a "patch" release, add a commit to `main` with a comment like:
+For example, to perform a "patch" release, add a commit to `master` with a comment like:
 
 ```
 fix: Adds insecure flag, implements (#213)
