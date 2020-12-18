@@ -79,3 +79,13 @@ workflows:
           context: auditjs
           requires:
             - build
+
+  build_nightly:
+    triggers:
+      - schedule:
+          cron: "20 20 * * *"
+          filters:
+            branches:
+              only: main
+    jobs:
+      - build
