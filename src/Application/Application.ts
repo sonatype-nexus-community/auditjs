@@ -175,7 +175,7 @@ export class Application {
 
       this.spinner.maybeCreateMessageForSpinner('Removing whitelisted vulnerabilities');
       logMessage('Response being ran against whitelist', DEBUG, { ossIndexServerResults: ossIndexResults });
-      ossIndexResults = await filterVulnerabilities(ossIndexResults);
+      ossIndexResults = await filterVulnerabilities(ossIndexResults, args.whitelist);
       logMessage('Response has been whitelisted', DEBUG, { ossIndexServerResults: ossIndexResults });
       this.spinner.maybeSucceed();
 
