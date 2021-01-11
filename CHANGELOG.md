@@ -1,3 +1,10 @@
+## [4.0.23](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.22...v4.0.23) (2021-01-11)
+
+
+### Bug Fixes
+
+* take whitelist path parameter into account ([#219](https://github.com/sonatype-nexus-community/auditjs/issues/219)) ([f2f14ac](https://github.com/sonatype-nexus-community/auditjs/commit/f2f14aca311ab9a9a1edd9b770e656e912c26dc7))
+
 ## [4.0.22](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.21...v4.0.22) (2020-12-18)
 
 
