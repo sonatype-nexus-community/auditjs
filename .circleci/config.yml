@@ -86,6 +86,6 @@ workflows:
           cron: "20 20 * * *"
           filters:
             branches:
-              only: main
+              only: master
     jobs:
       - build
