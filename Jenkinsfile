@@ -17,6 +17,7 @@
 
 dockerizedBuildPipeline(
   buildImageId: "${sonatypeDockerRegistryId()}/cdi/node-12:1",
+  deployBranch: 'main',
   prepare: {
     githubStatusUpdate('pending')
   },
