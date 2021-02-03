@@ -17,7 +17,7 @@
 -->
 
 <p align="center">
-    <img src="https://github.com/sonatype-nexus-community/auditjs/blob/master/assets/images/auditjs.png" width="350"/>
+    <img src="https://github.com/sonatype-nexus-community/auditjs/blob/main/assets/images/auditjs.png" width="350"/>
 </p>
 
 # AuditJS
@@ -38,7 +38,7 @@ Supports any project with package managers that install npm dependencies into a 
 - yarn
 - bower
 
-<img src="https://github.com/sonatype-nexus-community/auditjs/blob/master/assets/images/auditjsnew.png?raw=true" width="640">
+<img src="https://github.com/sonatype-nexus-community/auditjs/blob/main/assets/images/auditjsnew.png?raw=true" width="640">
 
 ## Requirements
 
@@ -312,9 +312,9 @@ We care a lot about making the world a safer place, and that's why we continue t
 ## Releasing
 
 We use [semantic-release](https://github.com/semantic-release/semantic-release) to generate releases
-from commits to the `master` branch.
+from commits to the `main` branch.
 
-For example, to perform a "patch" release, add a commit to `master` with a comment like:
+For example, to perform a "patch" release, add a commit to `main` with a comment like:
 
 ```
 fix: Adds insecure flag, implements (#213)

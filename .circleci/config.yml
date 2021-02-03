@@ -75,7 +75,7 @@ workflows:
       - release:
           filters:
             branches:
-              only: master
+              only: main
           context: auditjs
           requires:
             - build
@@ -86,6 +86,6 @@ workflows:
           cron: "20 20 * * *"
           filters:
             branches:
-              only: master
+              only: main
     jobs:
       - build
