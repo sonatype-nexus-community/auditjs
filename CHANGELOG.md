@@ -1,3 +1,10 @@
+## [4.0.24](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.23...v4.0.24) (2021-02-12)
+
+
+### Bug Fixes
+
+* Handle relative URLs ([#224](https://github.com/sonatype-nexus-community/auditjs/issues/224)) ([c2e192c](https://github.com/sonatype-nexus-community/auditjs/commit/c2e192c87a3acd00aaf030b216f72aac49217f76))
+
 ## [4.0.23](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.22...v4.0.23) (2021-01-11)
 
 
