@@ -229,6 +229,8 @@ export class Application {
           const results: ReportStatus = Object.assign(new ReportStatus(), x);
           logMessage('Sonatype IQ results obtained!', DEBUG, results);
 
+          results.reportHtmlUrl = new URL(results.reportHtmlUrl!, requestService.host).href;
+
           const auditResults = new AuditIQServer();
 
           this.spinner.maybeStop();
