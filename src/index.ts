@@ -53,6 +53,12 @@ let argv = yargs
         description: 'Specify IQ server url/port',
         demandOption: false,
       },
+      deep: {
+        alias: 'g',
+        type: 'string',
+        description: 'Specify path to do a deep scan of all .js files in a specific directory',
+        demandOption: false
+      },
       timeout: {
         alias: 't',
         type: 'number',
