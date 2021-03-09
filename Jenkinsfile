@@ -29,6 +29,8 @@ dockerizedBuildPipeline(
     # prep for scan of only production dependencies
     rm -rf node_modules
     npm install --production
+    # manually install typescript to allow build step to succeed
+    npm install typescript@3.7.3
     npm run build
     '''
   },
