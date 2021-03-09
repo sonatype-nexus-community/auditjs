@@ -28,6 +28,13 @@ dockerizedBuildPipeline(
     npm run test-ci
     '''
   },
+  prepForScan: {
+    sh '''
+    rm -rf node_modules
+    npm install --production
+    npm run build
+    '''
+  },
   vulnerabilityScan: {
     withDockerImage(env.DOCKER_IMAGE_ID, {
       withCredentials([usernamePassword(credentialsId: 'policy.s integration account',
