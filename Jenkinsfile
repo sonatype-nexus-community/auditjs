@@ -26,10 +26,7 @@ dockerizedBuildPipeline(
     npm i
     npm run build
     npm run test-ci
-    '''
-  },
-  prepForScan: {
-    sh '''
+    # prep for scan of only production dependencies
     rm -rf node_modules
     npm install --production
     npm run build
