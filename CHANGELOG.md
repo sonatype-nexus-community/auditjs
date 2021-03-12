@@ -1,3 +1,10 @@
+## [4.0.25](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.24...v4.0.25) (2021-03-12)
+
+
+### Bug Fixes
+
+* CVE-2021-21366 in commit 4d727dcd ([7875242](https://github.com/sonatype-nexus-community/auditjs/commit/787524261bc23312c01f76172fc84fd5ae29bed8))
+
 ## [4.0.24](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.23...v4.0.24) (2021-02-12)
 
 
