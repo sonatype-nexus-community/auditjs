@@ -26,3 +26,4 @@ The local build runs in a docker container.
       However, the build will proceed and can complete “successfully”, which allows you to verify scripts in your config, etc.
       
       If the build does complete successfully, you should see a happy yellow `Success!` message.
+
