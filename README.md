@@ -353,28 +353,21 @@ auditjs@4.0.25 /Users/bhamail/sonatype/community/auditjs/auditjs
 
 npm ERR! invalid: hosted-git-info@3.0.8 /Users/bhamail/sonatype/community/auditjs/auditjs/node_modules/normalize-package-data/node_modules/hosted-git-info
 ```
-Just for completeness, in this particular case, we also had to upgrade the `mocha` testing components to work with the updated `hosted-git-info`.
-It looked like all was well, but then the unit test suite uncovered an issue where functions were missing in some of the 
-updated components. e.g.:
+After updating the transitive dependency, we need to make sure the tests still pass:
 ```shell
 npm run test
 ...
-Error: Cannot find module 'lru-cache'
-    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:636:15)
-    at Function.Module._load (internal/modules/cjs/loader.js:562:25) 
+29 passing (84ms) 
 ```
-At that point, I started trying to "upgrade" each "parent component" in transitive dependency tree, staring with `normalize-package-data@2.5.0`
-and upgrading it to `normalize-package-data@2.5.0` via the `resolutions` section of `package.json`.
+Victory! Commit the changes and we're done. 
+
+You could also upgrade a the higher level transtitive dependnency: `read-package-json` , like so:
 ```shell
   "resolutions": {
-    "hosted-git-info": "^3.0.8",
-    "normalize-package-data": "^3.0.2"
+    "read-package-json": "^3.0.1"
   },
 ```
-Still no joy:
-```shell
 
-```
 
 ## Credit
 
