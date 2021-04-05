@@ -330,7 +330,7 @@ Since we are not using yarn, we will use [npm-force-resolutions](https://github.
 See the [excellent npm-force-resolutions docs](https://github.com/rogeriochaves/npm-force-resolutions#npm-force-resolutions)
 for details on how this works.
 
-After running updating our `package.json` file as described by `npm-force-resolutions`,
+After updating our `package.json` file as described by `npm-force-resolutions`,
 ```json
 ...
   "resolutions": {
