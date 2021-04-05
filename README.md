@@ -334,7 +334,7 @@ After running updating our `package.json` file as described by `npm-force-resolu
 ```json
 ...
   "resolutions": {
-    "hosted-git-info": "3.8.2"
+    "hosted-git-info": "^3.8.2"
   },
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
@@ -343,6 +343,7 @@ After running updating our `package.json` file as described by `npm-force-resolu
 we run `npm install`, and verify
 our transitive dependency is updated to a new version.
 ```shell
+$ rm -rf node_modules && npm install
 $ npm ls hosted-git-info
 auditjs@4.0.25 /Users/bhamail/sonatype/community/auditjs/auditjs
 └─┬ read-installed@4.0.3
@@ -352,7 +353,28 @@ auditjs@4.0.25 /Users/bhamail/sonatype/community/auditjs/auditjs
 
 npm ERR! invalid: hosted-git-info@3.0.8 /Users/bhamail/sonatype/community/auditjs/auditjs/node_modules/normalize-package-data/node_modules/hosted-git-info
 ```
-Not done yet, looks like intermediate dependencies also need upgrading...Check `normalize-package-data`, `read-package-json`, etc
+Just for completeness, in this particular case, we also had to upgrade the `mocha` testing components to work with the updated `hosted-git-info`.
+It looked like all was well, but then the unit test suite uncovered an issue where functions were missing in some of the 
+updated components. e.g.:
+```shell
+npm run test
+...
+Error: Cannot find module 'lru-cache'
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:636:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:562:25) 
+```
+At that point, I started trying to "upgrade" each "parent component" in transitive dependency tree, staring with `normalize-package-data@2.5.0`
+and upgrading it to `normalize-package-data@2.5.0` via the `resolutions` section of `package.json`.
+```shell
+  "resolutions": {
+    "hosted-git-info": "^3.0.8",
+    "normalize-package-data": "^3.0.2"
+  },
+```
+Still no joy:
+```shell
+
+```
 
 ## Credit
 

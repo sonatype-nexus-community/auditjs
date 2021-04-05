@@ -14,7 +14,7 @@
     "node": ">=8.0.0"
   },
   "resolutions": {
-    "hosted-git-info": "3.0.8"
+    "hosted-git-info": "^3.0.8"
   },
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
