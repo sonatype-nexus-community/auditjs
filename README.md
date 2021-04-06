@@ -302,9 +302,11 @@ Or, "Patient: Hey Doc, it hurts when I do this. Doctor: Then don't do that."
 
 So you've found a vulnerability. Now what? The best case is to upgrade the vulnerable component to a newer/non-vulnerable
 version. However, it is likely the vulnerable component is not a direct dependency, but instead is a transitive dependency
-(a dependency of a dependncy, of a dependncy, wash-rinse-repeat). In such a case, the first step is to figure out which
+(a dependency of a dependency, of a dependency, wash-rinse-repeat). In such a case, the first step is to figure out which
 direct dependency (and sub-dependencies) depend on the vulnerable component. The `npm ls <vulnerable dependency>` 
 command will print a dependency tree that can lead you through this dependency forest.
+
+If your project uses yarn, the `yarn why <vulnerable dependency>` command can provide a similar trail of breadcrumbs. 
 
 As an example, suppose we've learned that component `hosted-git-info`, version 2.8.8 is vulnerable (CVE-2021-23362). Use
 the command below to find which components depend on this vulnerable component.
