@@ -296,6 +296,81 @@ We chose to allow output directly to the stdout, so that the user can decide wha
 As this program depends on the OSS Index database, network access is
 required. Connection problems with OSS Index will result in an exception.
 
+## How to Fix Vulnerabilities
+
+Or, "Patient: Hey Doc, it hurts when I do this. Doctor: Then don't do that."
+
+So you've found a vulnerability. Now what? The best case is to upgrade the vulnerable component to a newer/non-vulnerable
+version. However, it is likely the vulnerable component is not a direct dependency, but instead is a transitive dependency
+(a dependency of a dependency, of a dependency, wash-rinse-repeat). In such a case, the first step is to figure out which
+direct dependency (and sub-dependencies) depend on the vulnerable component. The `npm ls <vulnerable dependency>` 
+command will print a dependency tree that can lead you through this dependency forest.
+
+If your project uses yarn, the `yarn why <vulnerable dependency>` command can provide a similar trail of breadcrumbs. 
+
+As an example, suppose we've learned that component `hosted-git-info`, version 2.8.8 is vulnerable (CVE-2021-23362). Use
+the command below to find which components depend on this vulnerable component.
+```shell
+  $ npm ls hosted-git-info
+  auditjs@4.0.25 /Users/bhamail/sonatype/community/auditjs/auditjs
+  └─┬ read-installed@4.0.3
+    └─┬ read-package-json@2.1.2
+      └─┬ normalize-package-data@2.5.0
+        └── hosted-git-info@2.8.8
+```
+Now we know the `read-installed@4.0.3` component has a transitive dependency on the vulnerable component `hosted-git-info@2.8.8`.
+The best solution would be to upgrade `read-installed` to a newer version that uses a non-vulnerable version of `hosted-git-info`.
+As of this writing, however, no such version of `read-installed` exists. The next step is to file an issue with the
+`read-installed` project for them to update the vulnerable sub-dependencies. Be sure to read and follow any vulnerability
+reporting instructions published by the project: Look for a `SECURITY.md` file, or other instructions on how to report
+vulnerabilities. Some projects may prefer you not report the vulnerability publicly. Here's our bug report for this case:
+[bug #53](https://github.com/npm/read-installed/issues/53)
+
+To fix this particular vulnerability in our project, we need some way to force the transitive dependency to a newer version. 
+This would be relatively easy if we were using yarn (see [yarn's selective dependency resolutions](https://yarnpkg.com/lang/en/docs/selective-version-resolutions/)).
+Since we are not using yarn, we will use [npm-force-resolutions](https://github.com/rogeriochaves/npm-force-resolutions).
+See the [excellent npm-force-resolutions docs](https://github.com/rogeriochaves/npm-force-resolutions#npm-force-resolutions)
+for details on how this works.
+
+After updating our `package.json` file as described by `npm-force-resolutions`,
+```json
+...
+  "resolutions": {
+    "hosted-git-info": "^3.8.2"
+  },
+  "scripts": {
+    "preinstall": "npx npm-force-resolutions",
+...
+```
+we run `npm install`, and verify
+our transitive dependency is updated to a new version.
+```shell
+$ rm -rf node_modules && npm install
+$ npm ls hosted-git-info
+auditjs@4.0.25 /Users/bhamail/sonatype/community/auditjs/auditjs
+└─┬ read-installed@4.0.3
+  └─┬ read-package-json@2.1.1
+    └─┬ normalize-package-data@2.5.0
+      └── hosted-git-info@3.0.8  invalid
+
+npm ERR! invalid: hosted-git-info@3.0.8 /Users/bhamail/sonatype/community/auditjs/auditjs/node_modules/normalize-package-data/node_modules/hosted-git-info
+```
+After updating the transitive dependency, we need to make sure the tests still pass:
+```shell
+npm run test
+...
+29 passing (84ms) 
+```
+Victory! Commit the changes and we're done. 
+
+You could also upgrade a the higher level transtitive dependnency: `read-package-json` , like so:
+```shell
+  "resolutions": {
+    "read-package-json": "^3.0.1"
+  },
+```
+
+
 ## Credit
 
 ---

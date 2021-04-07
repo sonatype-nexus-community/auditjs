@@ -13,7 +13,11 @@
   "engines": {
     "node": ">=8.0.0"
   },
+  "resolutions": {
+    "hosted-git-info": "^3.0.8"
+  },
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "test": "mocha -r ts-node/register src/**/*.spec.ts",
     "build": "tsc -p tsconfig.json",
     "build-dev": "tsc -p tsconfig.development.json",
