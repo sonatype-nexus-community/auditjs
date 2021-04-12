@@ -361,9 +361,9 @@ npm run test
 ...
 29 passing (84ms) 
 ```
-Victory! Commit the changes and we're done. 
+Victory! Commit the changes, and we're done. 
 
-You could also upgrade a the higher level transtitive dependnency: `read-package-json` , like so:
+You could also upgrade a higher level transitive dependency: `read-package-json` , like so:
 ```shell
   "resolutions": {
     "read-package-json": "^3.0.1"
