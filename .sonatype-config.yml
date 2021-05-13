@@ -1,0 +1,5 @@
+---
+    iq:
+        PublicApplication: testapp
+    application:
+        IncludeDev: false
