@@ -32,6 +32,10 @@ import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 import { visuallySeperateText } from '../Visual/VisualHelper';
+import { OSSIndexRequestService } from '@sonatype/js-sona-types';
+import storage from 'node-persist';
+import { join } from 'path';
+import { homedir } from 'os';
 const pj = require('../../package.json');
 
 export class Application {
@@ -149,7 +153,7 @@ export class Application {
 
   private async auditWithOSSIndex(args: any): Promise<void> {
     logMessage('Instantiating OSS Index Request Service', DEBUG);
-    const requestService = this.getOssIndexRequestService(args);
+    const requestService = await this.getOssIndexRequestService(args);
     this.spinner.maybeSucceed();
 
     logMessage('Submitting coordinates to Sonatype OSS Index', DEBUG);
@@ -248,18 +252,23 @@ export class Application {
     }
   }
 
-  private getOssIndexRequestService(args: any): OssIndexRequestService {
+  private async getOssIndexRequestService(args: any): Promise<OSSIndexRequestService> {
+    const PATH = join(homedir(), '.ossindex', 'auditjs');
+
+    const TWELVE_HOURS = 12 * 60 * 60 * 1000;
+
+    await storage.init({ttl: TWELVE_HOURS, dir: PATH});
     if (args.user && args.password) {
-      return new OssIndexRequestService(args?.user, args?.password);
+      return new OSSIndexRequestService({user: args?.user, token: args?.password, browser: false}, storage as any);
     }
     try {
       const config = new OssIndexServerConfig();
 
       config.getConfigFromFile();
 
-      return new OssIndexRequestService(config.getUsername(), config.getToken());
+      return new OSSIndexRequestService({user: config.getUsername(), token: config.getToken(), browser: false}, storage as any);
     } catch (e) {
-      return new OssIndexRequestService();
+      return new OSSIndexRequestService({browser: false}, storage as any);
     }
   }
 
