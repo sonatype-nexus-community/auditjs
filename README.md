@@ -336,7 +336,7 @@ After updating our `package.json` file as described by `npm-force-resolutions`,
 ```json
 ...
   "resolutions": {
-    "hosted-git-info": "^3.8.2"
+    "hosted-git-info": "^3.0.8"
   },
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
