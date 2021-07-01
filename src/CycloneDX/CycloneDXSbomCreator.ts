@@ -31,7 +31,7 @@ import spdxLicensesNonDeprecated = require('spdx-license-ids');
 import spdxLicensesDeprecated = require('spdx-license-ids/deprecated');
 import { toPurl } from './Helpers/Helpers';
 import { logMessage, DEBUG } from '../Application/Logger/Logger';
-import {DepGraph} from 'dependency-graph';
+import { DepGraph } from 'dependency-graph';
 import { Dependency } from './Types/Dependency';
 import { Metadata } from './Types/Metadata';
 
@@ -72,7 +72,7 @@ export class CycloneDXSbomCreator {
 
     bom.att('version', 1);
 
-    bom.ele({metadata: this.getMetadata(pkgInfo)});
+    bom.ele({ metadata: this.getMetadata(pkgInfo) });
 
     const componentsNode = bom.ele('components');
     const components = this.listComponents(pkgInfo);
@@ -85,12 +85,12 @@ export class CycloneDXSbomCreator {
 
     this.listDependencies(this.getPurlFromPkgInfo(pkgInfo), depArray);
 
-    let dependenciesNode = bom.ele("dependencies");
+    const dependenciesNode = bom.ele('dependencies');
 
     depArray.map((dep) => {
-      const depNode = dependenciesNode.ele("dependency", {ref: dep['@ref']});
+      const depNode = dependenciesNode.ele('dependency', { ref: dep['@ref'] });
       dep.dependencies?.map((subDep) => {
-        depNode.ele("dependency", {ref: subDep['@ref']});
+        depNode.ele('dependency', { ref: subDep['@ref'] });
       });
     });
 
@@ -124,24 +124,24 @@ export class CycloneDXSbomCreator {
   private getMetadata(pkg: any): Metadata {
     return {
       timestamp: Date.now().toString(),
-      component: this.getComponent(pkg)
+      component: this.getComponent(pkg),
     };
   }
 
   private listDependencies(rootPkg: string, depArray: Array<Dependency>) {
     const dependencies = this._graph.directDependenciesOf(rootPkg);
 
-    let intermediateDepArray: Array<Dependency> = dependencies.map((dep) => {
+    const intermediateDepArray: Array<Dependency> = dependencies.map((dep) => {
       const dependency: Dependency = {
-        '@ref': dep
-      }
+        '@ref': dep,
+      };
       return dependency;
     });
 
     const dependency: Dependency = {
       '@ref': rootPkg,
-      dependencies: intermediateDepArray
-    }
+      dependencies: intermediateDepArray,
+    };
 
     depArray.push(dependency);
 
