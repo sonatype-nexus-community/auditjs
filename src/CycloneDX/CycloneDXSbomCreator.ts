@@ -72,9 +72,7 @@ export class CycloneDXSbomCreator {
 
     bom.att('version', 1);
 
-    const metadata = this.getMetadata(pkgInfo);
-
-    const metadataNode = bom.ele({metadata: metadata});
+    bom.ele({metadata: this.getMetadata(pkgInfo)});
 
     const componentsNode = bom.ele('components');
     const components = this.listComponents(pkgInfo);
