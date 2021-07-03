@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
+import { DepGraph } from 'dependency-graph';
+import { Component } from '../CycloneDX/Types/Component';
 import { Coordinates } from '../Types/Coordinates';
 
 export interface Muncher {
   getDepList(): Promise<Array<Coordinates>>;
+  getGraph(): DepGraph<Component> | undefined;
   getSbomFromCommand(): Promise<any>;
   getInstalledDeps(): Promise<any>;
   isValid(): boolean;

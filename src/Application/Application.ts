@@ -223,10 +223,13 @@ export class Application {
           logMessage('There was an issue auditing your application!', ERROR, { title: e.message, stack: e.stack });
           shutDownLoggerAndExit(1);
         },
-        (x) => {
+        async (results: ReportStatus) => {
           this.spinner.maybeSucceed();
           this.spinner.maybeCreateMessageForSpinner('Auditing your results');
-          const results: ReportStatus = Object.assign(new ReportStatus(), x);
+
+          logMessage('Getting raw report results', DEBUG);
+          const policyReportResults = await requestService.getPolicyReportResults(results.reportDataUrl!);
+
           logMessage('Sonatype IQ results obtained!', DEBUG, results);
 
           results.reportHtmlUrl = new URL(results.reportHtmlUrl!, requestService.host).href;
@@ -235,7 +238,9 @@ export class Application {
 
           this.spinner.maybeStop();
           logMessage('Auditing results', DEBUG, results);
-          const failure = auditResults.auditThirdPartyResults(results);
+
+          const graph = this.muncher.getGraph();
+          const failure = auditResults.auditThirdPartyResults(results, policyReportResults, graph);
           logMessage('Audit finished', DEBUG, { failure: failure });
 
           failure ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);

@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-export class ReportStatus {
-  policyAction?: string;
-  reportHtmlUrl?: string;
+export interface ReportStatus {
+  policyAction?:                  string;
+  reportHtmlUrl?:                 string;
+  reportPdfUrl?:                  string;
+  reportDataUrl?:                 string;
+  embeddableReportHtmlUrl?:       string;
+  isError:                       boolean;
+  componentsAffected?:            ComponentsAffected;
+  openPolicyViolations?:          ComponentsAffected;
+  grandfatheredPolicyViolations?: number;
   errorMessage?: string;
-  isError = false;
+}
+
+export interface ComponentsAffected {
+  critical: number;
+  severe:   number;
+  moderate: number;
 }

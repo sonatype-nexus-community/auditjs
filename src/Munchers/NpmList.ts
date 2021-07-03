@@ -19,8 +19,11 @@ import path from 'path';
 import fs from 'fs';
 import { Coordinates } from '../Types/Coordinates';
 import { CycloneDXSbomCreator } from '../CycloneDX/CycloneDXSbomCreator';
+import { DepGraph } from 'dependency-graph';
+import { Component } from '../CycloneDX/Types/Component';
 
 export class NpmList implements Muncher {
+  private graph?: DepGraph<Component>;
   private depsArray: Array<Coordinates> = [];
 
   constructor(readonly devDependencies: boolean = false) {}
@@ -34,6 +37,10 @@ export class NpmList implements Muncher {
     return fs.existsSync(nodeModulesPath);
   }
 
+  public getGraph(): DepGraph<Component> | undefined {
+    return this.graph;
+  }
+
   public async getSbomFromCommand(): Promise<string> {
     const sbomCreator = new CycloneDXSbomCreator(process.cwd(), {
       devDependencies: this.devDependencies,
@@ -45,6 +52,8 @@ export class NpmList implements Muncher {
     const pkgInfo = await sbomCreator.getPackageInfoFromReadInstalled();
 
     const result = await sbomCreator.createBom(pkgInfo);
+
+    this.graph = sbomCreator.inverseGraph;
 
     return result;
   }

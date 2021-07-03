@@ -17,6 +17,7 @@
 import expect from '../Tests/TestHelper';
 import { AuditIQServer } from './AuditIQServer';
 import { ReportStatus } from '../Types/ReportStatus';
+import { IQServerPolicyReportResult } from '../Types/IQServerPolicyReportResult';
 
 const oldLog = console.log;
 const oldError = console.error;
@@ -34,28 +35,24 @@ describe('AuditIQServer', () => {
 
   it('should provide a true value if IQ Server Results have policy violations', () => {
     const auditIqServer = new AuditIQServer();
-    const results = new ReportStatus();
-    results.policyAction = 'Failure';
-    results.reportHtmlUrl = '';
-    const result = auditIqServer.auditThirdPartyResults(results);
+    const results: ReportStatus = {policyAction: 'Failure', isError: false};
+    const result = auditIqServer.auditThirdPartyResults(results, {} as IQServerPolicyReportResult);
     expect(result).to.equal(true);
   });
 
   it('should provide a true value if IQ Server Results have an isError value', () => {
     const auditIqServer = new AuditIQServer();
-    const results = new ReportStatus();
-    results.isError = true;
-    results.reportHtmlUrl = '';
-    const result = auditIqServer.auditThirdPartyResults(results);
+    const results: ReportStatus = {isError: true};
+    const result = auditIqServer.auditThirdPartyResults(results, {} as IQServerPolicyReportResult);
     expect(result).to.equal(true);
   });
 
   it('should provide a false value if IQ Server Results have no policy violations', () => {
     const auditIqServer = new AuditIQServer();
-    const results = new ReportStatus();
+    const results: ReportStatus = {policyAction: 'None', reportHtmlUrl: '', isError: false};
     results.policyAction = 'None';
     results.reportHtmlUrl = '';
-    const result = auditIqServer.auditThirdPartyResults(results);
+    const result = auditIqServer.auditThirdPartyResults(results, {} as IQServerPolicyReportResult);
     expect(result).to.equal(false);
   });
 });

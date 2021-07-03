@@ -36,7 +36,8 @@ import { Dependency } from './Types/Dependency';
 import { Metadata } from './Types/Metadata';
 
 export class CycloneDXSbomCreator {
-  private _graph: DepGraph<Component>;
+  public graph: DepGraph<Component>;
+  public inverseGraph: DepGraph<Component>;
 
   readonly licenseFilenames: Array<string> = [
     'LICENSE',
@@ -60,7 +61,8 @@ export class CycloneDXSbomCreator {
   readonly SBOMSCHEMA: string = 'http://cyclonedx.org/schema/bom/1.3';
 
   constructor(readonly path: string, readonly options?: Options) {
-    this._graph = new DepGraph();
+    this.graph = new DepGraph();
+    this.inverseGraph = new DepGraph();
   }
 
   public async createBom(pkgInfo: any): Promise<string> {
@@ -129,7 +131,7 @@ export class CycloneDXSbomCreator {
   }
 
   private listDependencies(rootPkg: string, depArray: Array<Dependency>) {
-    const dependencies = this._graph.directDependenciesOf(rootPkg);
+    const dependencies = this.graph.directDependenciesOf(rootPkg);
 
     const intermediateDepArray: Array<Dependency> = dependencies.map((dep) => {
       const dependency: Dependency = {
@@ -196,10 +198,12 @@ export class CycloneDXSbomCreator {
 
     const component = this.getComponent(pkg);
 
-    this._graph.addNode(component.purl, component);
+    this.graph.addNode(component.purl, component);
+    this.inverseGraph.addNode(component.purl, component);
 
     if (parent) {
-      this._graph.addDependency(parent.purl, component.purl);
+      this.graph.addDependency(parent.purl, component.purl);
+      this.inverseGraph.addDependency(component.purl, parent.purl);
     }
 
     if (!isRootPkg) {
