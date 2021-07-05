@@ -32,6 +32,7 @@ import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 import { visuallySeperateText } from '../Visual/VisualHelper';
+import { AuditGraph } from '../Audit/AuditGraph';
 const pj = require('../../package.json');
 
 export class Application {
@@ -181,10 +182,14 @@ export class Application {
 
       this.spinner.maybeCreateMessageForSpinner('Auditing your results from Sonatype OSS Index');
       logMessage('Instantiating OSS Index Request Service, with quiet option', DEBUG, { quiet: args.quiet });
+
+      const graph = this.muncher.getGraph();
+      const auditGraph = new AuditGraph(graph!);
       const auditOSSIndex = new AuditOSSIndex(
         args.quiet ? true : false,
         args.json ? true : false,
         args.xml ? true : false,
+        auditGraph
       );
       this.spinner.maybeStop();
 
@@ -234,13 +239,15 @@ export class Application {
 
           results.reportHtmlUrl = new URL(results.reportHtmlUrl!, requestService.host).href;
 
-          const auditResults = new AuditIQServer();
+          const graph = this.muncher.getGraph();
+          const auditGraph = new AuditGraph(graph!);
+
+          const auditResults = new AuditIQServer(auditGraph);
 
           this.spinner.maybeStop();
           logMessage('Auditing results', DEBUG, results);
 
-          const graph = this.muncher.getGraph();
-          const failure = auditResults.auditThirdPartyResults(results, policyReportResults, graph);
+          const failure = auditResults.auditThirdPartyResults(results, policyReportResults);
           logMessage('Audit finished', DEBUG, { failure: failure });
 
           failure ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);

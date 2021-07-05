@@ -16,6 +16,7 @@
 
 import { CycloneDXSbomCreator } from './CycloneDXSbomCreator';
 import expect from '../Tests/TestHelper';
+import { Bom } from './Types/Bom';
 
 // Test object with circular dependency, scoped dependency, dependency with dependency
 const object = {
@@ -64,16 +65,20 @@ describe('CycloneDXSbomCreator', async () => {
   it('should create an sbom string given a minimal valid object', async () => {
     const sbomCreator = new CycloneDXSbomCreator(process.cwd());
 
-    const string = await sbomCreator.createBom(object);
+    const bom: Bom = await sbomCreator.getBom(object);
 
-    expect(string).to.eq(expectedResponse);
+    const sbomString = sbomCreator.toXml(bom);
+
+    expect(sbomString).to.eq(expectedResponse);
   });
 
   it('should create a spartan sbom string given a minimal valid object', async () => {
     const sbomCreator = new CycloneDXSbomCreator(process.cwd(), { spartan: true });
 
-    const string = await sbomCreator.createBom(object);
+    const bom: Bom = await sbomCreator.getBom(object);
 
-    expect(string).to.eq(expectedSpartanResponse);
+    const sbomString = sbomCreator.toXml(bom);
+
+    expect(sbomString).to.eq(expectedSpartanResponse);
   });
 });

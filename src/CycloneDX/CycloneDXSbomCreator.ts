@@ -34,6 +34,7 @@ import { logMessage, DEBUG } from '../Application/Logger/Logger';
 import { DepGraph } from 'dependency-graph';
 import { Dependency } from './Types/Dependency';
 import { Metadata } from './Types/Metadata';
+import { Bom } from './Types/Bom';
 
 export class CycloneDXSbomCreator {
   public graph: DepGraph<Component>;
@@ -65,38 +66,47 @@ export class CycloneDXSbomCreator {
     this.inverseGraph = new DepGraph();
   }
 
-  public async createBom(pkgInfo: any): Promise<string> {
-    const bom = builder.create('bom', { encoding: 'utf-8', separateArrayItems: true }).att('xmlns', this.SBOMSCHEMA);
+  public async getBom(pkgInfo: any): Promise<Bom> {
+    const components = Array.from(this.listComponents(pkgInfo).values());
 
-    if (this.options && this.options.includeBomSerialNumber) {
-      bom.att('serialNumber', 'urn:uuid:' + uuidv4());
-    }
+    const dependencies: Array<Dependency> = new Array();
 
-    bom.att('version', 1);
+    this.listDependencies(this.getPurlFromPkgInfo(pkgInfo), dependencies);
 
-    bom.ele({ metadata: this.getMetadata(pkgInfo) });
+    const bom: Bom = {
+      '@serial-number': 'urn:uuid:' + uuidv4(),
+      '@version': 1,
+      '@xmlns': this.SBOMSCHEMA,
+      metadata: this.getMetadata(pkgInfo),
+      components: components,
+      dependencies: dependencies,
+    } 
 
-    const componentsNode = bom.ele('components');
-    const components = this.listComponents(pkgInfo);
+    return bom;
+  }
 
-    if (components.length > 0) {
-      componentsNode.ele(components);
-    }
+  public toXml(bom: Bom): string {
+    const sbom = builder.create('bom', { encoding: 'utf-8', separateArrayItems: true });
 
-    const depArray: Array<Dependency> = new Array();
+    sbom.att('serialNumber', bom['@serial-number']);
+    sbom.att('version', bom['@version']);
+    sbom.ele('metadata', bom.metadata);
 
-    this.listDependencies(this.getPurlFromPkgInfo(pkgInfo), depArray);
+    const componentsNode = sbom.ele('components');
+    bom.components.forEach((comp) => {
+      componentsNode.ele("component", comp);
+    });
 
-    const dependenciesNode = bom.ele('dependencies');
+    const dependenciesNode = sbom.ele('dependencies');
 
-    depArray.map((dep) => {
+    bom.dependencies.map((dep) => {
       const depNode = dependenciesNode.ele('dependency', { ref: dep['@ref'] });
       dep.dependencies?.map((subDep) => {
         depNode.ele('dependency', { ref: subDep['@ref'] });
       });
     });
 
-    const bomString = bom.end({
+    const bomString = sbom.end({
       width: 0,
       allowEmpty: false,
       spaceBeforeSlash: '',
@@ -181,14 +191,14 @@ export class CycloneDXSbomCreator {
     return component;
   }
 
-  private listComponents(pkg: any): Array<any> {
-    const list: any = {};
+  private listComponents(pkg: any): Map<string, Component> {
+    let map = new Map<string, Component>();
     const isRootPkg = true;
-    this.addComponent(pkg, list, isRootPkg);
-    return Object.keys(list).map((k) => ({ component: list[k] }));
+    this.addComponent(pkg, map, isRootPkg);
+    return map;
   }
 
-  private addComponent(pkg: any, list: any, isRootPkg = false, parent?: Component): void {
+  private addComponent(pkg: any, map: Map<string, Component>, isRootPkg = false, parent?: Component): void {
     const spartan = this.options?.spartan ? this.options.spartan : false;
     //read-installed with default options marks devDependencies as extraneous
     //if a package is marked as extraneous, do not include it as a component
@@ -232,14 +242,14 @@ export class CycloneDXSbomCreator {
         this.processHashes(pkg, component);
       }
 
-      if (list[component.purl]) return; //remove cycles
-      list[component.purl] = component;
+      if (map.get(component.purl)) return; //remove cycles
+      map.set(component.purl, component);
     }
     if (pkg.dependencies) {
       Object.keys(pkg.dependencies)
         .map((x) => pkg.dependencies[x])
         .filter((x) => typeof x !== 'string') //remove cycles
-        .map((x) => this.addComponent(x, list, false, component));
+        .map((x) => this.addComponent(x, map, false, component));
     }
   }
 

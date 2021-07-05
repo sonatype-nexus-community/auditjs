@@ -15,6 +15,7 @@
  */
 
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
+import { AuditGraph } from './AuditGraph';
 import { Formatter, getNumberOfVulnerablePackagesFromResults } from './Formatters/Formatter';
 import { JsonFormatter } from './Formatters/JsonFormatter';
 import { TextFormatter } from './Formatters/TextFormatter';
@@ -23,13 +24,13 @@ import { XmlFormatter } from './Formatters/XmlFormatter';
 export class AuditOSSIndex {
   private formatter: Formatter;
 
-  constructor(readonly quiet: boolean = false, readonly json: boolean = false, readonly xml: boolean = false) {
+  constructor(readonly quiet: boolean = false, readonly json: boolean = false, readonly xml: boolean = false, private graph?: AuditGraph) {
     if (json) {
       this.formatter = new JsonFormatter();
     } else if (xml) {
       this.formatter = new XmlFormatter();
     } else {
-      this.formatter = new TextFormatter(quiet);
+      this.formatter = new TextFormatter(quiet, graph);
     }
   }
 

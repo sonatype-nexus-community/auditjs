@@ -21,10 +21,10 @@ import { Coordinates } from '../Types/Coordinates';
 import { CycloneDXSbomCreator } from '../CycloneDX/CycloneDXSbomCreator';
 import { DepGraph } from 'dependency-graph';
 import { Component } from '../CycloneDX/Types/Component';
+import { Bom } from '../CycloneDX/Types/Bom';
 
 export class NpmList implements Muncher {
   private graph?: DepGraph<Component>;
-  private depsArray: Array<Coordinates> = [];
 
   constructor(readonly devDependencies: boolean = false) {}
 
@@ -51,11 +51,13 @@ export class NpmList implements Muncher {
 
     const pkgInfo = await sbomCreator.getPackageInfoFromReadInstalled();
 
-    const result = await sbomCreator.createBom(pkgInfo);
+    const bom: Bom = await sbomCreator.getBom(pkgInfo);
+
+    const sbomString = sbomCreator.toXml(bom);
 
     this.graph = sbomCreator.inverseGraph;
 
-    return result;
+    return sbomString;
   }
 
   // turns object tree from read-installed into an array of coordinates represented node-managed deps
@@ -68,9 +70,18 @@ export class NpmList implements Muncher {
 
     const data = await sbomCreator.getPackageInfoFromReadInstalled();
 
-    this.recurseObjectTree(data, this.depsArray, true);
+    const bom: Bom = await sbomCreator.getBom(data);
 
-    return this.depsArray;
+    const coordinates: Array<Coordinates> = new Array();
+
+    bom.components.map((comp) => {
+      const coordinate = new Coordinates(comp.name, comp.version, comp.group);
+      coordinates.push(coordinate);
+    });
+
+    this.graph = sbomCreator.inverseGraph;
+
+    return coordinates;
   }
 
   // recursive unit that traverses tree and terminates when object has no dependencies
