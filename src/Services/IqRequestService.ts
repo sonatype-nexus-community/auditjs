@@ -18,7 +18,7 @@ import fetch from 'node-fetch';
 import { RequestHelpers } from './RequestHelpers';
 import { logMessage, DEBUG } from '../Application/Logger/Logger';
 import { URL } from 'url';
-import { IQServerPolicyReportResult } from '../Types/IQServerPolicyReportResult';
+import { IqServerPolicyReportResult } from '../Types/IqServerPolicyReportResult';
 
 const APPLICATION_INTERNAL_ID_ENDPOINT = '/api/v2/applications?publicId=';
 
@@ -73,7 +73,7 @@ export class IqRequestService {
     }
   }
 
-  public async getPolicyReportResults(reportUrl: string): Promise<IQServerPolicyReportResult> {
+  public async getPolicyReportResults(reportUrl: string): Promise<IqServerPolicyReportResult> {
     logMessage('Attempting to get policy report results', DEBUG, { reportUrl: reportUrl });
 
     if (reportUrl.endsWith('raw')) {
@@ -87,7 +87,7 @@ export class IqRequestService {
     });
 
     if (response.ok) {
-      const json: IQServerPolicyReportResult = await response.json();
+      const json: IqServerPolicyReportResult = await response.json();
 
       return json;
     } else {

@@ -17,13 +17,13 @@
 import { ReportStatus } from '../Types/ReportStatus';
 import chalk = require('chalk');
 import { visuallySeperateText } from '../Visual/VisualHelper';
-import { Component, IQServerPolicyReportResult } from '../Types/IQServerPolicyReportResult';
+import { Component, IqServerPolicyReportResult } from '../Types/IqServerPolicyReportResult';
 import { AuditGraph } from './AuditGraph';
 
 export class AuditIQServer {
   constructor(private graph?: AuditGraph) {}
 
-  public auditThirdPartyResults(results: ReportStatus, policyReport?: IQServerPolicyReportResult): boolean {
+  public auditThirdPartyResults(results: ReportStatus, policyReport?: IqServerPolicyReportResult): boolean {
     if (results.isError) {
       visuallySeperateText(true, [results.errorMessage]);
       return true;
@@ -39,7 +39,7 @@ export class AuditIQServer {
     return false;
   }
 
-  private handleFailure(reportURL: string, policyReport?: IQServerPolicyReportResult) {
+  private handleFailure(reportURL: string, policyReport?: IqServerPolicyReportResult) {
     visuallySeperateText(true, [
       `Sonabot here, you have some build-breaking policy violations to clean up!`,
       chalk.keyword('orange').bold(`Report URL: ${reportURL}`),
@@ -50,7 +50,7 @@ export class AuditIQServer {
     }
   }
 
-  private printPolicyViolations(policyReport: IQServerPolicyReportResult) {
+  private printPolicyViolations(policyReport: IqServerPolicyReportResult) {
     const violators = policyReport.components.filter((comp) => {
       return comp.violations && comp.violations.length > 0;
     });

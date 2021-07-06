@@ -1,4 +1,4 @@
-export interface IQServerPolicyReportResult {
+export interface IqServerPolicyReportResult {
   reportTime: number;
   reportTitle: string;
   commitHash: string;
