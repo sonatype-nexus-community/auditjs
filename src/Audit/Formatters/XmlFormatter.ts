@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { create }from 'xmlbuilder2';
+import { create } from 'xmlbuilder2';
 
 import { Formatter, getNumberOfVulnerablePackagesFromResults } from './Formatter';
 import { OssIndexServerResult, Vulnerability } from '../../Types/OssIndexServerResult';

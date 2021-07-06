@@ -19,7 +19,7 @@
 
 import { Options } from './Options';
 import uuidv4 from 'uuid/v4';
-import {create} from 'xmlbuilder2';
+import { create } from 'xmlbuilder2';
 import readInstalled from 'read-installed';
 import * as ssri from 'ssri';
 import * as fs from 'fs';
@@ -108,7 +108,7 @@ export class CycloneDXSbomCreator {
     });
 
     const bomString = sbom.end({
-      prettyPrint: true
+      prettyPrint: true,
     });
 
     return bomString;
