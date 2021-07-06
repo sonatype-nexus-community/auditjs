@@ -47,9 +47,9 @@ class Node {
     str += ident;
     if (last) {
       str += `${elbow}${dash} `;
-      ident += "  ";
+      ident += "   ";
     } else {
-      str += `${tree}${dash} `;
+      str += `${tree}${dash}${branch} `;
       ident += pipe + " ";
     }
 

@@ -19,7 +19,7 @@
 
 import { Options } from './Options';
 import uuidv4 from 'uuid/v4';
-import builder from 'xmlbuilder';
+import {create} from 'xmlbuilder2';
 import readInstalled from 'read-installed';
 import * as ssri from 'ssri';
 import * as fs from 'fs';
@@ -86,15 +86,16 @@ export class CycloneDXSbomCreator {
   }
 
   public toXml(bom: Bom): string {
-    const sbom = builder.create('bom', { encoding: 'utf-8', separateArrayItems: true });
+    const sbom = create().ele('bom', { encoding: 'utf-8', separateArrayItems: true });
 
     sbom.att('serialNumber', bom['@serial-number']);
-    sbom.att('version', bom['@version']);
+    sbom.att('version', bom['@version'].toString());
     sbom.ele('metadata', bom.metadata);
 
     const componentsNode = sbom.ele('components');
     bom.components.forEach((comp) => {
-      componentsNode.ele("component", comp);
+      const component = { component: comp };
+      componentsNode.ele(component);
     });
 
     const dependenciesNode = sbom.ele('dependencies');
@@ -107,9 +108,7 @@ export class CycloneDXSbomCreator {
     });
 
     const bomString = sbom.end({
-      width: 0,
-      allowEmpty: false,
-      spaceBeforeSlash: '',
+      prettyPrint: true
     });
 
     return bomString;

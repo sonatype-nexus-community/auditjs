@@ -103,7 +103,8 @@
     "spdx-license-ids": "^3.0.5",
     "ssri": "^8.0.1",
     "uuid": "^3.3.2",
-    "xmlbuilder": "^13.0.2",
+    "xmlbuilder": "^15.1.1",
+    "xmlbuilder2": "^2.4.1",
     "xmldom": "^0.5.0",
     "yargs": "^16.1.0"
   }
