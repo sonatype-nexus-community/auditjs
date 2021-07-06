@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import * as builder from 'xmlbuilder';
+import { create }from 'xmlbuilder2';
 
 import { Formatter, getNumberOfVulnerablePackagesFromResults } from './Formatter';
 import { OssIndexServerResult, Vulnerability } from '../../Types/OssIndexServerResult';
 
 export class XmlFormatter implements Formatter {
   public printAuditResults(list: Array<OssIndexServerResult>) {
-    const testsuite = builder.create('testsuite');
-    testsuite.att('tests', list.length);
+    const testsuite = create().ele('testsuite');
+    testsuite.att('tests', list.length.toString());
     testsuite.att('timestamp', new Date().toISOString());
-    testsuite.att('failures', getNumberOfVulnerablePackagesFromResults(list));
+    testsuite.att('failures', getNumberOfVulnerablePackagesFromResults(list).toString());
 
     for (let i = 0; i < list.length; i++) {
       const testcase = testsuite.ele('testcase', { classname: list[i].coordinates, name: list[i].coordinates });
@@ -37,13 +37,13 @@ export class XmlFormatter implements Formatter {
           for (let j = 0; j < vulns.length; j++) {
             failureText += this.getVulnerabilityForXmlBlock(vulns[j]) + '\n';
           }
-          failure.text(failureText);
+          failure.txt(failureText);
           failure.att('type', 'Vulnerability detected');
         }
       }
     }
 
-    const xml = testsuite.end({ pretty: true });
+    const xml = testsuite.end({ prettyPrint: true });
 
     console.log(xml);
   }
