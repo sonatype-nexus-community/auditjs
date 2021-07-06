@@ -90,7 +90,9 @@ export class CycloneDXSbomCreator {
 
     sbom.att('serialNumber', bom['@serial-number']);
     sbom.att('version', bom['@version'].toString());
-    sbom.ele('metadata', bom.metadata);
+    const metadataNode = sbom.ele('metadata');
+    metadataNode.ele('timestamp', bom.metadata.timestamp);
+    metadataNode.ele('component', bom.metadata.component);
 
     const componentsNode = sbom.ele('components');
     bom.components.forEach((comp) => {
