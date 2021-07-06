@@ -38,8 +38,8 @@ export class OssIndexRequestService {
   constructor(
     readonly user?: string,
     readonly password?: string,
+    readonly cacheLocation: string = PATH,
     private baseURL: string = OSS_INDEX_BASE_URL,
-    private cacheLocation: string = PATH,
   ) {}
 
   private checkStatus(res: Response): Response {

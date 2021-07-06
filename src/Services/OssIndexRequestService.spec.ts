@@ -31,7 +31,7 @@ describe('OssIndexRequestService', () => {
     nock(OSS_INDEX_BASE_URL)
       .post('/api/v3/component-report')
       .replyWithError('you messed up!');
-    const requestService = new OssIndexRequestService(undefined, undefined, OSS_INDEX_BASE_URL, CACHE_LOCATION);
+    const requestService = new OssIndexRequestService(undefined, undefined, CACHE_LOCATION, OSS_INDEX_BASE_URL);
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
     return expect(requestService.callOSSIndexOrGetFromCache(coords)).to.eventually.be.rejected;
   });
@@ -48,7 +48,7 @@ describe('OssIndexRequestService', () => {
     nock(OSS_INDEX_BASE_URL)
       .post('/api/v3/component-report')
       .reply(200, expectedOutput);
-    const requestService = new OssIndexRequestService(undefined, undefined, OSS_INDEX_BASE_URL, CACHE_LOCATION);
+    const requestService = new OssIndexRequestService(undefined, undefined, CACHE_LOCATION, OSS_INDEX_BASE_URL);
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
     return expect(requestService.callOSSIndexOrGetFromCache(coords)).to.eventually.deep.equal(expectedOutput);
   });
