@@ -17,14 +17,13 @@
 import { ReportStatus } from '../Types/ReportStatus';
 import chalk = require('chalk');
 import { visuallySeperateText } from '../Visual/VisualHelper';
-import { Component, IQServerPolicyReportResult } from '../Types/IQServerPolicyReportResult';
+import { Component, IqServerPolicyReportResult } from '../Types/IqServerPolicyReportResult';
 import { AuditGraph } from './AuditGraph';
 
 export class AuditIQServer {
-  constructor(private graph?: AuditGraph) {
-  }
+  constructor(private graph?: AuditGraph) {}
 
-  public auditThirdPartyResults(results: ReportStatus, policyReport?: IQServerPolicyReportResult): boolean {
+  public auditThirdPartyResults(results: ReportStatus, policyReport?: IqServerPolicyReportResult): boolean {
     if (results.isError) {
       visuallySeperateText(true, [results.errorMessage]);
       return true;
@@ -40,7 +39,7 @@ export class AuditIQServer {
     return false;
   }
 
-  private handleFailure(reportURL: string, policyReport?: IQServerPolicyReportResult) {
+  private handleFailure(reportURL: string, policyReport?: IqServerPolicyReportResult) {
     visuallySeperateText(true, [
       `Sonabot here, you have some build-breaking policy violations to clean up!`,
       chalk.keyword('orange').bold(`Report URL: ${reportURL}`),
@@ -51,27 +50,29 @@ export class AuditIQServer {
     }
   }
 
-  private printPolicyViolations(policyReport: IQServerPolicyReportResult) {
-    const violators = policyReport
-      .components
-      .filter(
-        (comp) => { 
-          return comp.violations && comp.violations.length > 0
-        });
+  private printPolicyViolations(policyReport: IqServerPolicyReportResult) {
+    const violators = policyReport.components.filter((comp) => {
+      return comp.violations && comp.violations.length > 0;
+    });
 
     if (violators.length > 0) {
-      console.log("Components with policy violations found");
+      console.log('Components with policy violations found');
 
-      violators.map(
-        (comp) => {
-          this.doPrintPolicyViolation(comp);
-        });
+      violators.map((comp) => {
+        this.doPrintPolicyViolation(comp);
+      });
     }
   }
 
   private doPrintPolicyViolation(component: Component) {
     console.group(`Package URL: ${chalk.bgBlack(chalk.cyan(component.packageUrl))}`);
-    console.log(`Known violations: ${component.violations.map((violation) => { return violation.policyName }).join(', ')}`);
+    console.log(
+      `Known violations: ${component.violations
+        .map((violation) => {
+          return violation.policyName;
+        })
+        .join(', ')}`,
+    );
     if (this.graph) {
       console.log(`Inverse dependency tree: `);
 

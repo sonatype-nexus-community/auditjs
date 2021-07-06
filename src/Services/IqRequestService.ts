@@ -18,7 +18,7 @@ import fetch from 'node-fetch';
 import { RequestHelpers } from './RequestHelpers';
 import { logMessage, DEBUG } from '../Application/Logger/Logger';
 import { URL } from 'url';
-import { IQServerPolicyReportResult } from '../Types/IQServerPolicyReportResult';
+import { IqServerPolicyReportResult } from '../Types/IqServerPolicyReportResult';
 
 const APPLICATION_INTERNAL_ID_ENDPOINT = '/api/v2/applications?publicId=';
 
@@ -73,24 +73,21 @@ export class IqRequestService {
     }
   }
 
-  public async getPolicyReportResults(report_url: string): Promise<IQServerPolicyReportResult> {
-    logMessage('Attempting to get policy report results', DEBUG, { report_url: report_url });
+  public async getPolicyReportResults(reportUrl: string): Promise<IqServerPolicyReportResult> {
+    logMessage('Attempting to get policy report results', DEBUG, { reportUrl: reportUrl });
 
-    if (report_url.endsWith('raw')) {
-      report_url = report_url.substr(0, report_url.length - 3) + 'policy';
+    if (reportUrl.endsWith('raw')) {
+      reportUrl = reportUrl.substr(0, reportUrl.length - 3) + 'policy';
     }
 
-    const response = await fetch(
-      `${this.host}/${report_url}`,
-      {
-        method: 'get',
-        headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
-        agent: RequestHelpers.getAgent(this.insecure)
-      }
-    )
+    const response = await fetch(`${this.host}/${reportUrl}`, {
+      method: 'get',
+      headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
+      agent: RequestHelpers.getAgent(this.insecure),
+    });
 
     if (response.ok) {
-      const json: IQServerPolicyReportResult = await response.json()
+      const json: IqServerPolicyReportResult = await response.json();
 
       return json;
     } else {

@@ -80,7 +80,7 @@ export class CycloneDXSbomCreator {
       metadata: this.getMetadata(pkgInfo),
       components: components,
       dependencies: dependencies,
-    } 
+    };
 
     return bom;
   }
@@ -191,7 +191,7 @@ export class CycloneDXSbomCreator {
   }
 
   private listComponents(pkg: any): Map<string, Component> {
-    let map = new Map<string, Component>();
+    const map = new Map<string, Component>();
     const isRootPkg = true;
     this.addComponent(pkg, map, isRootPkg);
     return map;

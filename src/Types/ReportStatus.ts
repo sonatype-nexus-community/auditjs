@@ -15,20 +15,20 @@
  */
 
 export interface ReportStatus {
-  policyAction?:                  string;
-  reportHtmlUrl?:                 string;
-  reportPdfUrl?:                  string;
-  reportDataUrl?:                 string;
-  embeddableReportHtmlUrl?:       string;
-  isError:                       boolean;
-  componentsAffected?:            ComponentsAffected;
-  openPolicyViolations?:          ComponentsAffected;
+  policyAction?: string;
+  reportHtmlUrl?: string;
+  reportPdfUrl?: string;
+  reportDataUrl?: string;
+  embeddableReportHtmlUrl?: string;
+  isError: boolean;
+  componentsAffected?: ComponentsAffected;
+  openPolicyViolations?: ComponentsAffected;
   grandfatheredPolicyViolations?: number;
   errorMessage?: string;
 }
 
 export interface ComponentsAffected {
   critical: number;
-  severe:   number;
+  severe: number;
   moderate: number;
 }

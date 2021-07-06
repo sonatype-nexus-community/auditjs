@@ -17,7 +17,7 @@
 import expect from '../Tests/TestHelper';
 import { AuditIQServer } from './AuditIQServer';
 import { ReportStatus } from '../Types/ReportStatus';
-import { IQServerPolicyReportResult } from '../Types/IQServerPolicyReportResult';
+import { IqServerPolicyReportResult } from '../Types/IqServerPolicyReportResult';
 
 const oldLog = console.log;
 const oldError = console.error;
@@ -35,24 +35,24 @@ describe('AuditIQServer', () => {
 
   it('should provide a true value if IQ Server Results have policy violations', () => {
     const auditIqServer = new AuditIQServer();
-    const results: ReportStatus = {policyAction: 'Failure', isError: false};
-    const result = auditIqServer.auditThirdPartyResults(results, {} as IQServerPolicyReportResult);
+    const results: ReportStatus = { policyAction: 'Failure', isError: false };
+    const result = auditIqServer.auditThirdPartyResults(results, {} as IqServerPolicyReportResult);
     expect(result).to.equal(true);
   });
 
   it('should provide a true value if IQ Server Results have an isError value', () => {
     const auditIqServer = new AuditIQServer();
-    const results: ReportStatus = {isError: true};
-    const result = auditIqServer.auditThirdPartyResults(results, {} as IQServerPolicyReportResult);
+    const results: ReportStatus = { isError: true };
+    const result = auditIqServer.auditThirdPartyResults(results, {} as IqServerPolicyReportResult);
     expect(result).to.equal(true);
   });
 
   it('should provide a false value if IQ Server Results have no policy violations', () => {
     const auditIqServer = new AuditIQServer();
-    const results: ReportStatus = {policyAction: 'None', reportHtmlUrl: '', isError: false};
+    const results: ReportStatus = { policyAction: 'None', reportHtmlUrl: '', isError: false };
     results.policyAction = 'None';
     results.reportHtmlUrl = '';
-    const result = auditIqServer.auditThirdPartyResults(results, {} as IQServerPolicyReportResult);
+    const result = auditIqServer.auditThirdPartyResults(results, {} as IqServerPolicyReportResult);
     expect(result).to.equal(false);
   });
 });

@@ -13,44 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface IQServerRawReportResult {
+export interface IqServerRawReportResult {
   components: Component[];
 }
 
 export interface Component {
-  hash:                string;
+  hash: string;
   componentIdentifier: ComponentIdentifier;
-  packageUrl:          string;
-  proprietary:         boolean;
-  matchState:          string;
-  pathnames:           string[];
-  licenseData:         LicenseData;
-  securityData:        SecurityData;
+  packageUrl: string;
+  proprietary: boolean;
+  matchState: string;
+  pathnames: string[];
+  licenseData: LicenseData;
+  securityData: SecurityData;
 }
 
 export interface ComponentIdentifier {
-  format:      string;
+  format: string;
   coordinates: Coordinates;
 }
 
 export interface Coordinates {
   artifactId: string;
-  groupId:    string;
-  version:    string;
-  extension:  string;
+  groupId: string;
+  version: string;
+  extension: string;
   classifier: string;
 }
 
 export interface LicenseData {
-  declaredLicenses:   License[];
-  observedLicenses:   License[];
-  effectiveLicenses:  License[];
+  declaredLicenses: License[];
+  observedLicenses: License[];
+  effectiveLicenses: License[];
   overriddenLicenses: any[];
-  status:             string;
+  status: string;
 }
 
 export interface License {
-  licenseId:   string;
+  licenseId: string;
   licenseName: string;
 }
 
@@ -59,10 +59,10 @@ export interface SecurityData {
 }
 
 export interface SecurityIssue {
-  source:         string;
-  reference:      string;
-  severity:       number;
-  status:         string;
-  url:            string;
+  source: string;
+  reference: string;
+  severity: number;
+  status: string;
+  url: string;
   threatCategory: string;
 }
