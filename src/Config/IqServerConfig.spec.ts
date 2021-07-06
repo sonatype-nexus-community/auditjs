@@ -22,6 +22,11 @@ import os from 'os';
 import { ConfigPersist } from './ConfigPersist';
 
 describe('IqServerConfig', async () => {
+  afterEach(() => {
+    sinon.restore();
+    mock.restore();
+  });
+
   it('should return true when it is able to save a config file', async () => {
     sinon.stub(os, 'homedir').returns('/nonsense');
     mock({ '/nonsense': {} });
@@ -35,7 +40,6 @@ describe('IqServerConfig', async () => {
     expect(conf.getUsername()).to.equal('username');
     expect(conf.getToken()).to.equal('password');
     expect(conf.getHost()).to.equal('http://localhost:8070');
-    mock.restore();
-    sinon.restore();
+
   });
 });

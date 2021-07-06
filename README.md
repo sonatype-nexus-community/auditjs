@@ -101,6 +101,7 @@ Options:
   --help           Show help                                           [boolean]
   --user, -u       Specify OSS Index username                           [string]
   --password, -p   Specify OSS Index password or token                  [string]
+  --cache, -c      Specify path to use as a cache location              [string]
   --quiet, -q      Only print out vulnerable dependencies              [boolean]
   --json, -j       Set output to JSON                                  [boolean]
   --xml, -x        Set output to JUnit XML format                      [boolean]
