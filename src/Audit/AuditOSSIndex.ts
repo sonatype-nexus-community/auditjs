@@ -24,7 +24,12 @@ import { XmlFormatter } from './Formatters/XmlFormatter';
 export class AuditOSSIndex {
   private formatter: Formatter;
 
-  constructor(readonly quiet: boolean = false, readonly json: boolean = false, readonly xml: boolean = false, private graph?: AuditGraph) {
+  constructor(
+    readonly quiet: boolean = false,
+    readonly json: boolean = false,
+    readonly xml: boolean = false,
+    private graph?: AuditGraph,
+  ) {
     if (json) {
       this.formatter = new JsonFormatter();
     } else if (xml) {

@@ -35,21 +35,21 @@ describe('AuditIQServer', () => {
 
   it('should provide a true value if IQ Server Results have policy violations', () => {
     const auditIqServer = new AuditIQServer();
-    const results: ReportStatus = {policyAction: 'Failure', isError: false};
+    const results: ReportStatus = { policyAction: 'Failure', isError: false };
     const result = auditIqServer.auditThirdPartyResults(results, {} as IQServerPolicyReportResult);
     expect(result).to.equal(true);
   });
 
   it('should provide a true value if IQ Server Results have an isError value', () => {
     const auditIqServer = new AuditIQServer();
-    const results: ReportStatus = {isError: true};
+    const results: ReportStatus = { isError: true };
     const result = auditIqServer.auditThirdPartyResults(results, {} as IQServerPolicyReportResult);
     expect(result).to.equal(true);
   });
 
   it('should provide a false value if IQ Server Results have no policy violations', () => {
     const auditIqServer = new AuditIQServer();
-    const results: ReportStatus = {policyAction: 'None', reportHtmlUrl: '', isError: false};
+    const results: ReportStatus = { policyAction: 'None', reportHtmlUrl: '', isError: false };
     results.policyAction = 'None';
     results.reportHtmlUrl = '';
     const result = auditIqServer.auditThirdPartyResults(results, {} as IQServerPolicyReportResult);

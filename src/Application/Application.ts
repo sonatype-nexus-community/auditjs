@@ -189,7 +189,7 @@ export class Application {
         args.quiet ? true : false,
         args.json ? true : false,
         args.xml ? true : false,
-        auditGraph
+        auditGraph,
       );
       this.spinner.maybeStop();
 

@@ -21,8 +21,7 @@ import { Component, IQServerPolicyReportResult } from '../Types/IQServerPolicyRe
 import { AuditGraph } from './AuditGraph';
 
 export class AuditIQServer {
-  constructor(private graph?: AuditGraph) {
-  }
+  constructor(private graph?: AuditGraph) {}
 
   public auditThirdPartyResults(results: ReportStatus, policyReport?: IQServerPolicyReportResult): boolean {
     if (results.isError) {
@@ -52,26 +51,28 @@ export class AuditIQServer {
   }
 
   private printPolicyViolations(policyReport: IQServerPolicyReportResult) {
-    const violators = policyReport
-      .components
-      .filter(
-        (comp) => { 
-          return comp.violations && comp.violations.length > 0
-        });
+    const violators = policyReport.components.filter((comp) => {
+      return comp.violations && comp.violations.length > 0;
+    });
 
     if (violators.length > 0) {
-      console.log("Components with policy violations found");
+      console.log('Components with policy violations found');
 
-      violators.map(
-        (comp) => {
-          this.doPrintPolicyViolation(comp);
-        });
+      violators.map((comp) => {
+        this.doPrintPolicyViolation(comp);
+      });
     }
   }
 
   private doPrintPolicyViolation(component: Component) {
     console.group(`Package URL: ${chalk.bgBlack(chalk.cyan(component.packageUrl))}`);
-    console.log(`Known violations: ${component.violations.map((violation) => { return violation.policyName }).join(', ')}`);
+    console.log(
+      `Known violations: ${component.violations
+        .map((violation) => {
+          return violation.policyName;
+        })
+        .join(', ')}`,
+    );
     if (this.graph) {
       console.log(`Inverse dependency tree: `);
 

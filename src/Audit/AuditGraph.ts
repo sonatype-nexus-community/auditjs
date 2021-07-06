@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import chalk from "chalk";
-import { DepGraph } from "dependency-graph";
-import { Component as CycloneDXComponent} from '../CycloneDX/Types/Component';
+import chalk from 'chalk';
+import { DepGraph } from 'dependency-graph';
+import { Component as CycloneDXComponent } from '../CycloneDX/Types/Component';
 
 const tree = `├`;
 const dash = '─';
@@ -39,39 +39,40 @@ class Node {
   }
 
   public prettyPrintTree(ident: string, last: boolean) {
-    let rootDepText = chalk.bgBlack(chalk.green(chalk.bold(`${this.name} - root package`)));
-    let iAmJustABadDepText = chalk.bgBlack(chalk.red(chalk.bold(`${this.name} - direct dependency`)));
-    let indirectlyResponsibleText = chalk.bgBlack(chalk.yellow(chalk.bold(`${this.name} - indirectly responsible`)));
-    let transitiveResponsibleText = chalk.bgBlack(chalk.red(chalk.bold(`${this.name} - directly responsible`)));
-    let str = "";
+    const rootDepText = chalk.bgBlack(chalk.green(chalk.bold(`${this.name} - root package`)));
+    const iAmJustABadDepText = chalk.bgBlack(chalk.red(chalk.bold(`${this.name} - direct dependency`)));
+    const indirectlyResponsibleText = chalk.bgBlack(chalk.yellow(chalk.bold(`${this.name} - indirectly responsible`)));
+    const transitiveResponsibleText = chalk.bgBlack(chalk.red(chalk.bold(`${this.name} - directly responsible`)));
+    let str = '';
     str += ident;
     if (last) {
       str += `${elbow}${dash} `;
-      ident += "  ";
+      ident += '  ';
     } else {
       str += `${tree}${dash} `;
-      ident += pipe + " ";
+      ident += pipe + ' ';
     }
 
-    const directlyResponsible = (this.depth == 1);
-    const isBottomDep = (this.dependencies.length == 0);
-    const isDirectDependencyInChargeOfThings = (this.dependencies.length == 1 && this.dependencies[0].dependencies.length == 0);
+    const directlyResponsible = this.depth == 1;
+    const isBottomDep = this.dependencies.length == 0;
+    const isDirectDependencyInChargeOfThings =
+      this.dependencies.length == 1 && this.dependencies[0].dependencies.length == 0;
 
     switch (true) {
-      case (directlyResponsible && !isBottomDep): 
+      case directlyResponsible && !isBottomDep:
         console.log(`${str}${transitiveResponsibleText}`);
         break;
-      case (isBottomDep): {
+      case isBottomDep: {
         console.log(`${str}${rootDepText}`);
         break;
       }
-      case (isDirectDependencyInChargeOfThings && this.depth != 0): 
+      case isDirectDependencyInChargeOfThings && this.depth != 0:
         console.log(`${str}${indirectlyResponsibleText}`);
         break;
-      case (isDirectDependencyInChargeOfThings && this.depth == 0):
+      case isDirectDependencyInChargeOfThings && this.depth == 0:
         console.log(`${str}${iAmJustABadDepText}`);
         break;
-      case (directlyResponsible):
+      case directlyResponsible:
         console.log(`${str}${transitiveResponsibleText}`);
         break;
       default:
@@ -92,7 +93,7 @@ export class AuditGraph {
     const rootNode = new Node(rootComponent, 0);
 
     this.constructTree(rootNode, rootComponent);
-    rootNode.prettyPrintTree("", true);
+    rootNode.prettyPrintTree('', true);
   }
 
   private constructTree(tree: Node, purl: string) {

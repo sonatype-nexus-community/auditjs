@@ -1,84 +1,84 @@
 export interface IQServerPolicyReportResult {
-  reportTime:  number;
+  reportTime: number;
   reportTitle: string;
-  commitHash:  string;
-  initiator:   string;
+  commitHash: string;
+  initiator: string;
   application: Application;
-  counts:      Counts;
-  components:  Component[];
+  counts: Counts;
+  components: Component[];
 }
 
 export interface Application {
-  id:              string;
-  publicId:        string;
-  name:            string;
-  organizationId:  string;
+  id: string;
+  publicId: string;
+  name: string;
+  organizationId: string;
   contactUserName: string;
 }
 
 export interface Component {
-  hash:                string;
-  matchState:          string;
+  hash: string;
+  matchState: string;
   componentIdentifier: ComponentIdentifier;
-  packageUrl:          string;
-  proprietary:         boolean;
-  pathnames:           string[];
-  dependencyData?:      DependencyData;
-  violations:          Violation[];
-  displayName?:        string;
+  packageUrl: string;
+  proprietary: boolean;
+  pathnames: string[];
+  dependencyData?: DependencyData;
+  violations: Violation[];
+  displayName?: string;
 }
 
 export interface ComponentIdentifier {
-  format:      string;
+  format: string;
   coordinates: Coordinates;
 }
 
 export interface Coordinates {
   artifactId: string;
   classifier: string;
-  extension:  string;
-  groupId:    string;
-  version:    string;
+  extension: string;
+  groupId: string;
+  version: string;
 }
 
 export interface DependencyData {
-  directDependency:      boolean;
-  innerSource:           boolean;
-  innerSourceData?:      InnerSourceDatum[];
+  directDependency: boolean;
+  innerSource: boolean;
+  innerSourceData?: InnerSourceDatum[];
   parentComponentPurls?: string[];
 }
 
 export interface InnerSourceDatum {
-  ownerApplicationName:      string;
-  ownerApplicationId:        string;
+  ownerApplicationName: string;
+  ownerApplicationId: string;
   innerSourceComponentPurl?: string;
 }
 
 export interface Violation {
-  policyId:             string;
-  policyName:           string;
+  policyId: string;
+  policyName: string;
   policyThreatCategory: string;
-  policyThreatLevel:    number;
-  policyViolationId:    string;
-  waived:               boolean;
-  grandfathered:        boolean;
-  constraints:          Constraint[];
+  policyThreatLevel: number;
+  policyViolationId: string;
+  waived: boolean;
+  grandfathered: boolean;
+  constraints: Constraint[];
 }
 
 export interface Constraint {
-  constraintId:   string;
+  constraintId: string;
   constraintName: string;
-  conditions:     Condition[];
+  conditions: Condition[];
 }
 
 export interface Condition {
   conditionSummary: string;
-  conditionReason:  string;
+  conditionReason: string;
 }
 
 export interface Counts {
-  partiallyMatchedComponentCount:    number;
-  exactlyMatchedComponentCount:      number;
-  totalComponentCount:               number;
+  partiallyMatchedComponentCount: number;
+  exactlyMatchedComponentCount: number;
+  totalComponentCount: number;
   grandfatheredPolicyViolationCount: number;
 }
