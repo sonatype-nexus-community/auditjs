@@ -33,7 +33,7 @@ const object = {
       dependencies: {
         testdependency: {
           name: 'testdependency',
-          version: '1.0.1',
+          version: '1.0.3',
         },
       },
     },
