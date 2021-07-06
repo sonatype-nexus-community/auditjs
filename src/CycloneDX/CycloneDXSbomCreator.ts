@@ -86,13 +86,13 @@ export class CycloneDXSbomCreator {
   }
 
   public toXml(bom: Bom): string {
-    const sbom = create().ele('bom', { encoding: 'utf-8', separateArrayItems: true });
+    const sbom = create().ele('bom', { encoding: 'utf-8' });
 
     sbom.att('serialNumber', bom['@serial-number']);
     sbom.att('version', bom['@version'].toString());
     const metadataNode = sbom.ele('metadata');
     metadataNode.ele('timestamp', bom.metadata.timestamp);
-    metadataNode.ele('component', bom.metadata.component);
+    metadataNode.ele({ component: bom.metadata.component });
 
     const componentsNode = sbom.ele('components');
     bom.components.forEach((comp) => {
