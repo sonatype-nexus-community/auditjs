@@ -53,7 +53,7 @@ export class NpmList implements Muncher {
 
     const bom: Bom = await sbomCreator.getBom(pkgInfo);
 
-    const sbomString = sbomCreator.toXml(bom);
+    const sbomString = sbomCreator.toXml(bom, false);
 
     this.graph = sbomCreator.inverseGraph;
 

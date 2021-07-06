@@ -85,7 +85,7 @@ export class CycloneDXSbomCreator {
     return bom;
   }
 
-  public toXml(bom: Bom): string {
+  public toXml(bom: Bom, prettyPrint: boolean): string {
     const sbom = create().ele('bom', { encoding: 'utf-8' });
 
     sbom.att('serialNumber', bom['@serial-number']);
@@ -110,7 +110,7 @@ export class CycloneDXSbomCreator {
     });
 
     const bomString = sbom.end({
-      prettyPrint: true,
+      prettyPrint: prettyPrint,
     });
 
     return bomString;

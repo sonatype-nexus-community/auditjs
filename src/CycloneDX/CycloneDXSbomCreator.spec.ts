@@ -67,7 +67,7 @@ describe('CycloneDXSbomCreator', async () => {
 
     const bom: Bom = await sbomCreator.getBom(object);
 
-    const sbomString = sbomCreator.toXml(bom);
+    const sbomString = sbomCreator.toXml(bom, false);
 
     expect(sbomString).to.eq(expectedResponse);
   });
@@ -77,7 +77,7 @@ describe('CycloneDXSbomCreator', async () => {
 
     const bom: Bom = await sbomCreator.getBom(object);
 
-    const sbomString = sbomCreator.toXml(bom);
+    const sbomString = sbomCreator.toXml(bom, false);
 
     expect(sbomString).to.eq(expectedSpartanResponse);
   });
