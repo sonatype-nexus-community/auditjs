@@ -59,7 +59,7 @@ export class CycloneDXSbomCreator {
     { licenseContentType: 'text/xml', fileExtension: '.xml' },
   ];
 
-  readonly SBOMSCHEMA: string = 'http://cyclonedx.org/schema/bom/1.3';
+  readonly SBOMSCHEMA: string = 'https://cyclonedx.org/schema/bom/1.3';
 
   constructor(readonly path: string, readonly options?: Options) {
     this.graph = new DepGraph();
@@ -69,7 +69,7 @@ export class CycloneDXSbomCreator {
   public async getBom(pkgInfo: any): Promise<Bom> {
     const components = Array.from(this.listComponents(pkgInfo).values());
 
-    const dependencies: Array<Dependency> = new Array();
+    const dependencies: Array<Dependency> = [];
 
     this.listDependencies(this.getPurlFromPkgInfo(pkgInfo), dependencies);
 
@@ -86,8 +86,11 @@ export class CycloneDXSbomCreator {
   }
 
   public toXml(bom: Bom, prettyPrint: boolean): string {
-    const sbom = create().ele('bom', { encoding: 'utf-8' });
+    const builder = create();
+    builder.set({ encoding: 'utf-8' });
+    const sbom = builder.ele('bom');
 
+    sbom.att('xmlns', bom['@xmlns']);
     sbom.att('serialNumber', bom['@serial-number']);
     sbom.att('version', bom['@version'].toString());
     const metadataNode = sbom.ele('metadata');
