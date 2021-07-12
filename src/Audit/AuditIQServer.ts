@@ -17,18 +17,19 @@
 import { ReportStatus } from '../Types/ReportStatus';
 import chalk = require('chalk');
 import { visuallySeperateText } from '../Visual/VisualHelper';
+import { Component, IqServerPolicyReportResult } from '../Types/IqServerPolicyReportResult';
+import { AuditGraph } from './AuditGraph';
 
 export class AuditIQServer {
-  public auditThirdPartyResults(results: ReportStatus): boolean {
+  constructor(private graph?: AuditGraph) {}
+
+  public auditThirdPartyResults(results: ReportStatus, policyReport?: IqServerPolicyReportResult): boolean {
     if (results.isError) {
       visuallySeperateText(true, [results.errorMessage]);
       return true;
     }
     if (results.policyAction === 'Failure') {
-      visuallySeperateText(true, [
-        `Sonabot here, you have some build-breaking policy violations to clean up!`,
-        chalk.keyword('orange').bold(`Report URL: ${results.reportHtmlUrl}`),
-      ]);
+      this.handleFailure(results.reportHtmlUrl!, policyReport);
       return true;
     }
     visuallySeperateText(false, [
@@ -36,5 +37,48 @@ export class AuditIQServer {
       chalk.keyword('green').bold(`Report URL: ${results.reportHtmlUrl}`),
     ]);
     return false;
+  }
+
+  private handleFailure(reportURL: string, policyReport?: IqServerPolicyReportResult) {
+    visuallySeperateText(true, [
+      `Sonabot here, you have some build-breaking policy violations to clean up!`,
+      chalk.keyword('orange').bold(`Report URL: ${reportURL}`),
+    ]);
+
+    if (policyReport) {
+      this.printPolicyViolations(policyReport);
+    }
+  }
+
+  private printPolicyViolations(policyReport: IqServerPolicyReportResult) {
+    const violators = policyReport.components.filter((comp) => {
+      return comp.violations && comp.violations.length > 0;
+    });
+
+    if (violators.length > 0) {
+      console.log('Components with policy violations found');
+
+      violators.map((comp) => {
+        this.doPrintPolicyViolation(comp);
+      });
+    }
+  }
+
+  private doPrintPolicyViolation(component: Component) {
+    console.group(`Package URL: ${chalk.bgBlack(chalk.cyan(component.packageUrl))}`);
+    console.log(
+      `Known violations: ${component.violations
+        .map((violation) => {
+          return violation.policyName;
+        })
+        .join(', ')}`,
+    );
+    if (this.graph) {
+      console.log(`Inverse dependency tree: `);
+
+      this.graph.printGraph(component.packageUrl);
+    }
+    console.groupEnd();
+    console.log();
   }
 }

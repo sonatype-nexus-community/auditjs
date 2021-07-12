@@ -32,6 +32,7 @@ import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 import { visuallySeperateText } from '../Visual/VisualHelper';
+import { AuditGraph } from '../Audit/AuditGraph';
 const pj = require('../../package.json');
 
 export class Application {
@@ -181,10 +182,14 @@ export class Application {
 
       this.spinner.maybeCreateMessageForSpinner('Auditing your results from Sonatype OSS Index');
       logMessage('Instantiating OSS Index Request Service, with quiet option', DEBUG, { quiet: args.quiet });
+
+      const graph = this.muncher.getGraph();
+      const auditGraph = new AuditGraph(graph!);
       const auditOSSIndex = new AuditOSSIndex(
         args.quiet ? true : false,
         args.json ? true : false,
         args.xml ? true : false,
+        auditGraph,
       );
       this.spinner.maybeStop();
 
@@ -223,19 +228,26 @@ export class Application {
           logMessage('There was an issue auditing your application!', ERROR, { title: e.message, stack: e.stack });
           shutDownLoggerAndExit(1);
         },
-        (x) => {
+        async (results: ReportStatus) => {
           this.spinner.maybeSucceed();
           this.spinner.maybeCreateMessageForSpinner('Auditing your results');
-          const results: ReportStatus = Object.assign(new ReportStatus(), x);
+
+          logMessage('Getting raw report results', DEBUG);
+          const policyReportResults = await requestService.getPolicyReportResults(results.reportDataUrl!);
+
           logMessage('Sonatype IQ results obtained!', DEBUG, results);
 
           results.reportHtmlUrl = new URL(results.reportHtmlUrl!, requestService.host).href;
 
-          const auditResults = new AuditIQServer();
+          const graph = this.muncher.getGraph();
+          const auditGraph = new AuditGraph(graph!);
+
+          const auditResults = new AuditIQServer(auditGraph);
 
           this.spinner.maybeStop();
           logMessage('Auditing results', DEBUG, results);
-          const failure = auditResults.auditThirdPartyResults(results);
+
+          const failure = auditResults.auditThirdPartyResults(results, policyReportResults);
           logMessage('Audit finished', DEBUG, { failure: failure });
 
           failure ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);

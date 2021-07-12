@@ -18,11 +18,17 @@ import { Muncher } from './Muncher';
 import { Coordinates } from '../Types/Coordinates';
 import path from 'path';
 import fs from 'fs';
+import { DepGraph } from 'dependency-graph';
+import { Component } from '../CycloneDX/Types/Component';
 
 export class Bower implements Muncher {
   constructor(readonly devDependencies: boolean = false) {}
 
   getSbomFromCommand(): Promise<any> {
+    throw new Error('Method not implemented.');
+  }
+
+  public getGraph(): DepGraph<Component> | undefined {
     throw new Error('Method not implemented.');
   }
 
