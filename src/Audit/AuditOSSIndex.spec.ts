@@ -15,6 +15,7 @@
  */
 
 import expect, { ossIndexResult, ossIndexResultNoVulnerabilities } from '../Tests/TestHelper';
+import { ComponentDetails } from '@sonatype/js-sona-types';
 import { AuditOSSIndex } from './AuditOSSIndex';
 
 let auditOSSIndex: AuditOSSIndex;
@@ -26,12 +27,12 @@ const write = (): boolean => {
 
 const oldWrite = process.stdout.write;
 
-// const doAuditOSSIndex = (results: OssIndexServerResult[]): boolean => {
-//   process.stdout.write = write;
-//   const auditResult = auditOSSIndex.auditResults(results);
-//   process.stdout.write = oldWrite;
-//   return auditResult;
-// };
+const doAuditOSSIndex = (results: ComponentDetails): boolean => {
+  process.stdout.write = write;
+  const auditResult = auditOSSIndex.auditResults({componentDetails: [ossIndexResult]});
+  process.stdout.write = oldWrite;
+  return auditResult;
+};
 
 describe('AuditOSSIndex', () => {
   beforeEach(() => {
@@ -39,32 +40,24 @@ describe('AuditOSSIndex', () => {
   });
 
   it('should return true if OSS Index results have vulnerabilities', () => {
-    // const results = new Array<OssIndexServerResult>();
-    // results.push(ossIndexObject);
-    // const result = doAuditOSSIndex(results);
-    // expect(result).to.equal(true);
+    const result = doAuditOSSIndex({componentDetails: [ossIndexResult]});
+    expect(result).to.equal(true);
   });
 
   it('should return true if OSS Index results have vulnerabilities, and json print is chosen', () => {
-    // auditOSSIndex = new AuditOSSIndex(false, true);
-    // const results = new Array<OssIndexServerResult>();
-    // results.push(ossIndexObject);
-    // const result = doAuditOSSIndex(results);
-    // expect(result).to.equal(true);
+    auditOSSIndex = new AuditOSSIndex(false, true);
+    const result = doAuditOSSIndex({componentDetails: [ossIndexResult]});
+    expect(result).to.equal(true);
   });
 
   it('should return false if OSS Index results have no vulnerabilities', () => {
-    // const results = new Array<OssIndexServerResult>();
-    // results.push(ossIndexObjectNoVulnerabilities);
-    // const result = doAuditOSSIndex(results);
-    // expect(result).to.equal(false);
+    const result = doAuditOSSIndex({componentDetails: [ossIndexResultNoVulnerabilities]});
+    expect(result).to.equal(false);
   });
 
   it('should return false if OSS Index results have no vulnerabilities, and json print is chosen', () => {
-    // auditOSSIndex = new AuditOSSIndex(false, true);
-    // const results = new Array<OssIndexServerResult>();
-    // results.push(ossIndexObjectNoVulnerabilities);
-    // const result = doAuditOSSIndex(results);
-    // expect(result).to.equal(false);
+    auditOSSIndex = new AuditOSSIndex(false, true);
+    const result = doAuditOSSIndex({componentDetails: [ossIndexResultNoVulnerabilities]});
+    expect(result).to.equal(false);
   });
 });
