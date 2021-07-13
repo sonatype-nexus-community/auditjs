@@ -15,10 +15,10 @@
  */
 
 import { Formatter } from './Formatter';
-import { OssIndexServerResult } from '../../Types/OssIndexServerResult';
+import { ComponentDetails } from '@sonatype/js-sona-types';
 
 export class JsonFormatter implements Formatter {
-  public printAuditResults(list: Array<OssIndexServerResult>) {
-    console.log(JSON.stringify(list, null, 2));
+  public printAuditResults(components: ComponentDetails) {
+    console.log(JSON.stringify(components.componentDetails, null, 2));
   }
 }

@@ -17,41 +17,59 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import 'mocha';
-import { OssIndexServerResult } from '../Types/OssIndexServerResult';
+import { ComponentContainer, SecurityIssue } from '@sonatype/js-sona-types';
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-export const ossIndexObject: OssIndexServerResult = new OssIndexServerResult({
-  coordinates: 'Test',
-  reference: 'reference',
-  vulnerabilities: [
-    {
-      id: 'test_id',
-      title: 'title',
-      cvssScore: '9.8',
-      reference: 'reference',
-      description: '',
-      cvssVector: '',
-      cve: '9.8',
-    },
-    {
-      id: 'test_id2',
-      title: 'title',
-      cvssScore: '9.8',
-      reference: 'reference',
-      description: '',
-      cvssVector: '',
-      cve: '9.8',
-    },
-  ],
-});
+export const securityIsses: SecurityIssue[] = [
+  {
+    id: 'test_id',
+    reference: 'title',
+    severity: 9.8,
+    url: 'reference',
+    description: '',
+    source: 'cve',
+  },
+  {
+    id: 'test_id2',
+    reference: 'title',
+    severity: 9.8,
+    url: 'reference',
+    description: '',
+    source: 'cve',
+  },
+];
 
-export const ossIndexObjectNoVulnerabilities: OssIndexServerResult = new OssIndexServerResult({
-  coordinates: 'Test',
-  reference: 'reference',
-  vulnerabilities: [],
-});
+export const ossIndexResult: ComponentContainer = {
+  component: {
+    packageUrl: 'pkg:npm/test@1.0.0',
+    name: 'test',
+    hash: '',
+  },
+  matchState: 'PURL',
+  catalogDate: '',
+  relativePopularity: '',
+  licenseData: undefined,
+  securityData: {
+    securityIssues: securityIsses,
+  },
+};
+
+export const ossIndexResultNoVulnerabilities: ComponentContainer = {
+  component: {
+    packageUrl: 'pkg:npm/test-no-vulns@1.0.0',
+    name: 'test-no-vulns',
+    hash: '',
+  },
+  matchState: 'PURL',
+  catalogDate: '',
+  relativePopularity: '',
+  licenseData: undefined,
+  securityData: {
+    securityIssues: [],
+  },
+};
 
 export const applicationInternalIdResponse = {
   statusCode: 200,
@@ -75,6 +93,6 @@ export const applicationInternalIdResponse = {
   },
 };
 
-export const ossIndexServerResults = [ossIndexObjectNoVulnerabilities, ossIndexObject];
+export const ossIndexServerResults = [ossIndexResultNoVulnerabilities, ossIndexResult];
 
 export default expect;

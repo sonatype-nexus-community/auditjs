@@ -30,11 +30,11 @@ import { Hash } from './Types/Hash';
 import spdxLicensesNonDeprecated = require('spdx-license-ids');
 import spdxLicensesDeprecated = require('spdx-license-ids/deprecated');
 import { toPurl } from './Helpers/Helpers';
-import { logMessage, DEBUG } from '../Application/Logger/Logger';
 import { DepGraph } from 'dependency-graph';
 import { Dependency } from './Types/Dependency';
 import { Metadata } from './Types/Metadata';
 import { Bom } from './Types/Bom';
+import { DEBUG } from '../Application/Logger/Logger';
 
 export class CycloneDXSbomCreator {
   public graph: DepGraph<Component>;
@@ -336,7 +336,7 @@ export class CycloneDXSbomCreator {
       const uri = new URL(url);
       externalReferences.push({ reference: { '@type': typeOfURL, url: uri.toString() } });
     } catch (e) {
-      logMessage('Encountered an invalid URL', DEBUG, { title: e.message, stack: e.stack });
+      this.options?.logger.logMessage('Encountered an invalid URL', DEBUG, { title: e.message, stack: e.stack });
     }
   }
 

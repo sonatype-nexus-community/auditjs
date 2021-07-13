@@ -20,6 +20,7 @@ import path from 'path';
 import fs from 'fs';
 import { DepGraph } from 'dependency-graph';
 import { Component } from '../CycloneDX/Types/Component';
+import { PackageURL } from 'packageurl-js';
 
 export class Bower implements Muncher {
   constructor(readonly devDependencies: boolean = false) {}
@@ -59,5 +60,9 @@ export class Bower implements Muncher {
     }
 
     return depsArray;
+  }
+
+  public async getInstalledDepsAsPurls(): Promise<Array<PackageURL>> {
+    throw new Error('Method not implemented.');
   }
 }

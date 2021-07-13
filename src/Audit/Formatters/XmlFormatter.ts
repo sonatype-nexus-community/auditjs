@@ -17,18 +17,18 @@
 import { create } from 'xmlbuilder2';
 
 import { Formatter, getNumberOfVulnerablePackagesFromResults } from './Formatter';
-import { OssIndexServerResult, Vulnerability } from '../../Types/OssIndexServerResult';
+import { ComponentDetails, SecurityIssue } from '@sonatype/js-sona-types';
 
 export class XmlFormatter implements Formatter {
-  public printAuditResults(list: Array<OssIndexServerResult>) {
+  public printAuditResults(components: ComponentDetails) {
     const testsuite = create().ele('testsuite');
-    testsuite.att('tests', list.length.toString());
+    testsuite.att('tests', components.componentDetails.length.toString());
     testsuite.att('timestamp', new Date().toISOString());
-    testsuite.att('failures', getNumberOfVulnerablePackagesFromResults(list).toString());
+    testsuite.att('failures', getNumberOfVulnerablePackagesFromResults(components).toString());
 
-    for (let i = 0; i < list.length; i++) {
-      const testcase = testsuite.ele('testcase', { classname: list[i].coordinates, name: list[i].coordinates });
-      const vulns = list[i].vulnerabilities;
+    for (let i = 0; i < components.componentDetails.length; i++) {
+      const testcase = testsuite.ele('testcase', { classname: components.componentDetails[i].component.packageUrl, name: components.componentDetails[i].component.packageUrl });
+      const vulns = components.componentDetails[i].securityData?.securityIssues;
 
       if (vulns) {
         if (vulns.length > 0) {
@@ -48,15 +48,15 @@ export class XmlFormatter implements Formatter {
     console.log(xml);
   }
 
-  private getVulnerabilityForXmlBlock(vuln: Vulnerability): string {
+  private getVulnerabilityForXmlBlock(vuln: SecurityIssue): string {
     let vulnBlock = '';
-    vulnBlock += `Vulnerability Title: ${vuln.title}\n`;
+    vulnBlock += `Vulnerability Title: ${vuln.reference}\n`;
     vulnBlock += `ID: ${vuln.id}\n`;
     vulnBlock += `Description: ${vuln.description}\n`;
-    vulnBlock += `CVSS Score: ${vuln.cvssScore}\n`;
-    vulnBlock += `CVSS Vector: ${vuln.cvssVector}\n`;
-    vulnBlock += `CVE: ${vuln.cve}\n`;
-    vulnBlock += `Reference: ${vuln.reference}\n`;
+    vulnBlock += `CVSS Score: ${vuln.severity}\n`;
+    // vulnBlock += `CVSS Vector: ${vuln.cvssVector}\n`;
+    vulnBlock += `CVE: ${vuln.source}\n`;
+    vulnBlock += `Reference: ${vuln.url}\n`;
 
     return vulnBlock;
   }

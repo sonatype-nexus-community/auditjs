@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { OssIndexServerResult } from '../Types/OssIndexServerResult';
+import { ComponentDetails } from '@sonatype/js-sona-types';
 import { AuditGraph } from './AuditGraph';
 import { Formatter, getNumberOfVulnerablePackagesFromResults } from './Formatters/Formatter';
 import { JsonFormatter } from './Formatters/JsonFormatter';
@@ -39,10 +39,10 @@ export class AuditOSSIndex {
     }
   }
 
-  public auditResults(results: Array<OssIndexServerResult>): boolean {
+  public auditResults(results: ComponentDetails): boolean {
     if (this.quiet) {
-      results = results.filter((x) => {
-        return x.vulnerabilities && x.vulnerabilities?.length > 0;
+      results.componentDetails = results.componentDetails.filter((x) => {
+        return x.securityData && x.securityData.securityIssues && x.securityData.securityIssues.length > 0;
       });
     }
 
