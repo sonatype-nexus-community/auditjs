@@ -15,12 +15,10 @@
  */
 
 import { textSync } from 'figlet';
-
-import { IqRequestService } from '../Services/IqRequestService';
 import { NpmList } from '../Munchers/NpmList';
 import { Coordinates } from '../Types/Coordinates';
 import { Muncher } from '../Munchers/Muncher';
-import { OSSIndexRequestService, ILogger } from '@sonatype/js-sona-types';
+import { OSSIndexRequestService, ILogger, IqRequestService } from '@sonatype/js-sona-types';
 import { AuditIQServer } from '../Audit/AuditIQServer';
 import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
 import { ReportStatus } from '../Types/ReportStatus';
@@ -43,6 +41,7 @@ export class Application {
   private muncher: Muncher;
   private spinner: Spinner;
   private logger: ILogger;
+  private host: string = "";
 
   constructor(
     readonly devDependency: boolean = false,
@@ -243,7 +242,7 @@ export class Application {
 
           this.logger.logMessage('Sonatype IQ results obtained!', DEBUG, results);
 
-          results.reportHtmlUrl = new URL(results.reportHtmlUrl!, requestService.host).href;
+          results.reportHtmlUrl = new URL(results.reportHtmlUrl!, this.host).href;
 
           const graph = this.muncher.getGraph();
           const auditGraph = new AuditGraph(graph!);
@@ -304,15 +303,24 @@ export class Application {
         'No config file is defined and you are missing one of the -h (host), -u (user), or -p (password) parameters.',
       );
 
-    return new IqRequestService(
-      args.user !== undefined ? (args.user as string) : config.getUsername(),
-      args.password !== undefined ? (args.password as string) : config.getToken(),
-      args.server !== undefined ? (args.server as string) : config.getHost(),
-      args.application as string,
-      args.stage as string,
-      args.timeout as number,
-      args.insecure as boolean,
-      this.logger,
-    );
+    this.host = args.server !== undefined ? (args.server as string) : config.getHost();
+    const token = args.password !== undefined ? (args.password as string) : config.getToken();
+    const user = args.user !== undefined ? (args.user as string) : config.getUsername();
+
+    const options = {
+      browser: false,
+      product: 'AuditJS',
+      version: pj.version,
+      logger: this.logger,
+      host: this.host,
+      user: user,
+      token: token,
+      application: args.application as string,
+      stage: args.stage as string,
+      timeout: args.timeout as number,
+      insecure: args.insecure as boolean
+    };
+
+    return new IqRequestService(options);
   }
 }
