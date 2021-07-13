@@ -41,7 +41,7 @@ export class Application {
   private muncher: Muncher;
   private spinner: Spinner;
   private logger: ILogger;
-  private host: string = "";
+  private host = '';
 
   constructor(
     readonly devDependency: boolean = false,
@@ -318,7 +318,7 @@ export class Application {
       application: args.application as string,
       stage: args.stage as string,
       timeout: args.timeout as number,
-      insecure: args.insecure as boolean
+      insecure: args.insecure as boolean,
     };
 
     return new IqRequestService(options);

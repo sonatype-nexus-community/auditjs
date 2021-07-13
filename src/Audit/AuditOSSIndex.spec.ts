@@ -40,24 +40,24 @@ describe('AuditOSSIndex', () => {
   });
 
   it('should return true if OSS Index results have vulnerabilities', () => {
-    const result = doAuditOSSIndex({componentDetails: [ossIndexResult]});
+    const result = doAuditOSSIndex({ componentDetails: [ossIndexResult] });
     expect(result).to.equal(true);
   });
 
   it('should return true if OSS Index results have vulnerabilities, and json print is chosen', () => {
     auditOSSIndex = new AuditOSSIndex(false, true);
-    const result = doAuditOSSIndex({componentDetails: [ossIndexResult]});
+    const result = doAuditOSSIndex({ componentDetails: [ossIndexResult] });
     expect(result).to.equal(true);
   });
 
   it('should return false if OSS Index results have no vulnerabilities', () => {
-    const result = doAuditOSSIndex({componentDetails: [ossIndexResultNoVulnerabilities]});
+    const result = doAuditOSSIndex({ componentDetails: [ossIndexResultNoVulnerabilities] });
     expect(result).to.equal(false);
   });
 
   it('should return false if OSS Index results have no vulnerabilities, and json print is chosen', () => {
     auditOSSIndex = new AuditOSSIndex(false, true);
-    const result = doAuditOSSIndex({componentDetails: [ossIndexResultNoVulnerabilities]});
+    const result = doAuditOSSIndex({ componentDetails: [ossIndexResultNoVulnerabilities] });
     expect(result).to.equal(false);
   });
 });

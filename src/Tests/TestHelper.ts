@@ -29,7 +29,7 @@ export const securityIsses: SecurityIssue[] = [
     severity: 9.8,
     url: 'reference',
     description: '',
-    source: 'cve'
+    source: 'cve',
   },
   {
     id: 'test_id2',
@@ -37,8 +37,8 @@ export const securityIsses: SecurityIssue[] = [
     severity: 9.8,
     url: 'reference',
     description: '',
-    source: 'cve'
-  }
+    source: 'cve',
+  },
 ];
 
 export const ossIndexResult: ComponentContainer = {
@@ -52,10 +52,9 @@ export const ossIndexResult: ComponentContainer = {
   relativePopularity: '',
   licenseData: undefined,
   securityData: {
-    securityIssues: securityIsses
-  }
-}
-
+    securityIssues: securityIsses,
+  },
+};
 
 export const ossIndexResultNoVulnerabilities: ComponentContainer = {
   component: {
@@ -68,9 +67,9 @@ export const ossIndexResultNoVulnerabilities: ComponentContainer = {
   relativePopularity: '',
   licenseData: undefined,
   securityData: {
-    securityIssues: []
-  }
-}
+    securityIssues: [],
+  },
+};
 
 export const applicationInternalIdResponse = {
   statusCode: 200,
