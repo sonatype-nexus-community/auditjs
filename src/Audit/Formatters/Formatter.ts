@@ -21,7 +21,8 @@ export interface Formatter {
 }
 
 export const getNumberOfVulnerablePackagesFromResults = (components: ComponentDetails): number => {
-  return components.componentDetails.filter((x) => {
+  const num = components.componentDetails.filter((x) => {
     return x.securityData && x.securityData.securityIssues && x.securityData.securityIssues.length > 0;
   }).length;
+  return num;
 };
