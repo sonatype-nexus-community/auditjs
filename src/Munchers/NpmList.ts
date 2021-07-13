@@ -49,7 +49,7 @@ export class NpmList implements Muncher {
       includeLicenseData: false,
       includeBomSerialNumber: true,
       spartan: true,
-      logger: this.logger
+      logger: this.logger,
     });
 
     const pkgInfo = await sbomCreator.getPackageInfoFromReadInstalled();
@@ -95,7 +95,7 @@ export class NpmList implements Muncher {
       includeLicenseData: false,
       includeBomSerialNumber: true,
       spartan: false,
-      logger: this.logger
+      logger: this.logger,
     });
 
     const data = await sbomCreator.getPackageInfoFromReadInstalled();

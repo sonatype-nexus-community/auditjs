@@ -63,6 +63,6 @@ export class Bower implements Muncher {
   }
 
   public async getInstalledDepsAsPurls(): Promise<Array<PackageURL>> {
-    throw new Error('Method not implemented.'); 
+    throw new Error('Method not implemented.');
   }
 }

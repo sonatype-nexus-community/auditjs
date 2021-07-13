@@ -38,7 +38,7 @@ describe('IQRequestService', () => {
       stage,
       300,
       false,
-      new TestLogger()
+      new TestLogger(),
     );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
@@ -60,7 +60,7 @@ describe('IQRequestService', () => {
       stage,
       300,
       false,
-      new TestLogger()
+      new TestLogger(),
     );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
@@ -93,7 +93,7 @@ describe('IQRequestService', () => {
       stage,
       300,
       false,
-      new TestLogger()
+      new TestLogger(),
     );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
@@ -126,7 +126,7 @@ describe('IQRequestService', () => {
       stage,
       300,
       false,
-      new TestLogger()
+      new TestLogger(),
     );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
@@ -158,7 +158,7 @@ describe('IQRequestService', () => {
       stage,
       300,
       false,
-      new TestLogger()
+      new TestLogger(),
     );
 
     requestService.asyncPollForResults(

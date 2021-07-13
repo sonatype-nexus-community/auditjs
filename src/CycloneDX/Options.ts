@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {ILogger} from '@sonatype/js-sona-types';
+import { ILogger } from '@sonatype/js-sona-types';
 
 export interface Options {
   devDependencies?: boolean;

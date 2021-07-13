@@ -179,7 +179,9 @@ export class Application {
       this.spinner.maybeSucceed();
 
       this.spinner.maybeCreateMessageForSpinner('Auditing your results from Sonatype OSS Index');
-      this.logger.logMessage('Instantiating OSS Index Request Service, with quiet option', DEBUG, { quiet: args.quiet });
+      this.logger.logMessage('Instantiating OSS Index Request Service, with quiet option', DEBUG, {
+        quiet: args.quiet,
+      });
 
       const graph = this.muncher.getGraph();
       const auditGraph = new AuditGraph(graph!);
@@ -198,7 +200,10 @@ export class Application {
       failed ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);
     } catch (e) {
       this.spinner.maybeStop();
-      this.logger.logMessage('There was an error auditing with Sonatype OSS Index', ERROR, { title: e.message, stack: e.stack });
+      this.logger.logMessage('There was an error auditing with Sonatype OSS Index', ERROR, {
+        title: e.message,
+        stack: e.stack,
+      });
       shutDownLoggerAndExit(1);
     }
   }
@@ -223,7 +228,10 @@ export class Application {
         `${resultUrl}`,
         (e) => {
           this.spinner.maybeFail();
-          this.logger.logMessage('There was an issue auditing your application!', ERROR, { title: e.message, stack: e.stack });
+          this.logger.logMessage('There was an issue auditing your application!', ERROR, {
+            title: e.message,
+            stack: e.stack,
+          });
           shutDownLoggerAndExit(1);
         },
         async (results: ReportStatus) => {
@@ -253,13 +261,16 @@ export class Application {
       );
     } catch (e) {
       this.spinner.maybeFail();
-      this.logger.logMessage('There was an issue auditing your application!', ERROR, { title: e.message, stack: e.stack });
+      this.logger.logMessage('There was an issue auditing your application!', ERROR, {
+        title: e.message,
+        stack: e.stack,
+      });
       shutDownLoggerAndExit(1);
     }
   }
 
   private async getOSSIndexRequestService(args: any): Promise<OSSIndexRequestService> {
-    await storage.init({dir: join(homedir(), '.ossindex', 'auditjs'), ttl: 12 * 60 * 60 * 1000});
+    await storage.init({ dir: join(homedir(), '.ossindex', 'auditjs'), ttl: 12 * 60 * 60 * 1000 });
 
     const options = {
       browser: false,
@@ -269,14 +280,17 @@ export class Application {
     };
 
     if (args.user && args.password) {
-      return new OSSIndexRequestService({...options, user: args?.user, token: args?.password}, storage as any);
+      return new OSSIndexRequestService({ ...options, user: args?.user, token: args?.password }, storage as any);
     }
     try {
       const config = new OssIndexServerConfig();
 
       config.getConfigFromFile();
 
-      return new OSSIndexRequestService({...options, user: config.getUsername(), token: config.getToken()}, storage as any);
+      return new OSSIndexRequestService(
+        { ...options, user: config.getUsername(), token: config.getToken() },
+        storage as any,
+      );
     } catch (e) {
       return new OSSIndexRequestService(options, storage as any);
     }
@@ -298,7 +312,7 @@ export class Application {
       args.stage as string,
       args.timeout as number,
       args.insecure as boolean,
-      this.logger
+      this.logger,
     );
   }
 }

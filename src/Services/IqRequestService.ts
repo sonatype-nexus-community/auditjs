@@ -35,7 +35,7 @@ export class IqRequestService {
     readonly stage: string,
     readonly timeout: number,
     readonly insecure: boolean,
-    readonly logger: ILogger
+    readonly logger: ILogger,
   ) {}
 
   private async init(): Promise<void> {

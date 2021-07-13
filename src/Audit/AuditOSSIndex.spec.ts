@@ -42,9 +42,7 @@ describe('AuditOSSIndex', () => {
   it('should return true if OSS Index results have vulnerabilities', () => {
     // const results = new Array<OssIndexServerResult>();
     // results.push(ossIndexObject);
-
     // const result = doAuditOSSIndex(results);
-
     // expect(result).to.equal(true);
   });
 
@@ -52,18 +50,14 @@ describe('AuditOSSIndex', () => {
     // auditOSSIndex = new AuditOSSIndex(false, true);
     // const results = new Array<OssIndexServerResult>();
     // results.push(ossIndexObject);
-
     // const result = doAuditOSSIndex(results);
-
     // expect(result).to.equal(true);
   });
 
   it('should return false if OSS Index results have no vulnerabilities', () => {
     // const results = new Array<OssIndexServerResult>();
     // results.push(ossIndexObjectNoVulnerabilities);
-
     // const result = doAuditOSSIndex(results);
-
     // expect(result).to.equal(false);
   });
 
@@ -71,9 +65,7 @@ describe('AuditOSSIndex', () => {
     // auditOSSIndex = new AuditOSSIndex(false, true);
     // const results = new Array<OssIndexServerResult>();
     // results.push(ossIndexObjectNoVulnerabilities);
-
     // const result = doAuditOSSIndex(results);
-
     // expect(result).to.equal(false);
   });
 });

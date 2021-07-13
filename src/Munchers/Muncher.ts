@@ -24,6 +24,6 @@ export interface Muncher {
   getGraph(): DepGraph<Component> | undefined;
   getSbomFromCommand(): Promise<any>;
   getInstalledDeps(): Promise<any>;
-  getInstalledDepsAsPurls(): Promise<Array<PackageURL>>
+  getInstalledDepsAsPurls(): Promise<Array<PackageURL>>;
   isValid(): boolean;
 }

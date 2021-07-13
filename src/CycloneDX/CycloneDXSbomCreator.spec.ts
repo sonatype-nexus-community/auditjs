@@ -74,7 +74,7 @@ describe('CycloneDXSbomCreator', async () => {
   });
 
   it('should create a spartan sbom string given a minimal valid object', async () => {
-    const sbomCreator = new CycloneDXSbomCreator(process.cwd(), { spartan: true , logger: new TestLogger()});
+    const sbomCreator = new CycloneDXSbomCreator(process.cwd(), { spartan: true, logger: new TestLogger() });
 
     const bom: Bom = await sbomCreator.getBom(object);
 
