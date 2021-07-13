@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import expect, { ossIndexObject, ossIndexObjectNoVulnerabilities } from '../Tests/TestHelper';
-import { OssIndexServerResult } from '../Types/OssIndexServerResult';
+import expect, { ossIndexResult, ossIndexResultNoVulnerabilities } from '../Tests/TestHelper';
 import { AuditOSSIndex } from './AuditOSSIndex';
 
 let auditOSSIndex: AuditOSSIndex;
