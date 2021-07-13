@@ -130,10 +130,10 @@ let argv = yargs
         description: 'Set output to JUnit XML format',
         demandOption: false,
       },
-      whitelist: {
+      ignorelist: {
         alias: 'w',
         type: 'string',
-        description: 'Set path to whitelist file',
+        description: 'Set path to ignorelist file',
         demandOption: false,
       },
       clear: {

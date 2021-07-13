@@ -16,9 +16,10 @@
 
 import fetch from 'node-fetch';
 import { RequestHelpers } from './RequestHelpers';
-import { logMessage, DEBUG } from '../Application/Logger/Logger';
+import { DEBUG } from '../Application/Logger/Logger';
 import { URL } from 'url';
 import { IqServerPolicyReportResult } from '../Types/IqServerPolicyReportResult';
+import { ILogger } from '@sonatype/js-sona-types';
 
 const APPLICATION_INTERNAL_ID_ENDPOINT = '/api/v2/applications?publicId=';
 
@@ -34,6 +35,7 @@ export class IqRequestService {
     readonly stage: string,
     readonly timeout: number,
     readonly insecure: boolean,
+    readonly logger: ILogger
   ) {}
 
   private async init(): Promise<void> {
@@ -74,7 +76,7 @@ export class IqRequestService {
   }
 
   public async getPolicyReportResults(reportUrl: string): Promise<IqServerPolicyReportResult> {
-    logMessage('Attempting to get policy report results', DEBUG, { reportUrl: reportUrl });
+    this.logger.logMessage('Attempting to get policy report results', DEBUG, { reportUrl: reportUrl });
 
     if (reportUrl.endsWith('raw')) {
       reportUrl = reportUrl.substr(0, reportUrl.length - 3) + 'policy';
@@ -92,7 +94,7 @@ export class IqRequestService {
       return json;
     } else {
       const body = await response.text();
-      logMessage('Response from report API', DEBUG, { response: body });
+      this.logger.logMessage('Response from report API', DEBUG, { response: body });
       throw new Error(`Unable to get results from Report API`);
     }
   }
@@ -101,7 +103,7 @@ export class IqRequestService {
     if (!this.isInitialized) {
       await this.init();
     }
-    logMessage('Internal ID', DEBUG, { internalId: this.internalId });
+    this.logger.logMessage('Internal ID', DEBUG, { internalId: this.internalId });
 
     const response = await fetch(
       `${this.host}/api/v2/scan/applications/${this.internalId}/sources/auditjs?stageId=${this.stage}`,
@@ -117,7 +119,7 @@ export class IqRequestService {
       return json.statusUrl as string;
     } else {
       const body = await response.text();
-      logMessage('Response from third party API', DEBUG, { response: body });
+      this.logger.logMessage('Response from third party API', DEBUG, { response: body });
       throw new Error(`Unable to submit to Third Party API`);
     }
   }
@@ -127,7 +129,7 @@ export class IqRequestService {
     errorHandler: (error: any) => any,
     pollingFinished: (body: any) => any,
   ): Promise<void> {
-    logMessage(url, DEBUG);
+    this.logger.logMessage(url, DEBUG);
     let mergeUrl: URL;
     try {
       mergeUrl = this.getURLOrMerge(url);
@@ -164,7 +166,7 @@ export class IqRequestService {
     try {
       return new URL(url);
     } catch (e) {
-      logMessage(e.title, DEBUG, { message: e.message });
+      this.logger.logMessage(e.title, DEBUG, { message: e.message });
       if (this.host.endsWith('/')) {
         return new URL(this.host.concat(url));
       }

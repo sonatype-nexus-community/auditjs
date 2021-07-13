@@ -15,17 +15,17 @@
  */
 
 import { Formatter } from './Formatter';
-import { OssIndexServerResult, Vulnerability } from '../../Types/OssIndexServerResult';
+import { ComponentDetails, ComponentContainer, SecurityIssue, SecurityData } from '@sonatype/js-sona-types';
 import chalk = require('chalk');
 import { AuditGraph } from '../AuditGraph';
 
 export class TextFormatter implements Formatter {
   constructor(readonly quiet: boolean = false, private graph?: AuditGraph) {}
 
-  public printAuditResults(list: Array<OssIndexServerResult>) {
-    const total = list.length;
-    list = list.sort((a, b) => {
-      return a.coordinates < b.coordinates ? -1 : 1;
+  public printAuditResults(components: ComponentDetails) {
+    const total = components.componentDetails.length;
+    components.componentDetails = components.componentDetails.sort((a, b) => {
+      return a.component.packageUrl < b.component.packageUrl ? -1 : 1;
     });
 
     console.log();
@@ -37,22 +37,36 @@ export class TextFormatter implements Formatter {
 
     this.printLine('-'.repeat(process.stdout.columns));
 
-    list.forEach((x: OssIndexServerResult, i: number) => {
-      if (x.vulnerabilities && x.vulnerabilities.length > 0) {
+    components.componentDetails.forEach((x: ComponentContainer, i: number) => {
+      if (x.securityData && x.securityData.securityIssues.length > 0) {
         this.printVulnerability(i, total, x);
         if (this.graph) {
           console.group();
           console.log("Inverse dependency graph:");
-          this.graph?.printGraph(x.coordinates);
+          this.graph?.printGraph(x.component.packageUrl);
           console.groupEnd();
           console.log();
         }
       } else {
-        this.printLine(chalk.keyword('green')(`[${i + 1}/${total}] - ${x.toAuditLog()}`));
+        this.printLine(chalk.keyword('green')(`[${i + 1}/${total}] - ${this.toAuditLog(x.component.packageUrl, x.securityData)}`));
       }
     });
 
     this.printLine('-'.repeat(process.stdout.columns));
+  }
+
+  private toAuditLog(coordinates: string, vulns: SecurityData | null | undefined): string {
+    return `${coordinates.replace('%40', '@')} - ${this.vulnerabilityMessage(vulns)}`;
+  }
+
+  private vulnerabilityMessage(vulns: SecurityData | null | undefined): string {
+    if (vulns && vulns.securityIssues && vulns.securityIssues.length > 1) {
+      return `${vulns.securityIssues.length} vulnerabilities found!`;
+    } else if (vulns && vulns.securityIssues && vulns.securityIssues.length === 1) {
+      return `${vulns.securityIssues.length} vulnerability found!`;
+    } else {
+      return `No vulnerabilities found!`;
+    }
   }
 
   private getColorFromMaxScore(maxScore: number, defaultColor = 'chartreuse'): string {
@@ -66,39 +80,39 @@ export class TextFormatter implements Formatter {
     return defaultColor;
   }
 
-  private printVulnerability(i: number, total: number, result: OssIndexServerResult): void {
-    if (!result.vulnerabilities) {
+  private printVulnerability(i: number, total: number, component: ComponentContainer): void {
+    if (!component.securityData || !component.securityData.securityIssues || component.securityData.securityIssues.length == 0) {
       return;
     }
     const maxScore: number = Math.max(
-      ...result.vulnerabilities.map((x: Vulnerability) => {
-        return +x.cvssScore;
+      ...component.securityData.securityIssues.map((x: SecurityIssue) => {
+        return +x.severity;
       }),
     );
-    const printVuln = (x: Array<Vulnerability>): void => {
-      x.forEach((y: Vulnerability) => {
-        const color: string = this.getColorFromMaxScore(+y.cvssScore);
+    const printVuln = (x: SecurityIssue[]): void => {
+      x.forEach((y: SecurityIssue) => {
+        const color: string = this.getColorFromMaxScore(+y.severity);
         console.group();
-        this.printVulnField(color, `Vulnerability Title: `, y.title);
+        this.printVulnField(color, `Vulnerability Title: `, y.reference);
         this.printVulnField(color, `ID: `, y.id);
         this.printVulnField(color, `Description: `, y.description);
-        this.printVulnField(color, `CVSS Score: `, y.cvssScore);
-        this.printVulnField(color, `CVSS Vector: `, y.cvssVector);
-        this.printVulnField(color, `CVE: `, y.cve);
-        this.printVulnField(color, `Reference: `, y.reference);
+        this.printVulnField(color, `CVSS Score: `, y.severity.toString());
+        // this.printVulnField(color, `CVSS Vector: `, y.cvssVector);
+        this.printVulnField(color, `CVE: `, y.source);
+        this.printVulnField(color, `Reference: `, y.url);
         console.log();
         console.groupEnd();
       });
     };
 
     console.log(
-      chalk.keyword(this.getColorFromMaxScore(maxScore)).bold(`[${i + 1}/${total}] - ${result.toAuditLog()}`),
+      chalk.keyword(this.getColorFromMaxScore(maxScore)).bold(`[${i + 1}/${total}] - ${this.toAuditLog(component.component.packageUrl, component.securityData)}`),
     );
     console.log();
-    result.vulnerabilities &&
+    component.securityData && component.securityData.securityIssues && component.securityData.securityIssues.length > 0
       printVuln(
-        result.vulnerabilities.sort((x, y) => {
-          return +y.cvssScore - +x.cvssScore;
+        component.securityData.securityIssues.sort((x, y) => {
+          return +y.severity - +x.severity;
         }),
       );
   }
@@ -109,8 +123,8 @@ export class TextFormatter implements Formatter {
     }
   }
 
-  private printVulnField(color: string, title: string, field: string) {
-    if (typeof field !== 'undefined') {
+  private printVulnField(color: string, title: string, field: string | null | undefined) {
+    if (field) {
       console.log(chalk.keyword(color)(title), field);
     }
   }

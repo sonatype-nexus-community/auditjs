@@ -18,6 +18,7 @@ import { configure, getLogger, shutdown, addLayout } from 'log4js';
 import { homedir } from 'os';
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import { ILogger } from '@sonatype/js-sona-types';
 
 export const DEBUG = 'debug';
 export const ERROR = 'error';
@@ -57,23 +58,27 @@ configure({
 const logger = getLogger('auditjs');
 logger.level = DEBUG;
 
-export const createAppLogger = () => {
-  if (!existsSync(logPath)) {
-    mkdirSync(logPath);
-  }
-};
-
-export const logMessage = (message: string, level: string, ...meta: any) => {
-  if (level == DEBUG) {
-    logger.debug(message, ...meta);
-  } else if (level == ERROR) {
-    if (meta && meta[0] && meta[0].stack) {
-      logger.error(message, meta[0].stack);
-    } else {
-      logger.error(message, ...meta);
+export class Logger implements ILogger {
+  constructor() {
+    if (!existsSync(logPath)) {
+      mkdirSync(logPath);
     }
   }
-};
+
+  public logMessage = (message: string, level: string, ...meta: any): void => {
+    if (level == DEBUG) {
+      logger.debug(message, ...meta);
+    } else if (level == ERROR) {
+      if (meta && meta[0] && meta[0].stack) {
+        logger.error(message, meta[0].stack);
+      } else {
+        logger.error(message, ...meta);
+      }
+    }
+  };
+}
+
+
 
 export const shutDownLoggerAndExit = (code: number) => {
   shutdown((err) => {

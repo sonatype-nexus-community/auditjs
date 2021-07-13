@@ -22,11 +22,13 @@ import { CycloneDXSbomCreator } from '../CycloneDX/CycloneDXSbomCreator';
 import { DepGraph } from 'dependency-graph';
 import { Component } from '../CycloneDX/Types/Component';
 import { Bom } from '../CycloneDX/Types/Bom';
+import { PackageURL } from 'packageurl-js';
+import { ILogger } from '@sonatype/js-sona-types';
 
 export class NpmList implements Muncher {
   private graph?: DepGraph<Component>;
 
-  constructor(readonly devDependencies: boolean = false) {}
+  constructor(readonly devDependencies: boolean = false, private logger: ILogger) {}
 
   public async getDepList(): Promise<any> {
     return await this.getInstalledDeps();
@@ -47,6 +49,7 @@ export class NpmList implements Muncher {
       includeLicenseData: false,
       includeBomSerialNumber: true,
       spartan: true,
+      logger: this.logger
     });
 
     const pkgInfo = await sbomCreator.getPackageInfoFromReadInstalled();
@@ -62,16 +65,7 @@ export class NpmList implements Muncher {
 
   // turns object tree from read-installed into an array of coordinates represented node-managed deps
   public async getInstalledDeps(): Promise<Array<Coordinates>> {
-    const sbomCreator = new CycloneDXSbomCreator(process.cwd(), {
-      devDependencies: this.devDependencies,
-      includeLicenseData: false,
-      includeBomSerialNumber: true,
-    });
-
-    const data = await sbomCreator.getPackageInfoFromReadInstalled();
-
-    const bom: Bom = await sbomCreator.getBom(data);
-
+    const bom: Bom = await this.getBom();
     const coordinates: Array<Coordinates> = new Array();
 
     bom.components.map((comp) => {
@@ -79,9 +73,38 @@ export class NpmList implements Muncher {
       coordinates.push(coordinate);
     });
 
+    return coordinates;
+  }
+
+  public async getInstalledDepsAsPurls(): Promise<Array<PackageURL>> {
+    const bom: Bom = await this.getBom();
+
+    const purls: Array<PackageURL> = new Array();
+
+    bom.components.map((comp) => {
+      const purl = PackageURL.fromString(comp.purl);
+      purls.push(purl);
+    });
+
+    return purls;
+  }
+
+  private async getBom(): Promise<Bom> {
+    const sbomCreator = new CycloneDXSbomCreator(process.cwd(), {
+      devDependencies: this.devDependencies,
+      includeLicenseData: false,
+      includeBomSerialNumber: true,
+      spartan: false,
+      logger: this.logger
+    });
+
+    const data = await sbomCreator.getPackageInfoFromReadInstalled();
+
+    const bom: Bom = await sbomCreator.getBom(data);
+
     this.graph = sbomCreator.inverseGraph;
 
-    return coordinates;
+    return bom;
   }
 
   // recursive unit that traverses tree and terminates when object has no dependencies

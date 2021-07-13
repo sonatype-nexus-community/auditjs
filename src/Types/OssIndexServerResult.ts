@@ -28,20 +28,6 @@ export class OssIndexServerResult {
       return new Vulnerability(x);
     });
   }
-
-  public toAuditLog(): string {
-    return `${this.coordinates.replace('%40', '@')} - ${this.vulnerabilityMessage()}`;
-  }
-
-  private vulnerabilityMessage(): string {
-    if (this.vulnerabilities && this.vulnerabilities?.length > 1) {
-      return `${this.vulnerabilities.length} vulnerabilities found!`;
-    } else if (this.vulnerabilities && this.vulnerabilities?.length === 1) {
-      return `${this.vulnerabilities.length} vulnerability found!`;
-    } else {
-      return `No vulnerabilities found!`;
-    }
-  }
 }
 
 export class Vulnerability {

@@ -18,6 +18,7 @@ import expect, { applicationInternalIdResponse } from '../Tests/TestHelper';
 import { Coordinates } from '../Types/Coordinates';
 import nock from 'nock';
 import { IqRequestService } from './IqRequestService';
+import { TestLogger } from '@sonatype/js-sona-types';
 
 describe('IQRequestService', () => {
   it("should have it's third party API request rejected when the IQ Server is down", async () => {
@@ -37,6 +38,7 @@ describe('IQRequestService', () => {
       stage,
       300,
       false,
+      new TestLogger()
     );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
@@ -58,6 +60,7 @@ describe('IQRequestService', () => {
       stage,
       300,
       false,
+      new TestLogger()
     );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
@@ -90,6 +93,7 @@ describe('IQRequestService', () => {
       stage,
       300,
       false,
+      new TestLogger()
     );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
@@ -122,6 +126,7 @@ describe('IQRequestService', () => {
       stage,
       300,
       false,
+      new TestLogger()
     );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
@@ -153,6 +158,7 @@ describe('IQRequestService', () => {
       stage,
       300,
       false,
+      new TestLogger()
     );
 
     requestService.asyncPollForResults(

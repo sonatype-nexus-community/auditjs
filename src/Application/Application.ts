@@ -20,19 +20,21 @@ import { IqRequestService } from '../Services/IqRequestService';
 import { NpmList } from '../Munchers/NpmList';
 import { Coordinates } from '../Types/Coordinates';
 import { Muncher } from '../Munchers/Muncher';
-import { OssIndexRequestService } from '../Services/OssIndexRequestService';
+import { OSSIndexRequestService, ILogger } from '@sonatype/js-sona-types';
 import { AuditIQServer } from '../Audit/AuditIQServer';
 import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
-import { OssIndexServerResult } from '../Types/OssIndexServerResult';
 import { ReportStatus } from '../Types/ReportStatus';
 import { Bower } from '../Munchers/Bower';
-import { DEBUG, ERROR, logMessage, createAppLogger, shutDownLoggerAndExit } from './Logger/Logger';
+import { DEBUG, ERROR, shutDownLoggerAndExit, Logger } from './Logger/Logger';
+import storage from 'node-persist';
 import { Spinner } from './Spinner/Spinner';
-import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
+import { filterVulnerabilities } from '../IgnoreList/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 import { visuallySeperateText } from '../Visual/VisualHelper';
 import { AuditGraph } from '../Audit/AuditGraph';
+import { join } from 'path';
+import { homedir } from 'os';
 const pj = require('../../package.json');
 
 export class Application {
@@ -40,6 +42,7 @@ export class Application {
   private sbom = '';
   private muncher: Muncher;
   private spinner: Spinner;
+  private logger: ILogger;
 
   constructor(
     readonly devDependency: boolean = false,
@@ -48,21 +51,21 @@ export class Application {
     readonly allen: boolean = false,
     readonly scanBower: boolean = false,
   ) {
-    const npmList = new NpmList(devDependency);
+    this.logger = new Logger();
+    const npmList = new NpmList(devDependency, this.logger);
     const bower = new Bower(devDependency);
 
     this.printHeader();
     this.spinner = new Spinner(silent);
-    createAppLogger();
 
     if (npmList.isValid() && !this.scanBower) {
-      logMessage('Setting Muncher to npm list', DEBUG);
+      this.logger.logMessage('Setting Muncher to npm list', DEBUG);
       this.muncher = npmList;
     } else if (bower.isValid()) {
-      logMessage('Setting Muncher to bower', DEBUG);
+      this.logger.logMessage('Setting Muncher to bower', DEBUG);
       this.muncher = bower;
     } else {
-      logMessage(
+      this.logger.logMessage(
         'Failed project directory validation.  Are you in a (built) node, yarn, or bower project directory?',
         'error',
       );
@@ -72,26 +75,26 @@ export class Application {
 
   public async startApplication(args: any): Promise<void> {
     if (args._[0] == 'iq') {
-      logMessage('Attempting to start application', DEBUG);
-      logMessage('Getting coordinates for Sonatype IQ', DEBUG);
+      this.logger.logMessage('Attempting to start application', DEBUG);
+      this.logger.logMessage('Getting coordinates for Sonatype IQ', DEBUG);
       this.spinner.maybeCreateMessageForSpinner('Getting coordinates for Sonatype IQ');
       await this.populateCoordinatesForIQ();
-      logMessage(`Coordinates obtained`, DEBUG, this.sbom);
+      this.logger.logMessage(`Coordinates obtained`, DEBUG, this.sbom);
 
       this.spinner.maybeSucceed();
-      logMessage(`Auditing application`, DEBUG, args.application);
+      this.logger.logMessage(`Auditing application`, DEBUG, args.application);
       this.spinner.maybeCreateMessageForSpinner('Auditing your application with Sonatype IQ');
       await this.auditWithIQ(args);
     } else if (args._[0] == 'ossi') {
-      logMessage('Attempting to start application', DEBUG);
+      this.logger.logMessage('Attempting to start application', DEBUG);
 
-      logMessage('Getting coordinates for Sonatype OSS Index', DEBUG);
+      this.logger.logMessage('Getting coordinates for Sonatype OSS Index', DEBUG);
       this.spinner.maybeCreateMessageForSpinner('Getting coordinates for Sonatype OSS Index');
       await this.populateCoordinates();
-      logMessage(`Coordinates obtained`, DEBUG, this.results);
+      this.logger.logMessage(`Coordinates obtained`, DEBUG, this.results);
 
       this.spinner.maybeSucceed();
-      logMessage('Auditing your application with Sonatype OSS Index', DEBUG);
+      this.logger.logMessage('Auditing your application with Sonatype OSS Index', DEBUG);
       this.spinner.maybeCreateMessageForSpinner('Auditing your application with Sonatype OSS Index');
       await this.auditWithOSSIndex(args);
     } else if (args._[0] == 'sbom') {
@@ -122,11 +125,11 @@ export class Application {
 
   private async populateCoordinates(): Promise<void> {
     try {
-      logMessage('Trying to get dependencies from Muncher', DEBUG);
+      this.logger.logMessage('Trying to get dependencies from Muncher', DEBUG);
       this.results = await this.muncher.getDepList();
-      logMessage('Successfully got dependencies from Muncher', DEBUG);
+      this.logger.logMessage('Successfully got dependencies from Muncher', DEBUG);
     } catch (e) {
-      logMessage(`An error was encountered while gathering your dependencies.`, ERROR, {
+      this.logger.logMessage(`An error was encountered while gathering your dependencies.`, ERROR, {
         title: e.message,
         stack: e.stack,
       });
@@ -136,11 +139,11 @@ export class Application {
 
   private async populateCoordinatesForIQ(): Promise<void> {
     try {
-      logMessage('Trying to get sbom from cyclonedx/bom', DEBUG);
+      this.logger.logMessage('Trying to get sbom from cyclonedx/bom', DEBUG);
       this.sbom = await this.muncher.getSbomFromCommand();
-      logMessage('Successfully got sbom from cyclonedx/bom', DEBUG);
+      this.logger.logMessage('Successfully got sbom from cyclonedx/bom', DEBUG);
     } catch (e) {
-      logMessage(`An error was encountered while gathering your dependencies into an SBOM`, ERROR, {
+      this.logger.logMessage(`An error was encountered while gathering your dependencies into an SBOM`, ERROR, {
         title: e.message,
         stack: e.stack,
       });
@@ -149,39 +152,34 @@ export class Application {
   }
 
   private async auditWithOSSIndex(args: any): Promise<void> {
-    logMessage('Instantiating OSS Index Request Service', DEBUG);
-    const requestService = this.getOssIndexRequestService(args);
+    this.logger.logMessage('Instantiating OSS Index Request Service', DEBUG);
+    const ossIndexService = await this.getOSSIndexRequestService(args);
     this.spinner.maybeSucceed();
 
-    logMessage('Submitting coordinates to Sonatype OSS Index', DEBUG);
+    this.logger.logMessage('Submitting coordinates to Sonatype OSS Index', DEBUG);
     this.spinner.maybeCreateMessageForSpinner('Submitting coordinates to Sonatype OSS Index');
 
     const format = this.muncher instanceof Bower ? 'bower' : 'npm';
-    logMessage('Format to query OSS Index picked', DEBUG, { format: format });
+    this.logger.logMessage('Format to query OSS Index picked', DEBUG, { format: format });
     try {
-      logMessage('Attempting to query OSS Index or use Cache', DEBUG);
-      const res = await requestService.callOSSIndexOrGetFromCache(this.results, format);
-      logMessage('Success from OSS Index', DEBUG, res);
+      this.logger.logMessage('Attempting to query OSS Index or use Cache', DEBUG);
+      const purls = await this.muncher.getInstalledDepsAsPurls();
+      let res = await ossIndexService.getComponentDetails(purls);
+
+      this.logger.logMessage('Success from OSS Index', DEBUG, res);
       this.spinner.maybeSucceed();
 
       this.spinner.maybeCreateMessageForSpinner('Reticulating splines');
-      logMessage('Turning response into Array<OssIndexServerResult>', DEBUG);
-      let ossIndexResults: Array<OssIndexServerResult> = res.map((y: any) => {
-        return new OssIndexServerResult(y);
-      });
-      logMessage('Response morphed into Array<OssIndexServerResult>', DEBUG, {
-        ossIndexServerResults: ossIndexResults,
-      });
       this.spinner.maybeSucceed();
 
-      this.spinner.maybeCreateMessageForSpinner('Removing whitelisted vulnerabilities');
-      logMessage('Response being ran against whitelist', DEBUG, { ossIndexServerResults: ossIndexResults });
-      ossIndexResults = await filterVulnerabilities(ossIndexResults, args.whitelist);
-      logMessage('Response has been whitelisted', DEBUG, { ossIndexServerResults: ossIndexResults });
+      this.spinner.maybeCreateMessageForSpinner('Removing ignored vulnerabilities');
+      this.logger.logMessage('Response being ran against ignore list', DEBUG, { ossIndexServerResults: res });
+      res = await filterVulnerabilities(res, args.ignorelist);
+      this.logger.logMessage('Response has been ran against ignore list', DEBUG, { ossIndexServerResults: res });
       this.spinner.maybeSucceed();
 
       this.spinner.maybeCreateMessageForSpinner('Auditing your results from Sonatype OSS Index');
-      logMessage('Instantiating OSS Index Request Service, with quiet option', DEBUG, { quiet: args.quiet });
+      this.logger.logMessage('Instantiating OSS Index Request Service, with quiet option', DEBUG, { quiet: args.quiet });
 
       const graph = this.muncher.getGraph();
       const auditGraph = new AuditGraph(graph!);
@@ -193,14 +191,14 @@ export class Application {
       );
       this.spinner.maybeStop();
 
-      logMessage('Attempting to audit results', DEBUG);
-      const failed = auditOSSIndex.auditResults(ossIndexResults);
+      this.logger.logMessage('Attempting to audit results', DEBUG);
+      const failed = auditOSSIndex.auditResults(res);
 
-      logMessage('Results audited', DEBUG, { failureCode: failed });
+      this.logger.logMessage('Results audited', DEBUG, { failureCode: failed });
       failed ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);
     } catch (e) {
       this.spinner.maybeStop();
-      logMessage('There was an error auditing with Sonatype OSS Index', ERROR, { title: e.message, stack: e.stack });
+      this.logger.logMessage('There was an error auditing with Sonatype OSS Index', ERROR, { title: e.message, stack: e.stack });
       shutDownLoggerAndExit(1);
     }
   }
@@ -209,33 +207,33 @@ export class Application {
     try {
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Authenticating with Sonatype IQ');
-      logMessage('Attempting to connect to Sonatype IQ', DEBUG, args.application);
+      this.logger.logMessage('Attempting to connect to Sonatype IQ', DEBUG, args.application);
       const requestService = this.getIqRequestService(args);
 
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Submitting your dependencies');
-      logMessage('Submitting SBOM to Sonatype IQ', DEBUG, this.sbom);
+      this.logger.logMessage('Submitting SBOM to Sonatype IQ', DEBUG, this.sbom);
       const resultUrl = await requestService.submitToThirdPartyAPI(this.sbom);
 
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Checking for results (this could take a minute)');
-      logMessage('Polling IQ for report results', DEBUG, resultUrl);
+      this.logger.logMessage('Polling IQ for report results', DEBUG, resultUrl);
 
       requestService.asyncPollForResults(
         `${resultUrl}`,
         (e) => {
           this.spinner.maybeFail();
-          logMessage('There was an issue auditing your application!', ERROR, { title: e.message, stack: e.stack });
+          this.logger.logMessage('There was an issue auditing your application!', ERROR, { title: e.message, stack: e.stack });
           shutDownLoggerAndExit(1);
         },
         async (results: ReportStatus) => {
           this.spinner.maybeSucceed();
           this.spinner.maybeCreateMessageForSpinner('Auditing your results');
 
-          logMessage('Getting raw report results', DEBUG);
+          this.logger.logMessage('Getting raw report results', DEBUG);
           const policyReportResults = await requestService.getPolicyReportResults(results.reportDataUrl!);
 
-          logMessage('Sonatype IQ results obtained!', DEBUG, results);
+          this.logger.logMessage('Sonatype IQ results obtained!', DEBUG, results);
 
           results.reportHtmlUrl = new URL(results.reportHtmlUrl!, requestService.host).href;
 
@@ -245,33 +243,42 @@ export class Application {
           const auditResults = new AuditIQServer(auditGraph);
 
           this.spinner.maybeStop();
-          logMessage('Auditing results', DEBUG, results);
+          this.logger.logMessage('Auditing results', DEBUG, results);
 
           const failure = auditResults.auditThirdPartyResults(results, policyReportResults);
-          logMessage('Audit finished', DEBUG, { failure: failure });
+          this.logger.logMessage('Audit finished', DEBUG, { failure: failure });
 
           failure ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);
         },
       );
     } catch (e) {
       this.spinner.maybeFail();
-      logMessage('There was an issue auditing your application!', ERROR, { title: e.message, stack: e.stack });
+      this.logger.logMessage('There was an issue auditing your application!', ERROR, { title: e.message, stack: e.stack });
       shutDownLoggerAndExit(1);
     }
   }
 
-  private getOssIndexRequestService(args: any): OssIndexRequestService {
+  private async getOSSIndexRequestService(args: any): Promise<OSSIndexRequestService> {
+    await storage.init({dir: join(homedir(), '.ossindex', 'auditjs'), ttl: 12 * 60 * 60 * 1000});
+
+    const options = {
+      browser: false,
+      product: 'AuditJS',
+      version: pj.version,
+      logger: this.logger,
+    };
+
     if (args.user && args.password) {
-      return new OssIndexRequestService(args?.user, args?.password);
+      return new OSSIndexRequestService({...options, user: args?.user, token: args?.password}, storage as any);
     }
     try {
       const config = new OssIndexServerConfig();
 
       config.getConfigFromFile();
 
-      return new OssIndexRequestService(config.getUsername(), config.getToken());
+      return new OSSIndexRequestService({...options, user: config.getUsername(), token: config.getToken()}, storage as any);
     } catch (e) {
-      return new OssIndexRequestService();
+      return new OSSIndexRequestService(options, storage as any);
     }
   }
 
@@ -291,6 +298,7 @@ export class Application {
       args.stage as string,
       args.timeout as number,
       args.insecure as boolean,
+      this.logger
     );
   }
 }

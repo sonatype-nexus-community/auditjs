@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { OssIndexServerResult } from '../../Types/OssIndexServerResult';
+import { ComponentDetails } from '@sonatype/js-sona-types';
 
 export interface Formatter {
-  printAuditResults(list: Array<OssIndexServerResult>): void;
+  printAuditResults(components: ComponentDetails): void;
 }
 
-export const getNumberOfVulnerablePackagesFromResults = (results: Array<OssIndexServerResult>): number => {
-  return results.filter((x) => {
-    return x.vulnerabilities && x.vulnerabilities?.length > 0;
+export const getNumberOfVulnerablePackagesFromResults = (components: ComponentDetails): number => {
+  return components.componentDetails.filter((x) => {
+    return x.securityData && x.securityData.securityIssues && x.securityData.securityIssues.length > 0;
   }).length;
 };

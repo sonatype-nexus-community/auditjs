@@ -17,6 +17,7 @@
 import { CycloneDXSbomCreator } from './CycloneDXSbomCreator';
 import expect from '../Tests/TestHelper';
 import { Bom } from './Types/Bom';
+import { TestLogger } from '@sonatype/js-sona-types';
 
 // Test object with circular dependency, scoped dependency, dependency with dependency
 const object = {
@@ -73,7 +74,7 @@ describe('CycloneDXSbomCreator', async () => {
   });
 
   it('should create a spartan sbom string given a minimal valid object', async () => {
-    const sbomCreator = new CycloneDXSbomCreator(process.cwd(), { spartan: true });
+    const sbomCreator = new CycloneDXSbomCreator(process.cwd(), { spartan: true , logger: new TestLogger()});
 
     const bom: Bom = await sbomCreator.getBom(object);
 
