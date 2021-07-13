@@ -269,7 +269,7 @@ The file should look like:
 }
 ```
 
-The only field that actually matters is `id` and that is the ID you recieve from OSS Index for a vulnerability. You can add fields such as `reason` so that you later can understand why you whitelisted a vulnerability.
+The only field that actually matters is `id` and that is the ID you receive from OSS Index for a vulnerability. You can add fields such as `reason` so that you later can understand why you whitelisted a vulnerability.
 
 Any `id` that is whitelisted will be squelched from the results, and not cause a failure.
 
