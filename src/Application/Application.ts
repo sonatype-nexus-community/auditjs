@@ -100,7 +100,7 @@ export class Application {
       await this.populateCoordinatesForIQ();
       console.log(this.sbom);
     } else {
-      shutDownLoggerAndExit(0);
+      shutDownLoggerAndExit(1);
     }
   }
 
