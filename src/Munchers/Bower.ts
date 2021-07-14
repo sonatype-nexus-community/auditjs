@@ -19,7 +19,7 @@ import { Coordinates } from '../Types/Coordinates';
 import path from 'path';
 import fs from 'fs';
 import { DepGraph } from 'dependency-graph';
-import { Component } from '../CycloneDX/Types/Component';
+import { CycloneDXComponent } from '@sonatype/js-sona-types';
 import { PackageURL } from 'packageurl-js';
 
 export class Bower implements Muncher {
@@ -29,7 +29,7 @@ export class Bower implements Muncher {
     throw new Error('Method not implemented.');
   }
 
-  public getGraph(): DepGraph<Component> | undefined {
+  public getGraph(): DepGraph<CycloneDXComponent> | undefined {
     throw new Error('Method not implemented.');
   }
 

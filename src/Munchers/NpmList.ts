@@ -18,15 +18,12 @@ import { Muncher } from './Muncher';
 import path from 'path';
 import fs from 'fs';
 import { Coordinates } from '../Types/Coordinates';
-import { CycloneDXSbomCreator } from '../CycloneDX/CycloneDXSbomCreator';
 import { DepGraph } from 'dependency-graph';
-import { Component } from '../CycloneDX/Types/Component';
-import { Bom } from '../CycloneDX/Types/Bom';
 import { PackageURL } from 'packageurl-js';
-import { ILogger } from '@sonatype/js-sona-types';
+import { ILogger, CycloneDXSBOMCreator, CycloneDXComponent, Bom } from '@sonatype/js-sona-types';
 
 export class NpmList implements Muncher {
-  private graph?: DepGraph<Component>;
+  private graph?: DepGraph<CycloneDXComponent>;
 
   constructor(readonly devDependencies: boolean = false, private logger: ILogger) {}
 
@@ -39,12 +36,12 @@ export class NpmList implements Muncher {
     return fs.existsSync(nodeModulesPath);
   }
 
-  public getGraph(): DepGraph<Component> | undefined {
+  public getGraph(): DepGraph<CycloneDXComponent> | undefined {
     return this.graph;
   }
 
   public async getSbomFromCommand(): Promise<string> {
-    const sbomCreator = new CycloneDXSbomCreator(process.cwd(), {
+    const sbomCreator = new CycloneDXSBOMCreator(process.cwd(), {
       devDependencies: this.devDependencies,
       includeLicenseData: false,
       includeBomSerialNumber: true,
@@ -68,7 +65,7 @@ export class NpmList implements Muncher {
     const bom: Bom = await this.getBom();
     const coordinates: Array<Coordinates> = new Array();
 
-    bom.components.map((comp) => {
+    bom.components.map((comp: CycloneDXComponent) => {
       const coordinate = new Coordinates(comp.name, comp.version, comp.group);
       coordinates.push(coordinate);
     });
@@ -81,7 +78,7 @@ export class NpmList implements Muncher {
 
     const purls: Array<PackageURL> = new Array();
 
-    bom.components.map((comp) => {
+    bom.components.map((comp: CycloneDXComponent) => {
       const purl = PackageURL.fromString(comp.purl);
       purls.push(purl);
     });
@@ -90,7 +87,7 @@ export class NpmList implements Muncher {
   }
 
   private async getBom(): Promise<Bom> {
-    const sbomCreator = new CycloneDXSbomCreator(process.cwd(), {
+    const sbomCreator = new CycloneDXSBOMCreator(process.cwd(), {
       devDependencies: this.devDependencies,
       includeLicenseData: false,
       includeBomSerialNumber: true,

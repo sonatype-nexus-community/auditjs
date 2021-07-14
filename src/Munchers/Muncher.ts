@@ -15,13 +15,13 @@
  */
 
 import { DepGraph } from 'dependency-graph';
-import { Component } from '../CycloneDX/Types/Component';
+import { CycloneDXComponent } from '@sonatype/js-sona-types';
 import { Coordinates } from '../Types/Coordinates';
 import { PackageURL } from 'packageurl-js';
 
 export interface Muncher {
   getDepList(): Promise<Array<Coordinates>>;
-  getGraph(): DepGraph<Component> | undefined;
+  getGraph(): DepGraph<CycloneDXComponent> | undefined;
   getSbomFromCommand(): Promise<any>;
   getInstalledDeps(): Promise<any>;
   getInstalledDepsAsPurls(): Promise<Array<PackageURL>>;

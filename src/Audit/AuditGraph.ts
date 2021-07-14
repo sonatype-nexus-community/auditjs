@@ -15,7 +15,7 @@
  */
 import chalk from 'chalk';
 import { DepGraph } from 'dependency-graph';
-import { Component as CycloneDXComponent } from '../CycloneDX/Types/Component';
+import { CycloneDXComponent } from '@sonatype/js-sona-types';
 
 const tree = `├`;
 const dash = '─';
