@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-import { ReportStatus } from '../Types/ReportStatus';
 import chalk = require('chalk');
 import { visuallySeperateText } from '../Visual/VisualHelper';
-import { Component, IqServerPolicyReportResult } from '../Types/IqServerPolicyReportResult';
 import { AuditGraph } from './AuditGraph';
+import { IqThirdPartyAPIServerPollingResult, IqServerPolicyReportResult, Component } from '@sonatype/js-sona-types'
 
 export class AuditIQServer {
   constructor(private graph?: AuditGraph) {}
 
-  public auditThirdPartyResults(results: ReportStatus, policyReport?: IqServerPolicyReportResult): boolean {
+  public auditThirdPartyResults(results: IqThirdPartyAPIServerPollingResult, policyReport?: IqServerPolicyReportResult): boolean {
     if (results.isError) {
       visuallySeperateText(true, [results.errorMessage]);
       return true;

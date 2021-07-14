@@ -17,10 +17,9 @@
 import { textSync } from 'figlet';
 import { NpmList } from '../Munchers/NpmList';
 import { Muncher } from '../Munchers/Muncher';
-import { OSSIndexRequestService, ILogger, IqRequestService } from '@sonatype/js-sona-types';
+import { OSSIndexRequestService, ILogger, IqRequestService, IqThirdPartyAPIServerPollingResult } from '@sonatype/js-sona-types';
 import { AuditIQServer } from '../Audit/AuditIQServer';
 import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
-import { ReportStatus } from '../Types/ReportStatus';
 import { Bower } from '../Munchers/Bower';
 import { DEBUG, ERROR, shutDownLoggerAndExit, Logger } from './Logger/Logger';
 import storage from 'node-persist';
@@ -233,7 +232,7 @@ export class Application {
           });
           shutDownLoggerAndExit(1);
         },
-        async (results: ReportStatus) => {
+        async (results: IqThirdPartyAPIServerPollingResult) => {
           this.spinner.maybeSucceed();
           this.spinner.maybeCreateMessageForSpinner('Auditing your results');
 
