@@ -78,14 +78,11 @@ export class Logger implements ILogger {
   };
 }
 
-
-
 export const shutDownLoggerAndExit = (code: number) => {
   shutdown((err) => {
     if (err) {
       console.error(err);
-      process.exit(1);
     }
-    process.exit(code);
+    process.exitCode = code;
   });
 };

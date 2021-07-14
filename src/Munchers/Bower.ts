@@ -15,7 +15,6 @@
  */
 
 import { Muncher } from './Muncher';
-import { Coordinates } from '../Types/Coordinates';
 import path from 'path';
 import fs from 'fs';
 import { DepGraph } from 'dependency-graph';
@@ -25,7 +24,7 @@ import { PackageURL } from 'packageurl-js';
 export class Bower implements Muncher {
   constructor(readonly devDependencies: boolean = false) {}
 
-  getSbomFromCommand(): Promise<any> {
+  public getSbomFromCommand(): Promise<any> {
     throw new Error('Method not implemented.');
   }
 
@@ -38,31 +37,23 @@ export class Bower implements Muncher {
     return fs.existsSync(tempPath);
   }
 
-  public async getDepList(): Promise<Coordinates[]> {
-    return await this.getInstalledDeps();
-  }
-
-  public async getInstalledDeps(): Promise<Coordinates[]> {
-    const depsArray: Array<Coordinates> = [];
+  public async getInstalledDepsAsPurls(): Promise<Array<PackageURL>> {
+    const depsArray: Array<PackageURL> = [];
     const file = fs.readFileSync(path.join(process.cwd(), 'bower.json'));
     const json = JSON.parse(file.toString());
 
     Object.keys(json.dependencies).map((x: string) => {
       const version: string = json.dependencies[x];
-      depsArray.push(new Coordinates(x, version.replace('~', ''), ''));
+      depsArray.push(new PackageURL("bower", undefined, x, version.replace('~', ''), undefined, undefined));
     });
 
     if (this.devDependencies) {
       Object.keys(json.devDependencies).map((x: string) => {
         const version: string = json.devDependencies[x];
-        depsArray.push(new Coordinates(x, version.replace('~', ''), ''));
+        depsArray.push(new PackageURL("bower", undefined, x, version.replace('~', ''), undefined, undefined));
       });
     }
 
     return depsArray;
-  }
-
-  public async getInstalledDepsAsPurls(): Promise<Array<PackageURL>> {
-    throw new Error('Method not implemented.');
   }
 }

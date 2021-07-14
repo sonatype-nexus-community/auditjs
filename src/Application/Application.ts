@@ -16,7 +16,6 @@
 
 import { textSync } from 'figlet';
 import { NpmList } from '../Munchers/NpmList';
-import { Coordinates } from '../Types/Coordinates';
 import { Muncher } from '../Munchers/Muncher';
 import { OSSIndexRequestService, ILogger, IqRequestService } from '@sonatype/js-sona-types';
 import { AuditIQServer } from '../Audit/AuditIQServer';
@@ -33,10 +32,11 @@ import { visuallySeperateText } from '../Visual/VisualHelper';
 import { AuditGraph } from '../Audit/AuditGraph';
 import { join } from 'path';
 import { homedir } from 'os';
+import { PackageURL } from 'packageurl-js';
 const pj = require('../../package.json');
 
 export class Application {
-  private results: Array<Coordinates> = [];
+  private results: Array<PackageURL> = [];
   private sbom = '';
   private muncher: Muncher;
   private spinner: Spinner;
@@ -89,7 +89,7 @@ export class Application {
 
       this.logger.logMessage('Getting coordinates for Sonatype OSS Index', DEBUG);
       this.spinner.maybeCreateMessageForSpinner('Getting coordinates for Sonatype OSS Index');
-      await this.populateCoordinates();
+      await this.populatePurls();
       this.logger.logMessage(`Coordinates obtained`, DEBUG, this.results);
 
       this.spinner.maybeSucceed();
@@ -122,10 +122,10 @@ export class Application {
     visuallySeperateText(false, [`${title} version: ${pj.version}`]);
   }
 
-  private async populateCoordinates(): Promise<void> {
+  private async populatePurls(): Promise<void> {
     try {
       this.logger.logMessage('Trying to get dependencies from Muncher', DEBUG);
-      this.results = await this.muncher.getDepList();
+      this.results = await this.muncher.getInstalledDepsAsPurls();
       this.logger.logMessage('Successfully got dependencies from Muncher', DEBUG);
     } catch (e) {
       this.logger.logMessage(`An error was encountered while gathering your dependencies.`, ERROR, {

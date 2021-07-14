@@ -17,7 +17,6 @@
 import { Muncher } from './Muncher';
 import path from 'path';
 import fs from 'fs';
-import { Coordinates } from '../Types/Coordinates';
 import { DepGraph } from 'dependency-graph';
 import { PackageURL } from 'packageurl-js';
 import { ILogger, CycloneDXSBOMCreator, CycloneDXComponent, Bom } from '@sonatype/js-sona-types';
@@ -26,10 +25,6 @@ export class NpmList implements Muncher {
   private graph?: DepGraph<CycloneDXComponent>;
 
   constructor(readonly devDependencies: boolean = false, private logger: ILogger) {}
-
-  public async getDepList(): Promise<any> {
-    return await this.getInstalledDeps();
-  }
 
   public isValid(): boolean {
     const nodeModulesPath = path.join(process.cwd(), 'node_modules');
@@ -58,19 +53,6 @@ export class NpmList implements Muncher {
     this.graph = sbomCreator.inverseGraph;
 
     return sbomString;
-  }
-
-  // turns object tree from read-installed into an array of coordinates represented node-managed deps
-  public async getInstalledDeps(): Promise<Array<Coordinates>> {
-    const bom: Bom = await this.getBom();
-    const coordinates: Array<Coordinates> = new Array();
-
-    bom.components.map((comp: CycloneDXComponent) => {
-      const coordinate = new Coordinates(comp.name, comp.version, comp.group);
-      coordinates.push(coordinate);
-    });
-
-    return coordinates;
   }
 
   public async getInstalledDepsAsPurls(): Promise<Array<PackageURL>> {

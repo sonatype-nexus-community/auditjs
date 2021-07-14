@@ -206,10 +206,10 @@ if (argv) {
       app.startApplication(argv);
     } catch (error) {
       console.error(error);
-      process.exit(1);
+      process.exitCode = 1;
     }
   } else {
     yargs.showHelp();
-    process.exit(0);
+    process.exitCode = 1;
   }
 }
