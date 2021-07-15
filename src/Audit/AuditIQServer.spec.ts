@@ -34,14 +34,14 @@ describe('AuditIQServer', () => {
 
   it('should provide a true value if IQ Server Results have policy violations', () => {
     const auditIqServer = new AuditIQServer();
-    const results: IqThirdPartyAPIServerPollingResult = { policyAction: 'Failure', isError: false };
+    const results: IqThirdPartyAPIServerPollingResult = { policyAction: 'Failure', isError: false, reportHtmlUrl: '' };
     const result = auditIqServer.auditThirdPartyResults(results, {} as IqServerPolicyReportResult);
     expect(result).to.equal(true);
   });
 
   it('should provide a true value if IQ Server Results have an isError value', () => {
     const auditIqServer = new AuditIQServer();
-    const results: IqThirdPartyAPIServerPollingResult = { isError: true };
+    const results: IqThirdPartyAPIServerPollingResult = { policyAction: '', isError: true, reportHtmlUrl: ''};
     const result = auditIqServer.auditThirdPartyResults(results, {} as IqServerPolicyReportResult);
     expect(result).to.equal(true);
   });
