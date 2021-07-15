@@ -17,7 +17,7 @@
 import chalk = require('chalk');
 import { visuallySeperateText } from '../Visual/VisualHelper';
 import { AuditGraph } from './AuditGraph';
-import { IqThirdPartyAPIServerPollingResult, IqServerPolicyReportResult, Component } from '@sonatype/js-sona-types'
+import { IqThirdPartyAPIServerPollingResult, IqServerPolicyReportResult, PolicyComponent } from '@sonatype/js-sona-types'
 
 export class AuditIQServer {
   constructor(private graph?: AuditGraph) {}
@@ -63,7 +63,7 @@ export class AuditIQServer {
     }
   }
 
-  private doPrintPolicyViolation(component: Component) {
+  private doPrintPolicyViolation(component: PolicyComponent) {
     console.group(`Package URL: ${chalk.bgBlack(chalk.cyan(component.packageUrl))}`);
     console.log(
       `Known violations: ${component.violations
