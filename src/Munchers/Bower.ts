@@ -44,13 +44,13 @@ export class Bower implements Muncher {
 
     Object.keys(json.dependencies).map((x: string) => {
       const version: string = json.dependencies[x];
-      depsArray.push(new PackageURL("bower", undefined, x, version.replace('~', ''), undefined, undefined));
+      depsArray.push(new PackageURL('bower', undefined, x, version.replace('~', ''), undefined, undefined));
     });
 
     if (this.devDependencies) {
       Object.keys(json.devDependencies).map((x: string) => {
         const version: string = json.devDependencies[x];
-        depsArray.push(new PackageURL("bower", undefined, x, version.replace('~', ''), undefined, undefined));
+        depsArray.push(new PackageURL('bower', undefined, x, version.replace('~', ''), undefined, undefined));
       });
     }
 
