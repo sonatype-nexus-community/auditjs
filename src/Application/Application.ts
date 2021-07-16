@@ -17,7 +17,12 @@
 import { textSync } from 'figlet';
 import { NpmList } from '../Munchers/NpmList';
 import { Muncher } from '../Munchers/Muncher';
-import { OSSIndexRequestService, ILogger, IqRequestService, IqThirdPartyAPIServerPollingResult } from '@sonatype/js-sona-types';
+import {
+  OSSIndexRequestService,
+  ILogger,
+  IqRequestService,
+  IqThirdPartyAPIServerPollingResult,
+} from '@sonatype/js-sona-types';
 import { AuditIQServer } from '../Audit/AuditIQServer';
 import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
 import { Bower } from '../Munchers/Bower';
