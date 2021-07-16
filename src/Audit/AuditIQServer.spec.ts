@@ -23,7 +23,9 @@ const oldError = console.error;
 
 describe('AuditIQServer', () => {
   before(() => {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     console.log = () => ({});
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     console.error = () => ({});
   });
 
