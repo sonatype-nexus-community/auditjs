@@ -38,7 +38,7 @@ class Node {
     return this.depth;
   }
 
-  public prettyPrintTree(ident: string, last: boolean) {
+  public prettyPrintTree(ident: string, last: boolean): void {
     const rootDepText = chalk.bgBlack(chalk.green(chalk.bold(`${this.name} - root package`)));
     const iAmJustABadDepText = chalk.bgBlack(chalk.red(chalk.bold(`${this.name} - direct dependency`)));
     const indirectlyResponsibleText = chalk.bgBlack(chalk.yellow(chalk.bold(`${this.name} - indirectly responsible`)));
@@ -80,7 +80,7 @@ class Node {
         break;
     }
 
-    this.dependencies.map((dep, i, arr) => {
+    this.dependencies.map((dep, i) => {
       dep.prettyPrintTree(ident, i == this.dependencies.length - 1);
     });
   }
@@ -89,30 +89,32 @@ class Node {
 export class AuditGraph {
   constructor(readonly graph: DepGraph<CycloneDXComponent>) {}
 
-  public printGraph(rootComponent: string) {
+  public printGraph(rootComponent: string): void {
     const rootNode = new Node(rootComponent, 0);
 
     this.constructTree(rootNode, rootComponent);
     rootNode.prettyPrintTree('', true);
   }
 
-  private constructTree(tree: Node, purl: string) {
-    const deps = this.graph!.directDependenciesOf(purl);
-    if (deps && deps.length > 0) {
-      deps?.map((dep) => {
-        const depNode = new Node(dep, tree.getDepth() + 1);
-        if (this.graph!.directDependenciesOf(dep).length == 0) {
-          if (deps.length == 1) {
+  private constructTree(tree: Node, purl: string): void {
+    if (this.graph) {
+      const deps = this.graph.directDependenciesOf(purl);
+      if (deps && deps.length > 0) {
+        deps.map((dep) => {
+          const depNode = new Node(dep, tree.getDepth() + 1);
+          if (this.graph.directDependenciesOf(dep).length == 0) {
+            if (deps.length == 1) {
+              tree.dependencies.push(depNode);
+            }
+          } else {
+            this.constructTree(depNode, dep);
             tree.dependencies.push(depNode);
           }
-        } else {
-          this.constructTree(depNode, dep);
-          tree.dependencies.push(depNode);
-        }
-      });
-    } else {
-      const depNode = new Node(purl, tree.getDepth() + 1);
-      tree.dependencies.push(depNode);
+        });
+      } else {
+        const depNode = new Node(purl, tree.getDepth() + 1);
+        tree.dependencies.push(depNode);
+      }
     }
   }
 }

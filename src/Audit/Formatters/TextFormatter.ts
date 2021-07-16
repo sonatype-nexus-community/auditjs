@@ -97,7 +97,7 @@ export class TextFormatter implements Formatter {
         this.printVulnField(color, `ID: `, y.id);
         this.printVulnField(color, `Description: `, y.description);
         this.printVulnField(color, `CVSS Score: `, y.severity.toString());
-        // this.printVulnField(color, `CVSS Vector: `, y.cvssVector);
+        this.printVulnField(color, `CVSS Vector: `, y.vector);
         this.printVulnField(color, `CVE: `, y.source);
         this.printVulnField(color, `Reference: `, y.url);
         console.log();

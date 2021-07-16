@@ -35,7 +35,10 @@ export class AuditIQServer {
       return true;
     }
     if (results.policyAction === 'Failure') {
-      this.handleFailure(results.reportHtmlUrl!, policyReport);
+      if (results.reportHtmlUrl) {
+        this.handleFailure(results.reportHtmlUrl, policyReport);
+        return true;
+      }
       return true;
     }
     visuallySeperateText(false, [
@@ -45,7 +48,7 @@ export class AuditIQServer {
     return false;
   }
 
-  private handleFailure(reportURL: string, policyReport?: IqServerPolicyReportResult) {
+  private handleFailure(reportURL: string, policyReport?: IqServerPolicyReportResult): void {
     visuallySeperateText(true, [
       `Sonabot here, you have some build-breaking policy violations to clean up!`,
       chalk.keyword('orange').bold(`Report URL: ${reportURL}`),
@@ -56,7 +59,7 @@ export class AuditIQServer {
     }
   }
 
-  private printPolicyViolations(policyReport: IqServerPolicyReportResult) {
+  private printPolicyViolations(policyReport: IqServerPolicyReportResult): void {
     const violators = policyReport.components.filter((comp) => {
       return comp.violations && comp.violations.length > 0;
     });
@@ -70,7 +73,7 @@ export class AuditIQServer {
     }
   }
 
-  private doPrintPolicyViolation(component: PolicyComponent) {
+  private doPrintPolicyViolation(component: PolicyComponent): void {
     console.group(`Package URL: ${chalk.bgBlack(chalk.cyan(component.packageUrl))}`);
     console.log(
       `Known violations: ${component.violations

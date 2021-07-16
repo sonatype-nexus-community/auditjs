@@ -54,7 +54,7 @@ export class XmlFormatter implements Formatter {
     vulnBlock += `ID: ${vuln.id}\n`;
     vulnBlock += `Description: ${vuln.description}\n`;
     vulnBlock += `CVSS Score: ${vuln.severity}\n`;
-    // vulnBlock += `CVSS Vector: ${vuln.cvssVector}\n`;
+    vulnBlock += `CVSS Vector: ${vuln.vector}\n`;
     vulnBlock += `CVE: ${vuln.source}\n`;
     vulnBlock += `Reference: ${vuln.url}\n`;
 
