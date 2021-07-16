@@ -35,7 +35,7 @@ describe('AuditIQServer', () => {
   it('should provide a true value if IQ Server Results have policy violations', () => {
     const auditIqServer = new AuditIQServer();
     const results: IqThirdPartyAPIServerPollingResult = { policyAction: 'Failure', isError: false };
-    const result = auditIqServer.auditThirdPartyResults(results, {} as IqServerPolicyReportResult);
+    const result = auditIqServer.auditThirdPartyResults(results, { components: [{}] } as IqServerPolicyReportResult);
     expect(result).to.equal(true);
   });
 
