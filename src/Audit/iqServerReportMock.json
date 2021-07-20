@@ -1,0 +1,148 @@
+{
+  "reportTime":1552489658463,
+  "reportTitle":"Build Report",
+  "commitHash":"79d5810d5545dea1db31d32d17d1a98376775186",
+  "initiator":"system",
+  "application":{
+    "id":"463ed0fa4ba14393ae4af264ab110bcf",
+    "publicId":"account-storage",
+    "name":"Account Storage",
+    "organizationId":"6766a6b01bd64e01988e478a3f57b08c",
+    "contactUserName":"test"
+  },
+  "counts":{
+    "partiallyMatchedComponentCount":1,
+    "exactlyMatchedComponentCount":30,
+    "totalComponentCount":32,
+    "grandfatheredPolicyViolationCount":72
+  },
+  "components":[
+    {
+      "hash":"47b6857af4a1cc50875a",
+      "matchState":"Exact",
+      "componentIdentifier":{
+        "format":"maven",
+        "coordinates":{
+          "artifactId":"logback-access",
+          "classifier":"",
+          "extension":"jar",
+          "groupId":"ch.qos.logback",
+          "version":"0.6"
+        }
+      },
+      "packageUrl":"pkg:maven/ch.qos.logback/logback-access@0.6?type=jar",
+      "proprietary":false,
+      "pathnames":[
+        "sample-application.zip/logback-access-0.6.jar"
+      ],
+      "dependencyData":{
+        "directDependency":true,
+        "innerSource":false
+      },
+      "violations":[
+        {
+          "policyId":"15d67e3299e34362b548847bb38dfc89",
+          "policyName":"Security-High",
+          "policyThreatCategory":"SECURITY",
+          "policyThreatLevel":9,
+          "policyViolationId":"c8fc78d54b904d2f8045afafbe0558dc",
+          "waived":false,
+          "grandfathered":true,
+          "constraints":[
+            {
+              "constraintId":"01996366a3fb445c800e79c7786224f7",
+              "constraintName":"cvss >= 7 and < 9",
+              "conditions":[
+                {
+                  "conditionSummary":"Security Vulnerability Severity >= 7",
+                  "conditionReason":"Found security vulnerability CVE-2017-5929 with severity 7.5."
+                },
+                {
+                  "conditionSummary":"Label is not 'waiver-security'",
+                  "conditionReason":"Did not find label 'waiver-security'."
+                },
+                {
+                  "conditionSummary":"Security Vulnerability Status is not NOT_APPLICABLE",
+                  "conditionReason":"Found security vulnerability CVE-2017-5929 with status 'Acknowledged', not 'Not Applicable'."
+                },
+                {
+                  "conditionSummary":"Security Vulnerability Severity < 9",
+                  "conditionReason":"Found security vulnerability CVE-2017-5929 with severity 7.5."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "packageUrl":"pkg:maven/org.example/ACME-business@1.0.0?type=jar",
+      "hash":"cefa389a797ca9d030ef",
+      "componentIdentifier":{
+        "format":"maven",
+        "coordinates":{
+          "artifactId":"ACME-business",
+          "classifier":"",
+          "extension":"jar",
+          "groupId":"org.example",
+          "version":"1.0.0"
+        }
+      },
+      "displayName":"org.example : ACME-business : 1.0.0",
+      "proprietary":false,
+      "matchState":"exact",
+      "pathnames":[
+        "org.example:Consumer-Data:jar:1.0.0/org.example:ACME-business:jar:1.0.0",
+        "org.example:Consumer-Service:jar:1.0.0/org.example:ACME-business:jar:1.0.0"
+      ],
+      "dependencyData":{
+        "directDependency":true,
+        "innerSource":true,
+        "innerSourceData":[
+          {
+            "ownerApplicationName":"ACM-PRODUCER",
+            "ownerApplicationId":"17f3d3479cbf44b2809b68569d1b0b5c"
+          }
+        ]
+      },
+      "violations":[]
+    },
+    {
+      "packageUrl":"pkg:maven/org.example/ACME-data@1.0.0?type=jar",
+      "hash":"32032f22af513c6e683d",
+      "componentIdentifier":{
+        "format":"maven",
+        "coordinates":{
+          "artifactId":"ACME-data",
+          "classifier":"",
+          "extension":"jar",
+          "groupId":"org.example",
+          "version":"1.0.0"
+        }
+      },
+      "displayName":"org.example : ACME-data : 1.0.0",
+      "proprietary":false,
+      "matchState":"exact",
+      "pathnames":[
+        "org.example:Consumer-Data:jar:1.0.0/org.example:ACME-data:jar:1.0.0",
+        "org.example:Consumer-Service:jar:1.0.0/org.example:ACME-data:jar:1.0.0"
+      ],
+      "dependencyData":{
+        "directDependency":false,
+        "innerSource":false,
+        "parentComponentPurls":[
+          "pkg:maven/org.example/ACME-business@1.0.0?type=jar",
+          "pkg:maven/org.example/ACME-model@2.1.0?type=jar"
+        ],
+        "innerSourceData":[
+          {
+            "ownerApplicationName":"ACM-PRODUCER",
+            "ownerApplicationId":"17f3d3479cbf44b2809b68569d1b0b5c",
+            "innerSourceComponentPurl":"pkg:maven/org.example/ACME-business@1.0.0?type=jar"
+          }
+        ]
+      },
+      "violations":[]
+    }
+  ]
+}

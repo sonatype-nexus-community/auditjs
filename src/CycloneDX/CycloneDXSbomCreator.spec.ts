@@ -16,6 +16,7 @@
 
 import { CycloneDXSbomCreator } from './CycloneDXSbomCreator';
 import expect from '../Tests/TestHelper';
+import { Bom } from './Types/Bom';
 
 // Test object with circular dependency, scoped dependency, dependency with dependency
 const object = {
@@ -32,7 +33,7 @@ const object = {
       dependencies: {
         testdependency: {
           name: 'testdependency',
-          version: '1.0.1',
+          version: '1.0.3',
         },
       },
     },
@@ -56,24 +57,55 @@ const object = {
   },
 };
 
-const expectedResponse = `<?xml version="1.0" encoding="utf-8"?><bom xmlns="http://cyclonedx.org/schema/bom/1.1" version="1"><components><component type="library" bom-ref="pkg:npm/testdependency@1.0.1"><name>testdependency</name><version>1.0.1</version><purl>pkg:npm/testdependency@1.0.1</purl><description/><externalReferences><reference type="issue-tracker"><url>git+ssh://git@github.com/slackhq/csp-html-webpack-plugin.git</url></reference></externalReferences></component><component type="library" bom-ref="pkg:npm/testdependency2@1.0.2"><name>testdependency2</name><version>1.0.2</version><purl>pkg:npm/testdependency2@1.0.2</purl><description/></component><component type="library" bom-ref="pkg:npm/testdependency@1.0.0"><name>testdependency</name><version>1.0.0</version><purl>pkg:npm/testdependency@1.0.0</purl><description/></component><component type="library" bom-ref="pkg:npm/%40scope/testdependency3@1.0.2"><group>@scope</group><name>testdependency3</name><version>1.0.2</version><purl>pkg:npm/%40scope/testdependency3@1.0.2</purl><description/></component></components></bom>`;
+const bomSchemaVersion = '1.3';
+const serialNumberToReplace = 'serialNumberToReplace';
+const metadataTimestampToReplace = 'metadataTimestampToReplace';
 
-const expectedSpartanResponse = `<?xml version="1.0" encoding="utf-8"?><bom xmlns="http://cyclonedx.org/schema/bom/1.1" version="1"><components><component type="library" bom-ref="pkg:npm/testdependency@1.0.1"><name>testdependency</name><version>1.0.1</version><purl>pkg:npm/testdependency@1.0.1</purl></component><component type="library" bom-ref="pkg:npm/testdependency2@1.0.2"><name>testdependency2</name><version>1.0.2</version><purl>pkg:npm/testdependency2@1.0.2</purl></component><component type="library" bom-ref="pkg:npm/testdependency@1.0.0"><name>testdependency</name><version>1.0.0</version><purl>pkg:npm/testdependency@1.0.0</purl></component><component type="library" bom-ref="pkg:npm/%40scope/testdependency3@1.0.2"><group>@scope</group><name>testdependency3</name><version>1.0.2</version><purl>pkg:npm/%40scope/testdependency3@1.0.2</purl></component></components></bom>`;
+const expectedResponseTemplate =
+  `<?xml version="1.0" encoding="utf-8"?><bom xmlns="https://cyclonedx.org/schema/bom/` +
+  bomSchemaVersion +
+  `" serialNumber="` +
+  serialNumberToReplace +
+  `" version="1"><metadata><timestamp>` +
+  metadataTimestampToReplace +
+  `</timestamp><component type="library" bom-ref="pkg:npm/testproject@1.0.0"><group/><name>testproject</name><version>1.0.0</version><purl>pkg:npm/testproject@1.0.0</purl></component></metadata><components><component type="library" bom-ref="pkg:npm/testdependency@1.0.1"><name>testdependency</name><version>1.0.1</version><purl>pkg:npm/testdependency@1.0.1</purl><description/><externalReferences><reference type="issue-tracker"><url>git+ssh://git@github.com/slackhq/csp-html-webpack-plugin.git</url></reference></externalReferences></component><component type="library" bom-ref="pkg:npm/testdependency@1.0.3"><name>testdependency</name><version>1.0.3</version><purl>pkg:npm/testdependency@1.0.3</purl><description/></component><component type="library" bom-ref="pkg:npm/testdependency2@1.0.2"><name>testdependency2</name><version>1.0.2</version><purl>pkg:npm/testdependency2@1.0.2</purl><description/></component><component type="library" bom-ref="pkg:npm/testdependency@1.0.0"><name>testdependency</name><version>1.0.0</version><purl>pkg:npm/testdependency@1.0.0</purl><description/></component><component type="library" bom-ref="pkg:npm/%40scope/testdependency3@1.0.2"><group>@scope</group><name>testdependency3</name><version>1.0.2</version><purl>pkg:npm/%40scope/testdependency3@1.0.2</purl><description/></component></components><dependencies><dependency ref="pkg:npm/testproject@1.0.0"><dependency ref="pkg:npm/testdependency@1.0.1"/><dependency ref="pkg:npm/testdependency2@1.0.2"/><dependency ref="pkg:npm/%40scope/testdependency3@1.0.2"/></dependency><dependency ref="pkg:npm/testdependency@1.0.1"><dependency ref="pkg:npm/testdependency@1.0.3"/></dependency><dependency ref="pkg:npm/testdependency@1.0.3"/><dependency ref="pkg:npm/testdependency2@1.0.2"><dependency ref="pkg:npm/testdependency@1.0.0"/></dependency><dependency ref="pkg:npm/testdependency@1.0.0"/><dependency ref="pkg:npm/%40scope/testdependency3@1.0.2"/></dependencies></bom>`;
+
+const expectedSpartanResponseTemplate =
+  `<?xml version="1.0" encoding="utf-8"?><bom xmlns="https://cyclonedx.org/schema/bom/` +
+  bomSchemaVersion +
+  `" serialNumber="` +
+  serialNumberToReplace +
+  `" version="1"><metadata><timestamp>` +
+  metadataTimestampToReplace +
+  `</timestamp><component type="library" bom-ref="pkg:npm/testproject@1.0.0"><group/><name>testproject</name><version>1.0.0</version><purl>pkg:npm/testproject@1.0.0</purl></component></metadata><components><component type="library" bom-ref="pkg:npm/testdependency@1.0.1"><name>testdependency</name><version>1.0.1</version><purl>pkg:npm/testdependency@1.0.1</purl></component><component type="library" bom-ref="pkg:npm/testdependency@1.0.3"><name>testdependency</name><version>1.0.3</version><purl>pkg:npm/testdependency@1.0.3</purl></component><component type="library" bom-ref="pkg:npm/testdependency2@1.0.2"><name>testdependency2</name><version>1.0.2</version><purl>pkg:npm/testdependency2@1.0.2</purl></component><component type="library" bom-ref="pkg:npm/testdependency@1.0.0"><name>testdependency</name><version>1.0.0</version><purl>pkg:npm/testdependency@1.0.0</purl></component><component type="library" bom-ref="pkg:npm/%40scope/testdependency3@1.0.2"><group>@scope</group><name>testdependency3</name><version>1.0.2</version><purl>pkg:npm/%40scope/testdependency3@1.0.2</purl></component></components><dependencies><dependency ref="pkg:npm/testproject@1.0.0"><dependency ref="pkg:npm/testdependency@1.0.1"/><dependency ref="pkg:npm/testdependency2@1.0.2"/><dependency ref="pkg:npm/%40scope/testdependency3@1.0.2"/></dependency><dependency ref="pkg:npm/testdependency@1.0.1"><dependency ref="pkg:npm/testdependency@1.0.3"/></dependency><dependency ref="pkg:npm/testdependency@1.0.3"/><dependency ref="pkg:npm/testdependency2@1.0.2"><dependency ref="pkg:npm/testdependency@1.0.0"/></dependency><dependency ref="pkg:npm/testdependency@1.0.0"/><dependency ref="pkg:npm/%40scope/testdependency3@1.0.2"/></dependencies></bom>`;
 
 describe('CycloneDXSbomCreator', async () => {
   it('should create an sbom string given a minimal valid object', async () => {
     const sbomCreator = new CycloneDXSbomCreator(process.cwd());
 
-    const string = await sbomCreator.createBom(object);
+    const bom: Bom = await sbomCreator.getBom(object);
 
-    expect(string).to.eq(expectedResponse);
+    const sbomString = sbomCreator.toXml(bom, false);
+    // replace template placeholders with real values
+    const expectedResponse = expectedResponseTemplate
+      .replace(serialNumberToReplace, bom['@serial-number'])
+      .replace(metadataTimestampToReplace, bom.metadata.timestamp);
+
+    expect(sbomString).to.eq(expectedResponse);
   });
 
   it('should create a spartan sbom string given a minimal valid object', async () => {
     const sbomCreator = new CycloneDXSbomCreator(process.cwd(), { spartan: true });
 
-    const string = await sbomCreator.createBom(object);
+    const bom: Bom = await sbomCreator.getBom(object);
 
-    expect(string).to.eq(expectedSpartanResponse);
+    const sbomString = sbomCreator.toXml(bom, false);
+
+    // replace template placeholders with real values
+    const expectedResponse = expectedSpartanResponseTemplate
+      .replace(serialNumberToReplace, bom['@serial-number'])
+      .replace(metadataTimestampToReplace, bom.metadata.timestamp);
+
+    expect(sbomString).to.eq(expectedResponse);
   });
 });

@@ -19,7 +19,7 @@
 
 import { Options } from './Options';
 import uuidv4 from 'uuid/v4';
-import builder from 'xmlbuilder';
+import { create } from 'xmlbuilder2';
 import readInstalled from 'read-installed';
 import * as ssri from 'ssri';
 import * as fs from 'fs';
@@ -31,8 +31,15 @@ import spdxLicensesNonDeprecated = require('spdx-license-ids');
 import spdxLicensesDeprecated = require('spdx-license-ids/deprecated');
 import { toPurl } from './Helpers/Helpers';
 import { logMessage, DEBUG } from '../Application/Logger/Logger';
+import { DepGraph } from 'dependency-graph';
+import { Dependency } from './Types/Dependency';
+import { Metadata } from './Types/Metadata';
+import { Bom } from './Types/Bom';
 
 export class CycloneDXSbomCreator {
+  public graph: DepGraph<Component>;
+  public inverseGraph: DepGraph<Component>;
+
   readonly licenseFilenames: Array<string> = [
     'LICENSE',
     'License',
@@ -52,30 +59,61 @@ export class CycloneDXSbomCreator {
     { licenseContentType: 'text/xml', fileExtension: '.xml' },
   ];
 
-  readonly SBOMSCHEMA: string = 'http://cyclonedx.org/schema/bom/1.1';
+  readonly SBOMSCHEMA: string = 'https://cyclonedx.org/schema/bom/1.3';
 
-  constructor(readonly path: string, readonly options?: Options) {}
+  constructor(readonly path: string, readonly options?: Options) {
+    this.graph = new DepGraph();
+    this.inverseGraph = new DepGraph();
+  }
 
-  public async createBom(pkgInfo: any): Promise<string> {
-    const bom = builder.create('bom', { encoding: 'utf-8', separateArrayItems: true }).att('xmlns', this.SBOMSCHEMA);
+  public async getBom(pkgInfo: any): Promise<Bom> {
+    const components = Array.from(this.listComponents(pkgInfo).values());
 
-    if (this.options && this.options.includeBomSerialNumber) {
-      bom.att('serialNumber', 'urn:uuid:' + uuidv4());
-    }
+    const dependencies: Array<Dependency> = [];
 
-    bom.att('version', 1);
+    this.listDependencies(this.getPurlFromPkgInfo(pkgInfo), dependencies);
 
-    const componentsNode = bom.ele('components');
-    const components = this.listComponents(pkgInfo);
+    const bom: Bom = {
+      '@serial-number': 'urn:uuid:' + uuidv4(),
+      '@version': 1,
+      '@xmlns': this.SBOMSCHEMA,
+      metadata: this.getMetadata(pkgInfo),
+      components: components,
+      dependencies: dependencies,
+    };
 
-    if (components.length > 0) {
-      componentsNode.ele(components);
-    }
+    return bom;
+  }
 
-    const bomString = bom.end({
-      width: 0,
-      allowEmpty: false,
-      spaceBeforeSlash: '',
+  public toXml(bom: Bom, prettyPrint: boolean): string {
+    const builder = create();
+    builder.set({ encoding: 'utf-8' });
+    const sbom = builder.ele('bom');
+
+    sbom.att('xmlns', bom['@xmlns']);
+    sbom.att('serialNumber', bom['@serial-number']);
+    sbom.att('version', bom['@version'].toString());
+    const metadataNode = sbom.ele('metadata');
+    metadataNode.ele('timestamp').txt(bom.metadata.timestamp);
+    metadataNode.ele({ component: bom.metadata.component });
+
+    const componentsNode = sbom.ele('components');
+    bom.components.forEach((comp) => {
+      const component = { component: comp };
+      componentsNode.ele(component);
+    });
+
+    const dependenciesNode = sbom.ele('dependencies');
+
+    bom.dependencies.map((dep) => {
+      const depNode = dependenciesNode.ele('dependency', { ref: dep['@ref'] });
+      dep.dependencies?.map((subDep) => {
+        depNode.ele('dependency', { ref: subDep['@ref'] });
+      });
+    });
+
+    const bomString = sbom.end({
+      prettyPrint: prettyPrint,
     });
 
     return bomString;
@@ -99,35 +137,90 @@ export class CycloneDXSbomCreator {
     });
   }
 
-  private listComponents(pkg: any): Array<any> {
-    const list: any = {};
-    const isRootPkg = true;
-    this.addComponent(pkg, list, isRootPkg);
-    return Object.keys(list).map((k) => ({ component: list[k] }));
+  private getMetadata(pkg: any): Metadata {
+    return {
+      timestamp: Date.now().toString(),
+      component: this.getComponent(pkg),
+    };
   }
 
-  private addComponent(pkg: any, list: any, isRootPkg = false): void {
+  private listDependencies(rootPkg: string, depArray: Array<Dependency>) {
+    const dependencies = this.graph.directDependenciesOf(rootPkg);
+
+    const intermediateDepArray: Array<Dependency> = dependencies.map((dep) => {
+      const dependency: Dependency = {
+        '@ref': dep,
+      };
+      return dependency;
+    });
+
+    const dependency: Dependency = {
+      '@ref': rootPkg,
+      dependencies: intermediateDepArray,
+    };
+
+    depArray.push(dependency);
+
+    if (dependencies.length > 0) {
+      dependencies.map((dep) => {
+        this.listDependencies(dep, depArray);
+      });
+    }
+  }
+
+  private getPurlFromPkgInfo(pkgInfo: any): string {
+    const pkgIdentifier = this.parsePackageJsonName(pkgInfo.name);
+    const group: string = pkgIdentifier.scope == undefined ? '' : `@${pkgIdentifier.scope}`;
+    const name: string = pkgIdentifier.fullName as string;
+    const version: string = pkgInfo.version as string;
+
+    return toPurl(name, version, group);
+  }
+
+  private getComponent(pkg: any): Component {
+    const pkgIdentifier = this.parsePackageJsonName(pkg.name);
+    const group: string = pkgIdentifier.scope == undefined ? '' : `@${pkgIdentifier.scope}`;
+    const name: string = pkgIdentifier.fullName as string;
+    const version: string = pkg.version as string;
+
+    const component: Component = {
+      '@type': this.determinePackageType(pkg),
+      '@bom-ref': this.getPurlFromPkgInfo(pkg),
+      group: group,
+      name: name,
+      version: version,
+      purl: this.getPurlFromPkgInfo(pkg),
+    };
+
+    return component;
+  }
+
+  private listComponents(pkg: any): Map<string, Component> {
+    const map = new Map<string, Component>();
+    const isRootPkg = true;
+    this.addComponent(pkg, map, isRootPkg);
+    return map;
+  }
+
+  private addComponent(pkg: any, map: Map<string, Component>, isRootPkg = false, parent?: Component): void {
     const spartan = this.options?.spartan ? this.options.spartan : false;
     //read-installed with default options marks devDependencies as extraneous
     //if a package is marked as extraneous, do not include it as a component
     if (pkg.extraneous) {
       return;
     }
-    if (!isRootPkg) {
-      const pkgIdentifier = this.parsePackageJsonName(pkg.name);
-      const group: string = pkgIdentifier.scope == undefined ? '' : `@${pkgIdentifier.scope}`;
-      const name: string = pkgIdentifier.fullName as string;
-      const version: string = pkg.version as string;
-      const purl: string = toPurl(name, version, group);
-      const component: Component = {
-        '@type': this.determinePackageType(pkg),
-        '@bom-ref': purl,
-        group: group,
-        name: name,
-        version: version,
-        purl: purl,
-      };
 
+    const component = this.getComponent(pkg);
+
+    this.graph.addNode(component.purl, component);
+    this.inverseGraph.addNode(component.purl, component);
+
+    if (parent) {
+      this.graph.addDependency(parent.purl, component.purl);
+      this.inverseGraph.addDependency(component.purl, parent.purl);
+    }
+
+    if (!isRootPkg) {
       if (component.group === '') {
         delete component.group;
       }
@@ -153,14 +246,14 @@ export class CycloneDXSbomCreator {
         this.processHashes(pkg, component);
       }
 
-      if (list[component.purl]) return; //remove cycles
-      list[component.purl] = component;
+      if (map.get(component.purl)) return; //remove cycles
+      map.set(component.purl, component);
     }
     if (pkg.dependencies) {
       Object.keys(pkg.dependencies)
         .map((x) => pkg.dependencies[x])
         .filter((x) => typeof x !== 'string') //remove cycles
-        .map((x) => this.addComponent(x, list));
+        .map((x) => this.addComponent(x, map, false, component));
     }
   }
 

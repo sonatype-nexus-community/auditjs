@@ -18,6 +18,7 @@ import fetch from 'node-fetch';
 import { RequestHelpers } from './RequestHelpers';
 import { logMessage, DEBUG } from '../Application/Logger/Logger';
 import { URL } from 'url';
+import { IqServerPolicyReportResult } from '../Types/IqServerPolicyReportResult';
 
 const APPLICATION_INTERNAL_ID_ENDPOINT = '/api/v2/applications?publicId=';
 
@@ -69,6 +70,30 @@ export class IqRequestService {
           this.host +
           ' in your browser.',
       );
+    }
+  }
+
+  public async getPolicyReportResults(reportUrl: string): Promise<IqServerPolicyReportResult> {
+    logMessage('Attempting to get policy report results', DEBUG, { reportUrl: reportUrl });
+
+    if (reportUrl.endsWith('raw')) {
+      reportUrl = reportUrl.substr(0, reportUrl.length - 3) + 'policy';
+    }
+
+    const response = await fetch(`${this.host}/${reportUrl}`, {
+      method: 'get',
+      headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
+      agent: RequestHelpers.getAgent(this.insecure),
+    });
+
+    if (response.ok) {
+      const json: IqServerPolicyReportResult = await response.json();
+
+      return json;
+    } else {
+      const body = await response.text();
+      logMessage('Response from report API', DEBUG, { response: body });
+      throw new Error(`Unable to get results from Report API`);
     }
   }
 

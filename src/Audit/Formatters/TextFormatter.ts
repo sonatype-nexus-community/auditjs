@@ -17,9 +17,10 @@
 import { Formatter } from './Formatter';
 import { OssIndexServerResult, Vulnerability } from '../../Types/OssIndexServerResult';
 import chalk = require('chalk');
+import { AuditGraph } from '../AuditGraph';
 
 export class TextFormatter implements Formatter {
-  constructor(readonly quiet: boolean = false) {}
+  constructor(readonly quiet: boolean = false, private graph?: AuditGraph) {}
 
   public printAuditResults(list: Array<OssIndexServerResult>) {
     const total = list.length;
@@ -39,6 +40,13 @@ export class TextFormatter implements Formatter {
     list.forEach((x: OssIndexServerResult, i: number) => {
       if (x.vulnerabilities && x.vulnerabilities.length > 0) {
         this.printVulnerability(i, total, x);
+        if (this.graph) {
+          console.group();
+          console.log("Inverse dependency graph:");
+          this.graph?.printGraph(x.coordinates);
+          console.groupEnd();
+          console.log();
+        }
       } else {
         this.printLine(chalk.keyword('green')(`[${i + 1}/${total}] - ${x.toAuditLog()}`));
       }
