@@ -249,18 +249,18 @@ export class Application {
   }
 
   private getOssIndexRequestService(args: any): OssIndexRequestService {
-    if (args.user && args.password) {
-      return new OssIndexRequestService(args?.user, args?.password);
-    }
+    let config;
     try {
-      const config = new OssIndexServerConfig();
-
+      config = new OssIndexServerConfig();
       config.getConfigFromFile();
-
-      return new OssIndexRequestService(config.getUsername(), config.getToken());
     } catch (e) {
-      return new OssIndexRequestService();
+      // Ignore config load failure
     }
+    return new OssIndexRequestService(
+      args?.user || config?.getUsername(),
+      args?.password || config?.getToken(),
+      args?.cache || config?.getCacheLocation(),
+    );
   }
 
   private getIqRequestService(args: any): IqRequestService {
