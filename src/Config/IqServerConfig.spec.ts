@@ -40,6 +40,5 @@ describe('IqServerConfig', async () => {
     expect(conf.getUsername()).to.equal('username');
     expect(conf.getToken()).to.equal('password');
     expect(conf.getHost()).to.equal('http://localhost:8070');
-
   });
 });
