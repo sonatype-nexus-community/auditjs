@@ -18,7 +18,6 @@ import expect from '../Tests/TestHelper';
 import { Application } from './Application';
 import sinon, { SinonStub } from 'sinon';
 import { OssIndexRequestService } from '../Services/OssIndexRequestService';
-import { Coordinates } from '../Types/Coordinates';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 import { TextFormatter } from '../Audit/Formatters/TextFormatter';
 
@@ -44,7 +43,7 @@ describe('Application', () => {
     let ossIndexRequestService: any = null;
     sinon
       .stub(OssIndexRequestService.prototype, 'callOSSIndexOrGetFromCache')
-      .callsFake(async function(this: any, data: Coordinates[], format = 'npm'): Promise<any> {
+      .callsFake(async function(this: any): Promise<any> {
         ossIndexRequestService = this;
         return [
           {
