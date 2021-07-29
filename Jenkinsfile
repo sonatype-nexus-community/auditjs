@@ -26,16 +26,17 @@ dockerizedBuildPipeline(
     npm i
     npm run build
     npm run test-ci
+    ls -l
     # prep for scan of only production dependencies
-    rm -rf node_modules
-    npm install --production
+    # rm -rf node_modules
+    # npm install --production
     '''
   },
   vulnerabilityScan: {
     withDockerImage(env.DOCKER_IMAGE_ID, {
       withCredentials([usernamePassword(credentialsId: 'policy.s integration account',
         usernameVariable: 'IQ_USERNAME', passwordVariable: 'IQ_PASSWORD')]) {
-        sh 'npx auditjs@latest iq -x -a auditjs -s stage-release -u $IQ_USERNAME -p $IQ_PASSWORD -h https://policy.ci.sonatype.dev'
+        // sh 'npx auditjs@latest iq -x -a auditjs -s stage-release -u $IQ_USERNAME -p $IQ_PASSWORD -h https://policy.ci.sonatype.dev'
       }
     })
   },
