@@ -18,7 +18,7 @@
     "y18n": "^5.0.8"
   },
   "scripts": {
-    "preinstall": "npx npm-force-resolutions",
+    "preinstall": "npx force-resolutions",
     "test": "mocha -r ts-node/register src/**/*.spec.ts",
     "build": "tsc -p tsconfig.json",
     "build-dev": "tsc -p tsconfig.development.json",
