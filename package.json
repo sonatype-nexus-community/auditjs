@@ -91,6 +91,7 @@
     "node-persist": "^3.1.0",
     "ora": "^4.0.3",
     "packageurl-js": "0.0.5",
+    "read-installed": "^4.0.3",
     "xmlbuilder2": "^2.4.1",
     "yargs": "^16.1.0"
   }

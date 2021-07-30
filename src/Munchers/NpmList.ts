@@ -19,6 +19,7 @@ import path from 'path';
 import fs from 'fs';
 import { DepGraph } from 'dependency-graph';
 import { PackageURL } from 'packageurl-js';
+import readInstalled from 'read-installed';
 import { ILogger, CycloneDXSBOMCreator, CycloneDXComponent, Bom } from '@sonatype/js-sona-types';
 
 export class NpmList implements Muncher {
@@ -44,7 +45,7 @@ export class NpmList implements Muncher {
       logger: this.logger,
     });
 
-    const pkgInfo = await sbomCreator.getPackageInfoFromReadInstalled();
+    const pkgInfo = await this.getPackageInfoFromReadInstalled(process.cwd(), this.devDependencies);
 
     const bom: Bom = await sbomCreator.getBom(pkgInfo);
 
@@ -77,12 +78,30 @@ export class NpmList implements Muncher {
       logger: this.logger,
     });
 
-    const data = await sbomCreator.getPackageInfoFromReadInstalled();
+    const data = await this.getPackageInfoFromReadInstalled(process.cwd(), this.devDependencies);
 
     const bom: Bom = await sbomCreator.getBom(data);
 
     this.graph = sbomCreator.inverseGraph;
 
     return bom;
+  }
+
+  private getPackageInfoFromReadInstalled = (path: string, dev: boolean): Promise<any> =>  {
+    return new Promise((resolve, reject) => {
+      readInstalled(
+        path,
+        {
+          dev: dev,
+        },
+        async (err: any, data: any) => {
+          if (err) {
+            reject(err);
+          }
+  
+          resolve(data);
+        },
+      );
+    });
   }
 }
