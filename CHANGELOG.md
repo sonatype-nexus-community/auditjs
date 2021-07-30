@@ -1,3 +1,10 @@
+## [4.0.27](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.26...v4.0.27) (2021-07-30)
+
+
+### Bug Fixes
+
+* switch to force-resolutions to avoid error when running on a project without a package-lock.json ([a07ae78](https://github.com/sonatype-nexus-community/auditjs/commit/a07ae78f1c0bdcbe606754aa2288dd06150c855d))
+
 ## [4.0.26](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.25...v4.0.26) (2021-07-29)
 
 
