@@ -18,7 +18,7 @@ import path from 'path';
 import { homedir } from 'os';
 import { mkdirSync, existsSync } from 'fs';
 import { writeFileSync } from 'fs';
-import { safeDump } from 'js-yaml';
+import { dump } from 'js-yaml';
 
 import { ConfigPersist } from './ConfigPersist';
 
@@ -47,7 +47,7 @@ export abstract class Config {
   }
 
   public saveFile(objectToSave: ConfigPersist): boolean {
-    writeFileSync(this.getConfigLocation(), safeDump(objectToSave, { skipInvalid: true }));
+    writeFileSync(this.getConfigLocation(), dump(objectToSave, { skipInvalid: true }));
     this.getConfigFromFile();
     return true;
   }

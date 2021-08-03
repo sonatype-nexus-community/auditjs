@@ -16,7 +16,7 @@
 
 import { Config } from './Config';
 import { readFileSync } from 'fs';
-import { safeLoad } from 'js-yaml';
+import { load } from 'js-yaml';
 import storage from 'node-persist';
 
 export class OssIndexServerConfig extends Config {
@@ -52,10 +52,18 @@ export class OssIndexServerConfig extends Config {
   }
 
   public getConfigFromFile(saveLocation: string = this.getConfigLocation()): OssIndexServerConfig {
-    const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
-    super.username = doc.Username;
-    super.token = doc.Token;
-    this.cacheLocation = doc.CacheLocation;
+    const doc = load(readFileSync(saveLocation, 'utf8')) as OssIndexConfigOnDisk;
+    if (doc) {
+      super.username = doc.Username;
+      super.token = doc.Token;
+      this.cacheLocation = doc.CacheLocation;
+    }
     return this;
   }
+}
+
+interface OssIndexConfigOnDisk {
+  Username : string ;
+  Token : string;
+  CacheLocation : string;
 }
