@@ -87,7 +87,7 @@ export class NpmList implements Muncher {
     return bom;
   }
 
-  private getPackageInfoFromReadInstalled = (path: string, dev: boolean): Promise<any> =>  {
+  private getPackageInfoFromReadInstalled = (path: string, dev: boolean): Promise<any> => {
     return new Promise((resolve, reject) => {
       readInstalled(
         path,
@@ -98,10 +98,10 @@ export class NpmList implements Muncher {
           if (err) {
             reject(err);
           }
-  
+
           resolve(data);
         },
       );
     });
-  }
+  };
 }

@@ -63,7 +63,7 @@ export class OssIndexServerConfig extends Config {
 }
 
 interface OssIndexConfigOnDisk {
-  Username : string ;
-  Token : string;
-  CacheLocation : string;
+  Username: string;
+  Token: string;
+  CacheLocation: string;
 }

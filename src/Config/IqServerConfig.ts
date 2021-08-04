@@ -55,7 +55,7 @@ export class IqServerConfig extends Config {
 }
 
 interface IqServerConfigOnDisk {
-  Username : string ;
-  Token : string;
-  Server : string;
+  Username: string;
+  Token: string;
+  Server: string;
 }
