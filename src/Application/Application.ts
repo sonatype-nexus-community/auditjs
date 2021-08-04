@@ -282,16 +282,19 @@ export class Application {
       logger: this.logger,
     };
 
-    if (args.user && args.password) {
-      return new OSSIndexRequestService({ ...options, user: args?.user, token: args?.password }, storage as any);
-    }
     try {
-      const config = new OssIndexServerConfig();
-
+      config = new OssIndexServerConfig();
       config.getConfigFromFile();
+    } catch (e) {
+      // Ignore config load failure
+    }
 
-      return new OSSIndexRequestService(
-        { ...options, user: config.getUsername(), token: config.getToken() },
+    return new OSSIndexRequestService(
+        { ...options,
+          args?.user || config?.getUsername(),
+          args?.password || config?.getToken(),
+          args?.cache || config?.getCacheLocation()
+        },
         storage as any,
       );
     } catch (e) {

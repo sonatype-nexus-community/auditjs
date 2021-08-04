@@ -1,3 +1,26 @@
+## [4.0.28](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.27...v4.0.28) (2021-08-03)
+
+
+### Bug Fixes
+
+* workaround to fix issue [#239](https://github.com/sonatype-nexus-community/auditjs/issues/239). may convert to yarn later ([2056567](https://github.com/sonatype-nexus-community/auditjs/commit/2056567345da061b6823e4b715dfbdc8e4f03eca))
+
+## [4.0.27](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.26...v4.0.27) (2021-07-30)
+
+
+### Bug Fixes
+
+* switch to force-resolutions to avoid error when running on a project without a package-lock.json ([a07ae78](https://github.com/sonatype-nexus-community/auditjs/commit/a07ae78f1c0bdcbe606754aa2288dd06150c855d))
+
+## [4.0.26](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.25...v4.0.26) (2021-07-29)
+
+
+### Bug Fixes
+
+* avoid ab-end in Application.spec.ts test by using process.exitCode instead of process.exit(). @TNeer rules! ([1e63108](https://github.com/sonatype-nexus-community/auditjs/commit/1e631088da66d45e72aa4c4c90c3ace1560439f1))
+* CWE-20: Improper Input Validation in y18n version 5.0.5 ([1b6a7cb](https://github.com/sonatype-nexus-community/auditjs/commit/1b6a7cbd191433df4bfb6dd992bb6773b16f5604))
+* the releases must flow. remove semantic-release dry-run flag ([9bb8efb](https://github.com/sonatype-nexus-community/auditjs/commit/9bb8efb8308dbae863a63066af61bbd767cec829))
+
 ## [4.0.25](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.24...v4.0.25) (2021-03-12)
 
 

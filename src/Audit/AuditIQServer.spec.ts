@@ -16,22 +16,19 @@
 
 import expect from '../Tests/TestHelper';
 import { AuditIQServer } from './AuditIQServer';
+import { ReportStatus } from '../Types/ReportStatus';
 import { IqThirdPartyAPIServerPollingResult, IqServerPolicyReportResult } from '@sonatype/js-sona-types';
 
-const oldLog = console.log;
-const oldError = console.error;
+import sinon from 'sinon';
 
 describe('AuditIQServer', () => {
   before(() => {
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    console.log = () => ({});
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    console.error = () => ({});
+    sinon.stub(console, 'log');
+    sinon.stub(console, 'error');
   });
 
   after(() => {
-    console.log = oldLog;
-    console.error = oldError;
+    sinon.restore();
   });
 
   it('should provide a true value if IQ Server Results have policy violations', () => {
