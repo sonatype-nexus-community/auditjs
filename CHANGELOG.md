@@ -1,3 +1,10 @@
+## [4.0.29](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.28...v4.0.29) (2021-08-05)
+
+
+### Bug Fixes
+
+* Initial move to yarn ([#241](https://github.com/sonatype-nexus-community/auditjs/issues/241)) ([88b063f](https://github.com/sonatype-nexus-community/auditjs/commit/88b063f66a3998d175e144ef162b550fb892ce6c))
+
 ## [4.0.28](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.27...v4.0.28) (2021-08-03)
 
 
