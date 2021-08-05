@@ -52,10 +52,19 @@ export class OssIndexServerConfig extends Config {
   }
 
   public getConfigFromFile(saveLocation: string = this.getConfigLocation()): OssIndexServerConfig {
-    const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
-    this.username = doc.Username;
-    this.token = doc.Token;
-    this.cacheLocation = doc.CacheLocation;
+    const doc = safeLoad(readFileSync(saveLocation, 'utf8')) as OssIndexServerConfigOnDisk;
+    if (doc && doc.Username && doc.Token && doc.CacheLocation) {
+      this.username = doc.Username;
+      this.token = doc.Token;
+      this.cacheLocation = doc.CacheLocation;
+    }
+
     return this;
   }
+}
+
+interface OssIndexServerConfigOnDisk {
+  Username?: string;
+  Token?: string;
+  CacheLocation?: string;
 }

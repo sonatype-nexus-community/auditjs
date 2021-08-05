@@ -6,35 +6,35 @@ jobs:
       - image: circleci/node:12.14.0
     steps:
       - checkout
-      - run:
-          name: update-npm
-          command: 'sudo npm install -g npm@latest'
       - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
       - run:
-          name: install-npm-wee
-          command: npm ci install
+          name: Install Dependencies
+          command: yarn install
       - save_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
           paths:
-            - ./node_modules
+            - ~/.cache/yarn
       - run:
           name: Lint auditjs
-          command: npm run lint
+          command: yarn lint
       - run:
           name: build
-          command: npm run build
+          command: yarn build
       - run:
           name: make test reports directory
           command: mkdir reports
       - run:
           name: test
-          command: npm run test-ci
+          command: yarn test-ci
       - run:
           name: code coverage
           command: |
-            npm run coverage
-            npm run generate-coverage-report
+            yarn coverage
+            yarn generate-coverage-report
       - store_test_results:
           path: reports
       - store_artifacts:
@@ -44,7 +44,7 @@ jobs:
           prefix: tests
       - run:
           name: dogfood scan
-          command: npm run start -- ossi
+          command: yarn run start ossi
   release:
     working_directory: ~/auditjs
     docker:
@@ -56,16 +56,16 @@ jobs:
           command: sudo chown -R circleci:circleci /usr/local/lib && sudo chown -R circleci:circleci /usr/local/bin
       - run:
           name: Install dependencies
-          command: npm install
+          command: yarn install
       - run:
           name: Build auditjs
-          command: npm run build
+          command: yarn build
       - run:
           name: Install publishing packages
-          command: npm install -g semantic-release@beta @semantic-release/changelog @semantic-release/git@beta @semantic-release/npm@beta
+          command: yarn global add semantic-release@beta @semantic-release/changelog @semantic-release/git@beta @semantic-release/npm@beta
       - run:
           name: Attempt publish
-          command: npx semantic-release
+          command: yarn exec semantic-release
 
 workflows:
   version: 2.1
