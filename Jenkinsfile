@@ -23,12 +23,12 @@ dockerizedBuildPipeline(
   },
   buildAndTest: {
     sh '''
-    npm i
-    npm run build
-    npm run test-ci
+    yarn
+    yarn build
+    yarn test-ci
     # prep for scan of only production dependencies
     rm -rf node_modules
-    npm install --production
+    yarn install --production --frozen-lockfile
     '''
   },
   vulnerabilityScan: {
