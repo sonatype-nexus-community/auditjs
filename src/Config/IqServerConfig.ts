@@ -44,11 +44,19 @@ export class IqServerConfig extends Config {
   }
 
   public getConfigFromFile(saveLocation: string = this.getConfigLocation()): IqServerConfig {
-    const doc = safeLoad(readFileSync(saveLocation, 'utf8'));
-    super.username = doc.Username;
-    super.token = doc.Token;
-    this.host = doc.Server;
+    const doc = safeLoad(readFileSync(saveLocation, 'utf8')) as IqServerConfigOnDisk;
+    if (doc && doc.Username && doc.Token && doc.Server) {
+      super.username = doc.Username;
+      super.token = doc.Token;
+      this.host = doc.Server;
+    }
 
     return this;
   }
+}
+
+interface IqServerConfigOnDisk {
+  Username?: string;
+  Token?: string;
+  Server?: string;
 }
