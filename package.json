@@ -26,8 +26,8 @@
     "test-ci": "MOCHA_FILE=./reports/test-results.xml mocha -r ts-node/register src/**/*.spec.ts --reporter mocha-junit-reporter",
     "lint": "eslint src/**/*.ts",
     "start": "node ./bin/index.js",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm run test",
+    "prepare": "yarn build",
+    "prepublishOnly": "yarn test",
     "iq-scan": "npx auditjs@latest iq -a auditjs"
   },
   "keywords": [
