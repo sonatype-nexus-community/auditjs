@@ -1,3 +1,10 @@
+## [4.0.30](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.29...v4.0.30) (2021-08-09)
+
+
+### Bug Fixes
+
+* CVE-2021-32796, will change when xmldom@0.7.0 is published on npm ([#242](https://github.com/sonatype-nexus-community/auditjs/issues/242)) ([a6c8e32](https://github.com/sonatype-nexus-community/auditjs/commit/a6c8e327015025b65f681f25b3d31c7d695733a1))
+
 ## [4.0.29](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.28...v4.0.29) (2021-08-05)
 
 
