@@ -21,7 +21,7 @@ import {
   OSSIndexRequestService,
   ILogger,
   IqRequestService,
-  IqThirdPartyAPIServerPollingResult,
+  IqThirdPartyAPIServerPollingResult, RequestServiceOptions,
 } from '@sonatype/js-sona-types';
 import { AuditIQServer } from '../Audit/AuditIQServer';
 import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
@@ -275,31 +275,27 @@ export class Application {
   private async getOSSIndexRequestService(args: any): Promise<OSSIndexRequestService> {
     await storage.init({ dir: join(homedir(), '.ossindex', 'auditjs'), ttl: 12 * 60 * 60 * 1000 });
 
-    const options = {
-      browser: false,
-      product: 'AuditJS',
-      version: pj.version,
-      logger: this.logger,
-    };
-
+    const config = new OssIndexServerConfig();
     try {
-      config = new OssIndexServerConfig();
       config.getConfigFromFile();
     } catch (e) {
       // Ignore config load failure
     }
 
+    const options : RequestServiceOptions = {
+      browser: false,
+      product: 'AuditJS',
+      version: pj.version,
+      logger: this.logger,
+      user: config.getUsername(),
+      token: config.getToken()
+    };
+
+
     return new OSSIndexRequestService(
-        { ...options,
-          args?.user || config?.getUsername(),
-          args?.password || config?.getToken(),
-          args?.cache || config?.getCacheLocation()
-        },
+        options,
         storage as any,
       );
-    } catch (e) {
-      return new OSSIndexRequestService(options, storage as any);
-    }
   }
 
   private getIqRequestService(args: any): IqRequestService {

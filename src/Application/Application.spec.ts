@@ -17,9 +17,9 @@
 import expect from '../Tests/TestHelper';
 import { Application } from './Application';
 import sinon, { SinonStub } from 'sinon';
-import { OssIndexRequestService } from '../Services/OssIndexRequestService';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 import { TextFormatter } from '../Audit/Formatters/TextFormatter';
+import {OSSIndexRequestService} from "@sonatype/js-sona-types";
 
 describe('Application', () => {
   afterEach(() => {
@@ -42,7 +42,7 @@ describe('Application', () => {
     sinon.stub(OssIndexServerConfig.prototype, 'getCacheLocation').returns('config-cache-location');
     let ossIndexRequestService: any = null;
     sinon
-      .stub(OssIndexRequestService.prototype, 'callOSSIndexOrGetFromCache')
+      .stub(OSSIndexRequestService.prototype, 'getComponentDetails')
       .callsFake(async function(this: any): Promise<any> {
         ossIndexRequestService = this;
         return [
@@ -54,12 +54,12 @@ describe('Application', () => {
         ];
       });
     await app.startApplication(yargs);
-    sinon.assert.calledOnce(OssIndexRequestService.prototype.callOSSIndexOrGetFromCache as SinonStub);
-    expect(ossIndexRequestService).is.instanceOf(OssIndexRequestService);
-    if (ossIndexRequestService instanceof OssIndexRequestService) {
-      expect(ossIndexRequestService.user).to.equal('config-user');
-      expect(ossIndexRequestService.password).to.equal('cli-password');
-      expect(ossIndexRequestService.cacheLocation).to.equal('config-cache-location');
+    sinon.assert.calledOnce(OSSIndexRequestService.prototype.getComponentDetails as SinonStub);
+    expect(ossIndexRequestService).is.instanceOf(OSSIndexRequestService);
+    if (ossIndexRequestService instanceof OSSIndexRequestService) {
+      expect(ossIndexRequestService.options.user).to.equal('config-user');
+      expect(ossIndexRequestService.options.token).to.equal('cli-password');
+      // expect(ossIndexRequestService.options.).to.equal('config-cache-location');
     }
   });
 });

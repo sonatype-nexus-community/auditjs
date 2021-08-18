@@ -16,7 +16,6 @@
 
 import expect from '../Tests/TestHelper';
 import { AuditIQServer } from './AuditIQServer';
-import { ReportStatus } from '../Types/ReportStatus';
 import { IqThirdPartyAPIServerPollingResult, IqServerPolicyReportResult } from '@sonatype/js-sona-types';
 
 import sinon from 'sinon';

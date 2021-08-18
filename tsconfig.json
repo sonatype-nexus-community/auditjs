@@ -13,7 +13,10 @@
     "typeRoots": [
       "./node_modules/@types",
       "./src/typings"
-    ],
+    ]
+  },
+  "ts-node": {
+    "files": true
   },
   "include": [
     "src/**/*.d.ts",
