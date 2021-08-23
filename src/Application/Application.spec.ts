@@ -19,7 +19,7 @@ import { Application } from './Application';
 import sinon, { SinonStub } from 'sinon';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 import { TextFormatter } from '../Audit/Formatters/TextFormatter';
-import {OSSIndexRequestService} from "@sonatype/js-sona-types";
+import { OSSIndexRequestService } from '@sonatype/js-sona-types';
 
 describe('Application', () => {
   afterEach(() => {

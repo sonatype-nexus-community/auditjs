@@ -21,7 +21,8 @@ import {
   OSSIndexRequestService,
   ILogger,
   IqRequestService,
-  IqThirdPartyAPIServerPollingResult, RequestServiceOptions,
+  IqThirdPartyAPIServerPollingResult,
+  RequestServiceOptions,
 } from '@sonatype/js-sona-types';
 import { AuditIQServer } from '../Audit/AuditIQServer';
 import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
@@ -282,20 +283,16 @@ export class Application {
       // Ignore config load failure
     }
 
-    const options : RequestServiceOptions = {
+    const options: RequestServiceOptions = {
       browser: false,
       product: 'AuditJS',
       version: pj.version,
       logger: this.logger,
       user: config.getUsername(),
-      token: config.getToken()
+      token: config.getToken(),
     };
 
-
-    return new OSSIndexRequestService(
-        options,
-        storage as any,
-      );
+    return new OSSIndexRequestService(options, storage as any);
   }
 
   private getIqRequestService(args: any): IqRequestService {
