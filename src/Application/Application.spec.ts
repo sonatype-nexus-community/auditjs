@@ -38,7 +38,7 @@ describe('Application', () => {
     sinon.stub(TextFormatter.prototype, 'printAuditResults');
     sinon.stub(OssIndexServerConfig.prototype, 'getConfigFromFile');
     sinon.stub(OssIndexServerConfig.prototype, 'getUsername').returns('config-user');
-    sinon.stub(OssIndexServerConfig.prototype, 'getToken').returns('config-password');
+    sinon.stub(OssIndexServerConfig.prototype, 'getToken').returns('cli-password');
     sinon.stub(OssIndexServerConfig.prototype, 'getCacheLocation').returns('config-cache-location');
     let ossIndexRequestService: any = null;
     sinon
