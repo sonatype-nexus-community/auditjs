@@ -27,16 +27,25 @@ export class OssIndexServerConfig extends Config {
     }
   }
 
-  public getUsername(): string {
-    return this.username;
+  public getUsername(): string | undefined {
+    if (this.username != '') {
+      return this.username;
+    }
+    return undefined;
   }
 
-  public getToken(): string {
-    return this.token;
+  public getToken(): string | undefined {
+    if (this.token != '') {
+      return this.token;
+    }
+    return undefined;
   }
 
-  public getCacheLocation(): string {
-    return this.cacheLocation;
+  public getCacheLocation(): string | undefined {
+    if (this.cacheLocation != '') {
+      return this.cacheLocation;
+    }
+    return undefined;
   }
 
   public async clearCache(): Promise<boolean> {
@@ -53,9 +62,13 @@ export class OssIndexServerConfig extends Config {
 
   public getConfigFromFile(saveLocation: string = this.getConfigLocation()): OssIndexServerConfig {
     const doc = safeLoad(readFileSync(saveLocation, 'utf8')) as OssIndexServerConfigOnDisk;
-    if (doc && doc.Username && doc.Token && doc.CacheLocation) {
+    if (doc && doc.Username) {
       this.username = doc.Username;
+    }
+    if (doc && doc.Token) {
       this.token = doc.Token;
+    }
+    if (doc && doc.CacheLocation) {
       this.cacheLocation = doc.CacheLocation;
     }
 
