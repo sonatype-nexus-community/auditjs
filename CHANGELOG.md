@@ -1,3 +1,12 @@
+## [4.0.31](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.30...v4.0.31) (2021-09-07)
+
+
+### Bug Fixes
+
+* Make caching class return undefined if property does not exist ([#247](https://github.com/sonatype-nexus-community/auditjs/issues/247)) ([8e3b3ad](https://github.com/sonatype-nexus-community/auditjs/commit/8e3b3ad2daaf6eee5a5caf7bcd63cd9fe555d07e))
+* use newer node version in CI release process, required to run semantic-release. ([589e0ce](https://github.com/sonatype-nexus-community/auditjs/commit/589e0cee02a260bde777edef3acd504221896f4f))
+* use newly published @xmldom/xmldom package. fixes [#243](https://github.com/sonatype-nexus-community/auditjs/issues/243) ([9f8b646](https://github.com/sonatype-nexus-community/auditjs/commit/9f8b64689d5cc16591a37065c79c6a82b764040b))
+
 ## [4.0.30](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.29...v4.0.30) (2021-08-09)
 
 
