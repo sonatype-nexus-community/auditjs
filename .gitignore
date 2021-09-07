@@ -9,3 +9,5 @@ auditjs.json
 reports/
 lcov.info
 test-results.xml
+# IDEA config files
+*.iml
