@@ -38,4 +38,18 @@ describe('OssIndexServerConfig', async () => {
     mock.restore();
     sinon.restore();
   });
+
+  it('should return undefined when property does not exist', async () => {
+    sinon.stub(os, 'homedir').returns('/nonsense');
+    mock({ '/nonsense': {} });
+
+    const conf = new OssIndexServerConfig();
+
+    expect(conf.getUsername()).to.equal(undefined);
+    expect(conf.getToken()).to.equal(undefined);
+    expect(conf.getCacheLocation()).to.equal(undefined);
+
+    mock.restore();
+    sinon.restore();
+  });
 });
