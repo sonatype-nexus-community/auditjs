@@ -1,3 +1,11 @@
+## [4.0.32](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.31...v4.0.32) (2021-09-16)
+
+
+### Bug Fixes
+
+* revert fix for SONATYPE-2021-1169, breaks eslint. needs more work ([a7428e2](https://github.com/sonatype-nexus-community/auditjs/commit/a7428e22d29a62dfdb50dd812fd472f16b598260))
+* SONATYPE-2021-1169 ([74abe3c](https://github.com/sonatype-nexus-community/auditjs/commit/74abe3cba69ab75deb756e595ccb6394e2d6a405))
+
 ## [4.0.31](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.30...v4.0.31) (2021-09-07)
 
 
