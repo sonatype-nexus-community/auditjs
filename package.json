@@ -15,8 +15,7 @@
   },
   "resolutions": {
     "hosted-git-info": "^3.0.8",
-    "y18n": "^5.0.8",
-    "ansi-regex": "^6.0.1"
+    "y18n": "^5.0.8"
   },
   "scripts": {
     "test": "mocha -r ts-node/register src/**/*.spec.ts",
