@@ -63,12 +63,16 @@ export const createAppLogger = () => {
   }
 };
 
+const cleanupStack = (message: string): string => {
+  return message.replace(/^(Error: )+/, 'Error: ');
+};
+
 export const logMessage = (message: string, level: string, ...meta: any) => {
   if (level == DEBUG) {
     logger.debug(message, ...meta);
   } else if (level == ERROR) {
     if (meta && meta[0] && meta[0].stack) {
-      logger.error(message, meta[0].stack);
+      logger.error(message, cleanupStack(meta[0].stack));
     } else {
       logger.error(message, ...meta);
     }
