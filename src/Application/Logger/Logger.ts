@@ -26,8 +26,8 @@ const logPath = join(homedir(), '.ossindex');
 
 const logPathFile = join(logPath, '.auditjs.combined.log');
 
-addLayout('json', function (config) {
-  return function (logEvent) {
+addLayout('json', function(config) {
+  return function(logEvent): string {
     return JSON.stringify(logEvent) + config.separator;
   };
 });
@@ -57,7 +57,7 @@ configure({
 const logger = getLogger('auditjs');
 logger.level = DEBUG;
 
-export const createAppLogger = () => {
+export const createAppLogger = (): void => {
   if (!existsSync(logPath)) {
     mkdirSync(logPath);
   }
@@ -67,7 +67,7 @@ const cleanupStack = (message: string): string => {
   return message.replace(/^(Error: )+/, 'Error: ');
 };
 
-export const logMessage = (message: string, level: string, ...meta: any) => {
+export const logMessage = (message: string, level: string, ...meta: any): void => {
   if (level == DEBUG) {
     logger.debug(message, ...meta);
   } else if (level == ERROR) {
@@ -79,7 +79,7 @@ export const logMessage = (message: string, level: string, ...meta: any) => {
   }
 };
 
-export const shutDownLoggerAndExit = (code: number) => {
+export const shutDownLoggerAndExit = (code: number): void => {
   shutdown((err) => {
     if (err) {
       console.error(err);
