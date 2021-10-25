@@ -1,3 +1,10 @@
+## [4.0.33](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.32...v4.0.33) (2021-10-25)
+
+
+### Bug Fixes
+
+* Error message formatting ([#248](https://github.com/sonatype-nexus-community/auditjs/issues/248)) ([c8acb04](https://github.com/sonatype-nexus-community/auditjs/commit/c8acb04de235a79686e66d97231c72fb7a961563)), closes [#206](https://github.com/sonatype-nexus-community/auditjs/issues/206)
+
 ## [4.0.32](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.31...v4.0.32) (2021-09-16)
 
 
