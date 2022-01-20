@@ -1,3 +1,10 @@
+## [4.0.35](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.34...v4.0.35) (2022-01-20)
+
+
+### Bug Fixes
+
+* CVE-2022-21704 in log4js : 6.3.0 ([b7f1548](https://github.com/sonatype-nexus-community/auditjs/commit/b7f1548527d4866a5dad7cdb252230f4975bd37b))
+
 ## [4.0.34](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.33...v4.0.34) (2022-01-20)
 
 
