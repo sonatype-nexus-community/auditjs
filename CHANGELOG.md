@@ -1,3 +1,10 @@
+## [4.0.34](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.33...v4.0.34) (2022-01-20)
+
+
+### Bug Fixes
+
+* CVE-2022-0235 in node-fetch : 2.6.1 ([cde4677](https://github.com/sonatype-nexus-community/auditjs/commit/cde4677621066f1087b1111f8bdc233c3ecdfb7d))
+
 ## [4.0.33](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.32...v4.0.33) (2021-10-25)
 
 
