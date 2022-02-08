@@ -1,3 +1,10 @@
+## [4.0.36](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.35...v4.0.36) (2022-02-08)
+
+
+### Bug Fixes
+
+* sonatype-2021-4879 in minimatch : 3.0.4 ([384a99f](https://github.com/sonatype-nexus-community/auditjs/commit/384a99f4ec56dd1f4ad811d1342f06ea57149911))
+
 ## [4.0.35](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.34...v4.0.35) (2022-01-20)
 
 
