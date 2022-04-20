@@ -1,3 +1,10 @@
+## [4.0.37](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.36...v4.0.37) (2022-04-20)
+
+
+### Bug Fixes
+
+* security(npm): lock colors library to 1.4.0 ([#251](https://github.com/sonatype-nexus-community/auditjs/issues/251)) ([36ae07f](https://github.com/sonatype-nexus-community/auditjs/commit/36ae07fa0588bb77436c06f6d3fa9cc627062628)), closes [#250](https://github.com/sonatype-nexus-community/auditjs/issues/250)
+
 ## [4.0.36](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.35...v4.0.36) (2022-02-08)
 
 
