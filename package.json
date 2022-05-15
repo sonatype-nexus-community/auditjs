@@ -90,7 +90,7 @@
   },
   "dependencies": {
     "@xmldom/xmldom": "^0.7.2",
-    "chalk": "^3.0.0",
+    "chalk": "^4.0.0",
     "colors": "1.4.0",
     "figlet": "^1.2.4",
     "https-proxy-agent": "^5.0.0",
