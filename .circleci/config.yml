@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@4.10.1
+
 executors:
   node_executor:
     docker:
@@ -49,7 +52,12 @@ jobs:
           prefix: tests
       - run:
           name: dogfood scan
-          command: yarn run start ossi
+          command: yarn run start ossi --whitelist dev-auditjs.json
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
+          branch_pattern: main
+
   release:
     working_directory: ~/auditjs
     executor: node_executor
@@ -70,17 +78,23 @@ jobs:
       - run:
           name: Attempt publish
           command: yarn exec semantic-release
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
 
 workflows:
   version: 2.1
   build_and_release:
     jobs:
-      - build
+      - build:
+          context: slack_community_oss_fun
       - release:
           filters:
             branches:
               only: main
-          context: auditjs
+          context:
+            - auditjs
+            - slack_community_oss_fun
           requires:
             - build
 

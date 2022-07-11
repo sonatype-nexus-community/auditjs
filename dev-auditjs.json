@@ -1,0 +1,8 @@
+{
+  "ignore": [
+    {
+      "id": "sonatype-2022-3677",
+      "reason": "node-fetch @ all have possible vulnerability regarding Exposure of Sensitive Information to an Unauthorized Actor. ignoring while researching solutions, 07/11/2022"
+    }
+  ]
+}
