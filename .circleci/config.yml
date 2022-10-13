@@ -106,4 +106,5 @@ workflows:
             branches:
               only: main
     jobs:
-      - build
+      - build:
+          context: slack_community_oss_fun
