@@ -1,3 +1,10 @@
+## [4.0.39](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.38...v4.0.39) (2022-10-31)
+
+
+### Bug Fixes
+
+* CVE-2022-39353 in @xmldom/xmldom : 0.8.3 ([73b65bd](https://github.com/sonatype-nexus-community/auditjs/commit/73b65bd186e08091840114124694f1f456c27714))
+
 ## [4.0.38](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.37...v4.0.38) (2022-10-13)
 
 
