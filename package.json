@@ -89,7 +89,7 @@
     "typescript": "^3.7.3"
   },
   "dependencies": {
-    "@xmldom/xmldom": "^0.8.3",
+    "@xmldom/xmldom": "^0.8.5",
     "chalk": "^3.0.0",
     "colors": "1.4.0",
     "figlet": "^1.2.4",
