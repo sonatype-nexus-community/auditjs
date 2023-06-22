@@ -1,3 +1,10 @@
+## [4.0.40](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.39...v4.0.40) (2023-06-22)
+
+
+### Bug Fixes
+
+* CVE-2022-25883 in semver : 5.7.1 ([51d1dd0](https://github.com/sonatype-nexus-community/auditjs/commit/51d1dd00b04702f5de258ba6031001cbc4639cc4))
+
 ## [4.0.39](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.38...v4.0.39) (2022-10-31)
 
 
