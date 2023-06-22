@@ -6,7 +6,7 @@ orbs:
 executors:
   node_executor:
     docker:
-      - image: cimg/node:16.20
+      - image: cimg/node:14.17
 
 jobs:
   build:
@@ -74,7 +74,7 @@ jobs:
           command: yarn build
       - run:
           name: Install publishing packages
-          command: yarn global add semantic-release@beta @semantic-release/changelog @semantic-release/git@beta @semantic-release/npm@beta
+          command: yarn global add semantic-release@latest @semantic-release/changelog @semantic-release/git@latest @semantic-release/npm@latest
       - run:
           name: Attempt publish
           command: yarn exec semantic-release
