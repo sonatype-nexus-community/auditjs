@@ -44,6 +44,7 @@ describe('Application', () => {
     sinon
       .stub(OssIndexRequestService.prototype, 'callOSSIndexOrGetFromCache')
       .callsFake(async function(this: any): Promise<any> {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         ossIndexRequestService = this;
         return [
           {

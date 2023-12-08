@@ -39,6 +39,7 @@ export class IqServerResult {
 class Component {
   readonly packageUrl: string;
   readonly hash: string;
+  // eslint-disable-next-line
   readonly componentIdentifier: {};
   readonly proprietary: boolean;
 
@@ -61,8 +62,11 @@ class ComponentIdentifier {
 }
 
 class LicenseData {
+  // eslint-disable-next-line
   readonly declaredLicenses: {};
+  // eslint-disable-next-line
   readonly observedLicenses: {};
+  // eslint-disable-next-line
   readonly overriddenLicenses: {};
   readonly status: string;
 
