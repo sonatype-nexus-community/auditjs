@@ -18,6 +18,7 @@
     "y18n": "^5.0.8",
     "minimatch": ">=3.0.5",
     "semver": "^7.5.2",
+    "read-package-json": ">=7.0.0",
     "glob": ">=9.3.5"
   },
   "scripts": {
