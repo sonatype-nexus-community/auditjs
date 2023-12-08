@@ -13,6 +13,7 @@
     "typeRoots": [
       "./node_modules/@types",
     ],
+    "useUnknownInCatchVariables": false,
   },
   "include": [
     "src/**/*.d.ts",
