@@ -20,7 +20,7 @@ import { Hash } from './Hash';
 export interface Component {
   '@type': string;
   '@bom-ref': string;
-  group: string;
+  group?: string;
   name: string;
   version: string;
   description?: Object;

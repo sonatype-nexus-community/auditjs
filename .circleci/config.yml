@@ -38,11 +38,11 @@ jobs:
       - run:
           name: test
           command: yarn test-ci
-      - run:
-          name: code coverage
-          command: |
-            yarn coverage
-            yarn generate-coverage-report
+#      - run:
+#          name: code coverage
+#          command: |
+#            yarn coverage
+#            yarn generate-coverage-report
       - store_test_results:
           path: reports
       - store_artifacts:

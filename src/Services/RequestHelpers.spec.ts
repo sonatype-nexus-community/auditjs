@@ -33,7 +33,6 @@ describe('RequestHelpers', () => {
   });
 
   it('getAgent() should return undefined when no env variable is set', () => {
-    // eslint-disable-next-line @typescript-eslint/camelcase
     process.env.http_proxy = 'no-proxy';
 
     const res = RequestHelpers.getAgent();
@@ -41,15 +40,14 @@ describe('RequestHelpers', () => {
   });
 
   it('getAgent() should return a proxy httpAgent when env variable is set', () => {
-    // eslint-disable-next-line @typescript-eslint/camelcase
     process.env.http_proxy = 'http://test.local:8080';
     const res = RequestHelpers.getAgent();
     expect(res).not.to.be.undefined;
     if (res) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       expect(res.proxy.host).to.equal('test.local');
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       expect(res.proxy.port).to.equal(8080);
     }
@@ -59,7 +57,7 @@ describe('RequestHelpers', () => {
     const res = RequestHelpers.getAgent(true);
     expect(res).not.to.be.undefined;
     if (res) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       expect(res.options.rejectUnauthorized).to.equal(false);
     }
@@ -74,13 +72,13 @@ describe('RequestHelpers', () => {
     const res = RequestHelpers.getAgent(true);
     expect(res).not.to.be.undefined;
     if (res) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       expect(res.options.rejectUnauthorized).to.equal(false);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       expect(res.proxy.host).to.equal('test.local');
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       expect(res.proxy.port).to.equal(8080);
     }
@@ -88,22 +86,20 @@ describe('RequestHelpers', () => {
   */
 
   it('should return an httpAgent when env variable is set', () => {
-    // eslint-disable-next-line @typescript-eslint/camelcase
     process.env.http_proxy = 'http://test.local:8080';
     const res = RequestHelpers.getHttpAgent();
     expect(res).not.to.be.undefined;
     if (res) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       expect(res.proxy.host).to.equal('test.local');
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       expect(res.proxy.port).to.equal(8080);
     }
   });
 
   it('should return undefined when no env variable is set', () => {
-    // eslint-disable-next-line @typescript-eslint/camelcase
     process.env.http_proxy = 'no-proxy';
 
     const res = RequestHelpers.getHttpAgent();

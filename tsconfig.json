@@ -10,6 +10,7 @@
     "sourceMap": true,
     "declaration": true,
     "resolveJsonModule": true,
+    "useUnknownInCatchVariables": false,
   },
   "include": [
     "src/**/*.d.ts",
