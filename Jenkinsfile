@@ -16,7 +16,7 @@
 @Library(['private-pipeline-library', 'jenkins-shared']) _
 
 dockerizedBuildPipeline(
-  buildImageId: "${sonatypeDockerRegistryId()}/cdi/node-12:1",
+  buildImageId: "${sonatypeDockerRegistryId()}/cdi/node-17",
   deployBranch: 'main',
   prepare: {
     githubStatusUpdate('pending')
