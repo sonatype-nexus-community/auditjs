@@ -414,3 +414,4 @@ Phew, that was easier than I thought. Last but not least of all - have fun!
 Looking to contribute to our code but need some help? There's a few ways to get information:
 
 - Chat with us on the [AuditJS Gitter](https://gitter.im/sonatype-nexus-community/auditjs) or the [Nexus-Developers Gitter](https://gitter.im/sonatype/nexus-developers)
+
