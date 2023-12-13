@@ -1,6 +1,6 @@
 {
   "name": "auditjs",
-  "version": "4.0.42",
+  "version": "4.0.43",
   "description": "Audit dependencies to identify known vulnerabilities and maintenance problems",
   "main": "./bin/index.js",
   "bin": {

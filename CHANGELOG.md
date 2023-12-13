@@ -1,3 +1,10 @@
+## [4.0.43](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.42...v4.0.43) (2023-12-13)
+
+
+### Bug Fixes
+
+* minor change to trigger release of fix for sonatype-2023-4801 ([032b20a](https://github.com/sonatype-nexus-community/auditjs/commit/032b20a36882fc77ed65134b3b79e1c1d428d42e))
+
 ## [4.0.42](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.41...v4.0.42) (2023-12-13)
 
 
