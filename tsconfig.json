@@ -10,9 +10,6 @@
     "sourceMap": true,
     "declaration": true,
     "resolveJsonModule": true,
-    "typeRoots": [
-      "./node_modules/@types",
-    ],
     "useUnknownInCatchVariables": false,
   },
   "include": [
