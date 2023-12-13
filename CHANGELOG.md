@@ -1,3 +1,10 @@
+## [4.0.42](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.41...v4.0.42) (2023-12-13)
+
+
+### Bug Fixes
+
+* error TS2688: Cannot find type definition file for 'node'. ([#274](https://github.com/sonatype-nexus-community/auditjs/issues/274)) ([2d79b85](https://github.com/sonatype-nexus-community/auditjs/commit/2d79b850bbee6f231518f562b3d506794d206672))
+
 ## [4.0.41](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.40...v4.0.41) (2023-07-12)
 
 
