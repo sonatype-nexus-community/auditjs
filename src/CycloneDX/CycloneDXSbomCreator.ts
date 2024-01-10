@@ -18,7 +18,7 @@
 /// <reference types="./typings/spdx-license-ids" />
 
 import { Options } from './Options';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import builder from 'xmlbuilder';
 import readInstalled from 'read-installed';
 import * as ssri from 'ssri';
