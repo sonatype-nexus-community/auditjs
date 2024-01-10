@@ -1,3 +1,10 @@
+## [4.0.44](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.43...v4.0.44) (2024-01-10)
+
+
+### Bug Fixes
+
+* minor change to trigger release of PR# 276 ([f676f91](https://github.com/sonatype-nexus-community/auditjs/commit/f676f91a4a96b44f95d2e050acbe0f7e0fdd6943))
+
 ## [4.0.43](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.42...v4.0.43) (2023-12-13)
 
 
