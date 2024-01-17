@@ -1,3 +1,10 @@
+## [4.0.45](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.44...v4.0.45) (2024-01-17)
+
+
+### Bug Fixes
+
+* use semantic-release version that works with node 18 (newer node causes  build errors). ([a122b0e](https://github.com/sonatype-nexus-community/auditjs/commit/a122b0e828066d13c9f39e300ee5fe7df8023bc6))
+
 ## [4.0.44](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.43...v4.0.44) (2024-01-10)
 
 
