@@ -18,9 +18,6 @@
 dockerizedBuildPipeline(
   buildImageId: "${sonatypeDockerRegistryId()}/cdi/node-16",
   deployBranch: 'main',
-  prepare: {
-    githubStatusUpdate('pending')
-  },
   buildAndTest: {
     sh '''
     yarn
@@ -40,11 +37,7 @@ dockerizedBuildPipeline(
     })
   },
   testResults: [ 'reports/test-results.xml' ],
-  onSuccess: {
-    githubStatusUpdate('success')
-  },
   onFailure: {
-    githubStatusUpdate('failure')
     notifyChat(currentBuild: currentBuild, env: env, room: 'community-oss-fun')
     sendEmailNotification(currentBuild, env, [], 'community-group@sonatype.com')
   }
