@@ -166,6 +166,8 @@ export class Application {
       this.spinner.maybeCreateMessageForSpinner('Reticulating splines');
       logMessage('Turning response into Array<OssIndexServerResult>', DEBUG);
       let ossIndexResults: Array<OssIndexServerResult> = res.map((y: any) => {
+        logMessage(`Filtering results by score threshold: ${args.score}`, DEBUG);
+        y.vulnerabilities = y.vulnerabilities.filter((vuln: any) => vuln.cvssScore > args.score);
         return new OssIndexServerResult(y);
       });
       logMessage('Response morphed into Array<OssIndexServerResult>', DEBUG, {
