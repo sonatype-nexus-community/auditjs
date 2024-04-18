@@ -32,7 +32,7 @@ dockerizedBuildPipeline(
     withDockerImage(env.DOCKER_IMAGE_ID, {
       withCredentials([usernamePassword(credentialsId: 'jenkins-saas-service-acct',
         usernameVariable: 'IQ_USERNAME', passwordVariable: 'IQ_PASSWORD')]) {
-        sh 'npx auditjs@latest iq -x -a auditjs -s release -u $IQ_USERNAME -p $IQ_PASSWORD -h https://iq.sonatype.dev'
+        sh 'npx auditjs@latest iq -x -a auditjs -s release -u $IQ_USERNAME -p $IQ_PASSWORD -h https://sonatype.sonatype.app/platform'
       }
     })
   },
