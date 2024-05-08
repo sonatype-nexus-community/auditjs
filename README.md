@@ -266,13 +266,17 @@ The file should look like:
 
 ```json
 {
-  "ignore": [{ "id": "78a61524-80c5-4371-b6d1-6b32af349043", "reason": "Insert reason here" }]
+  "ignore": [{ "id": "78a61524-80c5-4371-b6d1-6b32af349043", "reason": "Insert reason here", "reviewDate": "2022-07-13T00:00:00.000Z" }]
 }
 ```
 
-The only field that actually matters is `id` and that is the ID you receive from OSS Index for a vulnerability. You can add fields such as `reason` so that you later can understand why you whitelisted a vulnerability.
+The only required field is `id` and that is the ID you receive from OSS Index for a vulnerability.
 
-Any `id` that is whitelisted will be squelched from the results, and not cause a failure.
+The `reason` field can be added so that you later can understand why you whitelisted a vulnerability.
+
+The `reviewDate` field can be used to limit the time a whitelist entry is applicable. Once this date passes, the whitelisted vulnerability will cause an audit failure. This can be useful when adding a temporary whitelist entry while package maintainers fix issues. The audit will fail eventually and serve as a reminder to check if the vulnerability has been solved by package maintainers.
+
+Any `id` that is whitelisted will be squelched from the results, and not cause a failure (unless the reviewDate has passed).
 
 ## Alternative output formats
 
