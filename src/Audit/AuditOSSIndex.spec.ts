@@ -29,7 +29,7 @@ const oldWrite = process.stdout.write;
 
 const doAuditOSSIndex = (results: OssIndexServerResult[]): boolean => {
   process.stdout.write = write;
-  const auditResult = auditOSSIndex.auditResults(results);
+  const auditResult = auditOSSIndex.auditResults(results, []);
   process.stdout.write = oldWrite;
   return auditResult;
 };
