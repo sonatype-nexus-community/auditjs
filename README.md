@@ -108,6 +108,7 @@ Options:
   --whitelist, -w  Set path to whitelist file                           [string]
   --clear          Clears cache location if it has been set in config  [boolean]
   --bower          Force the application to explicitly scan for Bower  [boolean]
+  -s, --score      Ignore entries with score less than this number     [number] [default: 0]
 ```
 
 ### Nexus IQ Server Usage
@@ -273,6 +274,19 @@ The file should look like:
 The only field that actually matters is `id` and that is the ID you receive from OSS Index for a vulnerability. You can add fields such as `reason` so that you later can understand why you whitelisted a vulnerability.
 
 Any `id` that is whitelisted will be squelched from the results, and not cause a failure.
+
+
+## Filtering
+
+You can filter vulnerabilities by a certain threshold. This is useful if you condition your checks on the success of an `auditjs` run, e.g. in CI/CD. By default, `auditjs` runs with a threshold of `0` and all vulnerabilities are reported.
+
+To set a minimum threshold of `5` for example, you'd use the `--score` (or `-s`) flag followed by the minimum score:
+
+```terminal
+$ auditjs ossi --score 5
+```
+
+In this example, no vulnerabilities with a score below `5` will be reported. If all vulnerabilities fall below this threshold, the run will have an exit code of `0`.
 
 ## Alternative output formats
 
