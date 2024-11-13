@@ -1,3 +1,14 @@
+## [4.0.46](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.45...v4.0.46) (2024-11-13)
+
+
+### Bug Fixes
+
+* latest mock-fs fixes failing unit tests after other updates, resolve CVE-2024-21538 in cross-spawn 7.0.3 ([7a66cbb](https://github.com/sonatype-nexus-community/auditjs/commit/7a66cbb5f7bd88e2ee6ccff70cb5ca2c88ee4846))
+* resolve CVE-2024-21538 in cross-spawn : 7.0.3 ([4ade2a7](https://github.com/sonatype-nexus-community/auditjs/commit/4ade2a7fd575bb7adf33191e14ab9ee7ef2786a9))
+* resolve CVE-2024-21538 in cross-spawn : 7.0.3 (update CI node version) ([d3378f5](https://github.com/sonatype-nexus-community/auditjs/commit/d3378f5b0c82f201558a74dc1496540f2306c90a))
+* resolve CVE-2024-4068 in braces : 3.0.2 ([d065149](https://github.com/sonatype-nexus-community/auditjs/commit/d06514982d97f9f5258b98e1a6f5731e899b79c4))
+* update CI 'release' target to use latest semantic-release, now that we use newer node version ([e2ac821](https://github.com/sonatype-nexus-community/auditjs/commit/e2ac821e5934a40a8d9f71666d7ca77f77a9984f))
+
 ## [4.0.45](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.44...v4.0.45) (2024-01-17)
 
 
