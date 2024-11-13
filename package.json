@@ -19,7 +19,8 @@
     "minimatch": ">=3.0.5",
     "semver": "^7.5.2",
     "read-package-json": ">=7.0.0",
-    "glob": ">=9.3.5"
+    "glob": ">=9.3.5",
+    "cross-spawn": ">=7.0.5"
   },
   "scripts": {
     "test": "mocha -r ts-node/register src/**/*.spec.ts",
@@ -81,7 +82,7 @@
     "eslint-plugin-prettier": "^3.1.2",
     "mocha": "^8.3.1",
     "mocha-junit-reporter": "^1.23.3",
-    "mock-fs": "^4.10.4",
+    "mock-fs": "^5.4.1",
     "nock": "11.7.0",
     "nyc": "^15.0.0",
     "prettier": "^1.19.1",
