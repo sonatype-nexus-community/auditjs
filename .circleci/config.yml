@@ -6,7 +6,7 @@ orbs:
 executors:
   node_executor:
     docker:
-      - image: cimg/node:18.19
+      - image: cimg/node:20.16
 
 jobs:
   build:
@@ -74,9 +74,7 @@ jobs:
           command: yarn build
       - run:
           name: Install publishing packages
-#          command: yarn global add semantic-release@latest @semantic-release/changelog @semantic-release/git@latest @semantic-release/npm@latest
-          # install newest semantic-release (22.0.12) that worked with node 18.19.0
-          command: yarn global add semantic-release@22.0.12 @semantic-release/changelog @semantic-release/git@latest @semantic-release/npm@latest
+          command: yarn global add semantic-release@latest @semantic-release/changelog @semantic-release/git@latest @semantic-release/npm@latest
       - run:
           name: Attempt publish
           command: yarn exec semantic-release
