@@ -15,7 +15,13 @@
  */
 
 export class Coordinates {
-  constructor(readonly name: string, readonly version: string, readonly group?: string) {}
+  constructor(
+    readonly name: string,
+    readonly version: string,
+    readonly group?: string,
+    public requestedBy: Set<string> = new Set(),
+    public pathOnDisk: string = '',
+  ) {}
 
   public toPurl(ecosystem = 'npm'): string {
     if (this.group) {

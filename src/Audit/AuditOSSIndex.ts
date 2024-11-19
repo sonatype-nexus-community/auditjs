@@ -19,6 +19,7 @@ import { Formatter, getNumberOfVulnerablePackagesFromResults } from './Formatter
 import { JsonFormatter } from './Formatters/JsonFormatter';
 import { TextFormatter } from './Formatters/TextFormatter';
 import { XmlFormatter } from './Formatters/XmlFormatter';
+import { Coordinates } from '../Types/Coordinates';
 
 export class AuditOSSIndex {
   private formatter: Formatter;
@@ -33,11 +34,16 @@ export class AuditOSSIndex {
     }
   }
 
-  public auditResults(results: Array<OssIndexServerResult>): boolean {
+  public auditResults(results: Array<OssIndexServerResult>, supplemental: Array<Coordinates>): boolean {
     if (this.quiet) {
       results = results.filter((x) => {
         return x.vulnerabilities && x.vulnerabilities?.length > 0;
       });
+    }
+    for (let i = 0; i < supplemental.length; i++) {
+      const index = results.findIndex((res) => res.coordinates == supplemental[i].toPurl());
+      results[index].requiredBy = Array.from(supplemental[i].requestedBy).join(', ');
+      results[index].realPath = supplemental[i].pathOnDisk;
     }
 
     this.formatter.printAuditResults(results);
