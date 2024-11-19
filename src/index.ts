@@ -152,6 +152,13 @@ let argv = yargs
         type: 'boolean',
         demandOption: false,
       },
+      score: {
+        alias: 's',
+        type: 'number',
+        description: 'Ignore entries with score less than this number',
+        demandOption: false,
+        default: 0,
+      },
     })
       .command('sbom', 'Output the purl only CycloneDx sbom to std_out');
   }).argv;
