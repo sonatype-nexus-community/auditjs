@@ -15,6 +15,7 @@
   },
   "resolutions": {
     "braces": "3.0.3",
+    "brace-expansion": "^2.0.2",
     "hosted-git-info": "^3.0.8",
     "y18n": "^5.0.8",
     "minimatch": ">=3.0.5",
