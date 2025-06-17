@@ -1,3 +1,10 @@
+## [4.0.47](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.46...v4.0.47) (2025-06-17)
+
+
+### Bug Fixes
+
+* CVE-2025-5889 in brace-expansion : 2.0.1 ([e9950ca](https://github.com/sonatype-nexus-community/auditjs/commit/e9950cadc7830639302852bf9879bec7113f2fae))
+
 ## [4.0.46](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.45...v4.0.46) (2024-11-13)
 
 
