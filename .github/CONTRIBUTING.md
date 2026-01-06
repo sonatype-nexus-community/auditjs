@@ -5,7 +5,7 @@
 * Make sure to fill out an issue for your PR, so that we have traceability as to what you are trying to fix,
 versus how you fixed it.
 * Spaces (not tabs), and 2 of them, that's what we like. Set your code style :)
-* Sign the [Sonatype CLA](https://sonatypecla.herokuapp.com/sign-cla)
+* Sign the [Sonatype CLA](https://the-cla.eu1.sonatype-se.com/)
 * Try to fix one thing per pull request! Many people work on this code, so the more focused your changes are, the less
 of a headache other people will have when they merge their work in.
 * Ensure your Pull Request passes tests either locally or via CircleCI (it will run automatically on your PR)
