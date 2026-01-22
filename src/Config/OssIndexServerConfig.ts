@@ -20,7 +20,7 @@ import { safeLoad } from 'js-yaml';
 import storage from 'node-persist';
 
 export class OssIndexServerConfig extends Config {
-  constructor(protected username: string = '', protected token: string = '', protected cacheLocation: string = '') {
+  constructor(protected username: string = '', protected token: string = '', protected cacheLocation: string = '', private server: string = '') {
     super('ossi', username, token);
     if (this.exists()) {
       this.getConfigFromFile();
@@ -48,6 +48,13 @@ export class OssIndexServerConfig extends Config {
     return undefined;
   }
 
+  public getServer(): string | undefined {
+    if (this.server != '') {
+      return this.server;
+    }
+    return undefined;
+  }
+
   public async clearCache(): Promise<boolean> {
     try {
       await storage.init({ dir: this.cacheLocation });
@@ -71,6 +78,9 @@ export class OssIndexServerConfig extends Config {
     if (doc && doc.CacheLocation) {
       this.cacheLocation = doc.CacheLocation;
     }
+    if (doc && doc.Server) {
+      this.server = doc.Server;
+    }
 
     return this;
   }
@@ -80,4 +90,5 @@ interface OssIndexServerConfigOnDisk {
   Username?: string;
   Token?: string;
   CacheLocation?: string;
+  Server?: string;
 }

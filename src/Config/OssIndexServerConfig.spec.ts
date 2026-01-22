@@ -39,6 +39,24 @@ describe('OssIndexServerConfig', async () => {
     sinon.restore();
   });
 
+  it('should save and retrieve server URL from config file', async () => {
+    sinon.stub(os, 'homedir').returns('/nonsense');
+    mock({ '/nonsense': {} });
+
+    const config = new OssIndexServerConfig();
+    const configPersist = new ConfigPersist('username', 'password', 'https://custom-ossindex.example.com', '/tmp/value');
+    expect(config.saveFile(configPersist)).to.equal(true);
+
+    const conf = config.getConfigFromFile('/nonsense/.ossindex/.oss-index-config');
+
+    expect(conf.getUsername()).to.equal('username');
+    expect(conf.getToken()).to.equal('password');
+    expect(conf.getServer()).to.equal('https://custom-ossindex.example.com');
+    expect(conf.getCacheLocation()).to.equal('/tmp/value');
+    mock.restore();
+    sinon.restore();
+  });
+
   it('should return undefined when property does not exist', async () => {
     sinon.stub(os, 'homedir').returns('/nonsense');
     mock({ '/nonsense': {} });
@@ -48,6 +66,7 @@ describe('OssIndexServerConfig', async () => {
     expect(conf.getUsername()).to.equal(undefined);
     expect(conf.getToken()).to.equal(undefined);
     expect(conf.getCacheLocation()).to.equal(undefined);
+    expect(conf.getServer()).to.equal(undefined);
 
     mock.restore();
     sinon.restore();

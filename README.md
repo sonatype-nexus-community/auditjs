@@ -99,6 +99,7 @@ Audit this application using Sonatype OSS Index
 Options:
   --version        Show version number                                 [boolean]
   --help           Show help                                           [boolean]
+  --server, -h     Specify OSS Index server url                         [string]
   --user, -u       Specify OSS Index username                           [string]
   --password, -p   Specify OSS Index password or token                  [string]
   --cache, -c      Specify path to use as a cache location              [string]
@@ -232,6 +233,30 @@ Note: these reference implementations are applicable to running an IQ scan as we
 Config is now set via the command line, you can do so by running `auditjs config`. You will be prompted if you'd like to set Nexus IQ Server config or Sonatype OSS Index config. Reasonable defaults are provided for Sonatype Nexus IQ Server that will work for an out of the box install. It is STRONGLY suggested that you do not save your password in config (although it will work), but rather use a token from OSS Index or Nexus IQ Server.
 
 Config passed in via the command line will be respected over filesystem based config so that you can override specific calls to either Sonatype OSS Index or Nexus IQ Server. Please see usage of either command to see how to set this command line config.
+
+### Custom OSS Index Server URL
+
+By default, `auditjs` uses the public OSS Index server at `https://ossindex.sonatype.org`. If you need to use a custom OSS Index server (for example, a private instance), you can configure it in one of two ways:
+
+#### Via Command Line
+
+```bash
+auditjs ossi --server https://custom-ossindex.example.com
+```
+
+#### Via Config File
+
+When running `auditjs config` and selecting OSS Index, you will be prompted for the server URL. The configuration is stored in `~/.ossindex/.oss-index-config`.
+
+Example config file:
+```yaml
+Username: your-username
+Token: your-token
+Server: https://custom-ossindex.example.com
+CacheLocation: /path/to/cache
+```
+
+Command line arguments take precedence over config file settings, allowing you to override the configured server URL on a per-run basis.
 
 ## OSS Index Credentials
 
