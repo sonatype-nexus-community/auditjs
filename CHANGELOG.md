@@ -1,3 +1,17 @@
+# [4.1.0](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.47...v4.1.0) (2026-01-27)
+
+
+### Bug Fixes
+
+* Bump `glob` to resolve CVE-2025-64756 ([66a817c](https://github.com/sonatype-nexus-community/auditjs/commit/66a817cf468f5071f34bae0dcd8b35e394ec5ba1))
+* Bump `js-yaml` to avert CVE-2025-64718 [#282](https://github.com/sonatype-nexus-community/auditjs/issues/282) ([2c9ca71](https://github.com/sonatype-nexus-community/auditjs/commit/2c9ca71652439d4e6347d4d9ff6fd29b4f010874))
+* Resolve test issues due to dependency updates ([284c930](https://github.com/sonatype-nexus-community/auditjs/commit/284c930539835d388a005d9bfc4fe7c7c68c25aa))
+
+
+### Features
+
+* Work to align to latest Sonatype Community Standards ([4ee3453](https://github.com/sonatype-nexus-community/auditjs/commit/4ee34535f046e264d2ebbb2308d48fadc9f2ff2a))
+
 ## [4.0.47](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.46...v4.0.47) (2025-06-17)
 
 

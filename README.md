@@ -22,7 +22,9 @@
 
 # AuditJS
 
-[![CircleCI](https://circleci.com/gh/sonatype-nexus-community/auditjs.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/auditjs)
+[![shield_gh-workflow-test]][link_gh-workflow-test]
+[![shield_license]][license_file]
+[![npm](https://img.shields.io/npm/v/auditjs)](https://www.npmjs.com/package/auditjs)       
 
 **IMPORTANT NOTE**: Welcome to AuditJS 4.0.0, lots has changed since 3.0.0, mainly around usage. Make sure to read the new docs.
 
@@ -425,18 +427,17 @@ fix: Adds insecure flag, implements (#213)
 
 Remember:
 
-It is worth noting that this is **NOT SUPPORTED** by Sonatype, and is a contribution of ours to the open source
-community (read: you!)
+This project is part of the [Sonatype Nexus Community](https://github.com/sonatype-nexus-community) organization, which is not officially supported by Sonatype. Please review the latest pull requests, issues, and commits to understand this project's readiness for contribution and use.
 
-* Use this contribution at the risk tolerance that you have
-* Do NOT file Sonatype support tickets related to `ossindex-lib`
-* DO file issues here on GitHub, so that the community can pitch in
+-   File suggestions and requests on this repo through GitHub Issues, so that the community can pitch in
+-   Use or contribute to this project according to your organization's policies and your own risk tolerance
+-   Don't file Sonatype support tickets related to this project— it won't reach the right people that way
 
-Phew, that was easier than I thought. Last but not least of all - have fun!
+Last but not least of all - have fun!
 
-## Getting help
+<!-- Links Section -->
 
-Looking to contribute to our code but need some help? There's a few ways to get information:
-
-- Chat with us on the [AuditJS Gitter](https://gitter.im/sonatype-nexus-community/auditjs) or the [Nexus-Developers Gitter](https://gitter.im/sonatype/nexus-developers)
-
+[shield_gh-workflow-test]: https://img.shields.io/github/actions/workflow/status/sonatype-nexus-community/auditjs/build.yaml?branch=main&logo=GitHub&logoColor=white 'build'
+[shield_license]: https://img.shields.io/github/license/sonatype-nexus-community/auditjs?logo=open%20source%20initiative&logoColor=white 'license'
+[link_gh-workflow-test]: https://github.com/sonatype-nexus-community/auditjs/actions/workflows/build.yaml?query=branch%3Amain
+[license_file]: https://github.com/sonatype-nexus-community/auditjs/blob/main/LICENSE

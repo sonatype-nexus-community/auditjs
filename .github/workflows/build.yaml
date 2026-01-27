@@ -1,0 +1,86 @@
+name: Build
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+  push:
+    branches:
+      - main
+
+env:
+  LC_APPLICATION_ID: auditjs
+  NODE_VERSION: '20'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Lint auditjs
+        run: yarn lint
+
+      - name: Build
+        run: yarn build
+
+      - name: Make test reports directory
+        run: mkdir -p reports
+
+      - name: Run tests
+        run: yarn test-ci
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: test-results
+          path: reports/test-results.xml
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage
+          path: lcov.info
+
+      - name: Dogfood scan
+        run: yarn run start ossi -u ${{ secrets.OSSI_USERNAME }} -p ${{ secrets.OSSI_TOKEN }} --whitelist dev-auditjs.json
+
+  sonatype:
+    name: Sonatype Lifecycle
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # See https://help.sonatype.com/en/npm-application-analysis.html
+      - name: Install Production Node Dependencies
+        run: yarn install --prod
+
+      - name: Sonatype Lifecycle Evaluation
+        id: evaluate
+        uses: sonatype/actions/evaluate@v1
+        with:
+          iq-server-url: ${{ vars.SONATYPE_PLATFORM_URL }}
+          username: ${{ secrets.SONATYPE_LIFECYCLE_USERNAME }}
+          password: ${{ secrets.SONATYPE_LIFECYCLE_PASSWORD }}
+          application-id: ${{ env.LC_APPLICATION_ID }}
+          scan-targets: 'yarn.lock node_modules'
