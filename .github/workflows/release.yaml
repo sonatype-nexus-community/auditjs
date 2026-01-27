@@ -1,0 +1,122 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+env:
+  LC_APPLICATION_ID: auditjs
+  NODE_VERSION: '20'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['20']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Lint auditjs
+        run: yarn lint
+
+      - name: Build
+        run: yarn build
+
+      - name: Make test reports directory
+        run: mkdir -p reports
+
+      - name: Run tests
+        run: yarn test-ci
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: test-results
+          path: reports/test-results.xml
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage
+          path: lcov.info
+
+      - name: Dogfood scan
+        run: yarn run start ossi --whitelist dev-auditjs.json
+
+  sonatype:
+    name: Sonatype Lifecycle
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env}}
+
+      # See https://help.sonatype.com/en/npm-application-analysis.html
+      - name: Install Production Node Dependencies
+        run: yarn install --prod
+
+      - name: Sonatype Lifecycle Evaluation
+        id: evaluate
+        uses: sonatype/actions/evaluate@v1
+        with:
+          iq-server-url: ${{ vars.SONATYPE_PLATFORM_URL }}
+          username: ${{ secrets.SONATYPE_LIFECYCLE_USERNAME }}
+          password: ${{ secrets.SONATYPE_LIFECYCLE_PASSWORD }}
+          application-id: ${{ env.LC_APPLICATION_ID }}
+          scan-targets: 'yarn.lock package.json src'
+          stage: release
+
+  release:
+    needs: 
+      - build
+      - sonatype
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build auditjs
+        run: yarn build
+
+      - name: Install publishing packages
+        run: yarn global add semantic-release@latest @semantic-release/changelog @semantic-release/git@latest @semantic-release/npm@latest
+
+      - name: Attempt publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: yarn exec semantic-release
