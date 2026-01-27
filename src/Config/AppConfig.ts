@@ -64,9 +64,13 @@ export class AppConfig {
       return config.saveFile(iqConfig);
     } else {
       let cacheLocation = join(homedir(), '.ossindex', 'auditjs');
+      let server = 'https://ossindex.sonatype.org';
+
       username = await this.setVariable('What is your username? ');
 
       token = await this.setVariable('What is your token? ');
+
+      server = await this.setVariable(`What is your OSS Index server address (default: ${server})? `, server);
 
       cacheLocation = await this.setVariable(
         `Where would you like your OSS Index cache saved to (default: ${cacheLocation})? `,
@@ -75,7 +79,12 @@ export class AppConfig {
 
       this.rl.close();
 
-      const ossIndexConfig = new ConfigPersist(username, token, undefined, cacheLocation);
+      const ossIndexConfig = new ConfigPersist(
+        username,
+        token,
+        server.endsWith('/') ? server.slice(0, server.length - 1) : server,
+        cacheLocation,
+      );
 
       const config = new OssIndexServerConfig();
 

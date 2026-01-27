@@ -100,6 +100,12 @@ let argv = yargs
   .command('config', 'Set config for OSS Index or Nexus IQ Server')
   .command('ossi [options]', 'Audit this application using Sonatype OSS Index', (y: Argv) => {
     return y.options({
+      server: {
+        alias: 'h',
+        type: 'string',
+        description: 'Specify OSS Index server url',
+        demandOption: false,
+      },
       user: {
         alias: 'u',
         type: 'string',

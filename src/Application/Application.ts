@@ -260,6 +260,7 @@ export class Application {
       args?.user || config?.getUsername(),
       args?.password || config?.getToken(),
       args?.cache || config?.getCacheLocation(),
+      args?.server || config?.getServer(),
     );
   }
 
