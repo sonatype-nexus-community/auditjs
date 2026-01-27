@@ -1,3 +1,10 @@
+# [4.2.0](https://github.com/sonatype-nexus-community/auditjs/compare/v4.1.0...v4.2.0) (2026-01-27)
+
+
+### Features
+
+* Add OSS Index server URL configuration support ([afe4428](https://github.com/sonatype-nexus-community/auditjs/commit/afe44282bc3acde5f8198413f19d38f985a5eab9))
+
 # [4.1.0](https://github.com/sonatype-nexus-community/auditjs/compare/v4.0.47...v4.1.0) (2026-01-27)
 
 
