@@ -125,7 +125,7 @@ jobs:
         run: yarn build
 
       - name: Install publishing packages
-        run: yarn global add semantic-release@latest @semantic-release/changelog @semantic-release/git@latest @semantic-release/npm@latest
+        run: yarn global add semantic-release@23 @semantic-release/changelog@6 @semantic-release/git@10 @semantic-release/npm@10
 
       - name: Attempt publish
         env:
