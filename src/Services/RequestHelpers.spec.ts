@@ -46,10 +46,10 @@ describe('RequestHelpers', () => {
     if (res) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      expect(res.proxy.host).to.equal('test.local');
+      expect(res.proxy.hostname).to.equal('test.local');
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      expect(res.proxy.port).to.equal(8080);
+      expect(res.proxy.port).to.equal('8080');
     }
   });
 
@@ -92,10 +92,10 @@ describe('RequestHelpers', () => {
     if (res) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      expect(res.proxy.host).to.equal('test.local');
+      expect(res.proxy.hostname).to.equal('test.local');
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      expect(res.proxy.port).to.equal(8080);
+      expect(res.proxy.port).to.equal('8080');
     }
   });
 

@@ -15,4 +15,4 @@ assignees: ''
 
 * **Anything else?**
 
-cc @bhamail / @DarthHater / @allenhsieh / @ken-duck
+cc @sonatype-nexus-community/auditjs
