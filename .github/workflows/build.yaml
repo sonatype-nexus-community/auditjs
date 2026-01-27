@@ -83,4 +83,4 @@ jobs:
           username: ${{ secrets.SONATYPE_LIFECYCLE_USERNAME }}
           password: ${{ secrets.SONATYPE_LIFECYCLE_PASSWORD }}
           application-id: ${{ env.LC_APPLICATION_ID }}
-          scan-targets: 'yarn.lock package.json src'
+          scan-targets: 'yarn.lock node_modules'
