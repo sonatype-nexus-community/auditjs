@@ -75,7 +75,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ env}}
+          node-version: ${{ env.NODE_VERSION }}
 
       # See https://help.sonatype.com/en/npm-application-analysis.html
       - name: Install Production Node Dependencies
