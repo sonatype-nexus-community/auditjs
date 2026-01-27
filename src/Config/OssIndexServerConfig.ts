@@ -20,7 +20,12 @@ import { safeLoad } from 'js-yaml';
 import storage from 'node-persist';
 
 export class OssIndexServerConfig extends Config {
-  constructor(protected username: string = '', protected token: string = '', protected cacheLocation: string = '', private server: string = '') {
+  constructor(
+    protected username: string = '',
+    protected token: string = '',
+    protected cacheLocation: string = '',
+    private server: string = '',
+  ) {
     super('ossi', username, token);
     if (this.exists()) {
       this.getConfigFromFile();

@@ -44,7 +44,12 @@ describe('OssIndexServerConfig', async () => {
     mock({ '/nonsense': {} });
 
     const config = new OssIndexServerConfig();
-    const configPersist = new ConfigPersist('username', 'password', 'https://custom-ossindex.example.com', '/tmp/value');
+    const configPersist = new ConfigPersist(
+      'username',
+      'password',
+      'https://custom-ossindex.example.com',
+      '/tmp/value',
+    );
     expect(config.saveFile(configPersist)).to.equal(true);
 
     const conf = config.getConfigFromFile('/nonsense/.ossindex/.oss-index-config');

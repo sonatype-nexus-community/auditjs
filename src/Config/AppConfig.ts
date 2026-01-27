@@ -70,10 +70,7 @@ export class AppConfig {
 
       token = await this.setVariable('What is your token? ');
 
-      server = await this.setVariable(
-        `What is your OSS Index server address (default: ${server})? `,
-        server,
-      );
+      server = await this.setVariable(`What is your OSS Index server address (default: ${server})? `, server);
 
       cacheLocation = await this.setVariable(
         `Where would you like your OSS Index cache saved to (default: ${cacheLocation})? `,
@@ -86,7 +83,7 @@ export class AppConfig {
         username,
         token,
         server.endsWith('/') ? server.slice(0, server.length - 1) : server,
-        cacheLocation
+        cacheLocation,
       );
 
       const config = new OssIndexServerConfig();
