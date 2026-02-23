@@ -16,8 +16,7 @@
 
 import path from 'path';
 import { homedir } from 'os';
-import { mkdirSync, existsSync } from 'fs';
-import { writeFileSync } from 'fs';
+import { mkdirSync, existsSync, writeFileSync, chmodSync } from 'fs';
 import { safeDump } from 'js-yaml';
 
 import { ConfigPersist } from './ConfigPersist';
@@ -40,14 +39,19 @@ export abstract class Config {
   }
 
   private tryCreateDirectory(): void {
-    if (!existsSync(path.join(homedir(), this.directoryName))) {
-      mkdirSync(path.join(homedir(), this.directoryName));
+    const dirPath = path.join(homedir(), this.directoryName);
+    if (!existsSync(dirPath)) {
+      // SECURITY: Create directory with restrictive permissions (CWE-732)
+      mkdirSync(dirPath, { mode: 0o700 });
     }
     return;
   }
 
   public saveFile(objectToSave: ConfigPersist): boolean {
-    writeFileSync(this.getConfigLocation(), safeDump(objectToSave, { skipInvalid: true }));
+    const configPath = this.getConfigLocation();
+    writeFileSync(configPath, safeDump(objectToSave, { skipInvalid: true }));
+    // SECURITY: Set restrictive file permissions - owner read/write only (CWE-732)
+    chmodSync(configPath, 0o600);
     this.getConfigFromFile();
     return true;
   }

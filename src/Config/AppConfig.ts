@@ -41,19 +41,17 @@ export class AppConfig {
     );
 
     if (type == 'iq') {
-      username = 'admin';
-      token = 'admin123';
+      // SECURITY: Removed hardcoded default credentials (CWE-798)
+      // Users must now provide their own credentials
+      let host = '';
 
-      let host = 'http://localhost:8070';
+      username = await this.setRequiredVariable('What is your username? ');
 
-      username = await this.setVariable(`What is your username (default: ${username})? `, username);
-
-      token = await this.setVariable(
-        `What is your password/token (pretty please do not save your password to the filesystem, USE A TOKEN) (default: ${token})? `,
-        token,
+      token = await this.setRequiredVariable(
+        'What is your password/token (please use a token, not your password)? ',
       );
 
-      host = await this.setVariable(`What is your IQ Server address (default: ${host})? `, host);
+      host = await this.setRequiredVariable('What is your IQ Server address (e.g., https://iq.example.com:8070)? ');
 
       this.rl.close();
 
@@ -97,6 +95,23 @@ export class AppConfig {
       this.rl.question(message, (answer) => {
         resolve(answer || defaultValue);
       });
+    });
+  }
+
+  // SECURITY: Require user to provide a value - no defaults allowed
+  private setRequiredVariable(message: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const askQuestion = (): void => {
+        this.rl.question(message, (answer) => {
+          if (answer && answer.trim() !== '') {
+            resolve(answer.trim());
+          } else {
+            console.log('This field is required. Please provide a value.');
+            askQuestion();
+          }
+        });
+      };
+      askQuestion();
     });
   }
 }
