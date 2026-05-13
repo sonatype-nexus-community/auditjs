@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import 'mocha';
+import { expect } from 'vitest';
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
-
-chai.use(chaiAsPromised);
-const expect = chai.expect;
 
 export const ossIndexObject: OssIndexServerResult = new OssIndexServerResult({
   coordinates: 'Test',

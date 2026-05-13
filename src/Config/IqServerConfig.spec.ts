@@ -14,31 +14,30 @@
  * limitations under the License.
  */
 
-import expect from '../Tests/TestHelper';
+import { expect, vi, describe, it, afterEach } from 'vitest';
 import { IqServerConfig } from './IqServerConfig';
 import mock from 'mock-fs';
-import sinon from 'sinon';
 import os from 'os';
 import { ConfigPersist } from './ConfigPersist';
 
-describe('IqServerConfig', async () => {
+describe('IqServerConfig', () => {
   afterEach(() => {
-    sinon.restore();
+    vi.restoreAllMocks();
     mock.restore();
   });
 
-  it('should return true when it is able to save a config file', async () => {
-    sinon.stub(os, 'homedir').returns('/nonsense');
+  it('should return true when it is able to save a config file', () => {
+    vi.spyOn(os, 'homedir').mockReturnValue('/nonsense');
     mock({ '/nonsense': {} });
 
     const config = new IqServerConfig();
     const configPersist = new ConfigPersist('username', 'password', 'http://localhost:8070');
-    expect(config.saveFile(configPersist)).to.equal(true);
+    expect(config.saveFile(configPersist)).toEqual(true);
 
     const conf = config.getConfigFromFile('/nonsense/.iqserver/.iq-server-config');
 
-    expect(conf.getUsername()).to.equal('username');
-    expect(conf.getToken()).to.equal('password');
-    expect(conf.getHost()).to.equal('http://localhost:8070');
+    expect(conf.getUsername()).toEqual('username');
+    expect(conf.getToken()).toEqual('password');
+    expect(conf.getHost()).toEqual('http://localhost:8070');
   });
 });

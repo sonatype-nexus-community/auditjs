@@ -14,11 +14,29 @@
  * limitations under the License.
  */
 
+import { expect, vi, describe, it, afterEach } from 'vitest';
 import { OssIndexRequestService } from './OssIndexRequestService';
-import expect from '../Tests/TestHelper';
 import { Coordinates } from '../Types/Coordinates';
-import nock from 'nock';
-import rimraf from 'rimraf';
+import { rmSync, existsSync } from 'fs';
+
+// Mock node-fetch since source files still use it
+vi.mock('node-fetch', () => ({
+  default: vi.fn(),
+  Response: class Response {
+    ok: boolean;
+    statusText: string;
+    constructor(public body: any, init: { status?: number } = {}) {
+      this.ok = (init.status || 200) >= 200 && (init.status || 200) < 300;
+      this.statusText = this.ok ? 'OK' : 'Error';
+    }
+    async json() {
+      return typeof this.body === 'string' ? JSON.parse(this.body) : this.body;
+    }
+  },
+}));
+
+import nodeFetch from 'node-fetch';
+const mockFetch = nodeFetch as unknown as ReturnType<typeof vi.fn>;
 
 // This will only work on Linux/OS X, find a better Windows friendly path
 const CACHE_LOCATION = '/tmp/.ossindex';
@@ -26,18 +44,21 @@ const CACHE_LOCATION = '/tmp/.ossindex';
 const OSS_INDEX_BASE_URL = 'http://ossindex.sonatype.org/';
 
 describe('OssIndexRequestService', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should have its request rejected when the OSS Index server is down', async () => {
-    rimraf.sync(CACHE_LOCATION);
-    nock(OSS_INDEX_BASE_URL)
-      .post('/api/v3/component-report')
-      .replyWithError('you messed up!');
+    if (existsSync(CACHE_LOCATION)) rmSync(CACHE_LOCATION, { recursive: true, force: true });
+    mockFetch.mockRejectedValueOnce(new Error('you messed up!'));
+
     const requestService = new OssIndexRequestService(undefined, undefined, CACHE_LOCATION, OSS_INDEX_BASE_URL);
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
-    return expect(requestService.callOSSIndexOrGetFromCache(coords)).to.eventually.be.rejected;
+    await expect(requestService.callOSSIndexOrGetFromCache(coords)).rejects.toThrow();
   });
 
   it('should return a valid response when given a valid component request', async () => {
-    rimraf.sync(CACHE_LOCATION);
+    if (existsSync(CACHE_LOCATION)) rmSync(CACHE_LOCATION, { recursive: true, force: true });
     const expectedOutput = [
       {
         coordinates: 'pkg:npm/%40types/commander@2.12.2',
@@ -45,11 +66,16 @@ describe('OssIndexRequestService', () => {
         vulnerabilities: [],
       },
     ];
-    nock(OSS_INDEX_BASE_URL)
-      .post('/api/v3/component-report')
-      .reply(200, expectedOutput);
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      statusText: 'OK',
+      json: vi.fn().mockResolvedValue(expectedOutput),
+    });
+
     const requestService = new OssIndexRequestService(undefined, undefined, CACHE_LOCATION, OSS_INDEX_BASE_URL);
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
-    return expect(requestService.callOSSIndexOrGetFromCache(coords)).to.eventually.deep.equal(expectedOutput);
+    const result = await requestService.callOSSIndexOrGetFromCache(coords);
+    expect(result).toEqual(expectedOutput);
   });
 });

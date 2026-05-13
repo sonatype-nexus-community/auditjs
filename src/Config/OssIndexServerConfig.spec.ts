@@ -14,33 +14,35 @@
  * limitations under the License.
  */
 
-import expect from '../Tests/TestHelper';
+import { expect, vi, describe, it, afterEach } from 'vitest';
 import { OssIndexServerConfig } from './OssIndexServerConfig';
 import mock from 'mock-fs';
-import sinon from 'sinon';
 import os from 'os';
 import { ConfigPersist } from './ConfigPersist';
 
-describe('OssIndexServerConfig', async () => {
-  it('should return true when it is able to save a config file', async () => {
-    sinon.stub(os, 'homedir').returns('/nonsense');
+describe('OssIndexServerConfig', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    mock.restore();
+  });
+
+  it('should return true when it is able to save a config file', () => {
+    vi.spyOn(os, 'homedir').mockReturnValue('/nonsense');
     mock({ '/nonsense': {} });
 
     const config = new OssIndexServerConfig();
     const configPersist = new ConfigPersist('username', 'password', undefined, '/tmp/value');
-    expect(config.saveFile(configPersist)).to.equal(true);
+    expect(config.saveFile(configPersist)).toEqual(true);
 
     const conf = config.getConfigFromFile('/nonsense/.ossindex/.oss-index-config');
 
-    expect(conf.getUsername()).to.equal('username');
-    expect(conf.getToken()).to.equal('password');
-    expect(conf.getCacheLocation()).to.equal('/tmp/value');
-    mock.restore();
-    sinon.restore();
+    expect(conf.getUsername()).toEqual('username');
+    expect(conf.getToken()).toEqual('password');
+    expect(conf.getCacheLocation()).toEqual('/tmp/value');
   });
 
-  it('should save and retrieve server URL from config file', async () => {
-    sinon.stub(os, 'homedir').returns('/nonsense');
+  it('should save and retrieve server URL from config file', () => {
+    vi.spyOn(os, 'homedir').mockReturnValue('/nonsense');
     mock({ '/nonsense': {} });
 
     const config = new OssIndexServerConfig();
@@ -50,30 +52,25 @@ describe('OssIndexServerConfig', async () => {
       'https://custom-ossindex.example.com',
       '/tmp/value',
     );
-    expect(config.saveFile(configPersist)).to.equal(true);
+    expect(config.saveFile(configPersist)).toEqual(true);
 
     const conf = config.getConfigFromFile('/nonsense/.ossindex/.oss-index-config');
 
-    expect(conf.getUsername()).to.equal('username');
-    expect(conf.getToken()).to.equal('password');
-    expect(conf.getServer()).to.equal('https://custom-ossindex.example.com');
-    expect(conf.getCacheLocation()).to.equal('/tmp/value');
-    mock.restore();
-    sinon.restore();
+    expect(conf.getUsername()).toEqual('username');
+    expect(conf.getToken()).toEqual('password');
+    expect(conf.getServer()).toEqual('https://custom-ossindex.example.com');
+    expect(conf.getCacheLocation()).toEqual('/tmp/value');
   });
 
-  it('should return undefined when property does not exist', async () => {
-    sinon.stub(os, 'homedir').returns('/nonsense');
+  it('should return undefined when property does not exist', () => {
+    vi.spyOn(os, 'homedir').mockReturnValue('/nonsense');
     mock({ '/nonsense': {} });
 
     const conf = new OssIndexServerConfig();
 
-    expect(conf.getUsername()).to.equal(undefined);
-    expect(conf.getToken()).to.equal(undefined);
-    expect(conf.getCacheLocation()).to.equal(undefined);
-    expect(conf.getServer()).to.equal(undefined);
-
-    mock.restore();
-    sinon.restore();
+    expect(conf.getUsername()).toBeUndefined();
+    expect(conf.getToken()).toBeUndefined();
+    expect(conf.getCacheLocation()).toBeUndefined();
+    expect(conf.getServer()).toBeUndefined();
   });
 });

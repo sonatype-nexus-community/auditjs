@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "module":"commonjs",
-    "target": "es6",
-    "lib": ["es6", "dom"],
+    "target": "es2020",
+    "lib": ["es2020", "dom"],
     "types": ["node"],
     "strict": true,
     "esModuleInterop": true,

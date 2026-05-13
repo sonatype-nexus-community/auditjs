@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-import expect from '../Tests/TestHelper';
+import { expect, vi, describe, it, afterEach } from 'vitest';
 import { Application } from './Application';
-import sinon, { SinonStub } from 'sinon';
 import { OssIndexRequestService } from '../Services/OssIndexRequestService';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 import { TextFormatter } from '../Audit/Formatters/TextFormatter';
+import { NpmList } from '../Munchers/NpmList';
 
 describe('Application', () => {
   afterEach(() => {
-    sinon.restore();
+    vi.restoreAllMocks();
   });
 
   it('merges both CLI and config options for auditWithOSSIndex, with CLI taking precedence', async () => {
+    // Ensure NpmList is valid so Application constructor can create a muncher
+    vi.spyOn(NpmList.prototype, 'isValid').mockReturnValue(true);
+    vi.spyOn(NpmList.prototype, 'getDepList').mockResolvedValue([]);
+
     const app = new Application(false, true);
     const yargs = {
       _: ['ossi'],
@@ -35,15 +39,14 @@ describe('Application', () => {
       cache: '',
     };
 
-    sinon.stub(TextFormatter.prototype, 'printAuditResults');
-    sinon.stub(OssIndexServerConfig.prototype, 'getConfigFromFile');
-    sinon.stub(OssIndexServerConfig.prototype, 'getUsername').returns('config-user');
-    sinon.stub(OssIndexServerConfig.prototype, 'getToken').returns('config-password');
-    sinon.stub(OssIndexServerConfig.prototype, 'getCacheLocation').returns('config-cache-location');
+    vi.spyOn(TextFormatter.prototype, 'printAuditResults').mockImplementation(() => undefined);
+    vi.spyOn(OssIndexServerConfig.prototype, 'getConfigFromFile').mockImplementation(() => undefined as any);
+    vi.spyOn(OssIndexServerConfig.prototype, 'getUsername').mockReturnValue('config-user');
+    vi.spyOn(OssIndexServerConfig.prototype, 'getToken').mockReturnValue('config-password');
+    vi.spyOn(OssIndexServerConfig.prototype, 'getCacheLocation').mockReturnValue('config-cache-location');
     let ossIndexRequestService: any = null;
-    sinon
-      .stub(OssIndexRequestService.prototype, 'callOSSIndexOrGetFromCache')
-      .callsFake(async function(this: any): Promise<any> {
+    vi.spyOn(OssIndexRequestService.prototype, 'callOSSIndexOrGetFromCache').mockImplementation(
+      async function(this: any): Promise<any> {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         ossIndexRequestService = this;
         return [
@@ -53,14 +56,15 @@ describe('Application', () => {
             vulnerabilities: [],
           },
         ];
-      });
+      },
+    );
     await app.startApplication(yargs);
-    sinon.assert.calledOnce(OssIndexRequestService.prototype.callOSSIndexOrGetFromCache as SinonStub);
-    expect(ossIndexRequestService).is.instanceOf(OssIndexRequestService);
+    expect(OssIndexRequestService.prototype.callOSSIndexOrGetFromCache).toHaveBeenCalledOnce();
+    expect(ossIndexRequestService).toBeInstanceOf(OssIndexRequestService);
     if (ossIndexRequestService instanceof OssIndexRequestService) {
-      expect(ossIndexRequestService.user).to.equal('config-user');
-      expect(ossIndexRequestService.password).to.equal('cli-password');
-      expect(ossIndexRequestService.cacheLocation).to.equal('config-cache-location');
+      expect(ossIndexRequestService.user).toEqual('config-user');
+      expect(ossIndexRequestService.password).toEqual('cli-password');
+      expect(ossIndexRequestService.cacheLocation).toEqual('config-cache-location');
     }
   });
 });
