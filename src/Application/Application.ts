@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { textSync } from 'figlet';
+import figlet = require('figlet');
 
 import { IqRequestService } from '../Services/IqRequestService';
 import { NpmList } from '../Munchers/NpmList';
@@ -127,9 +127,9 @@ export class Application {
     }
   }
 
-  private doPrintHeader(title = 'AuditJS', font: figlet.Fonts = '3D-ASCII'): void {
-    console.log(textSync(title, { font: font, horizontalLayout: 'fitted' }));
-    console.log(textSync('By Sonatype & Friends', { font: 'Pepper' }));
+  private doPrintHeader(title = 'AuditJS', font = '3D-ASCII'): void {
+    console.log(figlet.textSync(title, { font: font, horizontalLayout: 'fitted' }));
+    console.log(figlet.textSync('By Sonatype & Friends', { font: 'Pepper' }));
     visuallySeperateText(false, [`${title} version: ${pj.version}`]);
   }
 
