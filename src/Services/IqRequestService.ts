@@ -55,7 +55,7 @@ export class IqRequestService {
       const res = (await response.json()) as any;
       try {
         return res.applications[0].id;
-      } catch (e) {
+      } catch {
         throw new Error(
           `No valid ID on response from Sonatype Lifecycle, potentially check the public application ID you are using`,
         );

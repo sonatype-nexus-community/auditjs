@@ -206,7 +206,11 @@ export class Application {
       const failed = auditOSSIndex.auditResults(ossIndexResults);
 
       logMessage('Results audited', DEBUG, { failureCode: failed });
-      failed ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);
+      if (failed) {
+        shutDownLoggerAndExit(1);
+      } else {
+        shutDownLoggerAndExit(0);
+      }
     } catch (e) {
       this.spinner.maybeStop();
       logMessage('There was an error auditing with Sonatype OSS Index', ERROR, {
@@ -263,7 +267,11 @@ export class Application {
       const failed = auditGuide.auditResults(guideResults);
 
       logMessage('Results audited', DEBUG, { failureCode: failed });
-      failed ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);
+      if (failed) {
+        shutDownLoggerAndExit(1);
+      } else {
+        shutDownLoggerAndExit(0);
+      }
     } catch (e) {
       this.spinner.maybeStop();
       logMessage('There was an error auditing with Sonatype Guide', ERROR, {
@@ -312,7 +320,11 @@ export class Application {
           const failure = auditResults.auditThirdPartyResults(results);
           logMessage('Audit finished', DEBUG, { failure: failure });
 
-          failure ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);
+          if (failure) {
+            shutDownLoggerAndExit(1);
+          } else {
+            shutDownLoggerAndExit(0);
+          }
         },
       );
     } catch (e) {
@@ -330,7 +342,7 @@ export class Application {
     try {
       config = new OssIndexServerConfig();
       config.getConfigFromFile();
-    } catch (e) {
+    } catch {
       // Ignore config load failure
     }
     return new OssIndexRequestService(
@@ -346,7 +358,7 @@ export class Application {
     try {
       config = new GuideServerConfig();
       if (config.exists()) config.getConfigFromFile();
-    } catch (e) {
+    } catch {
       // Ignore config load failure
     }
     return new GuideRequestService(

@@ -15,338 +15,139 @@
  */
 
 /// <reference types="./typings/read-installed" />
-/// <reference types="./typings/spdx-license-ids" />
 
 import { Options } from './Options';
-import { v4 as uuidv4 } from 'uuid';
-import builder from 'xmlbuilder';
+import CDX = require('@cyclonedx/cyclonedx-library');
+import spdxExpressionParse = require('spdx-expression-parse');
 import readInstalled from 'read-installed';
 import * as ssri from 'ssri';
-import * as fs from 'fs';
-import { LicenseContent } from './Types/LicenseContent';
-import { Component, GenericDescription } from './Types/Component';
-import { ExternalReference } from './Types/ExternalReference';
-import { Hash } from './Types/Hash';
-import spdxLicensesNonDeprecated = require('spdx-license-ids');
-import spdxLicensesDeprecated = require('spdx-license-ids/deprecated');
 import { toPurl } from './Helpers/Helpers';
 import { logMessage, DEBUG } from '../Application/Logger/Logger';
 
+const SPEC = CDX.Spec.Spec1dot6;
+
+const licenseFactory = new CDX.Contrib.License.Factories.LicenseFactory(spdxExpressionParse);
+const extRefFactory = new CDX.Contrib.FromNodePackageJson.Factories.ExternalReferenceFactory();
+const componentBuilder = new CDX.Contrib.FromNodePackageJson.Builders.ComponentBuilder(extRefFactory, licenseFactory);
+
 export class CycloneDXSbomCreator {
-  readonly licenseFilenames: Array<string> = [
-    'LICENSE',
-    'License',
-    'license',
-    'LICENCE',
-    'Licence',
-    'licence',
-    'NOTICE',
-    'Notice',
-    'notice',
-  ];
-
-  readonly licenseContentTypes = [
-    { licenseContentType: 'text/plain', fileExtension: '' },
-    { licenseContentType: 'text/txt', fileExtension: '.txt' },
-    { licenseContentType: 'text/markdown', fileExtension: '.md' },
-    { licenseContentType: 'text/xml', fileExtension: '.xml' },
-  ];
-
-  readonly SBOMSCHEMA: string = 'http://cyclonedx.org/schema/bom/1.1';
-
   constructor(
     readonly path: string,
     readonly options?: Options,
   ) {}
 
   public async createBom(pkgInfo: any): Promise<string> {
-    const bom = builder.create('bom', { encoding: 'utf-8', separateArrayItems: true }).att('xmlns', this.SBOMSCHEMA);
+    const bom = new CDX.Models.Bom();
 
-    if (this.options && this.options.includeBomSerialNumber) {
-      bom.att('serialNumber', 'urn:uuid:' + uuidv4());
+    if (this.options?.includeBomSerialNumber) {
+      bom.serialNumber = CDX.Contrib.Bom.Utils.randomSerialNumber();
     }
 
-    bom.att('version', 1);
+    const seen = new Set<string>();
+    this.addComponents(pkgInfo, bom.components, seen, true);
 
-    const componentsNode = bom.ele('components');
-    const components = this.listComponents(pkgInfo);
-
-    if (components.length > 0) {
-      componentsNode.ele(components);
-    }
-
-    const bomString = bom.end({
-      width: 0,
-      allowEmpty: false,
-      spaceBeforeSlash: '',
+    return new CDX.Serialize.XmlSerializer(new CDX.Serialize.XML.Normalize.Factory(SPEC)).serialize(bom, {
+      sortLists: false,
     });
-
-    return bomString;
   }
 
   public getPackageInfoFromReadInstalled(path: string = this.path): Promise<any> {
     return new Promise((resolve, reject) => {
-      readInstalled(
-        path,
-        {
-          dev: this.options && this.options.devDependencies ? this.options.devDependencies : false,
-        },
-        async (err: any, data: any) => {
-          if (err) {
-            reject(err);
-          }
-
-          resolve(data);
-        },
-      );
+      readInstalled(path, { dev: this.options?.devDependencies ?? false }, (err: any, data: any) => {
+        if (err) reject(err);
+        resolve(data);
+      });
     });
   }
 
-  private listComponents(pkg: any): Array<any> {
-    const list: any = {};
-    const isRootPkg = true;
-    this.addComponent(pkg, list, isRootPkg);
-    return Object.keys(list).map((k) => ({ component: list[k] }));
-  }
+  private addComponents(pkg: any, repo: CDX.Models.ComponentRepository, seen: Set<string>, isRoot = false): void {
+    if (pkg.extraneous) return;
 
-  private addComponent(pkg: any, list: any, isRootPkg = false): void {
-    const spartan = this.options?.spartan ? this.options.spartan : false;
-    //read-installed with default options marks devDependencies as extraneous
-    //if a package is marked as extraneous, do not include it as a component
-    if (pkg.extraneous) {
-      return;
-    }
-    if (!isRootPkg) {
-      const pkgIdentifier = this.parsePackageJsonName(pkg.name);
-      const group: string = pkgIdentifier.scope == undefined ? '' : `@${pkgIdentifier.scope}`;
-      const name: string = pkgIdentifier.fullName as string;
-      const version: string = pkg.version as string;
-      const purl: string = toPurl(name, version, group);
-      const component: Component = {
-        '@type': this.determinePackageType(pkg),
-        '@bom-ref': purl,
-        group: group,
-        name: name,
-        version: version,
-        purl: purl,
-      };
+    if (!isRoot) {
+      const pkgId = this.parsePackageJsonName(pkg.name);
+      const group = pkgId.scope != null ? `@${pkgId.scope}` : '';
+      const name = pkgId.fullName;
+      const version: string = pkg.version ?? '';
+      const purl = toPurl(name, version, group);
 
-      if (component.group === '') {
-        delete component.group;
+      if (seen.has(purl)) return;
+      seen.add(purl);
+
+      const componentType =
+        this.determinePackageType(pkg) === 'framework'
+          ? CDX.Enums.ComponentType.Framework
+          : CDX.Enums.ComponentType.Library;
+
+      const comp = componentBuilder.makeComponent(pkg, componentType);
+      if (!comp) return;
+
+      comp.name = name;
+      comp.group = group !== '' ? group : undefined;
+      comp.version = version;
+      comp.purl = purl;
+
+      if (this.options?.spartan) {
+        comp.hashes.clear();
+        comp.licenses.clear();
+      } else {
+        if (!this.options?.includeLicenseData) {
+          comp.licenses.clear();
+        }
+        this.processHashes(pkg, comp);
       }
 
-      if (!spartan) {
-        const description: GenericDescription = { '#cdata': pkg.description };
-
-        component.description = description;
-        component.hashes = [];
-        component.licenses = [];
-        component.externalReferences = this.addExternalReferences(pkg);
-
-        if (this.options && this.options.includeLicenseData) {
-          component.licenses = this.getLicenses(pkg);
-        } else {
-          delete component.licenses;
-        }
-
-        if (component.externalReferences === undefined || component.externalReferences.length === 0) {
-          delete component.externalReferences;
-        }
-
-        this.processHashes(pkg, component);
-      }
-
-      if (list[component.purl]) return; //remove cycles
-      list[component.purl] = component;
+      repo.add(comp);
     }
+
     if (pkg.dependencies) {
       Object.keys(pkg.dependencies)
         .map((x) => pkg.dependencies[x])
-        .filter((x) => typeof x !== 'string') //remove cycles
-        .map((x) => this.addComponent(x, list));
+        .filter((x) => typeof x !== 'string')
+        .forEach((x) => this.addComponents(x, repo, seen, false));
     }
   }
 
-  /**
-   * If the author has described the module as a 'framework', the take their
-   * word for it, otherwise, identify the module as a 'library'.
-   */
-  private determinePackageType(pkg: any): string {
-    if (pkg.hasOwnProperty('keywords')) {
-      for (const keyword of pkg.keywords) {
-        if (keyword.toLowerCase() === 'framework') {
-          return 'framework';
+  private processHashes(pkg: any, comp: CDX.Models.Component): void {
+    if (pkg._shasum) {
+      comp.hashes.set(CDX.Enums.HashAlgorithm['SHA-1'], pkg._shasum);
+    } else if (pkg._integrity) {
+      try {
+        const [alg, hex] = CDX.Contrib.FromNodePackageJson.Utils.parsePackageIntegrity(pkg._integrity);
+        comp.hashes.set(alg, hex);
+      } catch {
+        // ssri fallback for multi-algorithm integrity strings
+        const integrity = ssri.parse(pkg._integrity);
+        const algMap: Array<[string, CDX.Enums.HashAlgorithm]> = [
+          ['sha512', CDX.Enums.HashAlgorithm['SHA-512']],
+          ['sha384', CDX.Enums.HashAlgorithm['SHA-384']],
+          ['sha256', CDX.Enums.HashAlgorithm['SHA-256']],
+          ['sha1', CDX.Enums.HashAlgorithm['SHA-1']],
+        ];
+        for (const [algo, cdxAlg] of algMap) {
+          if (integrity[algo]) {
+            comp.hashes.set(cdxAlg, Buffer.from(integrity[algo][0].digest, 'base64').toString('hex'));
+            break;
+          }
         }
+        logMessage('Parsed integrity via ssri fallback', DEBUG, { integrity: pkg._integrity });
+      }
+    }
+  }
+
+  private determinePackageType(pkg: any): string {
+    if (pkg.keywords) {
+      for (const kw of pkg.keywords) {
+        if (kw.toLowerCase() === 'framework') return 'framework';
       }
     }
     return 'library';
   }
 
-  /**
-   * Uses the SHA1 shasum (if Present) otherwise utilizes Subresource Integrity
-   * of the package with support for multiple hashing algorithms.
-   */
-  private processHashes(pkg: any, component: Component): void {
-    component.hashes = new Array<Hash>();
-    if (pkg._shasum) {
-      component.hashes.push({ hash: { '@alg': 'SHA-1', '#text': pkg._shasum } });
-    } else if (pkg._integrity) {
-      const integrity = ssri.parse(pkg._integrity);
-      // Components may have multiple hashes with various lengths. Check each one
-      // that is supported by the CycloneDX specification.
-      if (integrity.hasOwnProperty('sha512')) {
-        component.hashes.push(this.addComponentHash('SHA-512', integrity.sha512[0].digest));
-      }
-      if (integrity.hasOwnProperty('sha384')) {
-        component.hashes.push(this.addComponentHash('SHA-384', integrity.sha384[0].digest));
-      }
-      if (integrity.hasOwnProperty('sha256')) {
-        component.hashes.push(this.addComponentHash('SHA-256', integrity.sha256[0].digest));
-      }
-      if (integrity.hasOwnProperty('sha1')) {
-        component.hashes.push(this.addComponentHash('SHA-1', integrity.sha1[0].digest));
-      }
+  private parsePackageJsonName(name: string): { scope?: string; fullName: string } {
+    const match = name.match(/^(?:@([^/]+)\/)?(([^.]+)(?:\.(.*))?)$/);
+    if (match) {
+      return { scope: match[1] ?? undefined, fullName: match[2] ?? match[0] };
     }
-    if (component.hashes.length === 0) {
-      delete component.hashes; // If no hashes exist, delete the hashes node (it's optional)
-    }
+    return { scope: undefined, fullName: name };
   }
-
-  /**
-   * Adds a hash to component.
-   */
-  private addComponentHash(alg: string, digest: string): Hash {
-    const hash = Buffer.from(digest, 'base64').toString('hex');
-    return { hash: { '@alg': alg, '#text': hash } };
-  }
-
-  /**
-   * Adds external references supported by the package format.
-   */
-  private addExternalReferences(pkg: any): Array<ExternalReference> {
-    const externalReferences: Array<ExternalReference> = [];
-    if (pkg.homepage) {
-      this.pushURLToExternalReferences('website', pkg.homepage, externalReferences);
-    }
-    if (pkg.bugs && pkg.bugs.url) {
-      this.pushURLToExternalReferences('issue-tracker', pkg.bugs.url, externalReferences);
-    }
-    if (pkg.repository && pkg.repository.url) {
-      this.pushURLToExternalReferences('vcs', pkg.repository.url, externalReferences);
-    }
-    return externalReferences;
-  }
-
-  private pushURLToExternalReferences(
-    typeOfURL: string,
-    url: string,
-    externalReferences: Array<ExternalReference>,
-  ): void {
-    try {
-      const uri = new URL(url);
-      externalReferences.push({ reference: { '@type': typeOfURL, url: uri.toString() } });
-    } catch (e) {
-      logMessage('Encountered an invalid URL', DEBUG, { title: (e as Error).message, stack: (e as Error).stack });
-    }
-  }
-
-  /**
-   * Performs a lookup + validation of the license specified in the
-   * package. If the license is a valid SPDX license ID, set the 'id'
-   * of the license object, otherwise, set the 'name' of the license
-   * object.
-   */
-  private getLicenses(pkg: any): any {
-    const spdxLicenses = [...spdxLicensesNonDeprecated, ...spdxLicensesDeprecated];
-    let license = pkg.license && (pkg.license.type || pkg.license);
-    if (license) {
-      if (!Array.isArray(license)) {
-        license = [license];
-      }
-      return license
-        .map((l: string) => {
-          const licenseContent: LicenseContent = {};
-
-          if (
-            spdxLicenses.some((v: string) => {
-              return l === v;
-            })
-          ) {
-            licenseContent.id = l;
-          } else {
-            licenseContent.name = l;
-          }
-          if (this.options && this.options.includeLicenseText) {
-            licenseContent.text = this.addLicenseText(pkg, l);
-          }
-          return licenseContent;
-        })
-        .map((l: any) => ({ license: l }));
-    }
-    return undefined;
-  }
-
-  /**
-   * Tries to find a file containing the license text based on commonly
-   * used naming and content types. If a candidate file is found, add
-   * the text to the license text object and stop.
-   */
-  private addLicenseText(pkg: any, licenseName: string): GenericDescription | undefined {
-    for (const licenseFilename of this.licenseFilenames) {
-      for (const { licenseContentType, fileExtension } of this.licenseContentTypes) {
-        let licenseFilepath = `${pkg.realPath}/${licenseFilename}${licenseName}${fileExtension}`;
-        if (fs.existsSync(licenseFilepath)) {
-          return this.readLicenseText(licenseFilepath, licenseContentType);
-        }
-
-        licenseFilepath = `${pkg.realPath}/${licenseFilename}${fileExtension}`;
-        if (fs.existsSync(licenseFilepath)) {
-          return this.readLicenseText(licenseFilepath, licenseContentType);
-        }
-      }
-    }
-  }
-
-  /**
-   * Read the file from the given path to the license text object and includes
-   * content-type attribute, if not default. Returns the license text object.
-   */
-  private readLicenseText(licenseFilepath: string, licenseContentType: string): GenericDescription | undefined {
-    const licenseText = fs.readFileSync(licenseFilepath, 'utf8');
-    if (licenseText) {
-      const licenseContentText: GenericDescription = { '#cdata': licenseText };
-      if (licenseContentType !== 'text/plain') {
-        licenseContentText['@content-type'] = licenseContentType;
-      }
-      return licenseContentText;
-    }
-    return undefined;
-  }
-
-  private parsePackageJsonName(name: string): Result {
-    const result: Result = {
-      scope: undefined,
-      fullName: '',
-      projectName: '',
-      moduleName: '',
-    };
-
-    const regexp = new RegExp(/^(?:@([^/]+)\/)?(([^\.]+)(?:\.(.*))?)$/);
-
-    const matches = name.match(regexp);
-    if (matches) {
-      result.scope = matches[1] || undefined;
-      result.fullName = matches[2] || matches[0];
-      result.projectName = matches[3] === matches[2] ? undefined : matches[3];
-      result.moduleName = matches[4] || matches[2] || undefined;
-    }
-    return result;
-  }
-}
-
-interface Result {
-  scope?: string;
-  fullName: string;
-  projectName?: string;
-  moduleName?: string;
 }
