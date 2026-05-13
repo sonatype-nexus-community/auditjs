@@ -30,6 +30,9 @@ export abstract class Config {
     if (this.type == 'iq') {
       this.directoryName = '.iqserver';
       this.fileName = '.iq-server-config';
+    } else if (this.type == 'guide') {
+      this.directoryName = '.sonatype-guide';
+      this.fileName = '.sonatype-guide-config';
     }
     this.configLocation = path.join(homedir(), this.directoryName, this.fileName);
   }

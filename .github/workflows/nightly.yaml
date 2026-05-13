@@ -51,4 +51,4 @@ jobs:
           path: lcov.info
 
       - name: Dogfood scan
-        run: yarn run start ossi -u ${{ secrets.OSSI_USERNAME }} -p ${{ secrets.OSSI_TOKEN }} --whitelist dev-auditjs.json
+        run: yarn run start guide --token ${{ secrets.GUIDE_TOKEN }}

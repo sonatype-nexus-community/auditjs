@@ -21,6 +21,7 @@ import { NpmList } from '../Munchers/NpmList';
 import { Coordinates } from '../Types/Coordinates';
 import { Muncher } from '../Munchers/Muncher';
 import { OssIndexRequestService } from '../Services/OssIndexRequestService';
+import { GuideRequestService } from '../Services/GuideRequestService';
 import { AuditIQServer } from '../Audit/AuditIQServer';
 import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
@@ -31,6 +32,7 @@ import { Spinner } from './Spinner/Spinner';
 import { filterVulnerabilities } from '../Whitelist/VulnerabilityExcluder';
 import { IqServerConfig } from '../Config/IqServerConfig';
 import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
+import { GuideServerConfig } from '../Config/GuideServerConfig';
 import { visuallySeperateText } from '../Visual/VisualHelper';
 const pj = require('../../package.json');
 
@@ -70,16 +72,16 @@ export class Application {
   }
 
   public async startApplication(args: any): Promise<void> {
-    if (args._[0] == 'iq') {
+    if (args._[0] == 'iq' || args._[0] == 'lifecycle') {
       logMessage('Attempting to start application', DEBUG);
-      logMessage('Getting coordinates for Sonatype IQ', DEBUG);
-      this.spinner.maybeCreateMessageForSpinner('Getting coordinates for Sonatype IQ');
+      logMessage('Getting coordinates for Sonatype Lifecycle', DEBUG);
+      this.spinner.maybeCreateMessageForSpinner('Getting coordinates for Sonatype Lifecycle');
       await this.populateCoordinatesForIQ();
       logMessage(`Coordinates obtained`, DEBUG, this.sbom);
 
       this.spinner.maybeSucceed();
       logMessage(`Auditing application`, DEBUG, args.application);
-      this.spinner.maybeCreateMessageForSpinner('Auditing your application with Sonatype IQ');
+      this.spinner.maybeCreateMessageForSpinner('Auditing your application with Sonatype Lifecycle');
       await this.auditWithIQ(args);
     } else if (args._[0] == 'ossi') {
       logMessage('Attempting to start application', DEBUG);
@@ -93,6 +95,18 @@ export class Application {
       logMessage('Auditing your application with Sonatype OSS Index', DEBUG);
       this.spinner.maybeCreateMessageForSpinner('Auditing your application with Sonatype OSS Index');
       await this.auditWithOSSIndex(args);
+    } else if (args._[0] == 'guide') {
+      logMessage('Attempting to start application', DEBUG);
+
+      logMessage('Getting coordinates for Sonatype Guide', DEBUG);
+      this.spinner.maybeCreateMessageForSpinner('Getting coordinates for Sonatype Guide');
+      await this.populateCoordinates();
+      logMessage(`Coordinates obtained`, DEBUG, this.results);
+
+      this.spinner.maybeSucceed();
+      logMessage('Auditing your application with Sonatype Guide', DEBUG);
+      this.spinner.maybeCreateMessageForSpinner('Auditing your application with Sonatype Guide');
+      await this.auditWithGuide(args);
     } else if (args._[0] == 'sbom') {
       await this.populateCoordinatesForIQ();
       console.log(this.sbom);
@@ -200,21 +214,75 @@ export class Application {
     }
   }
 
+  private async auditWithGuide(args: any): Promise<void> {
+    logMessage('Instantiating Guide Request Service', DEBUG);
+    const requestService = this.getGuideRequestService(args);
+    this.spinner.maybeSucceed();
+
+    logMessage('Submitting coordinates to Sonatype Guide', DEBUG);
+    this.spinner.maybeCreateMessageForSpinner('Submitting coordinates to Sonatype Guide');
+
+    const format = this.muncher instanceof Bower ? 'bower' : 'npm';
+    logMessage('Format to query Sonatype Guide picked', DEBUG, { format: format });
+    try {
+      logMessage('Attempting to query Sonatype Guide or use Cache', DEBUG);
+      const res = await requestService.callGuideOrGetFromCache(this.results, format);
+      logMessage('Success from Sonatype Guide', DEBUG, res);
+      this.spinner.maybeSucceed();
+
+      this.spinner.maybeCreateMessageForSpinner('Reticulating splines');
+      logMessage('Turning response into Array<OssIndexServerResult>', DEBUG);
+      let guideResults: Array<OssIndexServerResult> = res.map((y: any) => {
+        return new OssIndexServerResult(y);
+      });
+      logMessage('Response morphed into Array<OssIndexServerResult>', DEBUG, {
+        ossIndexServerResults: guideResults,
+      });
+      this.spinner.maybeSucceed();
+
+      const allowlistPath = args.allowlist || args.whitelist;
+      this.spinner.maybeCreateMessageForSpinner('Removing allowlisted vulnerabilities');
+      logMessage('Response being ran against allowlist', DEBUG, { ossIndexServerResults: guideResults });
+      guideResults = await filterVulnerabilities(guideResults, allowlistPath);
+      logMessage('Response has been filtered', DEBUG, { ossIndexServerResults: guideResults });
+      this.spinner.maybeSucceed();
+
+      this.spinner.maybeCreateMessageForSpinner('Auditing your results from Sonatype Guide');
+      logMessage('Instantiating AuditOSSIndex, with quiet option', DEBUG, { quiet: args.quiet });
+      const auditGuide = new AuditOSSIndex(
+        args.quiet ? true : false,
+        args.json ? true : false,
+        args.xml ? true : false,
+      );
+      this.spinner.maybeStop();
+
+      logMessage('Attempting to audit results', DEBUG);
+      const failed = auditGuide.auditResults(guideResults);
+
+      logMessage('Results audited', DEBUG, { failureCode: failed });
+      failed ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);
+    } catch (e) {
+      this.spinner.maybeStop();
+      logMessage('There was an error auditing with Sonatype Guide', ERROR, { title: e.message, stack: e.stack });
+      shutDownLoggerAndExit(1);
+    }
+  }
+
   private async auditWithIQ(args: any): Promise<void> {
     try {
       this.spinner.maybeSucceed();
-      this.spinner.maybeCreateMessageForSpinner('Authenticating with Sonatype IQ');
-      logMessage('Attempting to connect to Sonatype IQ', DEBUG, args.application);
+      this.spinner.maybeCreateMessageForSpinner('Authenticating with Sonatype Lifecycle');
+      logMessage('Attempting to connect to Sonatype Lifecycle', DEBUG, args.application);
       const requestService = this.getIqRequestService(args);
 
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Submitting your dependencies');
-      logMessage('Submitting SBOM to Sonatype IQ', DEBUG, this.sbom);
+      logMessage('Submitting SBOM to Sonatype Lifecycle', DEBUG, this.sbom);
       const resultUrl = await requestService.submitToThirdPartyAPI(this.sbom);
 
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Checking for results (this could take a minute)');
-      logMessage('Polling IQ for report results', DEBUG, resultUrl);
+      logMessage('Polling Lifecycle for report results', DEBUG, resultUrl);
 
       requestService.asyncPollForResults(
         `${resultUrl}`,
@@ -227,7 +295,7 @@ export class Application {
           this.spinner.maybeSucceed();
           this.spinner.maybeCreateMessageForSpinner('Auditing your results');
           const results: ReportStatus = Object.assign(new ReportStatus(), x);
-          logMessage('Sonatype IQ results obtained!', DEBUG, results);
+          logMessage('Sonatype Lifecycle results obtained!', DEBUG, results);
 
           results.reportHtmlUrl = new URL(results.reportHtmlUrl!, requestService.host).href;
 
@@ -264,18 +332,37 @@ export class Application {
     );
   }
 
+  private getGuideRequestService(args: any): GuideRequestService {
+    let config: GuideServerConfig | undefined;
+    try {
+      config = new GuideServerConfig();
+      if (config.exists()) config.getConfigFromFile();
+    } catch (e) {
+      // Ignore config load failure
+    }
+    return new GuideRequestService(
+      args?.user || process.env.AUDITJS_GUIDE_USERNAME || config?.getUsername(),
+      args?.token || args?.password || process.env.AUDITJS_GUIDE_TOKEN || config?.getToken(),
+      args?.cache || config?.getCacheLocation?.(),
+      args?.server || config?.getServer?.(),
+    );
+  }
+
   private getIqRequestService(args: any): IqRequestService {
     const config = new IqServerConfig();
-    //config.getConfigFromFile();
-    if (!config.exists() && !(args.user && args.password && args.server))
+    const hasCredentials =
+      (args.user || process.env.AUDITJS_LIFECYCLE_USER) &&
+      (args.password || process.env.AUDITJS_LIFECYCLE_TOKEN) &&
+      (args.server || process.env.AUDITJS_LIFECYCLE_URL);
+    if (!config.exists() && !hasCredentials)
       throw new Error(
         'No config file is defined and you are missing one of the -h (host), -u (user), or -p (password) parameters.',
       );
 
     return new IqRequestService(
-      args.user !== undefined ? (args.user as string) : config.getUsername(),
-      args.password !== undefined ? (args.password as string) : config.getToken(),
-      args.server !== undefined ? (args.server as string) : config.getHost(),
+      args.user ?? process.env.AUDITJS_LIFECYCLE_USER ?? config.getUsername(),
+      args.password ?? process.env.AUDITJS_LIFECYCLE_TOKEN ?? config.getToken(),
+      args.server ?? process.env.AUDITJS_LIFECYCLE_URL ?? config.getHost(),
       args.application as string,
       args.stage as string,
       args.timeout as number,

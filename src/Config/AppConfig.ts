@@ -17,6 +17,7 @@
 import readline from 'readline';
 import { OssIndexServerConfig } from './OssIndexServerConfig';
 import { IqServerConfig } from './IqServerConfig';
+import { GuideServerConfig } from './GuideServerConfig';
 import { ConfigPersist } from './ConfigPersist';
 import { join } from 'path';
 import { homedir } from 'os';
@@ -37,10 +38,17 @@ export class AppConfig {
     let type = '';
 
     type = await this.setVariable(
-      'Do you want to set config for Nexus IQ Server or OSS Index? Hit enter for OSS Index, iq for Nexus IQ Server? ',
+      'What would you like to configure?\n' +
+      '  1. Sonatype Lifecycle\n' +
+      '  2. Sonatype Guide (Bearer Token)\n' +
+      '  3. Sonatype Guide (OSS Index Compatibility - Username and Token)\n' +
+      '  4. OSS Index [DEPRECATED]\n' +
+      'Enter your choice (default: 3): ',
+      '3',
     );
 
-    if (type == 'iq') {
+    if (type == '1') {
+      // Sonatype Lifecycle (formerly Nexus IQ)
       username = 'admin';
       token = 'admin123';
 
@@ -53,7 +61,7 @@ export class AppConfig {
         token,
       );
 
-      host = await this.setVariable(`What is your IQ Server address (default: ${host})? `, host);
+      host = await this.setVariable(`What is your Lifecycle Server address (default: ${host})? `, host);
 
       this.rl.close();
 
@@ -62,13 +70,60 @@ export class AppConfig {
       const config = new IqServerConfig();
 
       return config.saveFile(iqConfig);
-    } else {
+    } else if (type == '2') {
+      // Sonatype Guide Bearer Token
+      let accessToken = '';
+      let server = 'https://api.guide.sonatype.com';
+
+      accessToken = await this.setVariable('What is your Sonatype Guide API token? ');
+
+      server = await this.setVariable(`What is your Sonatype Guide server address (default: ${server})? `, server);
+
+      this.rl.close();
+
+      const guideConfig = new ConfigPersist(
+        '',
+        accessToken,
+        server.endsWith('/') ? server.slice(0, server.length - 1) : server,
+      );
+
+      const config = new GuideServerConfig();
+
+      return config.saveFile(guideConfig);
+    } else if (type == '3') {
+      // Sonatype Guide OSS Index Compatibility (username + token)
+      let server = 'https://api.guide.sonatype.com';
+
+      username = await this.setVariable('What is your Sonatype Guide username? ');
+
+      token = await this.setVariable('What is your Sonatype Guide token? ');
+
+      server = await this.setVariable(`What is your Sonatype Guide server address (default: ${server})? `, server);
+
+      this.rl.close();
+
+      const guideConfig = new ConfigPersist(
+        username,
+        token,
+        server.endsWith('/') ? server.slice(0, server.length - 1) : server,
+      );
+
+      const config = new GuideServerConfig();
+
+      return config.saveFile(guideConfig);
+    } else if (type == '4') {
+      // OSS Index (deprecated)
+      console.warn(
+        'DEPRECATION: OSS Index configuration is deprecated. ' +
+        'Please migrate to Sonatype Guide (option 3).',
+      );
+
       let cacheLocation = join(homedir(), '.ossindex', 'auditjs');
       let server = 'https://ossindex.sonatype.org';
 
-      username = await this.setVariable('What is your username? ');
+      username = await this.setVariable('What is your OSS Index username? ');
 
-      token = await this.setVariable('What is your token? ');
+      token = await this.setVariable('What is your OSS Index token? ');
 
       server = await this.setVariable(`What is your OSS Index server address (default: ${server})? `, server);
 
@@ -89,6 +144,27 @@ export class AppConfig {
       const config = new OssIndexServerConfig();
 
       return config.saveFile(ossIndexConfig);
+    } else {
+      // Default fallback: treat as option 3 (Guide OSS Index Compatibility)
+      let server = 'https://api.guide.sonatype.com';
+
+      username = await this.setVariable('What is your Sonatype Guide username? ');
+
+      token = await this.setVariable('What is your Sonatype Guide token? ');
+
+      server = await this.setVariable(`What is your Sonatype Guide server address (default: ${server})? `, server);
+
+      this.rl.close();
+
+      const guideConfig = new ConfigPersist(
+        username,
+        token,
+        server.endsWith('/') ? server.slice(0, server.length - 1) : server,
+      );
+
+      const config = new GuideServerConfig();
+
+      return config.saveFile(guideConfig);
     }
   }
 

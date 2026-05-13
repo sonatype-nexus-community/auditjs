@@ -94,6 +94,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@sonatype/sonatype-guide-api-client": "^0.1.0",
     "@xmldom/xmldom": "^0.8.5",
     "chalk": "^3.0.0",
     "colors": "1.4.0",

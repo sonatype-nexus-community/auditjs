@@ -58,14 +58,14 @@ export class IqRequestService {
         return res.applications[0].id;
       } catch (e) {
         throw new Error(
-          `No valid ID on response from Nexus IQ, potentially check the public application ID you are using`,
+          `No valid ID on response from Sonatype Lifecycle, potentially check the public application ID you are using`,
         );
       }
     } else {
       throw new Error(
-        'Unable to connect to IQ Server with http status ' +
+        'Unable to connect to Sonatype Lifecycle with http status ' +
           response.status +
-          '. Check your credentials and network connectivity by hitting Nexus IQ at ' +
+          '. Check your credentials and network connectivity by hitting Sonatype Lifecycle at ' +
           this.host +
           ' in your browser.',
       );
