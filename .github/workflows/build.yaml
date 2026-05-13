@@ -56,7 +56,7 @@ jobs:
           path: coverage/lcov.info
 
       - name: Dogfood scan
-        run: npm run start -- guide --user ${{ secrets.OSSI_USERNAME }} --token ${{ secrets.GUIDE_TOKEN }}
+        run: npm run start -- guide --user ${{ secrets.OSSI_USERNAME }} --token ${{ secrets.OSSI_TOKEN }}
 
   sonatype:
     name: Sonatype Lifecycle

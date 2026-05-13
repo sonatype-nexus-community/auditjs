@@ -95,7 +95,9 @@ export class GuideRequestService {
       const response = await this.api.getComponentReports({ purlRequestPost: { coordinates: purls } });
       return response;
     } catch (err) {
-      throw new Error(`There was an error making the request to Sonatype Guide: ${err}`);
+      const status = (err as any)?.response?.status;
+      const detail = status ? ` (HTTP ${status})` : '';
+      throw new Error(`There was an error making the request to Sonatype Guide: ${err}${detail}`);
     }
   }
 
