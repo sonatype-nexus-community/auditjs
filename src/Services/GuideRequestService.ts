@@ -119,7 +119,7 @@ export class GuideRequestService {
         const res = this.getResultsFromGuide(purls);
         responses.push(res);
       } catch (e) {
-        throw new Error(e);
+        throw new Error(String(e));
       }
     }
 

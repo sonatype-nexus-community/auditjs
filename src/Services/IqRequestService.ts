@@ -39,7 +39,7 @@ export class IqRequestService {
       this.internalId = await this.getApplicationInternalId();
       this.isInitialized = true;
     } catch (e) {
-      throw new Error(e);
+      throw new Error(String(e));
     }
   }
 
@@ -130,7 +130,7 @@ export class IqRequestService {
         pollingFinished(json);
       }
     } catch (e) {
-      errorHandler({ title: e.message });
+      errorHandler({ title: (e as Error).message });
     }
   }
 
@@ -138,7 +138,7 @@ export class IqRequestService {
     try {
       return new URL(url);
     } catch (e) {
-      logMessage(e.title, DEBUG, { message: e.message });
+      logMessage((e as any).title, DEBUG, { message: (e as Error).message });
       if (this.host.endsWith('/')) {
         return new URL(this.host.concat(url));
       }

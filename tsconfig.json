@@ -10,7 +10,6 @@
     "sourceMap": true,
     "declaration": true,
     "resolveJsonModule": true,
-    "useUnknownInCatchVariables": false,
     "noImplicitOverride": true,
     "skipLibCheck": true
   },

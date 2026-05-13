@@ -133,7 +133,7 @@ export class OssIndexRequestService {
         const res = this.getResultsFromOSSIndex(new OssIndexCoordinates(chunk.map((x) => x.toPurl(format))));
         responses.push(res);
       } catch (e) {
-        throw new Error(e);
+        throw new Error(String(e));
       }
     }
 

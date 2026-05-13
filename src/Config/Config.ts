@@ -17,7 +17,7 @@
 import path from 'path';
 import os from 'os';
 import { mkdirSync, existsSync } from 'fs';
-import { writeFileSync } from 'fs';
+import { writeFileSync, chmodSync } from 'fs';
 import { dump } from 'js-yaml';
 
 import { ConfigPersist } from './ConfigPersist';
@@ -48,7 +48,9 @@ export abstract class Config {
   }
 
   public saveFile(objectToSave: ConfigPersist): boolean {
-    writeFileSync(this.getConfigLocation(), dump(objectToSave, { skipInvalid: true }));
+    const location = this.getConfigLocation();
+    writeFileSync(location, dump(objectToSave, { skipInvalid: true }));
+    chmodSync(location, 0o600);
     this.getConfigFromFile();
     return true;
   }

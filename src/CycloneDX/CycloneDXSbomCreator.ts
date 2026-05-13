@@ -243,7 +243,7 @@ export class CycloneDXSbomCreator {
       const uri = new URL(url);
       externalReferences.push({ reference: { '@type': typeOfURL, url: uri.toString() } });
     } catch (e) {
-      logMessage('Encountered an invalid URL', DEBUG, { title: e.message, stack: e.stack });
+      logMessage('Encountered an invalid URL', DEBUG, { title: (e as Error).message, stack: (e as Error).stack });
     }
   }
 
