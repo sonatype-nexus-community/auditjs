@@ -25,7 +25,11 @@ import { ConfigPersist } from './ConfigPersist';
 export abstract class Config {
   private directoryName = '.ossindex';
   private fileName = '.oss-index-config';
-  constructor(protected type: string, protected username: string, protected token: string) {
+  constructor(
+    protected type: string,
+    protected username: string,
+    protected token: string,
+  ) {
     if (this.type == 'iq') {
       this.directoryName = '.iqserver';
       this.fileName = '.iq-server-config';

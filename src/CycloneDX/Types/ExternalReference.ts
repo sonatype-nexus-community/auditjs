@@ -15,10 +15,10 @@
  */
 
 export interface ExternalReference {
-  reference: Reference,
+  reference: Reference;
 }
 
 export interface Reference {
-  '@type': string,
-  url: string
+  '@type': string;
+  url: string;
 }

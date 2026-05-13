@@ -31,9 +31,7 @@ export class RequestHelpers {
 
   public static getAgent(insecure = false): UndiciAgent | ProxyAgent | undefined {
     if (insecure) {
-      console.warn(
-        'WARNING: --insecure disables TLS certificate validation. Do not use in production environments.',
-      );
+      console.warn('WARNING: --insecure disables TLS certificate validation. Do not use in production environments.');
       return new UndiciAgent({ connect: { rejectUnauthorized: false } });
     }
 

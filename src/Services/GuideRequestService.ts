@@ -134,5 +134,8 @@ export class GuideRequestService {
 }
 
 class PurlContainer {
-  constructor(readonly inCache: OssIndexServerResult[], readonly notInCache: Coordinates[]) {}
+  constructor(
+    readonly inCache: OssIndexServerResult[],
+    readonly notInCache: Coordinates[],
+  ) {}
 }

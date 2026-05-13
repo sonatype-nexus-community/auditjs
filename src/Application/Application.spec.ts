@@ -45,19 +45,19 @@ describe('Application', () => {
     vi.spyOn(OssIndexServerConfig.prototype, 'getToken').mockReturnValue('config-password');
     vi.spyOn(OssIndexServerConfig.prototype, 'getCacheLocation').mockReturnValue('config-cache-location');
     let ossIndexRequestService: any = null;
-    vi.spyOn(OssIndexRequestService.prototype, 'callOSSIndexOrGetFromCache').mockImplementation(
-      async function(this: any): Promise<any> {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        ossIndexRequestService = this;
-        return [
-          {
-            coordinates: '',
-            reference: '',
-            vulnerabilities: [],
-          },
-        ];
-      },
-    );
+    vi.spyOn(OssIndexRequestService.prototype, 'callOSSIndexOrGetFromCache').mockImplementation(async function (
+      this: any,
+    ): Promise<any> {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      ossIndexRequestService = this;
+      return [
+        {
+          coordinates: '',
+          reference: '',
+          vulnerabilities: [],
+        },
+      ];
+    });
     await app.startApplication(yargs);
     expect(OssIndexRequestService.prototype.callOSSIndexOrGetFromCache).toHaveBeenCalledOnce();
     expect(ossIndexRequestService).toBeInstanceOf(OssIndexRequestService);

@@ -152,5 +152,8 @@ export class OssIndexRequestService {
 }
 
 class PurlContainer {
-  constructor(readonly inCache: OssIndexServerResult[], readonly notInCache: Coordinates[]) {}
+  constructor(
+    readonly inCache: OssIndexServerResult[],
+    readonly notInCache: Coordinates[],
+  ) {}
 }

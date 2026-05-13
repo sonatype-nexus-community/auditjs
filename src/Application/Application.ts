@@ -209,7 +209,10 @@ export class Application {
       failed ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);
     } catch (e) {
       this.spinner.maybeStop();
-      logMessage('There was an error auditing with Sonatype OSS Index', ERROR, { title: (e as Error).message, stack: (e as Error).stack });
+      logMessage('There was an error auditing with Sonatype OSS Index', ERROR, {
+        title: (e as Error).message,
+        stack: (e as Error).stack,
+      });
       shutDownLoggerAndExit(1);
     }
   }
@@ -263,7 +266,10 @@ export class Application {
       failed ? shutDownLoggerAndExit(1) : shutDownLoggerAndExit(0);
     } catch (e) {
       this.spinner.maybeStop();
-      logMessage('There was an error auditing with Sonatype Guide', ERROR, { title: (e as Error).message, stack: (e as Error).stack });
+      logMessage('There was an error auditing with Sonatype Guide', ERROR, {
+        title: (e as Error).message,
+        stack: (e as Error).stack,
+      });
       shutDownLoggerAndExit(1);
     }
   }
@@ -311,7 +317,10 @@ export class Application {
       );
     } catch (e) {
       this.spinner.maybeFail();
-      logMessage('There was an issue auditing your application!', ERROR, { title: (e as Error).message, stack: (e as Error).stack });
+      logMessage('There was an issue auditing your application!', ERROR, {
+        title: (e as Error).message,
+        stack: (e as Error).stack,
+      });
       shutDownLoggerAndExit(1);
     }
   }

@@ -15,10 +15,10 @@
  */
 
 export interface Hash {
-  hash: HashDetails
+  hash: HashDetails;
 }
 
 export interface HashDetails {
-  '@alg': string,
-  '#text': string,
+  '@alg': string;
+  '#text': string;
 }

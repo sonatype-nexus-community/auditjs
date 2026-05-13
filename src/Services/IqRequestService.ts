@@ -52,7 +52,7 @@ export class IqRequestService {
       dispatcher: RequestHelpers.getAgent(this.insecure) as any,
     } as RequestInit);
     if (response.ok) {
-      const res = await response.json() as any;
+      const res = (await response.json()) as any;
       try {
         return res.applications[0].id;
       } catch (e) {
@@ -87,7 +87,7 @@ export class IqRequestService {
       } as RequestInit,
     );
     if (response.ok) {
-      const json = await response.json() as any;
+      const json = (await response.json()) as any;
       return json.statusUrl as string;
     } else {
       const body = await response.text();

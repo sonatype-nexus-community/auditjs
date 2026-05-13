@@ -62,9 +62,7 @@ describe('IQRequestService', () => {
   it('should respond with an error if the response for an ID is bad', async () => {
     const stage = 'build';
 
-    mockFetch.mockResolvedValueOnce(
-      makeResponse(applicationInternalIdResponse.statusCode, { thereisnoid: 'none' }),
-    );
+    mockFetch.mockResolvedValueOnce(makeResponse(applicationInternalIdResponse.statusCode, { thereisnoid: 'none' }));
 
     const requestService = new IqRequestService(
       'admin',
@@ -126,9 +124,7 @@ describe('IQRequestService', () => {
     );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
-    await expect(requestService.submitToThirdPartyAPI(coords)).rejects.toThrow(
-      'Unable to submit to Third Party API',
-    );
+    await expect(requestService.submitToThirdPartyAPI(coords)).rejects.toThrow('Unable to submit to Third Party API');
   });
 
   it('should have return a proper result when polling IQ Server and the request is eventually valid', async () => {
@@ -158,9 +154,7 @@ describe('IQRequestService', () => {
           reject(new Error(error.message || 'polling error'));
         },
         (x: any) => {
-          expect(x.reportHtmlUrl).toEqual(
-            'http://localhost:8070/ui/links/application/test-app/report/95c4c14e',
-          );
+          expect(x.reportHtmlUrl).toEqual('http://localhost:8070/ui/links/application/test-app/report/95c4c14e');
           resolve();
         },
       );

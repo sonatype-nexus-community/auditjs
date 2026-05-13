@@ -39,11 +39,11 @@ export class AppConfig {
 
     type = await this.setVariable(
       'What would you like to configure?\n' +
-      '  1. Sonatype Lifecycle\n' +
-      '  2. Sonatype Guide (Bearer Token)\n' +
-      '  3. Sonatype Guide (OSS Index Compatibility - Username and Token)\n' +
-      '  4. OSS Index [DEPRECATED]\n' +
-      'Enter your choice (default: 3): ',
+        '  1. Sonatype Lifecycle\n' +
+        '  2. Sonatype Guide (Bearer Token)\n' +
+        '  3. Sonatype Guide (OSS Index Compatibility - Username and Token)\n' +
+        '  4. OSS Index [DEPRECATED]\n' +
+        'Enter your choice (default: 3): ',
       '3',
     );
 
@@ -114,8 +114,7 @@ export class AppConfig {
     } else if (type == '4') {
       // OSS Index (deprecated)
       console.warn(
-        'DEPRECATION: OSS Index configuration is deprecated. ' +
-        'Please migrate to Sonatype Guide (option 3).',
+        'DEPRECATION: OSS Index configuration is deprecated. ' + 'Please migrate to Sonatype Guide (option 3).',
       );
 
       let cacheLocation = join(homedir(), '.ossindex', 'auditjs');

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { GenericDescription } from "./Component";
+import { GenericDescription } from './Component';
 
 export interface LicenseContent {
-  id?: string,
-  name?: string,
-  text?: GenericDescription,
+  id?: string;
+  name?: string;
+  text?: GenericDescription;
 }

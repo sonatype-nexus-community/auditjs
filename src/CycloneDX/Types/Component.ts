@@ -23,7 +23,7 @@ export interface Component {
   group?: string;
   name: string;
   version: string;
-  description?: Object;
+  description?: GenericDescription;
   hashes?: Array<Hash>;
   licenses?: Array<any>;
   purl: string;

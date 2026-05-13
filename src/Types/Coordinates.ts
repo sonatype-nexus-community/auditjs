@@ -15,7 +15,11 @@
  */
 
 export class Coordinates {
-  constructor(readonly name: string, readonly version: string, readonly group?: string) {}
+  constructor(
+    readonly name: string,
+    readonly version: string,
+    readonly group?: string,
+  ) {}
 
   public toPurl(ecosystem = 'npm'): string {
     if (this.group) {
