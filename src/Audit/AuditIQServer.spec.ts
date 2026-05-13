@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-import expect from '../Tests/TestHelper';
+import { expect, vi, describe, it, beforeAll, afterAll } from 'vitest';
 import { AuditIQServer } from './AuditIQServer';
 import { ReportStatus } from '../Types/ReportStatus';
-import sinon from 'sinon';
 
 describe('AuditIQServer', () => {
-  before(() => {
-    sinon.stub(console, 'log');
-    sinon.stub(console, 'error');
+  beforeAll(() => {
+    vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
-  after(() => {
-    sinon.restore();
+  afterAll(() => {
+    vi.restoreAllMocks();
   });
 
   it('should provide a true value if IQ Server Results have policy violations', () => {
@@ -35,7 +34,7 @@ describe('AuditIQServer', () => {
     results.policyAction = 'Failure';
     results.reportHtmlUrl = '';
     const result = auditIqServer.auditThirdPartyResults(results);
-    expect(result).to.equal(true);
+    expect(result).toEqual(true);
   });
 
   it('should provide a true value if IQ Server Results have an isError value', () => {
@@ -44,7 +43,7 @@ describe('AuditIQServer', () => {
     results.isError = true;
     results.reportHtmlUrl = '';
     const result = auditIqServer.auditThirdPartyResults(results);
-    expect(result).to.equal(true);
+    expect(result).toEqual(true);
   });
 
   it('should provide a false value if IQ Server Results have no policy violations', () => {
@@ -53,6 +52,6 @@ describe('AuditIQServer', () => {
     results.policyAction = 'None';
     results.reportHtmlUrl = '';
     const result = auditIqServer.auditThirdPartyResults(results);
-    expect(result).to.equal(false);
+    expect(result).toEqual(false);
   });
 });

@@ -343,7 +343,7 @@ export class Application {
     return new GuideRequestService(
       args?.user || process.env.AUDITJS_GUIDE_USERNAME || config?.getUsername(),
       args?.token || args?.password || process.env.AUDITJS_GUIDE_TOKEN || config?.getToken(),
-      args?.cache || config?.getCacheLocation?.(),
+      args?.cache,
       args?.server || config?.getServer?.(),
     );
   }

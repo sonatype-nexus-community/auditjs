@@ -16,13 +16,13 @@
 
 import { Config } from './Config';
 import { readFileSync } from 'fs';
-import { safeLoad } from 'js-yaml';
+import { load } from 'js-yaml';
 import storage from 'node-persist';
 
 export class OssIndexServerConfig extends Config {
   constructor(
-    protected username: string = '',
-    protected token: string = '',
+    protected override username: string = '',
+    protected override token: string = '',
     protected cacheLocation: string = '',
     private server: string = '',
   ) {
@@ -73,7 +73,7 @@ export class OssIndexServerConfig extends Config {
   }
 
   public getConfigFromFile(saveLocation: string = this.getConfigLocation()): OssIndexServerConfig {
-    const doc = safeLoad(readFileSync(saveLocation, 'utf8')) as OssIndexServerConfigOnDisk;
+    const doc = load(readFileSync(saveLocation, 'utf8')) as OssIndexServerConfigOnDisk;
     if (doc && doc.Username) {
       this.username = doc.Username;
     }

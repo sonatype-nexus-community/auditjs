@@ -231,7 +231,7 @@ let argv = yargs
         demandOption: false,
       },
     });
-  }).argv;
+  }).parseSync();
 
 if (argv) {
   if (argv._[0] == 'config') {

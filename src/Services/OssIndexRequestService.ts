@@ -16,8 +16,6 @@
 
 import { OssIndexCoordinates } from '../Types/OssIndexCoordinates';
 import { Coordinates } from '../Types/Coordinates';
-import fetch from 'node-fetch';
-import { Response } from 'node-fetch';
 import NodePersist from 'node-persist';
 import path from 'path';
 import { OssIndexServerResult } from '../Types/OssIndexServerResult';
@@ -61,11 +59,11 @@ export class OssIndexRequestService {
       method: 'post',
       body: JSON.stringify(data),
       headers: this.getHeaders(),
-      agent: RequestHelpers.getHttpAgent(),
-    })
-      .then(this.checkStatus)
-      .then((res) => res.json())
-      .catch((err) => {
+      dispatcher: RequestHelpers.getHttpAgent() as any,
+    } as RequestInit)
+      .then((res: Response) => this.checkStatus(res))
+      .then((res: Response) => res.json() as any)
+      .catch((err: unknown) => {
         throw new Error(`There was an error making the request: ${err}`);
       });
     return response;

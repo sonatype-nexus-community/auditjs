@@ -14,42 +14,40 @@
  * limitations under the License.
  */
 
-import * as builder from 'xmlbuilder';
-
 import { Formatter, getNumberOfVulnerablePackagesFromResults } from './Formatter';
 import { OssIndexServerResult, Vulnerability } from '../../Types/OssIndexServerResult';
 
 export class XmlFormatter implements Formatter {
   public printAuditResults(list: Array<OssIndexServerResult>) {
-    const testsuite = builder.create('testsuite');
-    testsuite.att('tests', list.length);
-    testsuite.att('timestamp', new Date().toISOString());
-    testsuite.att('failures', getNumberOfVulnerablePackagesFromResults(list));
+    const failures = getNumberOfVulnerablePackagesFromResults(list);
+    const timestamp = new Date().toISOString();
 
-    for (let i = 0; i < list.length; i++) {
-      const testcase = testsuite.ele('testcase', { classname: list[i].coordinates, name: list[i].coordinates });
-      const vulns = list[i].vulnerabilities;
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    xml += `<testsuite tests="${list.length}" timestamp="${timestamp}" failures="${failures}">\n`;
 
-      if (vulns) {
-        if (vulns.length > 0) {
-          const failure = testcase.ele('failure');
-          let failureText = '';
-          for (let j = 0; j < vulns.length; j++) {
-            failureText += this.getVulnerabilityForXmlBlock(vulns[j]) + '\n';
-          }
-          failure.text(failureText);
-          failure.att('type', 'Vulnerability detected');
+    for (const result of list) {
+      const name = this.escapeXml(result.coordinates);
+      const vulns = result.vulnerabilities;
+
+      if (vulns && vulns.length > 0) {
+        xml += `  <testcase classname="${name}" name="${name}">\n`;
+        xml += `    <failure type="Vulnerability detected">`;
+        for (const vuln of vulns) {
+          xml += this.getVulnerabilityForXmlBlock(vuln);
         }
+        xml += `\n    </failure>\n`;
+        xml += `  </testcase>\n`;
+      } else {
+        xml += `  <testcase classname="${name}" name="${name}"/>\n`;
       }
     }
 
-    const xml = testsuite.end({ pretty: true });
-
+    xml += `</testsuite>`;
     console.log(xml);
   }
 
   private getVulnerabilityForXmlBlock(vuln: Vulnerability): string {
-    let vulnBlock = '';
+    let vulnBlock = '\n';
     vulnBlock += `Vulnerability Title: ${vuln.title}\n`;
     vulnBlock += `ID: ${vuln.id}\n`;
     vulnBlock += `Description: ${vuln.description}\n`;
@@ -59,5 +57,14 @@ export class XmlFormatter implements Formatter {
     vulnBlock += `Reference: ${vuln.reference}\n`;
 
     return vulnBlock;
+  }
+
+  private escapeXml(s: string): string {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
   }
 }

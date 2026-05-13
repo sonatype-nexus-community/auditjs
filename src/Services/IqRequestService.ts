@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import fetch from 'node-fetch';
 import { RequestHelpers } from './RequestHelpers';
 import { logMessage, DEBUG } from '../Application/Logger/Logger';
 import { URL } from 'url';
@@ -50,10 +49,10 @@ export class IqRequestService {
     const response = await fetch(`${this.host}${APPLICATION_INTERNAL_ID_ENDPOINT}${this.application}`, {
       method: 'get',
       headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
-      agent: RequestHelpers.getAgent(this.insecure),
-    });
+      dispatcher: RequestHelpers.getAgent(this.insecure) as any,
+    } as RequestInit);
     if (response.ok) {
-      const res = await response.json();
+      const res = await response.json() as any;
       try {
         return res.applications[0].id;
       } catch (e) {
@@ -84,11 +83,11 @@ export class IqRequestService {
         method: 'post',
         headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ['Content-Type', 'application/xml']],
         body: data,
-        agent: RequestHelpers.getAgent(this.insecure),
-      },
+        dispatcher: RequestHelpers.getAgent(this.insecure) as any,
+      } as RequestInit,
     );
     if (response.ok) {
-      const json = await response.json();
+      const json = await response.json() as any;
       return json.statusUrl as string;
     } else {
       const body = await response.text();
@@ -111,8 +110,8 @@ export class IqRequestService {
       const response = await fetch(mergeUrl.href, {
         method: 'get',
         headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
-        agent: RequestHelpers.getAgent(this.insecure),
-      });
+        dispatcher: RequestHelpers.getAgent(this.insecure) as any,
+      } as RequestInit);
 
       const body = response.ok;
       // TODO: right now I think we cover 500s and 400s the same and we'd continue polling as a result. We should likely switch

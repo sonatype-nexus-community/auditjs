@@ -16,12 +16,12 @@
 
 import { Config } from './Config';
 import { readFileSync } from 'fs';
-import { safeLoad } from 'js-yaml';
+import { load } from 'js-yaml';
 
 export class GuideServerConfig extends Config {
   constructor(
-    protected username: string = '',
-    protected token: string = '',
+    protected override username: string = '',
+    protected override token: string = '',
     protected server: string = '',
     protected accessToken: string = '',
   ) {
@@ -57,7 +57,7 @@ export class GuideServerConfig extends Config {
   }
 
   public getConfigFromFile(saveLocation: string = this.getConfigLocation()): GuideServerConfig {
-    const doc = safeLoad(readFileSync(saveLocation, 'utf8')) as GuideServerConfigOnDisk;
+    const doc = load(readFileSync(saveLocation, 'utf8')) as GuideServerConfigOnDisk;
     if (doc && doc.Username) {
       this.username = doc.Username;
     }

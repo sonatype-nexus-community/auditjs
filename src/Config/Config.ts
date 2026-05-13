@@ -15,17 +15,16 @@
  */
 
 import path from 'path';
-import { homedir } from 'os';
+import os from 'os';
 import { mkdirSync, existsSync } from 'fs';
 import { writeFileSync } from 'fs';
-import { safeDump } from 'js-yaml';
+import { dump } from 'js-yaml';
 
 import { ConfigPersist } from './ConfigPersist';
 
 export abstract class Config {
   private directoryName = '.ossindex';
   private fileName = '.oss-index-config';
-  private configLocation: string;
   constructor(protected type: string, protected username: string, protected token: string) {
     if (this.type == 'iq') {
       this.directoryName = '.iqserver';
@@ -34,29 +33,28 @@ export abstract class Config {
       this.directoryName = '.sonatype-guide';
       this.fileName = '.sonatype-guide-config';
     }
-    this.configLocation = path.join(homedir(), this.directoryName, this.fileName);
   }
 
   protected getConfigLocation(): string {
     this.tryCreateDirectory();
-    return this.configLocation;
+    return path.join(os.homedir(), this.directoryName, this.fileName);
   }
 
   private tryCreateDirectory(): void {
-    if (!existsSync(path.join(homedir(), this.directoryName))) {
-      mkdirSync(path.join(homedir(), this.directoryName));
+    const dir = path.join(os.homedir(), this.directoryName);
+    if (!existsSync(dir)) {
+      mkdirSync(dir);
     }
-    return;
   }
 
   public saveFile(objectToSave: ConfigPersist): boolean {
-    writeFileSync(this.getConfigLocation(), safeDump(objectToSave, { skipInvalid: true }));
+    writeFileSync(this.getConfigLocation(), dump(objectToSave, { skipInvalid: true }));
     this.getConfigFromFile();
     return true;
   }
 
   public exists(): boolean {
-    return existsSync(this.configLocation);
+    return existsSync(path.join(os.homedir(), this.directoryName, this.fileName));
   }
 
   abstract getConfigFromFile(saveLocation?: string): Config;

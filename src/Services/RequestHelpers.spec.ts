@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-import expect from '../Tests/TestHelper';
+import { expect, describe, it, afterEach } from 'vitest';
+import { Agent as UndiciAgent, ProxyAgent } from 'undici';
 import { RequestHelpers } from './RequestHelpers';
 import os from 'os';
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const pack = require('../../package.json');
 
 describe('RequestHelpers', () => {
-  it('should return a valid user agent from getUserAgent ', () => {
+  afterEach(() => {
+    delete process.env.http_proxy;
+    delete process.env.https_proxy;
+  });
+
+  it('should return a valid user agent from getUserAgent', () => {
     const nodeVersion = process.versions;
     const environment = 'NodeJS';
     const environmentVersion = nodeVersion.node;
@@ -29,80 +36,40 @@ describe('RequestHelpers', () => {
     const res = RequestHelpers.getUserAgent();
     const expected = ['User-Agent', `AuditJS/${pack.version} (${environment} ${environmentVersion}; ${system})`];
 
-    expect(res).to.include.members(expected);
+    expect(res).toEqual(expected);
   });
 
   it('getAgent() should return undefined when no env variable is set', () => {
     process.env.http_proxy = 'no-proxy';
 
     const res = RequestHelpers.getAgent();
-    expect(res).to.be.undefined;
+    expect(res).toBeUndefined();
   });
 
-  it('getAgent() should return a proxy httpAgent when env variable is set', () => {
+  it('getAgent() should return a ProxyAgent when env variable is set', () => {
     process.env.http_proxy = 'http://test.local:8080';
     const res = RequestHelpers.getAgent();
-    expect(res).not.to.be.undefined;
-    if (res) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      expect(res.proxy.hostname).to.equal('test.local');
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      expect(res.proxy.port).to.equal('8080');
-    }
+    expect(res).not.toBeUndefined();
+    expect(res).toBeInstanceOf(ProxyAgent);
   });
 
-  it('getAgent() should return an insecure httpAgent', () => {
+  it('getAgent() should return an insecure UndiciAgent', () => {
     const res = RequestHelpers.getAgent(true);
-    expect(res).not.to.be.undefined;
-    if (res) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      expect(res.options.rejectUnauthorized).to.equal(false);
-    }
+    expect(res).not.toBeUndefined();
+    expect(res).toBeInstanceOf(UndiciAgent);
   });
 
-  // TODO: This may indicate a problem. In the case of insecure, the proxy setting is ignored
-  // see: https://github.com/sonatype-nexus-community/auditjs/pull/213#discussion_r545617666
-  /*
-  it('getAgent() should return an insecure proxy httpAgent when env variable is set', () => {
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    process.env.http_proxy = 'http://test.local:8080';
-    const res = RequestHelpers.getAgent(true);
-    expect(res).not.to.be.undefined;
-    if (res) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      expect(res.options.rejectUnauthorized).to.equal(false);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      expect(res.proxy.host).to.equal('test.local');
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      expect(res.proxy.port).to.equal(8080);
-    }
-  });
-  */
-
-  it('should return an httpAgent when env variable is set', () => {
+  it('should return a ProxyAgent when env variable is set', () => {
     process.env.http_proxy = 'http://test.local:8080';
     const res = RequestHelpers.getHttpAgent();
-    expect(res).not.to.be.undefined;
-    if (res) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      expect(res.proxy.hostname).to.equal('test.local');
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      expect(res.proxy.port).to.equal('8080');
-    }
+    expect(res).not.toBeUndefined();
+    expect(res).toBeInstanceOf(ProxyAgent);
   });
 
   it('should return undefined when no env variable is set', () => {
     process.env.http_proxy = 'no-proxy';
 
     const res = RequestHelpers.getHttpAgent();
-    expect(res).to.be.undefined;
+    expect(res).toBeUndefined();
   });
 });

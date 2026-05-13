@@ -92,7 +92,7 @@ export class GuideRequestService {
 
   private async getResultsFromGuide(purls: string[]): Promise<object> {
     try {
-      const response = await this.api.getComponentReports({ coordinates: purls });
+      const response = await this.api.getComponentReports({ purlRequestPost: { coordinates: purls } });
       return response;
     } catch (err) {
       throw new Error(`There was an error making the request to Sonatype Guide: ${err}`);
