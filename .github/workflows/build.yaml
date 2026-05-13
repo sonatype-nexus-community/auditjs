@@ -56,7 +56,7 @@ jobs:
           path: coverage/lcov.info
 
       - name: Dogfood scan
-        run: npm run start -- guide --token ${{ secrets.GUIDE_TOKEN }}
+        run: npm run start -- guide --user ${{ secrets.OSSI_USERNAME }} --token ${{ secrets.GUIDE_TOKEN }}
 
   sonatype:
     name: Sonatype Lifecycle
@@ -72,8 +72,9 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       # See https://help.sonatype.com/en/npm-application-analysis.html
+      # --ignore-scripts prevents the prepare script (tsc build) from running without devDependencies
       - name: Install Production Node Dependencies
-        run: npm ci --omit=dev
+        run: npm ci --omit=dev --ignore-scripts
 
       - name: Sonatype Lifecycle Evaluation
         id: evaluate
