@@ -42,7 +42,7 @@ describe('IQRequestService', () => {
     vi.unstubAllGlobals();
   });
 
-  it("should have it's third party API request rejected when the IQ Server is down", async () => {
+  it("should have it's third party API request rejected when Sonatype Lifecycle is down", async () => {
     mockFetch.mockRejectedValueOnce(new Error('you messed up!'));
 
     const requestService = new IqRequestService(
@@ -80,7 +80,7 @@ describe('IQRequestService', () => {
     );
   });
 
-  it("should have it's third party API request accepted when the IQ Server is up", async () => {
+  it("should have it's third party API request accepted when Sonatype Lifecycle is up", async () => {
     const stage = 'build';
     const statusUrl =
       'api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb';
@@ -105,7 +105,7 @@ describe('IQRequestService', () => {
     expect(result).toEqual(statusUrl);
   });
 
-  it("should have it's third party API request rejected when IQ Server is up but API gives bad response", async () => {
+  it("should have it's third party API request rejected when Sonatype Lifecycle is up but API gives bad response", async () => {
     const stage = 'build';
 
     mockFetch.mockResolvedValueOnce(
@@ -127,7 +127,7 @@ describe('IQRequestService', () => {
     await expect(requestService.submitToThirdPartyAPI(coords)).rejects.toThrow('Unable to submit to Third Party API');
   });
 
-  it('should have return a proper result when polling IQ Server and the request is eventually valid', async () => {
+  it('should have return a proper result when polling Sonatype Lifecycle and the request is eventually valid', async () => {
     const responseBody = {
       policyAction: 'None',
       reportHtmlUrl: 'http://localhost:8070/ui/links/application/test-app/report/95c4c14e',

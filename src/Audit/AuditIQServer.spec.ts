@@ -28,7 +28,7 @@ describe('AuditIQServer', () => {
     vi.restoreAllMocks();
   });
 
-  it('should provide a true value if IQ Server Results have policy violations', () => {
+  it('should provide a true value if Lifecycle Results have policy violations', () => {
     const auditIqServer = new AuditIQServer();
     const results = new ReportStatus();
     results.policyAction = 'Failure';
@@ -37,7 +37,7 @@ describe('AuditIQServer', () => {
     expect(result).toEqual(true);
   });
 
-  it('should provide a true value if IQ Server Results have an isError value', () => {
+  it('should provide a true value if Lifecycle Results have an isError value', () => {
     const auditIqServer = new AuditIQServer();
     const results = new ReportStatus();
     results.isError = true;
@@ -46,7 +46,7 @@ describe('AuditIQServer', () => {
     expect(result).toEqual(true);
   });
 
-  it('should provide a false value if IQ Server Results have no policy violations', () => {
+  it('should provide a false value if Lifecycle Results have no policy violations', () => {
     const auditIqServer = new AuditIQServer();
     const results = new ReportStatus();
     results.policyAction = 'None';
