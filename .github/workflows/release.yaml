@@ -61,7 +61,7 @@ jobs:
           path: coverage/lcov.info
 
       - name: Dogfood scan
-        run: npm run start -- guide --token ${{ secrets.GUIDE_TOKEN }}
+        run: npm run start -- guide --token ${{ secrets.SONATYPE_GUIDE_TOKEN }}
 
   sonatype:
     name: Sonatype Lifecycle
@@ -79,7 +79,7 @@ jobs:
 
       # See https://help.sonatype.com/en/npm-application-analysis.html
       - name: Install Production Node Dependencies
-        run: npm ci --omit=dev
+        run: npm ci --omit=dev --ignore-scripts
 
       - name: Sonatype Lifecycle Evaluation
         id: evaluate
