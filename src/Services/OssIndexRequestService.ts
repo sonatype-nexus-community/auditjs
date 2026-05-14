@@ -33,12 +33,16 @@ const PATH = path.join(homedir(), '.ossindex', 'auditjs');
 const TWELVE_HOURS = 12 * 60 * 60 * 1000;
 
 export class OssIndexRequestService {
+  private baseURL: string;
+
   constructor(
     readonly user?: string,
     readonly password?: string,
     readonly cacheLocation: string = PATH,
-    private baseURL: string = OSS_INDEX_BASE_URL,
-  ) {}
+    baseURL: string = OSS_INDEX_BASE_URL,
+  ) {
+    this.baseURL = baseURL.endsWith('/') ? baseURL : baseURL + '/';
+  }
 
   private checkStatus(res: Response): Response {
     if (res.ok) {
