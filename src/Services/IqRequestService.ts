@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import fetch from 'node-fetch';
 import { RequestHelpers } from './RequestHelpers';
 import { logMessage, DEBUG } from '../Application/Logger/Logger';
 import { URL } from 'url';
@@ -40,7 +39,7 @@ export class IqRequestService {
       this.internalId = await this.getApplicationInternalId();
       this.isInitialized = true;
     } catch (e) {
-      throw new Error(e);
+      throw new Error(String(e));
     }
   }
 
@@ -50,29 +49,29 @@ export class IqRequestService {
     const response = await fetch(`${this.host}${APPLICATION_INTERNAL_ID_ENDPOINT}${this.application}`, {
       method: 'get',
       headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
-      agent: RequestHelpers.getAgent(this.insecure),
-    });
+      dispatcher: RequestHelpers.getAgent(this.insecure),
+    } as RequestInit);
     if (response.ok) {
-      const res = await response.json();
+      const res = (await response.json()) as { applications: Array<{ id: string }> };
       try {
         return res.applications[0].id;
-      } catch (e) {
+      } catch {
         throw new Error(
-          `No valid ID on response from Nexus IQ, potentially check the public application ID you are using`,
+          `No valid ID on response from Sonatype Lifecycle, potentially check the public application ID you are using`,
         );
       }
     } else {
       throw new Error(
-        'Unable to connect to IQ Server with http status ' +
+        'Unable to connect to Sonatype Lifecycle with http status ' +
           response.status +
-          '. Check your credentials and network connectivity by hitting Nexus IQ at ' +
+          '. Check your credentials and network connectivity by hitting Sonatype Lifecycle at ' +
           this.host +
           ' in your browser.',
       );
     }
   }
 
-  public async submitToThirdPartyAPI(data: any): Promise<string> {
+  public async submitToThirdPartyAPI(data: string): Promise<string> {
     if (!this.isInitialized) {
       await this.init();
     }
@@ -84,12 +83,12 @@ export class IqRequestService {
         method: 'post',
         headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ['Content-Type', 'application/xml']],
         body: data,
-        agent: RequestHelpers.getAgent(this.insecure),
-      },
+        dispatcher: RequestHelpers.getAgent(this.insecure),
+      } as RequestInit,
     );
     if (response.ok) {
-      const json = await response.json();
-      return json.statusUrl as string;
+      const json = (await response.json()) as { statusUrl: string };
+      return json.statusUrl;
     } else {
       const body = await response.text();
       logMessage('Response from third party API', DEBUG, { response: body });
@@ -99,8 +98,8 @@ export class IqRequestService {
 
   public async asyncPollForResults(
     url: string,
-    errorHandler: (error: any) => any,
-    pollingFinished: (body: any) => any,
+    errorHandler: (error: { message: string; stack?: string }) => void,
+    pollingFinished: (body: unknown) => void,
   ): Promise<void> {
     logMessage(url, DEBUG);
     let mergeUrl: URL;
@@ -111,8 +110,8 @@ export class IqRequestService {
       const response = await fetch(mergeUrl.href, {
         method: 'get',
         headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
-        agent: RequestHelpers.getAgent(this.insecure),
-      });
+        dispatcher: RequestHelpers.getAgent(this.insecure),
+      } as RequestInit);
 
       const body = response.ok;
       // TODO: right now I think we cover 500s and 400s the same and we'd continue polling as a result. We should likely switch
@@ -131,7 +130,8 @@ export class IqRequestService {
         pollingFinished(json);
       }
     } catch (e) {
-      errorHandler({ title: e.message });
+      const err = e instanceof Error ? e : new Error(String(e));
+      errorHandler({ message: err.message });
     }
   }
 
@@ -139,7 +139,8 @@ export class IqRequestService {
     try {
       return new URL(url);
     } catch (e) {
-      logMessage(e.title, DEBUG, { message: e.message });
+      const err = e instanceof Error ? e : new Error(String(e));
+      logMessage(err.message, DEBUG);
       if (this.host.endsWith('/')) {
         return new URL(this.host.concat(url));
       }

@@ -21,7 +21,7 @@ export class Spinner {
 
   constructor(readonly silent: boolean = false) {
     if (!silent) {
-      this.spinner = ora("Starting application").start();
+      this.spinner = ora('Starting application').start();
       this.spinner.succeed();
     }
   }

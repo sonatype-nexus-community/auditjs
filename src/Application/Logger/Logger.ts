@@ -26,8 +26,8 @@ const logPath = join(homedir(), '.ossindex');
 
 const logPathFile = join(logPath, '.auditjs.combined.log');
 
-addLayout('json', function(config) {
-  return function(logEvent): string {
+addLayout('json', function (config) {
+  return function (logEvent): string {
     return JSON.stringify(logEvent) + config.separator;
   };
 });

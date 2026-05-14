@@ -14,41 +14,55 @@
  * limitations under the License.
  */
 
-import expect, { applicationInternalIdResponse } from '../Tests/TestHelper';
+import { expect, vi, describe, it, afterEach, beforeEach } from 'vitest';
+import { applicationInternalIdResponse } from '../Tests/TestHelper';
 import { Coordinates } from '../Types/Coordinates';
-import nock from 'nock';
 import { IqRequestService } from './IqRequestService';
 
+function makeResponse(statusCode: number, body: any, ok?: boolean): any {
+  const isOk = ok !== undefined ? ok : statusCode >= 200 && statusCode < 300;
+  return {
+    ok: isOk,
+    status: statusCode,
+    statusText: statusCode === 200 ? 'OK' : 'Error',
+    json: vi.fn().mockResolvedValue(body),
+    text: vi.fn().mockResolvedValue(JSON.stringify(body)),
+  };
+}
+
 describe('IQRequestService', () => {
-  it("should have it's third party API request rejected when the IQ Server is down", async () => {
-    const internalId = '123456';
-    const stage = 'build';
-    nock('http://testlocation:8070')
-      .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
-      .replyWithError('you messed up!')
-      .get(`/api/v2/applications?publicId=testapp`)
-      .reply(404, applicationInternalIdResponse.body);
+  const mockFetch = vi.fn();
+
+  beforeEach(() => {
+    vi.stubGlobal('fetch', mockFetch);
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it("should have it's third party API request rejected when Sonatype Lifecycle is down", async () => {
+    mockFetch.mockRejectedValueOnce(new Error('you messed up!'));
 
     const requestService = new IqRequestService(
       'admin',
       'admin123',
       'http://testlocation:8070',
       'testapp',
-      stage,
+      'build',
       300,
       false,
     );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
-    return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.be.rejected;
+    await expect(requestService.submitToThirdPartyAPI(coords)).rejects.toThrow();
   });
 
   it('should respond with an error if the response for an ID is bad', async () => {
     const stage = 'build';
 
-    nock('http://testlocation:8070')
-      .get(`/api/v2/applications?publicId=testapp`)
-      .reply(applicationInternalIdResponse.statusCode, { thereisnoid: 'none' });
+    mockFetch.mockResolvedValueOnce(makeResponse(applicationInternalIdResponse.statusCode, { thereisnoid: 'none' }));
 
     const requestService = new IqRequestService(
       'admin',
@@ -61,26 +75,20 @@ describe('IQRequestService', () => {
     );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
-    return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.be.rejectedWith(
-      'No valid ID on response from Nexus IQ, potentially check the public application ID you are using',
+    await expect(requestService.submitToThirdPartyAPI(coords)).rejects.toThrow(
+      'No valid ID on response from Sonatype Lifecycle, potentially check the public application ID you are using',
     );
   });
 
-  it("should have it's third party API request accepted when the IQ Server is up", async () => {
-    const internalId = '4bb67dcfc86344e3a483832f8c496419';
+  it("should have it's third party API request accepted when Sonatype Lifecycle is up", async () => {
     const stage = 'build';
-    const response = {
-      statusCode: 202,
-      body: {
-        statusUrl: 'api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb',
-      },
-    };
+    const statusUrl =
+      'api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb';
 
-    nock('http://testlocation:8070')
-      .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
-      .reply(response.statusCode, response.body)
-      .get(`/api/v2/applications?publicId=testapp`)
-      .reply(applicationInternalIdResponse.statusCode, applicationInternalIdResponse.body);
+    mockFetch.mockResolvedValueOnce(
+      makeResponse(applicationInternalIdResponse.statusCode, applicationInternalIdResponse.body),
+    );
+    mockFetch.mockResolvedValueOnce(makeResponse(202, { statusUrl }));
 
     const requestService = new IqRequestService(
       'admin',
@@ -93,26 +101,17 @@ describe('IQRequestService', () => {
     );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
-    return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.equal(
-      'api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb',
-    );
+    const result = await requestService.submitToThirdPartyAPI(coords);
+    expect(result).toEqual(statusUrl);
   });
 
-  it("should have it's third party API request rejected when IQ Server is up but API gives bad response", async () => {
-    const internalId = '4bb67dcfc86344e3a483832f8c496419';
+  it("should have it's third party API request rejected when Sonatype Lifecycle is up but API gives bad response", async () => {
     const stage = 'build';
-    const response = {
-      statusCode: 202,
-      body: {
-        statusUrl: 'api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb',
-      },
-    };
 
-    nock('http://testlocation:8070')
-      .post(`/api/v2/scan/applications/${internalId}/sources/auditjs?stageId=${stage}`)
-      .reply(404, response.body)
-      .get(`/api/v2/applications?publicId=testapp`)
-      .reply(applicationInternalIdResponse.statusCode, applicationInternalIdResponse.body);
+    mockFetch.mockResolvedValueOnce(
+      makeResponse(applicationInternalIdResponse.statusCode, applicationInternalIdResponse.body),
+    );
+    mockFetch.mockResolvedValueOnce(makeResponse(404, {}, false));
 
     const requestService = new IqRequestService(
       'admin',
@@ -125,25 +124,18 @@ describe('IQRequestService', () => {
     );
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
 
-    return expect(requestService.submitToThirdPartyAPI(coords)).to.eventually.be.rejectedWith(
-      'Unable to submit to Third Party API',
-    );
+    await expect(requestService.submitToThirdPartyAPI(coords)).rejects.toThrow('Unable to submit to Third Party API');
   });
 
-  it('should have return a proper result when polling IQ Server and the request is eventually valid', async () => {
-    const response = {
-      statusCode: 200,
-      body: {
-        policyAction: 'None',
-        reportHtmlUrl: 'http://localhost:8070/ui/links/application/test-app/report/95c4c14e',
-        isError: false,
-      },
+  it('should have return a proper result when polling Sonatype Lifecycle and the request is eventually valid', async () => {
+    const responseBody = {
+      policyAction: 'None',
+      reportHtmlUrl: 'http://localhost:8070/ui/links/application/test-app/report/95c4c14e',
+      isError: false,
     };
-
     const stage = 'build';
-    nock('http://testlocation:8070')
-      .get(`/api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb`)
-      .reply(response.statusCode, response.body);
+
+    mockFetch.mockResolvedValueOnce(makeResponse(200, responseBody));
 
     const requestService = new IqRequestService(
       'admin',
@@ -155,14 +147,17 @@ describe('IQRequestService', () => {
       false,
     );
 
-    requestService.asyncPollForResults(
-      'api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb',
-      () => {
-        return false;
-      },
-      (x) => {
-        return expect(x.reportHtmlUrl).to.equal('http://localhost:8070/ui/links/application/test-app/report/95c4c14e');
-      },
-    );
+    await new Promise<void>((resolve, reject) => {
+      requestService.asyncPollForResults(
+        'http://testlocation:8070/api/v2/scan/applications/a20bc16e83944595a94c2e36c1cd228e/status/9cee2b6366fc4d328edc318eae46b2cb',
+        (error: any) => {
+          reject(new Error(error.message || 'polling error'));
+        },
+        (x: any) => {
+          expect(x.reportHtmlUrl).toEqual('http://localhost:8070/ui/links/application/test-app/report/95c4c14e');
+          resolve();
+        },
+      );
+    });
   });
 });

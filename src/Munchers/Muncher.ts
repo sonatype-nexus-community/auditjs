@@ -18,7 +18,7 @@ import { Coordinates } from '../Types/Coordinates';
 
 export interface Muncher {
   getDepList(): Promise<Array<Coordinates>>;
-  getSbomFromCommand(): Promise<any>;
-  getInstalledDeps(): Promise<any>;
+  getSbomFromCommand(): Promise<string>;
+  getInstalledDeps(): Promise<Array<Coordinates>>;
   isValid(): boolean;
 }

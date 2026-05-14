@@ -1,3 +1,30 @@
+# [5.0.0](https://github.com/sonatype-nexus-community/auditjs/compare/v4.2.0...v5.0.0) (2026-05-14)
+
+### BREAKING CHANGES
+
+* **engine**: Node.js 20 or later is now required (dropped support for Node 16/18)
+* **ossi**: `auditjs ossi` is deprecated; runtime deprecation warning added. Will be removed in v6
+* **iq**: `auditjs iq` is deprecated; runtime deprecation warning added. Will be removed in v6
+
+### Features
+
+* **guide**: New `auditjs guide` command backed by the Sonatype Guide API replaces `ossi` as the primary scanner
+* **guide**: Bearer token auth support — pass `--token` (no `--user`) to authenticate via bearer token
+* **guide**: `--recommend` (`-r`) flag fetches AI-powered upgrade recommendations for vulnerable packages
+* **guide**: `--allowlist` flag (canonical); `--whitelist` accepted with deprecation warning
+* **lifecycle**: New `auditjs lifecycle` command as canonical alias for `auditjs iq`
+* **sbom**: Replace xmlbuilder with `@cyclonedx/cyclonedx-library` v10, targeting CycloneDX 1.6
+* **config**: `auditjs config` menu updated with Sonatype Guide (Bearer Token), Sonatype Guide (OSS Index compat), and Sonatype Lifecycle options
+* **config**: Environment variable support: `AUDITJS_GUIDE_TOKEN`, `AUDITJS_GUIDE_USERNAME`, `AUDITJS_LIFECYCLE_URL`, `AUDITJS_LIFECYCLE_USER`, `AUDITJS_LIFECYCLE_TOKEN`
+* **toolchain**: Migrated from Yarn to npm; test framework migrated from Mocha/Chai to Vitest
+* **toolchain**: ESLint upgraded to v9 flat config format; TypeScript strict mode enforced
+
+### Bug Fixes
+
+* **ci**: Use `OSSI_TOKEN` for guide dogfood scan; improved error messages
+
+---
+
 # [4.2.0](https://github.com/sonatype-nexus-community/auditjs/compare/v4.1.0...v4.2.0) (2026-01-27)
 
 

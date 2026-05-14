@@ -17,19 +17,15 @@
 import { Config } from './Config';
 import { readFileSync } from 'fs';
 import { load } from 'js-yaml';
-import storage from 'node-persist';
 
-export class OssIndexServerConfig extends Config {
+export class GuideServerConfig extends Config {
   constructor(
     protected override username: string = '',
     protected override token: string = '',
-    protected cacheLocation: string = '',
-    private server: string = '',
+    protected server: string = '',
+    protected accessToken: string = '',
   ) {
-    super('ossi', username, token);
-    if (this.exists()) {
-      this.getConfigFromFile();
-    }
+    super('guide', username, token);
   }
 
   public getUsername(): string | undefined {
@@ -46,13 +42,6 @@ export class OssIndexServerConfig extends Config {
     return undefined;
   }
 
-  public getCacheLocation(): string | undefined {
-    if (this.cacheLocation != '') {
-      return this.cacheLocation;
-    }
-    return undefined;
-  }
-
   public getServer(): string | undefined {
     if (this.server != '') {
       return this.server;
@@ -60,40 +49,35 @@ export class OssIndexServerConfig extends Config {
     return undefined;
   }
 
-  public async clearCache(): Promise<boolean> {
-    try {
-      await storage.init({ dir: this.cacheLocation });
-      await storage.clear();
-      return true;
-    } catch (error) {
-      // It's likely an error would only ever occur if there was a permission based issue, so log it and move on
-      console.log(error);
-      return false;
+  public getAccessToken(): string | undefined {
+    if (this.accessToken != '') {
+      return this.accessToken;
     }
+    return undefined;
   }
 
-  public getConfigFromFile(saveLocation: string = this.getConfigLocation()): OssIndexServerConfig {
-    const doc = load(readFileSync(saveLocation, 'utf8')) as OssIndexServerConfigOnDisk;
+  public getConfigFromFile(saveLocation: string = this.getConfigLocation()): GuideServerConfig {
+    const doc = load(readFileSync(saveLocation, 'utf8')) as GuideServerConfigOnDisk;
     if (doc && doc.Username) {
       this.username = doc.Username;
     }
     if (doc && doc.Token) {
       this.token = doc.Token;
     }
-    if (doc && doc.CacheLocation) {
-      this.cacheLocation = doc.CacheLocation;
-    }
     if (doc && doc.Server) {
       this.server = doc.Server;
+    }
+    if (doc && doc.AccessToken) {
+      this.accessToken = doc.AccessToken;
     }
 
     return this;
   }
 }
 
-interface OssIndexServerConfigOnDisk {
+interface GuideServerConfigOnDisk {
   Username?: string;
   Token?: string;
-  CacheLocation?: string;
   Server?: string;
+  AccessToken?: string;
 }

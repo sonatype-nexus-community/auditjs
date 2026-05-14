@@ -16,13 +16,13 @@
 
 import { Config } from './Config';
 import { readFileSync } from 'fs';
-import { safeLoad } from 'js-yaml';
+import { load } from 'js-yaml';
 
 export class IqServerConfig extends Config {
   constructor(
     // TODO: Decide if we want to put default values here or leave them blank.. regardless empty strings are not easy to handle
-    protected username: string = '',
-    protected token: string = '',
+    protected override username: string = '',
+    protected override token: string = '',
     private host: string = '',
   ) {
     super('iq', username, token);
@@ -44,7 +44,7 @@ export class IqServerConfig extends Config {
   }
 
   public getConfigFromFile(saveLocation: string = this.getConfigLocation()): IqServerConfig {
-    const doc = safeLoad(readFileSync(saveLocation, 'utf8')) as IqServerConfigOnDisk;
+    const doc = load(readFileSync(saveLocation, 'utf8')) as IqServerConfigOnDisk;
     if (doc && doc.Username && doc.Token && doc.Server) {
       super.username = doc.Username;
       super.token = doc.Token;

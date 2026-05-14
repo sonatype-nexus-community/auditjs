@@ -14,17 +14,34 @@
  * limitations under the License.
  */
 
+interface VulnerabilityJSON {
+  id: string;
+  title: string;
+  description: string;
+  cvssScore: string;
+  cvssVector: string;
+  cve: string;
+  reference: string;
+}
+
+export interface OssIndexServerResultJSON {
+  coordinates: string;
+  description?: string;
+  reference: string;
+  vulnerabilities: VulnerabilityJSON[];
+}
+
 export class OssIndexServerResult {
   readonly coordinates: string;
   readonly description?: string;
   readonly reference: string;
   readonly vulnerabilities?: Array<Vulnerability>;
 
-  constructor(result: any) {
+  constructor(result: OssIndexServerResultJSON) {
     this.coordinates = result.coordinates;
     this.description = result.description;
     this.reference = result.reference;
-    this.vulnerabilities = result.vulnerabilities.map((x: any) => {
+    this.vulnerabilities = result.vulnerabilities.map((x) => {
       return new Vulnerability(x);
     });
   }
@@ -52,7 +69,7 @@ export class Vulnerability {
   readonly cvssVector: string;
   readonly cve: string;
   readonly reference: string;
-  constructor(vulnerability: any) {
+  constructor(vulnerability: VulnerabilityJSON) {
     this.id = vulnerability.id;
     this.title = vulnerability.title;
     this.description = vulnerability.description;

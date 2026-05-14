@@ -15,9 +15,8 @@
  */
 
 import os from 'os';
-import { Agent } from 'http';
-import { Agent as HttpsAgent } from 'https';
-import { HttpsProxyAgent } from 'https-proxy-agent';
+import { Agent as UndiciAgent, ProxyAgent } from 'undici';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const pack = require('../../package.json');
 
 export class RequestHelpers {
@@ -30,20 +29,19 @@ export class RequestHelpers {
     return ['User-Agent', `AuditJS/${pack.version} (${environment} ${environmentVersion}; ${system})`];
   }
 
-  public static getAgent(insecure = false): Agent | undefined {
+  public static getAgent(insecure = false): UndiciAgent | ProxyAgent | undefined {
     if (insecure) {
-      return new HttpsAgent({
-        rejectUnauthorized: false,
-      });
+      console.warn('WARNING: --insecure disables TLS certificate validation. Do not use in production environments.');
+      return new UndiciAgent({ connect: { rejectUnauthorized: false } });
     }
 
     return this.getHttpAgent();
   }
 
-  public static getHttpAgent(): Agent | undefined {
+  public static getHttpAgent(): ProxyAgent | undefined {
     const proxyUrl = process.env.http_proxy || process.env.https_proxy;
     if (proxyUrl !== undefined && proxyUrl !== 'no-proxy') {
-      return new HttpsProxyAgent(proxyUrl);
+      return new ProxyAgent(proxyUrl);
     }
     return undefined;
   }
