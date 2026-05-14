@@ -1,19 +1,65 @@
-## How to be a contributor to this project
+## Contributing to AuditJS
 
-### Are you submitting a pull request?
+Thank you for your interest in contributing! Please read this guide before opening a pull request.
 
-* Make sure to fill out an issue for your PR, so that we have traceability as to what you are trying to fix,
-versus how you fixed it.
-* Spaces (not tabs), and 2 of them, that's what we like. Set your code style :)
-* Sign the [Sonatype CLA](https://sonatypecla.herokuapp.com/sign-cla)
-* Try to fix one thing per pull request! Many people work on this code, so the more focused your changes are, the less
-of a headache other people will have when they merge their work in.
-* Ensure your Pull Request passes tests either locally or via CircleCI (it will run automatically on your PR)
-* Make sure to add yourself or your organization to CONTRIBUTORS.md as a part of your PR, if you are new to the project!
-* If you're stuck, ask our [gitter channel](https://gitter.im/sonatype/nexus-developers)! There are a number of
-experienced programmers who are happy to help with learning and troubleshooting.
+### Before you start
 
-### Are you new and looking to dive in?
+- Check the [open issues](https://github.com/sonatype-nexus-community/auditjs/issues) to see if your idea or bug is already being tracked. If not, open a new issue so we can discuss scope before you invest time coding.
+- Sign the [Sonatype CLA](https://sonatypecla.herokuapp.com/sign-cla) if you haven't already — we can't merge without it.
 
-* Check our issues to see if there is something you can dive in to.
-* Come hang out with us at our [gitter channel](https://gitter.im/sonatype/nexus-developers).
+### Development setup
+
+**Requirements:** Node.js 20 or later, npm 10 or later.
+
+```bash
+git clone https://github.com/sonatype-nexus-community/auditjs.git
+cd auditjs
+npm install
+npm run build     # compile TypeScript → bin/
+npm test          # run the test suite (vitest)
+npm run lint      # ESLint + Prettier check
+```
+
+To run the compiled CLI directly:
+
+```bash
+node bin/index.js guide --help
+```
+
+### Pull request checklist
+
+- [ ] One focused change per PR — smaller diffs are easier to review and merge
+- [ ] All tests pass: `npm test`
+- [ ] No lint errors: `npm run lint`
+- [ ] TypeScript compiles cleanly: `npx tsc --noEmit`
+- [ ] New behaviour is covered by tests where practical
+- [ ] The linked issue is referenced in the PR description
+
+### Commit message format
+
+We use [Conventional Commits](https://www.conventionalcommits.org/) because releases are generated automatically by [semantic-release](https://github.com/semantic-release/semantic-release). Please format your commit messages accordingly:
+
+```
+<type>(<scope>): <short summary>
+
+[optional body]
+```
+
+Common types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `ci`.
+
+Examples:
+```
+feat(guide): add --recommend flag for AI-powered upgrade suggestions
+fix(config): fall back to env var when config file is absent
+docs: update README with environment variable table
+```
+
+A `feat` commit triggers a minor release; a `fix` commit triggers a patch release. Breaking changes must include `BREAKING CHANGE:` in the commit footer.
+
+### Code style
+
+The project uses Prettier for formatting and ESLint for linting. Run `npm run lint` before pushing — CI will reject formatting errors. TypeScript strict mode is enabled; avoid `any` where possible.
+
+### Getting help
+
+Open a [GitHub issue](https://github.com/sonatype-nexus-community/auditjs/issues) or start a [GitHub Discussion](https://github.com/sonatype-nexus-community/auditjs/discussions) if you have questions.

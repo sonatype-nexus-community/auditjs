@@ -121,6 +121,8 @@ Options:
   --allowlist, -w  Set path to allowlist file                          [string]
   --bower          Force the application to explicitly scan for Bower [boolean]
   --dev, -d        Include Development Dependencies                   [boolean]
+  --recommend, -r  Show AI-powered upgrade recommendations for
+                   vulnerable packages (requires bearer token)        [boolean]
 ```
 
 ### OSS Index Usage (Deprecated)
@@ -317,6 +319,21 @@ CacheLocation: /path/to/cache
 ```
 
 Command line arguments take precedence over config file settings, allowing you to override the configured server URL on a per-run basis.
+
+## Environment Variables
+
+All credentials can be supplied via environment variables instead of (or as a fallback from) the config file and CLI flags:
+
+| Variable | Used by | Description |
+|---|---|---|
+| `AUDITJS_GUIDE_TOKEN` | `guide` | Sonatype Guide API bearer token (or OSS Index compat token when used with `AUDITJS_GUIDE_USERNAME`) |
+| `AUDITJS_GUIDE_USERNAME` | `guide` | Sonatype Guide OSS Index Compatibility username |
+| `AUDITJS_LIFECYCLE_URL` | `lifecycle` / `iq` | Sonatype Lifecycle server URL |
+| `AUDITJS_LIFECYCLE_USER` | `lifecycle` / `iq` | Sonatype Lifecycle username |
+| `AUDITJS_LIFECYCLE_TOKEN` | `lifecycle` / `iq` | Sonatype Lifecycle password or token |
+| `http_proxy` / `https_proxy` | all | HTTP(S) proxy URL |
+
+CLI flags take precedence over environment variables; environment variables take precedence over config files.
 
 ## Sonatype Guide Credentials
 
