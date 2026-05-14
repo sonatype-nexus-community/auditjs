@@ -22,7 +22,7 @@ import { OssIndexServerResultJSON } from '../Types/OssIndexServerResult';
 import { homedir } from 'os';
 import { RequestHelpers } from './RequestHelpers';
 
-const OSS_INDEX_BASE_URL = 'https://ossindex.sonatype.org/';
+const OSS_INDEX_BASE_URL = 'https://api.guide.sonatype.com/';
 
 const COMPONENT_REPORT_ENDPOINT = 'api/v3/component-report';
 

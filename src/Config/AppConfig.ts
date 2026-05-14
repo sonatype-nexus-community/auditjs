@@ -120,7 +120,7 @@ export class AppConfig {
       );
 
       let cacheLocation = join(homedir(), '.ossindex', 'auditjs');
-      let server = 'https://ossindex.sonatype.org';
+      let server = 'https://api.guide.sonatype.com';
 
       username = await this.setVariable('What is your OSS Index username? ');
 
