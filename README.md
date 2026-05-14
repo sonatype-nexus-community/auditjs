@@ -26,12 +26,13 @@
 [![shield_license]][license_file]
 [![npm](https://img.shields.io/npm/v/auditjs)](https://www.npmjs.com/package/auditjs)       
 
-**IMPORTANT NOTE**: Welcome to AuditJS 5.0.0, which introduces the new `guide` command (backed by Sonatype Guide), the `lifecycle` alias for the `iq` command, and drops support for Node.js below v20. See [MIGRATION.md](MIGRATION.md) for the full upgrade guide from v4.
+**IMPORTANT NOTE**: Welcome to AuditJS 5.0.0, which introduces the new `guide` command (backed by [Sonatype Guide](https://guide.sonatype.com)), the `lifecycle` alias for the `iq` command, and drops support for Node.js below v20. 
+
+See [MIGRATION.md](MIGRATION.md) for the full upgrade guide from v4.
 
 If you have an issue migrating from AuditJS 4.x to AuditJS 5.x, please [file a GitHub issue here](https://github.com/sonatype-nexus-community/auditjs/issues).
 
-Audits JavaScript projects using the [OSS Index v3 REST API](https://ossindex.sonatype.org/rest)
-to identify known vulnerabilities and outdated package versions.
+Audits JavaScript projects using either [Sonatype Guide](https://guide.sonatype.com) (which has replaced OSS Index) or your Enterprise [Sonatype Lifecycle](https://www.sonatype.com/products/open-source-security-dependency-management) instatnce to identify known vulnerabilities and outdated package versions.
 
 Supports any project with package managers that install npm dependencies into a node_modules folder including:
 
@@ -74,11 +75,7 @@ We suggest you use it via `npx`, as global installs are generally frowned upon i
 
 `auditjs` requires Node.js 20 or later.
 
-Note that the Sonatype Guide API uses a credit-based model. To avoid unnecessary
-credit consumption, results are cached for 24 hours. If you are using the OSS Index
-compatibility mode, the API is rate limited; creating a free account at
-<https://guide.sonatype.com> and supplying an API token provides a much higher
-request quota. See below for more details.
+Note that the Sonatype Guide API uses a credit-based model. To avoid unnecessary credit consumption, results are cached for 24 hours. Create a free account at <https://guide.sonatype.com> to obtain an API token.
 
 ### Generic Usage
 
@@ -99,9 +96,7 @@ Options:
 
 ### Sonatype Guide Usage
 
-`auditjs guide` is the primary scanner in v5, backed by the
-[Sonatype Guide API](https://guide.sonatype.com). Get a free API token at
-<https://guide.sonatype.com> under **Settings > API Tokens**.
+`auditjs guide` is the primary scanner in v5, backed by the [Sonatype Guide API](https://guide.sonatype.com). Get a free API token at <https://guide.sonatype.com> under **Settings > API Tokens**.
 
 ```terminal
 auditjs guide [options]
@@ -152,8 +147,7 @@ Options:
 
 ### Sonatype Lifecycle Usage
 
-`auditjs lifecycle` is the canonical command for scanning against
-[Sonatype Lifecycle](https://www.sonatype.com/products/sonatype-lifecycle) (formerly Nexus IQ Server).
+`auditjs lifecycle` is the canonical command for scanning against [Sonatype Lifecycle](https://www.sonatype.com/products/sonatype-lifecycle).
 
 ```terminal
 auditjs lifecycle [options]
@@ -174,7 +168,7 @@ Options:
   --dev, -d          Include Development Dependencies                  [boolean]
 ```
 
-#### Nexus IQ Server / `iq` command (Deprecated)
+#### Sonatype IQ Server / `iq` command (Deprecated)
 
 > **DEPRECATED:** `auditjs iq` is deprecated and will be removed in v6.
 > Please migrate to `auditjs lifecycle`. The options are identical — only the
@@ -196,7 +190,7 @@ AuditJS should catch most if not the exact same amount of issues as the Sonatype
 
 AuditJS functions by traversing your `node_modules` folder in your project, so it will pick up the dependencies that are physically installed. This will capture your declared as well as transitive dependencies. Once it has done this, it takes the list and converts it into something that we use to communicate with Sonatype Lifecycle. The crux of this approach is that we do "coordinate" or "name based matching", which we've found to be reliable in the JavaScript ecosystem, but it will not catch corner cases such as if you've:
 
-- Drug a vulnerable copy of jQuery into your project and left it in a folder (npm does not know about this)
+- Drag a vulnerable copy of jQuery into your project and left it in a folder (npm does not know about this)
 - Copied and pasted code from a project into one of your files
 
 The Sonatype Lifecycle CLI Scanner is equipped to locate and identify cases such as what I've just described. As such if you are using AuditJS, you would not be made aware of these cases, potentially until your code is audited by the Lifecycle CLI Scanner later on.
@@ -509,7 +503,7 @@ vulnerabilities.
 
 ## Contributing
 
-We care a lot about making the world a safer place, and that's why we continue to work on this and other plugins for Sonatype OSS Index. If you as well want to speed up the pace of software development by working on this project, jump on in! Before you start work, create a new issue, or comment on an existing issue, to let others know you are!
+See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Releasing
 
