@@ -19,13 +19,14 @@ import path from 'path';
 import fs from 'fs';
 import { Coordinates } from '../Types/Coordinates';
 import { CycloneDXSbomCreator } from '../CycloneDX/CycloneDXSbomCreator';
+import { PackageTreeNode } from '../Types/PackageTreeNode';
 
 export class NpmList implements Muncher {
   private depsArray: Array<Coordinates> = [];
 
   constructor(readonly devDependencies: boolean = false) {}
 
-  public async getDepList(): Promise<any> {
+  public async getDepList(): Promise<Array<Coordinates>> {
     return await this.getInstalledDeps();
   }
 
@@ -65,7 +66,7 @@ export class NpmList implements Muncher {
   }
 
   // recursive unit that traverses tree and terminates when object has no dependencies
-  private recurseObjectTree(objectTree: any, list: Array<Coordinates>, isRootPkg = false): any {
+  private recurseObjectTree(objectTree: PackageTreeNode, list: Array<Coordinates>, isRootPkg = false): void {
     if (objectTree.extraneous && !this.devDependencies) {
       return;
     }
@@ -76,26 +77,28 @@ export class NpmList implements Muncher {
         return;
       }
     }
-    if (objectTree.dependencies) {
-      Object.keys(objectTree.dependencies)
-        .map((x) => objectTree.dependencies[x])
+    const deps = objectTree.dependencies;
+    if (deps) {
+      Object.keys(deps)
+        .map((x) => deps[x])
         .filter((x) => typeof x !== 'string')
         .map((dep) => {
+          const node = dep as PackageTreeNode;
           if (
-            this.toPurlObjTree(dep) == '' ||
+            this.toPurlObjTree(node) == '' ||
             list.find((x) => {
-              return x.toPurl() == this.toPurlObjTree(dep);
+              return x.toPurl() == this.toPurlObjTree(node);
             })
           ) {
             return;
           }
-          this.recurseObjectTree(dep, list, false);
+          this.recurseObjectTree(node, list, false);
         });
     }
     return;
   }
 
-  private maybePushNewCoordinate(pkg: any, list: Array<Coordinates>): boolean {
+  private maybePushNewCoordinate(pkg: PackageTreeNode, list: Array<Coordinates>): boolean {
     if (pkg.name && pkg.name.includes('/')) {
       const name = pkg.name.split('/');
       if (
@@ -105,7 +108,7 @@ export class NpmList implements Muncher {
       ) {
         return false;
       }
-      list.push(new Coordinates(name[1], pkg.version, name[0]));
+      list.push(new Coordinates(name[1], pkg.version ?? '', name[0]));
       return true;
     } else if (pkg.name) {
       if (
@@ -115,18 +118,18 @@ export class NpmList implements Muncher {
       ) {
         return false;
       }
-      list.push(new Coordinates(pkg.name, pkg.version, ''));
+      list.push(new Coordinates(pkg.name, pkg.version ?? '', ''));
       return true;
     }
     return false;
   }
 
-  private toPurlObjTree(objectTree: any): string {
+  private toPurlObjTree(objectTree: PackageTreeNode): string {
     if (objectTree.name && objectTree.name.includes('/')) {
       const name = objectTree.name.split('/');
-      return this.toPurl(name[1], objectTree.version, name[0]);
+      return this.toPurl(name[1], objectTree.version ?? '', name[0]);
     } else if (objectTree.name) {
-      return this.toPurl(objectTree.name, objectTree.version);
+      return this.toPurl(objectTree.name, objectTree.version ?? '');
     } else {
       return '';
     }

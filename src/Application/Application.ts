@@ -24,7 +24,7 @@ import { OssIndexRequestService } from '../Services/OssIndexRequestService';
 import { GuideRequestService } from '../Services/GuideRequestService';
 import { AuditIQServer } from '../Audit/AuditIQServer';
 import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
-import { OssIndexServerResult } from '../Types/OssIndexServerResult';
+import { OssIndexServerResult, OssIndexServerResultJSON } from '../Types/OssIndexServerResult';
 import { ReportStatus } from '../Types/ReportStatus';
 import { Bower } from '../Munchers/Bower';
 import { DEBUG, ERROR, logMessage, createAppLogger, shutDownLoggerAndExit } from './Logger/Logger';
@@ -35,6 +35,26 @@ import { OssIndexServerConfig } from '../Config/OssIndexServerConfig';
 import { GuideServerConfig } from '../Config/GuideServerConfig';
 import { visuallySeperateText } from '../Visual/VisualHelper';
 const pj = require('../../package.json');
+
+export interface CliArgs {
+  _: (string | number)[];
+  user?: string;
+  password?: string;
+  token?: string;
+  server?: string;
+  host?: string;
+  quiet?: boolean;
+  json?: boolean;
+  xml?: boolean;
+  allowlist?: string;
+  whitelist?: string;
+  cache?: string;
+  application?: string;
+  stage?: string;
+  timeout?: number;
+  insecure?: boolean;
+  dev?: boolean;
+}
 
 export class Application {
   private results: Array<Coordinates> = [];
@@ -71,7 +91,7 @@ export class Application {
     }
   }
 
-  public async startApplication(args: any): Promise<void> {
+  public async startApplication(args: CliArgs): Promise<void> {
     if (args._[0] == 'iq' || args._[0] == 'lifecycle') {
       logMessage('Attempting to start application', DEBUG);
       logMessage('Getting coordinates for Sonatype Lifecycle', DEBUG);
@@ -139,9 +159,10 @@ export class Application {
       this.results = await this.muncher.getDepList();
       logMessage('Successfully got dependencies from Muncher', DEBUG);
     } catch (e) {
+      const err = e instanceof Error ? e : new Error(String(e));
       logMessage(`An error was encountered while gathering your dependencies.`, ERROR, {
-        title: (e as Error).message,
-        stack: (e as Error).stack,
+        title: err.message,
+        stack: err.stack,
       });
       shutDownLoggerAndExit(1);
     }
@@ -153,15 +174,16 @@ export class Application {
       this.sbom = await this.muncher.getSbomFromCommand();
       logMessage('Successfully got sbom from cyclonedx/bom', DEBUG);
     } catch (e) {
+      const err = e instanceof Error ? e : new Error(String(e));
       logMessage(`An error was encountered while gathering your dependencies into an SBOM`, ERROR, {
-        title: (e as Error).message,
-        stack: (e as Error).stack,
+        title: err.message,
+        stack: err.stack,
       });
       shutDownLoggerAndExit(1);
     }
   }
 
-  private async auditWithOSSIndex(args: any): Promise<void> {
+  private async auditWithOSSIndex(args: CliArgs): Promise<void> {
     logMessage('Instantiating OSS Index Request Service', DEBUG);
     const requestService = this.getOssIndexRequestService(args);
     this.spinner.maybeSucceed();
@@ -179,7 +201,7 @@ export class Application {
 
       this.spinner.maybeCreateMessageForSpinner('Reticulating splines');
       logMessage('Turning response into Array<OssIndexServerResult>', DEBUG);
-      let ossIndexResults: Array<OssIndexServerResult> = res.map((y: any) => {
+      let ossIndexResults: Array<OssIndexServerResult> = res.map((y: OssIndexServerResultJSON) => {
         return new OssIndexServerResult(y);
       });
       logMessage('Response morphed into Array<OssIndexServerResult>', DEBUG, {
@@ -212,16 +234,17 @@ export class Application {
         shutDownLoggerAndExit(0);
       }
     } catch (e) {
+      const err = e instanceof Error ? e : new Error(String(e));
       this.spinner.maybeStop();
       logMessage('There was an error auditing with Sonatype OSS Index', ERROR, {
-        title: (e as Error).message,
-        stack: (e as Error).stack,
+        title: err.message,
+        stack: err.stack,
       });
       shutDownLoggerAndExit(1);
     }
   }
 
-  private async auditWithGuide(args: any): Promise<void> {
+  private async auditWithGuide(args: CliArgs): Promise<void> {
     logMessage('Instantiating Guide Request Service', DEBUG);
     const requestService = this.getGuideRequestService(args);
     this.spinner.maybeSucceed();
@@ -239,7 +262,7 @@ export class Application {
 
       this.spinner.maybeCreateMessageForSpinner('Reticulating splines');
       logMessage('Turning response into Array<OssIndexServerResult>', DEBUG);
-      let guideResults: Array<OssIndexServerResult> = res.map((y: any) => {
+      let guideResults: Array<OssIndexServerResult> = res.map((y: OssIndexServerResultJSON) => {
         return new OssIndexServerResult(y);
       });
       logMessage('Response morphed into Array<OssIndexServerResult>', DEBUG, {
@@ -273,16 +296,17 @@ export class Application {
         shutDownLoggerAndExit(0);
       }
     } catch (e) {
+      const err = e instanceof Error ? e : new Error(String(e));
       this.spinner.maybeStop();
       logMessage('There was an error auditing with Sonatype Guide', ERROR, {
-        title: (e as Error).message,
-        stack: (e as Error).stack,
+        title: err.message,
+        stack: err.stack,
       });
       shutDownLoggerAndExit(1);
     }
   }
 
-  private async auditWithIQ(args: any): Promise<void> {
+  private async auditWithIQ(args: CliArgs): Promise<void> {
     try {
       this.spinner.maybeSucceed();
       this.spinner.maybeCreateMessageForSpinner('Authenticating with Sonatype Lifecycle');
@@ -328,16 +352,17 @@ export class Application {
         },
       );
     } catch (e) {
+      const err = e instanceof Error ? e : new Error(String(e));
       this.spinner.maybeFail();
       logMessage('There was an issue auditing your application!', ERROR, {
-        title: (e as Error).message,
-        stack: (e as Error).stack,
+        title: err.message,
+        stack: err.stack,
       });
       shutDownLoggerAndExit(1);
     }
   }
 
-  private getOssIndexRequestService(args: any): OssIndexRequestService {
+  private getOssIndexRequestService(args: CliArgs): OssIndexRequestService {
     let config;
     try {
       config = new OssIndexServerConfig();
@@ -353,7 +378,7 @@ export class Application {
     );
   }
 
-  private getGuideRequestService(args: any): GuideRequestService {
+  private getGuideRequestService(args: CliArgs): GuideRequestService {
     let config: GuideServerConfig | undefined;
     try {
       config = new GuideServerConfig();
@@ -369,7 +394,7 @@ export class Application {
     );
   }
 
-  private getIqRequestService(args: any): IqRequestService {
+  private getIqRequestService(args: CliArgs): IqRequestService {
     const config = new IqServerConfig();
     const hasCredentials =
       (args.user || process.env.AUDITJS_LIFECYCLE_USER) &&

@@ -14,6 +14,37 @@
  * limitations under the License.
  */
 
+interface PolicyDataJSON {
+  [key: string]: unknown;
+}
+interface SecurityDataJSON {
+  [key: string]: unknown;
+}
+interface LicenseDataJSON {
+  declaredLicenses: unknown;
+  observedLicenses: unknown;
+  overriddenLicenses: unknown;
+  status: string;
+}
+interface ComponentIdentifierJSON {
+  format: string;
+  coordinates: Record<string, unknown>;
+}
+interface ComponentJSON {
+  packageUrl: string;
+  hash: string;
+  componentIdentifier: ComponentIdentifierJSON;
+  proprietary: boolean;
+}
+interface IqServerResultJSON {
+  component: ComponentJSON;
+  matchState: string;
+  catalogDate: string;
+  licenseData: LicenseDataJSON;
+  securityData: SecurityDataJSON;
+  policyData: PolicyDataJSON;
+}
+
 export class IqServerResult {
   readonly component: Component;
   readonly matchState: string;
@@ -22,7 +53,7 @@ export class IqServerResult {
   readonly securityData: SecurityData;
   readonly policyData: PolicyData;
 
-  constructor(result: any) {
+  constructor(result: IqServerResultJSON) {
     this.component = new Component(result.component);
     this.matchState = result.matchState;
     this.catalogDate = result.catalogDate;
@@ -39,11 +70,10 @@ export class IqServerResult {
 class Component {
   readonly packageUrl: string;
   readonly hash: string;
-  // eslint-disable-next-line
-  readonly componentIdentifier: {};
+  readonly componentIdentifier: ComponentIdentifier;
   readonly proprietary: boolean;
 
-  constructor(component: any) {
+  constructor(component: ComponentJSON) {
     this.packageUrl = component.packageUrl;
     this.hash = component.hash;
     this.componentIdentifier = new ComponentIdentifier(component.componentIdentifier);
@@ -53,24 +83,21 @@ class Component {
 
 class ComponentIdentifier {
   readonly format: string;
-  readonly coordinates: Record<string, any>;
+  readonly coordinates: Record<string, unknown>;
 
-  constructor(componentIdentifier: any) {
+  constructor(componentIdentifier: ComponentIdentifierJSON) {
     this.format = componentIdentifier.format;
     this.coordinates = componentIdentifier.coordinates;
   }
 }
 
 class LicenseData {
-  // eslint-disable-next-line
-  readonly declaredLicenses: {};
-  // eslint-disable-next-line
-  readonly observedLicenses: {};
-  // eslint-disable-next-line
-  readonly overriddenLicenses: {};
+  readonly declaredLicenses: unknown;
+  readonly observedLicenses: unknown;
+  readonly overriddenLicenses: unknown;
   readonly status: string;
 
-  constructor(licenseData: any) {
+  constructor(licenseData: LicenseDataJSON) {
     this.declaredLicenses = licenseData.declaredLicenses;
     this.observedLicenses = licenseData.observedLicenses;
     this.overriddenLicenses = licenseData.overriddenLicenses;
@@ -79,9 +106,9 @@ class LicenseData {
 }
 
 class SecurityData {
-  constructor(readonly securityData: any) {}
+  constructor(readonly securityData: SecurityDataJSON) {}
 }
 
 class PolicyData {
-  constructor(readonly policyData: any) {}
+  constructor(readonly policyData: PolicyDataJSON) {}
 }

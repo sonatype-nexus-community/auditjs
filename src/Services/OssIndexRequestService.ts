@@ -18,7 +18,7 @@ import { OssIndexCoordinates } from '../Types/OssIndexCoordinates';
 import { Coordinates } from '../Types/Coordinates';
 import NodePersist from 'node-persist';
 import path from 'path';
-import { OssIndexServerResult } from '../Types/OssIndexServerResult';
+import { OssIndexServerResultJSON } from '../Types/OssIndexServerResult';
 import { homedir } from 'os';
 import { RequestHelpers } from './RequestHelpers';
 
@@ -54,15 +54,15 @@ export class OssIndexRequestService {
     return [['Content-Type', 'application/json'], RequestHelpers.getUserAgent()];
   }
 
-  private getResultsFromOSSIndex(data: OssIndexCoordinates): Promise<object> {
+  private getResultsFromOSSIndex(data: OssIndexCoordinates): Promise<OssIndexServerResultJSON[]> {
     const response = fetch(`${this.baseURL}${COMPONENT_REPORT_ENDPOINT}`, {
       method: 'post',
       body: JSON.stringify(data),
       headers: this.getHeaders(),
-      dispatcher: RequestHelpers.getHttpAgent() as any,
+      dispatcher: RequestHelpers.getHttpAgent(),
     } as RequestInit)
       .then((res: Response) => this.checkStatus(res))
-      .then((res: Response) => res.json() as any)
+      .then((res: Response) => res.json() as unknown as OssIndexServerResultJSON[])
       .catch((err: unknown) => {
         throw new Error(`There was an error making the request: ${err}`);
       });
@@ -77,18 +77,20 @@ export class OssIndexRequestService {
     return chunks;
   }
 
-  private combineResponseChunks(data: [][]): Array<OssIndexServerResult> {
-    return [].concat.apply([], data);
+  private combineResponseChunks(data: OssIndexServerResultJSON[][]): Array<OssIndexServerResultJSON> {
+    return ([] as OssIndexServerResultJSON[]).concat(...data);
   }
 
   private combineCacheAndResponses(
-    combinedChunks: Array<OssIndexServerResult>,
-    dataInCache: Array<OssIndexServerResult>,
-  ): Array<OssIndexServerResult> {
+    combinedChunks: Array<OssIndexServerResultJSON>,
+    dataInCache: Array<OssIndexServerResultJSON>,
+  ): Array<OssIndexServerResultJSON> {
     return combinedChunks.concat(dataInCache);
   }
 
-  private async insertResponsesIntoCache(response: Array<OssIndexServerResult>): Promise<Array<OssIndexServerResult>> {
+  private async insertResponsesIntoCache(
+    response: Array<OssIndexServerResultJSON>,
+  ): Promise<Array<OssIndexServerResultJSON>> {
     // console.debug(`Preparing to cache ${response.length} coordinate responses`);
 
     for (let i = 0; i < response.length; i++) {
@@ -100,7 +102,7 @@ export class OssIndexRequestService {
   }
 
   private async checkIfResultsAreInCache(data: Coordinates[], format = 'npm'): Promise<PurlContainer> {
-    const inCache = new Array<OssIndexServerResult>();
+    const inCache = new Array<OssIndexServerResultJSON>();
     const notInCache = new Array<Coordinates>();
 
     for (let i = 0; i < data.length; i++) {
@@ -121,9 +123,12 @@ export class OssIndexRequestService {
    * @param data - {@link Coordinates} Array
    * @returns a {@link Promise} of all Responses
    */
-  public async callOSSIndexOrGetFromCache(data: Coordinates[], format = 'npm'): Promise<any> {
+  public async callOSSIndexOrGetFromCache(
+    data: Coordinates[],
+    format = 'npm',
+  ): Promise<Array<OssIndexServerResultJSON>> {
     await NodePersist.init({ dir: this.cacheLocation, ttl: TWELVE_HOURS });
-    const responses = new Array();
+    const responses: Array<Promise<OssIndexServerResultJSON[]>> = [];
     // console.debug(`Purls received, total purls before chunk: ${data.length}`);
     const results = await this.checkIfResultsAreInCache(data, format);
     const chunkedPurls = this.chunkData(results.notInCache);
@@ -141,7 +146,7 @@ export class OssIndexRequestService {
       .then((resolvedResponses) => this.combineResponseChunks(resolvedResponses))
       .then((combinedResponses) => this.insertResponsesIntoCache(combinedResponses))
       .then((combinedResponses) => this.combineCacheAndResponses(combinedResponses, results.inCache))
-      .catch((err) => {
+      .catch((err: unknown) => {
         throw err;
       });
   }
@@ -153,7 +158,7 @@ export class OssIndexRequestService {
 
 class PurlContainer {
   constructor(
-    readonly inCache: OssIndexServerResult[],
+    readonly inCache: OssIndexServerResultJSON[],
     readonly notInCache: Coordinates[],
   ) {}
 }

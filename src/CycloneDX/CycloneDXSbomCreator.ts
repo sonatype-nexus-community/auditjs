@@ -23,6 +23,7 @@ import readInstalled from 'read-installed';
 import * as ssri from 'ssri';
 import { toPurl } from './Helpers/Helpers';
 import { logMessage, DEBUG } from '../Application/Logger/Logger';
+import { PackageTreeNode } from '../Types/PackageTreeNode';
 
 const SPEC = CDX.Spec.Spec1dot6;
 
@@ -36,7 +37,7 @@ export class CycloneDXSbomCreator {
     readonly options?: Options,
   ) {}
 
-  public async createBom(pkgInfo: any): Promise<string> {
+  public async createBom(pkgInfo: PackageTreeNode): Promise<string> {
     const bom = new CDX.Models.Bom();
 
     if (this.options?.includeBomSerialNumber) {
@@ -51,19 +52,25 @@ export class CycloneDXSbomCreator {
     });
   }
 
-  public getPackageInfoFromReadInstalled(path: string = this.path): Promise<any> {
+  public getPackageInfoFromReadInstalled(path: string = this.path): Promise<PackageTreeNode> {
     return new Promise((resolve, reject) => {
-      readInstalled(path, { dev: this.options?.devDependencies ?? false }, (err: any, data: any) => {
+      readInstalled(path, { dev: this.options?.devDependencies ?? false }, (err: unknown, data: PackageTreeNode) => {
         if (err) reject(err);
         resolve(data);
       });
     });
   }
 
-  private addComponents(pkg: any, repo: CDX.Models.ComponentRepository, seen: Set<string>, isRoot = false): void {
+  private addComponents(
+    pkg: PackageTreeNode,
+    repo: CDX.Models.ComponentRepository,
+    seen: Set<string>,
+    isRoot = false,
+  ): void {
     if (pkg.extraneous) return;
 
     if (!isRoot) {
+      if (!pkg.name) return;
       const pkgId = this.parsePackageJsonName(pkg.name);
       const group = pkgId.scope != null ? `@${pkgId.scope}` : '';
       const name = pkgId.fullName;
@@ -99,15 +106,16 @@ export class CycloneDXSbomCreator {
       repo.add(comp);
     }
 
-    if (pkg.dependencies) {
-      Object.keys(pkg.dependencies)
-        .map((x) => pkg.dependencies[x])
+    const deps = pkg.dependencies;
+    if (deps) {
+      Object.keys(deps)
+        .map((x) => deps[x])
         .filter((x) => typeof x !== 'string')
-        .forEach((x) => this.addComponents(x, repo, seen, false));
+        .forEach((x) => this.addComponents(x as PackageTreeNode, repo, seen, false));
     }
   }
 
-  private processHashes(pkg: any, comp: CDX.Models.Component): void {
+  private processHashes(pkg: PackageTreeNode, comp: CDX.Models.Component): void {
     if (pkg._shasum) {
       comp.hashes.set(CDX.Enums.HashAlgorithm['SHA-1'], pkg._shasum);
     } else if (pkg._integrity) {
@@ -134,7 +142,7 @@ export class CycloneDXSbomCreator {
     }
   }
 
-  private determinePackageType(pkg: any): string {
+  private determinePackageType(pkg: PackageTreeNode): string {
     if (pkg.keywords) {
       for (const kw of pkg.keywords) {
         if (kw.toLowerCase() === 'framework') return 'framework';

@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-export const visuallySeperateText = (error: boolean, text: unknown[]): void => {
-  console.log();
-  console.group();
-  text.forEach((val) => {
-    if (error) {
-      console.error(val);
-    } else {
-      console.log(val);
-    }
-  });
-  console.groupEnd();
-  console.log();
-};
+export interface PackageTreeNode {
+  name?: string;
+  version?: string;
+  extraneous?: boolean;
+  private?: boolean;
+  keywords?: string[];
+  _shasum?: string;
+  _integrity?: string;
+  bugs?: { url?: string };
+  repository?: { url?: string };
+  dependencies?: Record<string, PackageTreeNode | string>;
+}

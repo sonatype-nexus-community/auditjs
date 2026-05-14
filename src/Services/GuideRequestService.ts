@@ -19,7 +19,7 @@ import NodePersist from 'node-persist';
 import path from 'path';
 import { homedir } from 'os';
 import { Coordinates } from '../Types/Coordinates';
-import { OssIndexServerResult } from '../Types/OssIndexServerResult';
+import { OssIndexServerResultJSON } from '../Types/OssIndexServerResult';
 
 const GUIDE_BASE_URL = 'https://api.guide.sonatype.com';
 
@@ -55,18 +55,20 @@ export class GuideRequestService {
     return chunks;
   }
 
-  private combineResponseChunks(data: [][]): Array<OssIndexServerResult> {
-    return ([] as any[]).concat(...data);
+  private combineResponseChunks(data: OssIndexServerResultJSON[][]): Array<OssIndexServerResultJSON> {
+    return ([] as OssIndexServerResultJSON[]).concat(...data);
   }
 
   private combineCacheAndResponses(
-    combinedChunks: Array<OssIndexServerResult>,
-    dataInCache: Array<OssIndexServerResult>,
-  ): Array<OssIndexServerResult> {
+    combinedChunks: Array<OssIndexServerResultJSON>,
+    dataInCache: Array<OssIndexServerResultJSON>,
+  ): Array<OssIndexServerResultJSON> {
     return combinedChunks.concat(dataInCache);
   }
 
-  private async insertResponsesIntoCache(response: Array<OssIndexServerResult>): Promise<Array<OssIndexServerResult>> {
+  private async insertResponsesIntoCache(
+    response: Array<OssIndexServerResultJSON>,
+  ): Promise<Array<OssIndexServerResultJSON>> {
     for (let i = 0; i < response.length; i++) {
       await NodePersist.setItem(response[i].coordinates, response[i]);
     }
@@ -74,7 +76,7 @@ export class GuideRequestService {
   }
 
   private async checkIfResultsAreInCache(data: Coordinates[], format = 'npm'): Promise<PurlContainer> {
-    const inCache = new Array<OssIndexServerResult>();
+    const inCache = new Array<OssIndexServerResultJSON>();
     const notInCache = new Array<Coordinates>();
 
     for (let i = 0; i < data.length; i++) {
@@ -90,12 +92,14 @@ export class GuideRequestService {
     return new PurlContainer(inCache, notInCache);
   }
 
-  private async getResultsFromGuide(purls: string[]): Promise<object> {
+  private async getResultsFromGuide(purls: string[]): Promise<OssIndexServerResultJSON[]> {
     try {
       const response = await this.api.getComponentReports({ purlRequestPost: { coordinates: purls } });
-      return response;
+      return response as unknown as OssIndexServerResultJSON[];
     } catch (err) {
-      const status = (err as any)?.response?.status;
+      const status =
+        (err instanceof Object && 'response' in err && (err as { response?: { status?: number } }).response?.status) ||
+        undefined;
       const detail = status ? ` (HTTP ${status})` : '';
       throw new Error(`There was an error making the request to Sonatype Guide: ${err}${detail}`);
     }
@@ -108,9 +112,9 @@ export class GuideRequestService {
    * @param format - purl format string (e.g. 'npm')
    * @returns a {@link Promise} of all Responses
    */
-  public async callGuideOrGetFromCache(data: Coordinates[], format = 'npm'): Promise<any> {
+  public async callGuideOrGetFromCache(data: Coordinates[], format = 'npm'): Promise<Array<OssIndexServerResultJSON>> {
     await NodePersist.init({ dir: this.cacheLocation, ttl: TWENTY_FOUR_HOURS });
-    const responses = new Array();
+    const responses: Array<Promise<OssIndexServerResultJSON[]>> = [];
 
     const results = await this.checkIfResultsAreInCache(data, format);
     const chunkedPurls = this.chunkData(results.notInCache);
@@ -129,7 +133,7 @@ export class GuideRequestService {
       .then((resolvedResponses) => this.combineResponseChunks(resolvedResponses))
       .then((combinedResponses) => this.insertResponsesIntoCache(combinedResponses))
       .then((combinedResponses) => this.combineCacheAndResponses(combinedResponses, results.inCache))
-      .catch((err) => {
+      .catch((err: unknown) => {
         throw err;
       });
   }
@@ -137,7 +141,7 @@ export class GuideRequestService {
 
 class PurlContainer {
   constructor(
-    readonly inCache: OssIndexServerResult[],
+    readonly inCache: OssIndexServerResultJSON[],
     readonly notInCache: Coordinates[],
   ) {}
 }

@@ -95,7 +95,7 @@ export class TextFormatter implements Formatter {
       );
   }
 
-  private printLine(line: any): void {
+  private printLine(line: unknown): void {
     if (!this.quiet) {
       console.log(line);
     }

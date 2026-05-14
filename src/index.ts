@@ -17,7 +17,7 @@
 
 import yargs from 'yargs';
 import { Argv } from 'yargs';
-import { Application } from './Application/Application';
+import { Application, CliArgs } from './Application/Application';
 import { AppConfig } from './Config/AppConfig';
 import { OssIndexServerConfig } from './Config/OssIndexServerConfig';
 
@@ -295,7 +295,7 @@ if (argv) {
       console.warn(
         'DEPRECATION: `--whitelist` is deprecated for the guide command. ' + 'Please use `--allowlist` instead.',
       );
-      (argv as any).allowlist = argv.whitelist;
+      (argv as CliArgs).allowlist = argv.whitelist as string;
     }
 
     // silence all output if quiet or if sending file to std_out

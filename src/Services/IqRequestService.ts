@@ -49,10 +49,10 @@ export class IqRequestService {
     const response = await fetch(`${this.host}${APPLICATION_INTERNAL_ID_ENDPOINT}${this.application}`, {
       method: 'get',
       headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
-      dispatcher: RequestHelpers.getAgent(this.insecure) as any,
+      dispatcher: RequestHelpers.getAgent(this.insecure),
     } as RequestInit);
     if (response.ok) {
-      const res = (await response.json()) as any;
+      const res = (await response.json()) as { applications: Array<{ id: string }> };
       try {
         return res.applications[0].id;
       } catch {
@@ -71,7 +71,7 @@ export class IqRequestService {
     }
   }
 
-  public async submitToThirdPartyAPI(data: any): Promise<string> {
+  public async submitToThirdPartyAPI(data: string): Promise<string> {
     if (!this.isInitialized) {
       await this.init();
     }
@@ -83,12 +83,12 @@ export class IqRequestService {
         method: 'post',
         headers: [this.getBasicAuth(), RequestHelpers.getUserAgent(), ['Content-Type', 'application/xml']],
         body: data,
-        dispatcher: RequestHelpers.getAgent(this.insecure) as any,
+        dispatcher: RequestHelpers.getAgent(this.insecure),
       } as RequestInit,
     );
     if (response.ok) {
-      const json = (await response.json()) as any;
-      return json.statusUrl as string;
+      const json = (await response.json()) as { statusUrl: string };
+      return json.statusUrl;
     } else {
       const body = await response.text();
       logMessage('Response from third party API', DEBUG, { response: body });
@@ -98,8 +98,8 @@ export class IqRequestService {
 
   public async asyncPollForResults(
     url: string,
-    errorHandler: (error: any) => any,
-    pollingFinished: (body: any) => any,
+    errorHandler: (error: { message: string; stack?: string }) => void,
+    pollingFinished: (body: unknown) => void,
   ): Promise<void> {
     logMessage(url, DEBUG);
     let mergeUrl: URL;
@@ -110,7 +110,7 @@ export class IqRequestService {
       const response = await fetch(mergeUrl.href, {
         method: 'get',
         headers: [this.getBasicAuth(), RequestHelpers.getUserAgent()],
-        dispatcher: RequestHelpers.getAgent(this.insecure) as any,
+        dispatcher: RequestHelpers.getAgent(this.insecure),
       } as RequestInit);
 
       const body = response.ok;
@@ -130,7 +130,8 @@ export class IqRequestService {
         pollingFinished(json);
       }
     } catch (e) {
-      errorHandler({ title: (e as Error).message });
+      const err = e instanceof Error ? e : new Error(String(e));
+      errorHandler({ message: err.message });
     }
   }
 
@@ -138,7 +139,8 @@ export class IqRequestService {
     try {
       return new URL(url);
     } catch (e) {
-      logMessage((e as any).title, DEBUG, { message: (e as Error).message });
+      const err = e instanceof Error ? e : new Error(String(e));
+      logMessage(err.message, DEBUG);
       if (this.host.endsWith('/')) {
         return new URL(this.host.concat(url));
       }
