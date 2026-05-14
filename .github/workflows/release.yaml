@@ -128,10 +128,10 @@ jobs:
         run: npm config list
 
       - name: Install publishing packages
-        run: npm install -g semantic-release@25 @semantic-release/changelog@6 @semantic-release/git@10 @semantic-release/npm@13 @semantic-release/github@12
+        run: npm install -g semantic-release@25 @semantic-release/changelog@6 @semantic-release/git@10 @semantic-release/npm@10 @semantic-release/github@12
 
       - name: Attempt publish
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          # NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release
