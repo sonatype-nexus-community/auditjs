@@ -51,4 +51,4 @@ jobs:
           path: coverage/lcov.info
 
       - name: Dogfood scan
-        run: npm run start -- guide --token ${{ secrets.GUIDE_TOKEN }}
+        run: npm run start -- guide --token ${{ secrets.SONATYPE_GUIDE_TOKEN }}
