@@ -231,6 +231,12 @@ const argv = yargs
         description: 'Include Development Dependencies',
         demandOption: false,
       },
+      recommend: {
+        alias: 'r',
+        type: 'boolean',
+        description: 'Show AI-powered upgrade recommendations for vulnerable packages (requires bearer token)',
+        demandOption: false,
+      },
     });
   })
   .parseSync();

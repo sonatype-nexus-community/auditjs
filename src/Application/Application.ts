@@ -22,6 +22,7 @@ import { Coordinates } from '../Types/Coordinates';
 import { Muncher } from '../Munchers/Muncher';
 import { OssIndexRequestService } from '../Services/OssIndexRequestService';
 import { GuideRequestService } from '../Services/GuideRequestService';
+import type { RecommendationResponse } from '@sonatype/sonatype-guide-api-client';
 import { AuditIQServer } from '../Audit/AuditIQServer';
 import { AuditOSSIndex } from '../Audit/AuditOSSIndex';
 import { OssIndexServerResult, OssIndexServerResultJSON } from '../Types/OssIndexServerResult';
@@ -54,6 +55,7 @@ export interface CliArgs {
   timeout?: number;
   insecure?: boolean;
   dev?: boolean;
+  recommend?: boolean;
 }
 
 export class Application {
@@ -288,8 +290,22 @@ export class Application {
 
       logMessage('Attempting to audit results', DEBUG);
       const failed = auditGuide.auditResults(guideResults);
-
       logMessage('Results audited', DEBUG, { failureCode: failed });
+
+      if (args.recommend && !args.json && !args.xml) {
+        const vulnerablePurls = guideResults
+          .filter((r) => r.vulnerabilities && r.vulnerabilities.length > 0)
+          .map((r) => r.coordinates);
+
+        if (vulnerablePurls.length > 0) {
+          this.spinner.maybeCreateMessageForSpinner('Fetching Sonatype Guide recommendations');
+          logMessage('Fetching recommendations for vulnerable packages', DEBUG, { count: vulnerablePurls.length });
+          const recommendations = await requestService.getRecommendations(vulnerablePurls);
+          this.spinner.maybeStop();
+          this.printRecommendations(recommendations);
+        }
+      }
+
       if (failed) {
         shutDownLoggerAndExit(1);
       } else {
@@ -304,6 +320,44 @@ export class Application {
       });
       shutDownLoggerAndExit(1);
     }
+  }
+
+  private printRecommendations(recommendations: Map<string, RecommendationResponse>): void {
+    if (recommendations.size === 0) return;
+
+    const cols = Math.min(process.stdout.columns || 80, 80);
+    const line = '-'.repeat(cols);
+
+    console.log('\n' + line);
+    console.log('Sonatype Guide Recommendations:');
+    console.log(line);
+
+    for (const [purl, rec] of recommendations) {
+      const top = rec.toVersions?.[0];
+      if (!top?.version) continue;
+
+      const displayPurl = purl.replace('%40', '@');
+      const fromDts = rec.fromVersion?.developerTrustScore?.toFixed(1) ?? 'N/A';
+      const toDts = top.developerTrustScore?.toFixed(1) ?? 'N/A';
+
+      const countVulns = (vulns?: { [key: string]: number }): number =>
+        vulns ? Object.values(vulns).reduce((s, n) => s + n, 0) : 0;
+
+      const fromVulnCount = countVulns(rec.fromVersion?.directVulnerabilities);
+      const toVulnCount = countVulns(top.directVulnerabilities);
+
+      console.log(`\n  ${displayPurl}`);
+      console.log(
+        `    Current:    ${rec.fromVersion?.version ?? '?'} (DTS: ${fromDts}, ${fromVulnCount} direct vuln(s))`,
+      );
+      console.log(`    Upgrade to: ${top.version} (DTS: ${toDts}, ${toVulnCount} direct vuln(s))`);
+
+      if (top.breakingChangesCount && top.breakingChangesCount !== '0') {
+        console.log(`    Note: ~${top.breakingChangesCount} breaking changes`);
+      }
+    }
+
+    console.log('\n' + line + '\n');
   }
 
   private async auditWithIQ(args: CliArgs): Promise<void> {
@@ -386,11 +440,19 @@ export class Application {
     } catch {
       // Ignore config load failure
     }
+
+    const username = args?.user || process.env.AUDITJS_GUIDE_USERNAME || config?.getUsername();
+    // Bearer token: used when no username is present (--token only, or config AccessToken)
+    const accessToken = !username
+      ? args?.token || process.env.AUDITJS_GUIDE_TOKEN || config?.getAccessToken()
+      : undefined;
+
     return new GuideRequestService(
-      args?.user || process.env.AUDITJS_GUIDE_USERNAME || config?.getUsername(),
+      username,
       args?.token || args?.password || process.env.AUDITJS_GUIDE_TOKEN || config?.getToken(),
       args?.cache,
       args?.server || config?.getServer?.(),
+      accessToken,
     );
   }
 

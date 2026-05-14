@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { OSSIndexCompatibilityApi, Configuration } from '@sonatype/sonatype-guide-api-client';
+import { OSSIndexCompatibilityApi, RecommendationsApi, Configuration } from '@sonatype/sonatype-guide-api-client';
+import type { RecommendationResponse } from '@sonatype/sonatype-guide-api-client';
 import NodePersist from 'node-persist';
 import path from 'path';
 import { homedir } from 'os';
@@ -31,19 +32,36 @@ const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 
 export class GuideRequestService {
   private api: OSSIndexCompatibilityApi;
+  private recommendationsApi: RecommendationsApi;
 
   constructor(
     readonly username?: string,
     readonly token?: string,
     readonly cacheLocation: string = CACHE_PATH,
     readonly server: string = GUIDE_BASE_URL,
+    readonly accessToken?: string,
   ) {
-    const config = new Configuration({
-      username: username,
-      password: token,
-      basePath: server,
-    });
+    const config =
+      accessToken && !username
+        ? new Configuration({ accessToken, basePath: server })
+        : new Configuration({ username, password: token, basePath: server });
     this.api = new OSSIndexCompatibilityApi(config);
+    this.recommendationsApi = new RecommendationsApi(config);
+  }
+
+  public async getRecommendations(purls: string[]): Promise<Map<string, RecommendationResponse>> {
+    const results = new Map<string, RecommendationResponse>();
+    await Promise.allSettled(
+      purls.map(async (purl) => {
+        try {
+          const response = await this.recommendationsApi.getRecommendations({ recommendationRequest: { purl } });
+          results.set(purl, response);
+        } catch {
+          // skip components where recommendations are unavailable
+        }
+      }),
+    );
+    return results;
   }
 
   private chunkData(data: Coordinates[]): Array<Array<Coordinates>> {
