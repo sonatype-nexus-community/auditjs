@@ -5,6 +5,7 @@ on:
     - cron: '40 20 * * *'
 
 env:
+  LC_APPLICATION_ID: auditjs
   NODE_VERSION: '20'
 
 jobs:
@@ -50,5 +51,18 @@ jobs:
           name: coverage
           path: coverage/lcov.info
 
-      - name: Dogfood scan
+      - name: Dogfood scan (Sonatype Guide)
+        continue-on-error: true
         run: npm run start -- guide --token ${{ secrets.SONATYPE_GUIDE_TOKEN }}
+
+      - name: Dogfood scan (OSSI - deprecated)
+        continue-on-error: true
+        run: npm run start -- ossi --user ${{ secrets.OSSI_USERNAME }} --password ${{ secrets.OSSI_TOKEN }}
+
+      - name: Dogfood scan (Sonatype Lifecycle)
+        continue-on-error: true
+        run: npm run start -- lifecycle -a ${{ env.LC_APPLICATION_ID }} -s develop -h ${{ vars.SONATYPE_PLATFORM_URL }} -u ${{ secrets.SONATYPE_LIFECYCLE_USERNAME }} -p ${{ secrets.SONATYPE_LIFECYCLE_PASSWORD }}
+
+      - name: Dogfood scan (IQ - deprecated)
+        continue-on-error: true
+        run: npm run start -- iq -a ${{ env.LC_APPLICATION_ID }} -s develop -h ${{ vars.SONATYPE_PLATFORM_URL }} -u ${{ secrets.SONATYPE_LIFECYCLE_USERNAME }} -p ${{ secrets.SONATYPE_LIFECYCLE_PASSWORD }}
