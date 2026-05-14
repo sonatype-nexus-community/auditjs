@@ -1,5 +1,41 @@
 # [5.0.0](https://github.com/sonatype-nexus-community/auditjs/compare/v4.2.0...v5.0.0) (2026-05-14)
 
+
+* feat!: modernise build toolchain and test framework for v5 ([a2c568f](https://github.com/sonatype-nexus-community/auditjs/commit/a2c568fa241768483e6315656b3520c45e8dd3ed))
+
+
+### Bug Fixes
+
+* **ci:** allow dogfood scan to find vulns without failing the build ([c55a964](https://github.com/sonatype-nexus-community/auditjs/commit/c55a9640a1fa00d531ae4eb2891b04d7a3ce4787))
+* **ci:** fix dogfood auth and lifecycle prepare script failures ([d773aa3](https://github.com/sonatype-nexus-community/auditjs/commit/d773aa3bded26ae85c501692f935b4887aa49885))
+* **ci:** fix release workflow dogfood token name and ignore-scripts ([40fc04c](https://github.com/sonatype-nexus-community/auditjs/commit/40fc04c13e446d6ef60fdd0ea33c04ac146e4ac0))
+* **ci:** force public npm registry and fix @types/figlet@1.7.0 type change ([874260c](https://github.com/sonatype-nexus-community/auditjs/commit/874260c8ea6b5b9ed099b3c34a432ee4b5e59081))
+* **ossi:** normalise baseURL to always have trailing slash ([5a44702](https://github.com/sonatype-nexus-community/auditjs/commit/5a4470270b2f20b2ce8196af5d40711cfe7f8477))
+* **config:** store guide bearer token in AccessToken field; fall back to Token for backward compat ([7fa9480](https://github.com/sonatype-nexus-community/auditjs/commit/7fa9480f85dedb15ac57a705abb0d6fb921b5c5e))
+* **ossi:** update default server URL to api.guide.sonatype.com ([c08491d](https://github.com/sonatype-nexus-community/auditjs/commit/c08491dc7c211623fd8de7d79c1f98a595a124a4))
+* **ci:** upgrade npm before install to avoid 10.8.2 exit-handler bug ([3a32f70](https://github.com/sonatype-nexus-community/auditjs/commit/3a32f70a621c3103a3e8718ebcfc359e8e42c8a6))
+* **ci:** upgrade release workflow to Node 22 ([980fdb7](https://github.com/sonatype-nexus-community/auditjs/commit/980fdb79d1d816cc640b491e698c20eff1764424))
+* **lint:** upgrade to ESLint 8 + Prettier 3 and fix all formatting errors ([55ec1fd](https://github.com/sonatype-nexus-community/auditjs/commit/55ec1fd641003580fdbca744bf401c638b040971))
+* **guide:** use Basic auth for OSSIndexCompatibilityApi in PAT-only mode ([a78fad6](https://github.com/sonatype-nexus-community/auditjs/commit/a78fad6239e82b7c5bef2ddfcdeed2f1107a2d26))
+* **ci:** use OSSI_TOKEN for guide dogfood scan; improve error message ([363560f](https://github.com/sonatype-nexus-community/auditjs/commit/363560f614c44d865e28406457dba51e51f16a68))
+
+
+### Features
+
+* **types:** Phase 5 — TypeScript strict enforcement ([2d443b4](https://github.com/sonatype-nexus-community/auditjs/commit/2d443b4d7dca55ad403984f39bfa6dc1d8795add))
+* **guide:** Phase 6 — bearer token auth and upgrade recommendations ([92806f1](https://github.com/sonatype-nexus-community/auditjs/commit/92806f1cb84a8b33f72c0fcf4b684390848a96a5))
+* **sbom:** replace xmlbuilder with @cyclonedx/cyclonedx-library v10 targeting CycloneDX 1.6 ([feb2c73](https://github.com/sonatype-nexus-community/auditjs/commit/feb2c73cb2799440a60cf947c8a16eb81ed33565))
+
+
+### BREAKING CHANGES
+
+* requires Node 20+; yarn replaced by npm
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+Signed-off-by: Paul Horton <phorton@sonatype.com>
+
+# [5.0.0](https://github.com/sonatype-nexus-community/auditjs/compare/v4.2.0...v5.0.0) (2026-05-14)
+
 ### BREAKING CHANGES
 
 * **engine**: Node.js 20 or later is now required (dropped support for Node 16/18)
