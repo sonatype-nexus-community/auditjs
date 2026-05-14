@@ -125,7 +125,7 @@ jobs:
         run: npm run build
 
       - name: Install publishing packages
-        run: npm install -g semantic-release@23 @semantic-release/changelog@6 @semantic-release/git@10 @semantic-release/npm@10
+        run: npm install -g semantic-release@25 @semantic-release/changelog@6 @semantic-release/git@10 @semantic-release/npm@13
 
       - name: Attempt publish
         env:
