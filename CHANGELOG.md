@@ -1,3 +1,10 @@
+## [5.0.1](https://github.com/sonatype-nexus-community/auditjs/compare/v5.0.0...v5.0.1) (2026-05-14)
+
+
+### Bug Fixes
+
+* **ci:** pin @semantic-release/npm to v10 and restore NPM_TOKEN ([c6908a1](https://github.com/sonatype-nexus-community/auditjs/commit/c6908a1a3f58b890c2a221157390fdd992572374))
+
 # [5.0.0](https://github.com/sonatype-nexus-community/auditjs/compare/v4.2.0...v5.0.0) (2026-05-14)
 
 
