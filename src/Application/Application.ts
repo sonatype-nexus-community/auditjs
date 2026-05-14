@@ -442,9 +442,10 @@ export class Application {
     }
 
     const username = args?.user || process.env.AUDITJS_GUIDE_USERNAME || config?.getUsername();
-    // Bearer token: used when no username is present (--token only, or config AccessToken)
+    // Bearer token: used when no username is present.
+    // Fall back to config Token for backward compat with configs saved before AccessToken field existed.
     const accessToken = !username
-      ? args?.token || process.env.AUDITJS_GUIDE_TOKEN || config?.getAccessToken()
+      ? args?.token || process.env.AUDITJS_GUIDE_TOKEN || config?.getAccessToken() || config?.getToken()
       : undefined;
 
     return new GuideRequestService(

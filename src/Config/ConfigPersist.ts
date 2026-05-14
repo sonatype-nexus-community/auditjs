@@ -20,5 +20,6 @@ export class ConfigPersist {
     readonly Token: string,
     readonly Server?: string,
     readonly CacheLocation?: string,
+    readonly AccessToken?: string,
   ) {}
 }

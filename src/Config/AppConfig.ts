@@ -83,8 +83,10 @@ export class AppConfig {
 
       const guideConfig = new ConfigPersist(
         '',
-        accessToken,
+        '',
         server.endsWith('/') ? server.slice(0, server.length - 1) : server,
+        undefined,
+        accessToken,
       );
 
       const config = new GuideServerConfig();
