@@ -59,20 +59,16 @@ jobs:
           path: coverage/lcov.info
 
       - name: Dogfood scan (Sonatype Guide)
-        if: matrix.node-version == '22'
         run: npm run start -- guide --token ${{ secrets.SONATYPE_GUIDE_TOKEN }}
 
       - name: Dogfood scan (OSSI - deprecated)
-        if: matrix.node-version == '22'
         continue-on-error: true
         run: npm run start -- ossi --user ${{ secrets.OSSI_USERNAME }} --password ${{ secrets.OSSI_TOKEN }}
 
       - name: Dogfood scan (Sonatype Lifecycle)
-        if: matrix.node-version == '22'
         run: npm run start -- lifecycle -a ${{ env.LC_APPLICATION_ID }} -s develop -h ${{ vars.SONATYPE_PLATFORM_URL }} -u ${{ secrets.SONATYPE_LIFECYCLE_USERNAME }} -p ${{ secrets.SONATYPE_LIFECYCLE_PASSWORD }}
 
       - name: Dogfood scan (IQ - deprecated)
-        if: matrix.node-version == '22'
         run: npm run start -- iq -a ${{ env.LC_APPLICATION_ID }} -s develop -h ${{ vars.SONATYPE_PLATFORM_URL }} -u ${{ secrets.SONATYPE_LIFECYCLE_USERNAME }} -p ${{ secrets.SONATYPE_LIFECYCLE_PASSWORD }}
 
   sonatype:
