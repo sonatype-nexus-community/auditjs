@@ -41,12 +41,21 @@ export class GuideRequestService {
     readonly server: string = GUIDE_BASE_URL,
     readonly accessToken?: string,
   ) {
-    const config =
+    // OSSIndexCompatibilityApi only supports HTTP Basic auth.
+    // In PAT-only mode (no username), send the PAT as password with empty username
+    // so the generated client includes an Authorization: Basic :<PAT> header.
+    const ossUsername = username ?? (accessToken ? '' : undefined);
+    const ossPassword = token ?? accessToken;
+    this.api = new OSSIndexCompatibilityApi(
+      new Configuration({ username: ossUsername, password: ossPassword, basePath: server }),
+    );
+
+    // RecommendationsApi supports Bearer auth; fall back to Basic when username is present.
+    const recConfig =
       accessToken && !username
         ? new Configuration({ accessToken, basePath: server })
         : new Configuration({ username, password: token, basePath: server });
-    this.api = new OSSIndexCompatibilityApi(config);
-    this.recommendationsApi = new RecommendationsApi(config);
+    this.recommendationsApi = new RecommendationsApi(recConfig);
   }
 
   public async getRecommendations(purls: string[]): Promise<Map<string, RecommendationResponse>> {
