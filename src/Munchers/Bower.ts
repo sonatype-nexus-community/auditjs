@@ -40,15 +40,26 @@ export class Bower implements Muncher {
     const file = fs.readFileSync(path.join(process.cwd(), 'bower.json'));
     const json = JSON.parse(file.toString());
 
-    Object.keys(json.dependencies).map((x: string) => {
-      const version: string = json.dependencies[x];
-      depsArray.push(new Coordinates(x, version.replace('~', ''), ''));
+    const resolve = (name: string): string | null => {
+      try {
+        const bowerJson = JSON.parse(
+          fs.readFileSync(path.join(process.cwd(), 'bower_components', name, '.bower.json'), 'utf8'),
+        );
+        return /^\d+\.\d+\.\d+/.test(bowerJson.version) ? bowerJson.version : null;
+      } catch {
+        return null;
+      }
+    };
+
+    Object.keys(json.dependencies).forEach((x: string) => {
+      const version = resolve(x);
+      if (version) depsArray.push(new Coordinates(x, version, ''));
     });
 
     if (this.devDependencies) {
-      Object.keys(json.devDependencies).map((x: string) => {
-        const version: string = json.devDependencies[x];
-        depsArray.push(new Coordinates(x, version.replace('~', ''), ''));
+      Object.keys(json.devDependencies).forEach((x: string) => {
+        const version = resolve(x);
+        if (version) depsArray.push(new Coordinates(x, version, ''));
       });
     }
 

@@ -338,6 +338,11 @@ results for 24 hours to avoid unnecessary credit consumption.
 Get a free API token at <https://guide.sonatype.com> under **Settings > API Tokens**.
 Pass the token via `--token` or store it with `auditjs config`.
 
+Sonatype Guide issues two kinds of tokens:
+
+- **Personal Access Tokens (PAT)** — format `sonatype_pat_*`. Use `--token` alone (no `--user`). AuditJS sends these as `Authorization: Bearer <token>`.
+- **OSS Index compatibility tokens** — used with `--user` (your email) and `--token`. AuditJS sends these as `Authorization: Basic <base64(user:token)>`.
+
 You can specify your credentials on either the command line or the configuration
 file. It is almost certainly better to put the credentials in a configuration
 file as described above, as using them on the command line is less secure.
