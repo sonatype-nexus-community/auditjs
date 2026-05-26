@@ -1,3 +1,12 @@
+## [5.0.1](https://github.com/sonatype-nexus-community/auditjs/compare/v5.0.0...v5.0.1) (2026-05-26)
+
+
+### Bug Fixes
+
+* **lint:** collapse spyOn chain to satisfy prettier ([bed08bc](https://github.com/sonatype-nexus-community/auditjs/commit/bed08bcd81c22126f90c7e87814e4184e7419c3a))
+* **bower:** resolve versions from bower_components/.bower.json ([#294](https://github.com/sonatype-nexus-community/auditjs/issues/294)) ([9bf288e](https://github.com/sonatype-nexus-community/auditjs/commit/9bf288ee39f577dbf7222beb3d8388042f79eb03))
+* Use `Bearer` auth with Sonatype Guide PAT tokens ([60308dd](https://github.com/sonatype-nexus-community/auditjs/commit/60308dd31a6fb493cd123a4b0d942257f2629d4d))
+
 # [5.0.0](https://github.com/sonatype-nexus-community/auditjs/compare/v4.2.0...v5.0.0) (2026-05-14)
 
 
