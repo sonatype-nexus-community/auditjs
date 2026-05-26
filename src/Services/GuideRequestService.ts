@@ -152,7 +152,8 @@ export class GuideRequestService {
 
     for (const chunk of chunkedPurls) {
       try {
-        const purls = chunk.map((x) => x.toPurl(format));
+        const purls = chunk.map((x) => x.toPurl(format)).filter((p) => /^[^@]+@\d+\.\d+\.\d+/.test(p));
+        if (purls.length === 0) continue;
         const res = this.getResultsFromGuide(purls);
         responses.push(res);
       } catch (e) {

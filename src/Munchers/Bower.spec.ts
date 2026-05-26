@@ -25,54 +25,6 @@ describe('Bower', () => {
   });
 
   describe('getInstalledDeps()', () => {
-    // ------------------------------------------------------------------
-    // Bug-confirmation tests: these PASS with the current (unfixed) code.
-    // They document the defective behaviour that causes HTTP 400 from the
-    // Sonatype Guide / OSS Index API when Bower deps use GitHub refs.
-    // ------------------------------------------------------------------
-
-    it('[BUG] returns raw GitHub ref as version, only stripping the leading ~', async () => {
-      vi.spyOn(process, 'cwd').mockReturnValue('/fake');
-      mockFs({
-        '/fake/bower.json': JSON.stringify({
-          dependencies: {
-            'iron-elements': 'PolymerElements/iron-elements#~1.0.4',
-            catiline: 'calvinmetcalf/catiline#2.9.3',
-          },
-        }),
-      });
-
-      const deps = await new Bower().getInstalledDeps();
-
-      // Only the first ~ is stripped; the rest of the GitHub ref remains.
-      // This produces invalid PURLs that cause the API to reject the entire batch.
-      const ironElements = deps.find((d) => d.name === 'iron-elements');
-      expect(ironElements?.version).toBe('PolymerElements/iron-elements#1.0.4');
-
-      const catiline = deps.find((d) => d.name === 'catiline');
-      expect(catiline?.version).toBe('calvinmetcalf/catiline#2.9.3');
-    });
-
-    it('[BUG] passes caret-range specifier verbatim as version (^ is not stripped)', async () => {
-      vi.spyOn(process, 'cwd').mockReturnValue('/fake');
-      mockFs({
-        '/fake/bower.json': JSON.stringify({
-          dependencies: { lodash: '^4.17.11' },
-        }),
-      });
-
-      const deps = await new Bower().getInstalledDeps();
-
-      // ^ prefix is not handled at all — results in an invalid semver PURL
-      expect(deps[0].version).toBe('^4.17.11');
-    });
-
-    // ------------------------------------------------------------------
-    // Fix-behavior tests: these FAIL with the current code and should
-    // PASS once Bower.getInstalledDeps() reads resolved versions from
-    // bower_components/<name>/.bower.json instead of bower.json specifiers.
-    // ------------------------------------------------------------------
-
     it('resolves GitHub ref to exact semver from bower_components/.bower.json', async () => {
       vi.spyOn(process, 'cwd').mockReturnValue('/fake');
       mockFs({

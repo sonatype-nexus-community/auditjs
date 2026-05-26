@@ -81,35 +81,6 @@ describe('GuideRequestService', () => {
   });
 
   describe('callGuideOrGetFromCache() with non-semver bower version strings', () => {
-    // ------------------------------------------------------------------
-    // Bug-confirmation test: PASSES with current (unfixed) code.
-    // Shows that a single non-semver PURL causes the entire batch to fail
-    // with no results returned — including valid packages in the same chunk.
-    // ------------------------------------------------------------------
-
-    it('[BUG] API error for non-semver PURL causes the entire batch to fail', async () => {
-      const service = new GuideRequestService('user', 'token', CACHE_LOCATION, GUIDE_BASE_URL);
-
-      // Simulate the HTTP 400 the Guide API returns when it receives an invalid PURL.
-      vi.spyOn(service as any, 'getResultsFromGuide').mockRejectedValueOnce(
-        new Error('There was an error making the request to Sonatype Guide (HTTP 400)'),
-      );
-
-      const coords = [
-        new Coordinates('iron-elements', 'PolymerElements/iron-elements#1.0.4'),
-        new Coordinates('polymer', '1.9.8'), // valid — but lost along with the bad one
-      ];
-
-      // Both packages disappear: the valid polymer@1.9.8 is never reported.
-      await expect(service.callGuideOrGetFromCache(coords, 'bower')).rejects.toThrow('400');
-    });
-
-    // ------------------------------------------------------------------
-    // Fix-behavior tests: these FAIL with current code and should PASS
-    // once callGuideOrGetFromCache() filters out non-semver PURLs before
-    // forwarding the batch to the API.
-    // ------------------------------------------------------------------
-
     it('filters non-semver PURLs from the batch before sending to the API', async () => {
       const service = new GuideRequestService('user', 'token', CACHE_LOCATION, GUIDE_BASE_URL);
 
