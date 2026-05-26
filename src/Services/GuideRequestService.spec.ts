@@ -19,7 +19,7 @@ import { GuideRequestService } from './GuideRequestService';
 import { OSSIndexCompatibilityApi } from '@sonatype/sonatype-guide-api-client';
 import type { InitOverrideFunction } from '@sonatype/sonatype-guide-api-client';
 import { Coordinates } from '../Types/Coordinates';
-import { rmSync, existsSync } from 'fs';
+import { rmSync, existsSync } from 'node:fs';
 
 const CACHE_PATH = '/tmp/.sonatype-guide-test';
 const SERVER = 'https://api.guide.sonatype.com';
