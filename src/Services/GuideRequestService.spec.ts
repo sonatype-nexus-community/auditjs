@@ -134,9 +134,7 @@ describe('GuideRequestService', () => {
     it('skips the API call entirely when every coordinate has a non-semver version', async () => {
       const service = new GuideRequestService('user', 'token', CACHE_LOCATION, GUIDE_BASE_URL);
 
-      const getResultsSpy = vi
-        .spyOn(service as any, 'getResultsFromGuide')
-        .mockResolvedValue([]);
+      const getResultsSpy = vi.spyOn(service as any, 'getResultsFromGuide').mockResolvedValue([]);
 
       const coords = [
         new Coordinates('iron-elements', 'PolymerElements/iron-elements#1.0.4'),
