@@ -17,6 +17,7 @@
 import { expect, vi, describe, it, afterEach, beforeEach } from 'vitest';
 import { GuideRequestService } from './GuideRequestService';
 import { OSSIndexCompatibilityApi } from '@sonatype/sonatype-guide-api-client';
+import type { InitOverrideFunction } from '@sonatype/sonatype-guide-api-client';
 import { Coordinates } from '../Types/Coordinates';
 import { rmSync, existsSync } from 'fs';
 
@@ -35,14 +36,16 @@ describe('GuideRequestService', () => {
   it('sends Authorization: Bearer when accessToken is set (PAT token mode)', async () => {
     const spy = vi
       .spyOn(OSSIndexCompatibilityApi.prototype, 'getComponentReports')
-      .mockResolvedValue([{ coordinates: 'pkg:npm/test@1.0.0', reference: '', vulnerabilities: [] } as any]);
+      .mockResolvedValue([{ coordinates: 'pkg:npm/test@1.0.0', reference: '', vulnerabilities: [] }] as Awaited<
+        ReturnType<typeof OSSIndexCompatibilityApi.prototype.getComponentReports>
+      >);
 
     const svc = new GuideRequestService(undefined, undefined, CACHE_PATH, SERVER, 'sonatype_pat_test123');
     const coords = [new Coordinates('test', '1.0.0', '')];
     await svc.callGuideOrGetFromCache(coords, 'npm');
 
     expect(spy).toHaveBeenCalledOnce();
-    const initOverrides = spy.mock.calls[0][1] as Function;
+    const initOverrides = spy.mock.calls[0][1] as InitOverrideFunction;
     expect(initOverrides).toBeDefined();
 
     const result = await initOverrides({ init: { method: 'POST', headers: { 'Content-Type': 'application/json' } } });
@@ -53,7 +56,9 @@ describe('GuideRequestService', () => {
   it('does not override Authorization when no accessToken (Basic auth mode)', async () => {
     const spy = vi
       .spyOn(OSSIndexCompatibilityApi.prototype, 'getComponentReports')
-      .mockResolvedValue([{ coordinates: 'pkg:npm/test@1.0.0', reference: '', vulnerabilities: [] } as any]);
+      .mockResolvedValue([{ coordinates: 'pkg:npm/test@1.0.0', reference: '', vulnerabilities: [] }] as Awaited<
+        ReturnType<typeof OSSIndexCompatibilityApi.prototype.getComponentReports>
+      >);
 
     const svc = new GuideRequestService('myuser', 'mytoken', CACHE_PATH, SERVER, undefined);
     const coords = [new Coordinates('test', '1.0.0', '')];
