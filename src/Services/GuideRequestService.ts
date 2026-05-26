@@ -15,7 +15,7 @@
  */
 
 import { OSSIndexCompatibilityApi, RecommendationsApi, Configuration } from '@sonatype/sonatype-guide-api-client';
-import type { RecommendationResponse } from '@sonatype/sonatype-guide-api-client';
+import type { RecommendationResponse, InitOverrideFunction } from '@sonatype/sonatype-guide-api-client';
 import NodePersist from 'node-persist';
 import path from 'path';
 import { homedir } from 'os';
@@ -121,7 +121,11 @@ export class GuideRequestService {
 
   private async getResultsFromGuide(purls: string[]): Promise<OssIndexServerResultJSON[]> {
     try {
-      const response = await this.api.getComponentReports({ purlRequestPost: { coordinates: purls } });
+      // PAT tokens require Bearer auth; the OSSIndexCompatibilityApi SDK only supports Basic by default.
+      const initOverrides: InitOverrideFunction | undefined = this.accessToken
+        ? async ({ init }) => ({ ...init, headers: { ...init.headers, Authorization: `Bearer ${this.accessToken}` } })
+        : undefined;
+      const response = await this.api.getComponentReports({ purlRequestPost: { coordinates: purls } }, initOverrides);
       return response as unknown as OssIndexServerResultJSON[];
     } catch (err) {
       const status =
