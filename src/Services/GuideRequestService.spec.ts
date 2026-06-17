@@ -129,23 +129,22 @@ describe('GuideRequestService', () => {
   });
 
   describe('proxy support', () => {
-    it('should pass ProxyAgent as dispatcher when http_proxy is set', async () => {
-      process.env.http_proxy = 'http://proxy.example.com:8080';
-
-      const expectedOutput = [
+    const mockSuccessResponse = {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: vi.fn().mockResolvedValue([
         {
           coordinates: 'pkg:npm/test@1.0.0',
           reference: 'https://guide.sonatype.com/blah',
           vulnerabilities: [],
         },
-      ];
+      ]),
+    };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        statusText: 'OK',
-        json: vi.fn().mockResolvedValue(expectedOutput),
-      });
+    it('should pass ProxyAgent as dispatcher when http_proxy is set', async () => {
+      process.env.http_proxy = 'http://proxy.example.com:8080';
+      mockFetch.mockResolvedValueOnce(mockSuccessResponse);
 
       const svc = new GuideRequestService('user', 'token', CACHE_PATH, SERVER);
       const coords = [new Coordinates('test', '1.0.0')];
@@ -153,10 +152,7 @@ describe('GuideRequestService', () => {
 
       // Verify fetch was called with a dispatcher (ProxyAgent)
       expect(mockFetch).toHaveBeenCalled();
-      const fetchCall = mockFetch.mock.calls[0];
-      const fetchOptions = fetchCall[1] as RequestInit & { dispatcher?: ProxyAgent };
-
-      // This assertion demonstrates the bug - dispatcher should be a ProxyAgent but is undefined
+      const fetchOptions = mockFetch.mock.calls[0][1] as RequestInit & { dispatcher?: ProxyAgent };
       expect(fetchOptions.dispatcher).toBeDefined();
       expect(fetchOptions.dispatcher).toBeInstanceOf(ProxyAgent);
     });
@@ -165,32 +161,14 @@ describe('GuideRequestService', () => {
       // Ensure no proxy env vars are set before creating service
       delete process.env.http_proxy;
       delete process.env.https_proxy;
-
-      const expectedOutput = [
-        {
-          coordinates: 'pkg:npm/test@1.0.0',
-          reference: 'https://guide.sonatype.com/blah',
-          vulnerabilities: [],
-        },
-      ];
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        statusText: 'OK',
-        json: vi.fn().mockResolvedValue(expectedOutput),
-      });
+      mockFetch.mockResolvedValueOnce(mockSuccessResponse);
 
       const svc = new GuideRequestService('user', 'token', CACHE_PATH, SERVER);
       const coords = [new Coordinates('test', '1.0.0')];
       await svc.callGuideOrGetFromCache(coords, 'npm');
 
       expect(mockFetch).toHaveBeenCalled();
-      const fetchCall = mockFetch.mock.calls[0];
-      const fetchOptions = fetchCall[1] as RequestInit & { dispatcher?: unknown };
-
-      // When no proxy is configured, the custom fetchApi should not be provided,
-      // so dispatcher should not be in the options
+      const fetchOptions = mockFetch.mock.calls[0][1] as RequestInit & { dispatcher?: unknown };
       expect(fetchOptions.dispatcher).toBeUndefined();
     });
   });
