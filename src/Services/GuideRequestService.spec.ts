@@ -49,6 +49,7 @@ describe('GuideRequestService', () => {
     vi.unstubAllGlobals();
     delete process.env.http_proxy;
     delete process.env.https_proxy;
+    mockFetch.mockClear();
   });
 
   it('sends Authorization: Bearer when accessToken is set (PAT token mode)', async () => {
@@ -161,7 +162,9 @@ describe('GuideRequestService', () => {
     });
 
     it('should not include dispatcher when no proxy is configured', async () => {
-      // No proxy env vars set
+      // Ensure no proxy env vars are set before creating service
+      delete process.env.http_proxy;
+      delete process.env.https_proxy;
 
       const expectedOutput = [
         {
@@ -186,7 +189,8 @@ describe('GuideRequestService', () => {
       const fetchCall = mockFetch.mock.calls[0];
       const fetchOptions = fetchCall[1] as RequestInit & { dispatcher?: unknown };
 
-      // When no proxy is configured, dispatcher should be undefined
+      // When no proxy is configured, the custom fetchApi should not be provided,
+      // so dispatcher should not be in the options
       expect(fetchOptions.dispatcher).toBeUndefined();
     });
   });
