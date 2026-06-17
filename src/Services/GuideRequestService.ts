@@ -46,7 +46,7 @@ export class GuideRequestService {
     const proxyAgent = RequestHelpers.getHttpAgent();
     const fetchApi: FetchAPI | undefined = proxyAgent
       ? (url: string | URL | Request, init?: RequestInit) =>
-          fetch(url, { ...init, dispatcher: proxyAgent })
+          fetch(url, { ...init, dispatcher: proxyAgent } as unknown as RequestInit)
       : undefined;
 
     // OSSIndexCompatibilityApi only supports HTTP Basic auth.
