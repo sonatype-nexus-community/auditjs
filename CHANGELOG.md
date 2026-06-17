@@ -1,3 +1,11 @@
+## [5.0.2](https://github.com/sonatype-nexus-community/auditjs/compare/v5.0.1...v5.0.2) (2026-06-17)
+
+
+### Bug Fixes
+
+* **proxy:** add forward proxy support for GuideRequestService ([566ecf8](https://github.com/sonatype-nexus-community/auditjs/commit/566ecf8c66f9f306eaadabee40c7650a318cb30b)), closes [#297](https://github.com/sonatype-nexus-community/auditjs/issues/297)
+* Support forward proxy when communicating with Sonatype Guide. ([1907c98](https://github.com/sonatype-nexus-community/auditjs/commit/1907c9802c3e1161e506e077014657b8b6dfe2d6))
+
 ## [5.0.1](https://github.com/sonatype-nexus-community/auditjs/compare/v5.0.0...v5.0.1) (2026-05-26)
 
 
