@@ -20,6 +20,7 @@ import { OSSIndexCompatibilityApi } from '@sonatype/sonatype-guide-api-client';
 import type { InitOverrideFunction } from '@sonatype/sonatype-guide-api-client';
 import { Coordinates } from '../Types/Coordinates';
 import { rmSync, existsSync } from 'node:fs';
+import { ProxyAgent } from 'undici';
 
 // node-persist is mocked globally so tests never touch the filesystem cache.
 vi.mock('node-persist', () => ({
@@ -36,12 +37,19 @@ const CACHE_PATH = '/tmp/.sonatype-guide-test';
 const SERVER = 'https://api.guide.sonatype.com';
 
 describe('GuideRequestService', () => {
+  const mockFetch = vi.fn();
+
   beforeEach(() => {
     if (existsSync(CACHE_PATH)) rmSync(CACHE_PATH, { recursive: true, force: true });
+    vi.stubGlobal('fetch', mockFetch);
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    delete process.env.http_proxy;
+    delete process.env.https_proxy;
+    mockFetch.mockClear();
   });
 
   it('sends Authorization: Bearer when accessToken is set (PAT token mode)', async () => {
@@ -117,6 +125,51 @@ describe('GuideRequestService', () => {
       // No HTTP request should be made; the result is an empty array rather than an error.
       expect(getResultsSpy).not.toHaveBeenCalled();
       expect(result).toEqual([]);
+    });
+  });
+
+  describe('proxy support', () => {
+    const mockSuccessResponse = {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: vi.fn().mockResolvedValue([
+        {
+          coordinates: 'pkg:npm/test@1.0.0',
+          reference: 'https://guide.sonatype.com/blah',
+          vulnerabilities: [],
+        },
+      ]),
+    };
+
+    it('should pass ProxyAgent as dispatcher when http_proxy is set', async () => {
+      process.env.http_proxy = 'http://proxy.example.com:8080';
+      mockFetch.mockResolvedValueOnce(mockSuccessResponse);
+
+      const svc = new GuideRequestService('user', 'token', CACHE_PATH, SERVER);
+      const coords = [new Coordinates('test', '1.0.0')];
+      await svc.callGuideOrGetFromCache(coords, 'npm');
+
+      // Verify fetch was called with a dispatcher (ProxyAgent)
+      expect(mockFetch).toHaveBeenCalled();
+      const fetchOptions = mockFetch.mock.calls[0][1] as RequestInit & { dispatcher?: ProxyAgent };
+      expect(fetchOptions.dispatcher).toBeDefined();
+      expect(fetchOptions.dispatcher).toBeInstanceOf(ProxyAgent);
+    });
+
+    it('should not include dispatcher when no proxy is configured', async () => {
+      // Ensure no proxy env vars are set before creating service
+      delete process.env.http_proxy;
+      delete process.env.https_proxy;
+      mockFetch.mockResolvedValueOnce(mockSuccessResponse);
+
+      const svc = new GuideRequestService('user', 'token', CACHE_PATH, SERVER);
+      const coords = [new Coordinates('test', '1.0.0')];
+      await svc.callGuideOrGetFromCache(coords, 'npm');
+
+      expect(mockFetch).toHaveBeenCalled();
+      const fetchOptions = mockFetch.mock.calls[0][1] as RequestInit & { dispatcher?: unknown };
+      expect(fetchOptions.dispatcher).toBeUndefined();
     });
   });
 });

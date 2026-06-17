@@ -18,6 +18,7 @@ import { expect, vi, describe, it, afterEach, beforeEach } from 'vitest';
 import { OssIndexRequestService } from './OssIndexRequestService';
 import { Coordinates } from '../Types/Coordinates';
 import { rmSync, existsSync } from 'fs';
+import { ProxyAgent } from 'undici';
 
 // This will only work on Linux/OS X; find a better Windows-friendly path
 const CACHE_LOCATION = '/tmp/.ossindex';
@@ -34,6 +35,8 @@ describe('OssIndexRequestService', () => {
   afterEach(() => {
     vi.clearAllMocks();
     vi.unstubAllGlobals();
+    delete process.env.http_proxy;
+    delete process.env.https_proxy;
   });
 
   it('should have its request rejected when the OSS Index server is down', async () => {
@@ -65,5 +68,35 @@ describe('OssIndexRequestService', () => {
     const coords = [new Coordinates('commander', '2.12.2', '@types')];
     const result = await requestService.callOSSIndexOrGetFromCache(coords);
     expect(result).toEqual(expectedOutput);
+  });
+
+  it('should pass ProxyAgent as dispatcher when http_proxy is set', async () => {
+    if (existsSync(CACHE_LOCATION)) rmSync(CACHE_LOCATION, { recursive: true, force: true });
+    process.env.http_proxy = 'http://proxy.example.com:8080';
+
+    const expectedOutput = [
+      {
+        coordinates: 'pkg:npm/test@1.0.0',
+        reference: 'https://ossindex.sonatype.org/blah',
+        vulnerabilities: [],
+      },
+    ];
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      statusText: 'OK',
+      json: vi.fn().mockResolvedValue(expectedOutput),
+    });
+
+    const requestService = new OssIndexRequestService(undefined, undefined, CACHE_LOCATION, OSS_INDEX_BASE_URL);
+    const coords = [new Coordinates('test', '1.0.0')];
+    await requestService.callOSSIndexOrGetFromCache(coords);
+
+    // Verify fetch was called with a dispatcher (ProxyAgent)
+    expect(mockFetch).toHaveBeenCalled();
+    const fetchCall = mockFetch.mock.calls[0];
+    const fetchOptions = fetchCall[1] as RequestInit & { dispatcher?: ProxyAgent };
+    expect(fetchOptions.dispatcher).toBeDefined();
+    expect(fetchOptions.dispatcher).toBeInstanceOf(ProxyAgent);
   });
 });

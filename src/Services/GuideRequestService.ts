@@ -15,12 +15,13 @@
  */
 
 import { OSSIndexCompatibilityApi, RecommendationsApi, Configuration } from '@sonatype/sonatype-guide-api-client';
-import type { RecommendationResponse, InitOverrideFunction } from '@sonatype/sonatype-guide-api-client';
+import type { RecommendationResponse, InitOverrideFunction, FetchAPI } from '@sonatype/sonatype-guide-api-client';
 import NodePersist from 'node-persist';
 import path from 'path';
 import { homedir } from 'os';
 import { Coordinates } from '../Types/Coordinates';
 import { OssIndexServerResultJSON } from '../Types/OssIndexServerResult';
+import { RequestHelpers } from './RequestHelpers';
 
 const GUIDE_BASE_URL = 'https://api.guide.sonatype.com';
 
@@ -41,20 +42,27 @@ export class GuideRequestService {
     readonly server: string = GUIDE_BASE_URL,
     readonly accessToken?: string,
   ) {
+    // Create a custom fetch wrapper that includes proxy support via dispatcher
+    const proxyAgent = RequestHelpers.getHttpAgent();
+    const fetchApi: FetchAPI | undefined = proxyAgent
+      ? (url: string | URL | Request, init?: RequestInit) =>
+          fetch(url, { ...init, dispatcher: proxyAgent } as unknown as RequestInit)
+      : undefined;
+
     // OSSIndexCompatibilityApi only supports HTTP Basic auth.
     // In PAT-only mode (no username), send the PAT as password with empty username
     // so the generated client includes an Authorization: Basic :<PAT> header.
     const ossUsername = username ?? (accessToken ? '' : undefined);
     const ossPassword = token ?? accessToken;
     this.api = new OSSIndexCompatibilityApi(
-      new Configuration({ username: ossUsername, password: ossPassword, basePath: server }),
+      new Configuration({ username: ossUsername, password: ossPassword, basePath: server, fetchApi }),
     );
 
     // RecommendationsApi supports Bearer auth; fall back to Basic when username is present.
     const recConfig =
       accessToken && !username
-        ? new Configuration({ accessToken, basePath: server })
-        : new Configuration({ username, password: token, basePath: server });
+        ? new Configuration({ accessToken, basePath: server, fetchApi })
+        : new Configuration({ username, password: token, basePath: server, fetchApi });
     this.recommendationsApi = new RecommendationsApi(recConfig);
   }
 
